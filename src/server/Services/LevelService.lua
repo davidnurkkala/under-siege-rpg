@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local Comm = require(ReplicatedStorage.Packages.Comm)
-local Lapis = require(ServerScriptService.ServerPackages.Lapis)
+local DataService = require(ServerScriptService.Server.Services.DataService)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 
 local LevelService = {
@@ -19,26 +19,34 @@ function LevelService.PrepareBlocking(self: LevelService)
 	self.PrestigeCountRemote = self.Comm:CreateProperty("PrestigeCount", 0)
 
 	Observers.observePlayer(function(player)
-		local promise = self.Collection:load(player.UserId):andThen(function(document)
-			self.DocumentsByPlayer[player] = document
+		local promise = DataService:GetSaveFile(player):andThen(function(saveFile)
+			saveFile:Observe("Level", function(level)
+				self.LevelRemote:SetFor(player, level)
+			end)
 
-			local data = document:read()
-			self.LevelRemote:SetFor(player, data.Level)
-			self.ExperienceRemote:SetFor(player, data.Experience)
-			self.PrestigeCountRemote:SetFor(player, data.PrestigeCount)
+			saveFile:Observe("Experience", function(experience)
+				self.ExperienceRemote:SetFor(player, experience)
+			end)
+
+			saveFile:Observe("PrestigeCount", function(prestigeCount)
+				self.PrestigeCountRemote:SetFor(player, prestigeCount)
+			end)
 		end)
 
 		return function()
 			promise:cancel()
-
-			if self.DocumentsByPlayer[player] then
-				self.DocumentsByPlayer[player]:close()
-				self.DocumentsByPlayer[player] = nil
-			end
 		end
 	end)
 end
 
-function LevelService.Start(self: LevelService) end
+function LevelService.Start(_self: LevelService) end
+
+function LevelService.AddExperience(_self: LevelService, player: Player, amount: number)
+	return DataService:GetSaveFile(player):andThen(function(saveFile)
+		saveFile:Update("Experience", function(oldExperience)
+			return oldExperience + amount
+		end)
+	end)
+end
 
 return LevelService
