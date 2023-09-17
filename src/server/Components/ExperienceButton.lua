@@ -1,11 +1,9 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local Animate = require(ReplicatedStorage.Shared.Util.Animate)
 local LevelService = require(ServerScriptService.Server.Services.LevelService)
-local Promise = require(ReplicatedStorage.Packages.Promise)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
 local ExperienceButton = {}
