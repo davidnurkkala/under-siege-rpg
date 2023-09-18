@@ -25,7 +25,7 @@ function DataService.PrepareBlocking(self: DataService)
 			return true
 		end,
 		defaultData = {
-			Level = 0,
+			Level = 1,
 			Experience = 0,
 			PrestigeCount = 0,
 		},

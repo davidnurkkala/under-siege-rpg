@@ -12,6 +12,14 @@ local LevelService = {
 
 type LevelService = typeof(LevelService)
 
+local function getMaxLevel(prestigeCount: number): number
+	return 100 + prestigeCount * 10
+end
+
+local function getRequiredExperienceAtLevel(level: number): number
+	return level * 25
+end
+
 function LevelService.PrepareBlocking(self: LevelService)
 	self.Comm = Comm.ServerComm.new(ReplicatedStorage, "LevelService")
 	self.LevelRemote = self.Comm:CreateProperty("Level", 0)
@@ -43,9 +51,27 @@ function LevelService.Start(_self: LevelService) end
 
 function LevelService.AddExperience(_self: LevelService, player: Player, amount: number)
 	return DataService:GetSaveFile(player):andThen(function(saveFile)
-		saveFile:Update("Experience", function(oldExperience)
-			return oldExperience + amount
-		end)
+		local maxLevel = getMaxLevel(saveFile:Get("PrestigeCount"))
+		if saveFile:Get("Level") >= maxLevel then return end
+
+		local newExperience = saveFile:Get("Experience") + amount
+
+		repeat
+			local level = saveFile:Get("Level")
+			if level >= maxLevel then
+				newExperience = 0
+				break
+			end
+
+			local req = getRequiredExperienceAtLevel(level)
+			local leveledUp = newExperience >= req
+			if leveledUp then
+				newExperience -= req
+				saveFile:Set("Level", level + 1)
+			end
+		until not leveledUp
+
+		saveFile:Set("Experience", newExperience)
 	end)
 end
 

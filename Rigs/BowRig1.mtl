@@ -1,0 +1,30 @@
+newmtl Rig171Mtl
+Material Color
+Ka 0.151058 0.0962661 0.0677246
+Kd 0.151058 0.0962661 0.0677246
+Ks 0.0598308 0.0381289 0.0268243 
+
+d 1
+
+Ns 0
+
+newmtl Rig161Mtl
+Material Color
+Ka 0.215764 0.215764 0.215764
+Kd 0.215764 0.215764 0.215764
+Ks 0.0135382 0.0135382 0.0135382 
+
+d 1
+
+Ns 0
+
+newmtl Meta1q1pmrhe2lhei5hwituojqw443gn5zg2ir2lmycymzogaydoq11Mtl
+Material Color
+Ka 0.373615 0.368591 0.383775
+Kd 0.373615 0.368591 0.383775
+Ks 0.0234425 0.0231273 0.02408 
+
+d 1
+
+Ns 0
+
