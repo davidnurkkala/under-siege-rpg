@@ -28,6 +28,12 @@ function DataService.PrepareBlocking(self: DataService)
 			Level = 1,
 			Experience = 0,
 			PrestigeCount = 0,
+			Weapons = {
+				Equipped = "WoodenBow",
+				Owned = {
+					WoodenBow = true,
+				},
+			},
 		},
 	})
 

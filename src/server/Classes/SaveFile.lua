@@ -62,7 +62,7 @@ function SaveFile.Set(self: SaveFile, key: string, value: any)
 	local set = self.Observers[key]
 	if set then
 		for observer in set do
-			observer.Callback(value)
+			task.spawn(observer.Callback, value)
 		end
 	end
 end

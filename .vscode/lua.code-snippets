@@ -1,0 +1,19 @@
+{
+	"service": {
+		"prefix": "service",
+		"body": [
+			"local $TM_FILENAME_BASE = {",
+			"\tPriority = 0,",
+			"}",
+			"",
+			"type $TM_FILENAME_BASE = typeof($TM_FILENAME_BASE)",
+			"",
+			"function $TM_FILENAME_BASE.PrepareBlocking(self: $TM_FILENAME_BASE) end",
+			"",
+			"function $TM_FILENAME_BASE.Start(self: $TM_FILENAME_BASE) end",
+			"",
+			"return $TM_FILENAME_BASE",
+			""
+		]
+	}
+}
