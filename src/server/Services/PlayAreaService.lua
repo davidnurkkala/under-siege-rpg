@@ -4,12 +4,21 @@ local PlayAreaService = {
 	Priority = 0,
 }
 
+local TrainingDummy: Model = nil
+local Model: Model = nil
+
 type PlayAreaService = typeof(PlayAreaService)
 
 function PlayAreaService.Start(_self: PlayAreaService)
-	local playArea = ReplicatedStorage.Assets.Models.PlayArea:Clone()
-	playArea:PivotTo(CFrame.new())
-	playArea.Parent = workspace
+	Model = ReplicatedStorage.Assets.Models.PlayArea:Clone()
+	Model:PivotTo(CFrame.new())
+	Model.Parent = workspace
+
+	TrainingDummy = Model:FindFirstChild("TrainingDummy") :: Model
+end
+
+function PlayAreaService.GetTrainingDummy(_self: PlayAreaService)
+	return TrainingDummy
 end
 
 return PlayAreaService

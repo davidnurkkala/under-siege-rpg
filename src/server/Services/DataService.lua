@@ -1,10 +1,13 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local Configuration = require(ReplicatedStorage.Shared.Configuration)
 local Lapis = require(ServerScriptService.ServerPackages.Lapis)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local SaveFile = require(ServerScriptService.Server.Classes.SaveFile)
+
+local COLLECTION_NAME = "DataService" .. Configuration.DataStoreVersion
 
 local DataService = {
 	Priority = -1024,
@@ -20,7 +23,7 @@ local function getDocumentKey(player: Player): string
 end
 
 function DataService.PrepareBlocking(self: DataService)
-	self.Collection = Lapis.createCollection("DataService", {
+	self.Collection = Lapis.createCollection(COLLECTION_NAME, {
 		validate = function()
 			return true
 		end,

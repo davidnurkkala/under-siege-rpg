@@ -11,6 +11,6 @@ return function(duration, callback)
 	return Promise.fromEvent(RunService.Heartbeat, function(dt)
 		timer = math.min(duration, timer + dt)
 		callback(timer / duration)
-		return timer == 1
+		return timer == duration
 	end)
 end

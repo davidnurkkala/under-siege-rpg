@@ -10,7 +10,7 @@ local Ids = {
 return Sift.Dictionary.map(Ids, function(id, name)
 	local animation = Instance.new("Animation")
 	animation.Name = name
-	animation.AnimationId = id
+	animation.AnimationId = `rbxassetid://{id}`
 
 	return animation, name
 end)

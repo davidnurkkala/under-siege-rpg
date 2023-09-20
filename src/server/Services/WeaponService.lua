@@ -16,7 +16,7 @@ type WeaponService = typeof(WeaponService)
 
 function WeaponService.PrepareBlocking(self: WeaponService)
 	self.Comm = Comm.ServerComm.new(ReplicatedStorage, "WeaponService")
-	self.WeaponRemote = self.Comm:CreateProperty("Weapon", {
+	self.WeaponsRemote = self.Comm:CreateProperty("Weapons", {
 		Equipped = nil,
 		Owned = {},
 	})
@@ -24,7 +24,7 @@ function WeaponService.PrepareBlocking(self: WeaponService)
 	Observers.observePlayer(function(player)
 		local promise = DataService:GetSaveFile(player):andThen(function(saveFile)
 			saveFile:Observe("Weapons", function(weapons)
-				self.WeaponRemote:SetFor(player, Sift.Dictionary.copyDeep(weapons))
+				self.WeaponsRemote:SetFor(player, Sift.Dictionary.copyDeep(weapons))
 			end)
 		end)
 
@@ -36,7 +36,13 @@ end
 
 function WeaponService.Start(_self: WeaponService) end
 
-function WeaponService:EquipWeapon(_self: WeaponService, player: Player, weaponId: string)
+function WeaponService.GetEquippedWeapon(_self: WeaponService, player: Player)
+	return DataService:GetSaveFile(player):andThen(function(saveFile)
+		return saveFile:Get("Weapons").Equipped
+	end)
+end
+
+function WeaponService.EquipWeapon(_self: WeaponService, player: Player, weaponId: string)
 	return DataService:GetSaveFile(player):andThen(function(saveFile)
 		local weapons = saveFile:Get("Weapons")
 		if weapons.Equipped == weaponId then return false end
@@ -48,7 +54,7 @@ function WeaponService:EquipWeapon(_self: WeaponService, player: Player, weaponI
 	end)
 end
 
-function WeaponService:UnlockWeapon(_self: WeaponService, player: Player, weaponId: string)
+function WeaponService.UnlockWeapon(_self: WeaponService, player: Player, weaponId: string)
 	if not WeaponDefs[weaponId] then return Promise.resolve(false) end
 
 	return DataService:GetSaveFile(player):andThen(function(saveFile)
