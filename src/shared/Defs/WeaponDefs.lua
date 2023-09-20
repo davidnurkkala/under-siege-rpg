@@ -11,6 +11,10 @@ local Weapons = {
 			Idle = "BowIdle",
 			Shoot = "BowShoot",
 		},
+		Sounds = {
+			Shoot = { "BowShoot1", "BowShoot2", "BowShoot3" },
+			Hit = { "BowHit1", "BowHit2", "BowHit3", "BowHit4" },
+		},
 	},
 }
 

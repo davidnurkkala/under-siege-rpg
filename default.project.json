@@ -32,6 +32,12 @@
       }
     },
 
+    "Workspace": {
+      "Effects": {
+        "$className": "Folder"
+      }
+    },
+
     "SoundService": {
       "$properties": {
         "RespectFilteringEnabled": true

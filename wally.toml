@@ -19,6 +19,7 @@ Comm = "sleitnick/comm@0.3.1"
 Input = "sleitnick/input@2.1.1"
 WaitFor = "sleitnick/wait-for@0.2.2"
 Observers = "sleitnick/observers@^0.3.3"
+Shake = "sleitnick/shake@0.1.7"
 
 [server-dependencies]
 Cmdr = "evaera/cmdr@1.11.0"

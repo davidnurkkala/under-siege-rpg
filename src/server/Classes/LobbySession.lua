@@ -1,11 +1,16 @@
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local ActionService = require(ServerScriptService.Server.Services.ActionService)
-local Animate = require(ReplicatedStorage.Shared.Util.Animate)
 local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
+local EffectEmission = require(ReplicatedStorage.Shared.Effects.EffectEmission)
+local EffectFaceTarget = require(ReplicatedStorage.Shared.Effects.EffectFaceTarget)
+local EffectProjectile = require(ReplicatedStorage.Shared.Effects.EffectProjectile)
+local EffectService = require(ServerScriptService.Server.Services.EffectService)
+local EffectShakeModel = require(ReplicatedStorage.Shared.Effects.EffectShakeModel)
+local EffectSound = require(ReplicatedStorage.Shared.Effects.EffectSound)
 local LevelService = require(ServerScriptService.Server.Services.LevelService)
+local PickRandom = require(ReplicatedStorage.Shared.Util.PickRandom)
 local PlayAreaService = require(ServerScriptService.Server.Services.PlayAreaService)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Trove = require(ReplicatedStorage.Packages.Trove)
@@ -38,12 +43,27 @@ function LobbySession.new(args: {
 
 	local model = trove:Clone(args.WeaponDef.Model)
 	do
+		model.Parent = args.Character
+
 		local part1 = model.Weapon
 		local part0 = args.HoldPart
 		local motor = part1.Grip
-		motor.Part0 = part0
 		motor.Part1 = part1
-		model.Parent = args.Character
+		motor.Part0 = part0
+		motor.Enabled = true
+
+		task.defer(function()
+			print(motor.Parent)
+			print(motor.Part1)
+			print(motor.Part0)
+		end)
+
+		task.delay(1, function()
+			print(motor.Parent)
+			print(motor.Part1)
+			print(motor.Part0)
+			motor.Enabled = true
+		end)
 	end
 
 	local animator = trove:Construct(Animator, args.Human)
@@ -65,29 +85,56 @@ function LobbySession.new(args: {
 
 		self.Animator:Play(self.WeaponDef.Animations.Shoot, 0)
 
+		local dummy = PlayAreaService:GetTrainingDummy()
+
+		EffectService:Effect(
+			self.Player,
+			EffectFaceTarget({
+				Root = self.Character.PrimaryPart,
+				Target = dummy,
+				Duration = 0.25,
+			})
+		)
+
 		-- temporary!!
 		Promise.delay(0.05)
 			:andThen(function()
-				local arrow = ReplicatedStorage.Assets.Models.Arrow1:Clone()
-				arrow.Parent = workspace
-
 				local part = self.Model:FindFirstChild("Weapon")
 				local here = part.Position
-				local there = PlayAreaService:GetTrainingDummy():GetPivot().Position
+				local there = dummy.Body.Core.WorldPosition
 				local start = CFrame.lookAt(here, there)
 				local finish = start - here + there
-				local distance = (there - here).Magnitude
-				local speed = 96
-				local duration = distance / speed
 
-				return Animate(duration, function(scalar)
-					arrow:PivotTo(start:Lerp(finish, scalar))
-				end):andThenReturn(arrow)
+				return EffectService:All(
+					EffectProjectile({
+						Model = ReplicatedStorage.Assets.Models.Arrow1,
+						Start = start,
+						Finish = finish,
+						Speed = 128,
+					}),
+					EffectSound({
+						SoundId = PickRandom(self.WeaponDef.Sounds.Shoot),
+						Parent = part,
+					})
+				)
 			end)
-			:andThen(function(arrow)
-				arrow:Destroy()
-
+			:andThen(function()
 				LevelService:AddExperience(self.Player, self.WeaponDef.Power)
+
+				EffectService:All(
+					EffectEmission({
+						Emitter = ReplicatedStorage.Assets.Emitters.Impact1,
+						ParticleCount = 2,
+						Target = dummy.Body.Core,
+					}),
+					EffectSound({
+						SoundId = PickRandom(self.WeaponDef.Sounds.Hit),
+						Parent = dummy.Body,
+					}),
+					EffectShakeModel({
+						Model = dummy,
+					})
+				)
 			end)
 	end)
 
@@ -107,6 +154,7 @@ function LobbySession.promised(player: Player)
 
 			local holdPart = character:WaitForChild(def.HoldPartName, 5)
 			local human = character:WaitForChild("Humanoid", 5)
+			task.wait(1)
 			if not (holdPart and human) then return Promise.reject("Bad character") end
 
 			return LobbySession.new({
