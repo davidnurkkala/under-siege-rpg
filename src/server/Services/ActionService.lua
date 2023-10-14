@@ -1,5 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 
+local ActionServiceSubscription = require(ServerScriptService.Server.Classes.ActionServiceSubscription)
 local Comm = require(ReplicatedStorage.Packages.Comm)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 
@@ -26,5 +28,9 @@ function ActionService.PrepareBlocking(self: ActionService)
 end
 
 function ActionService.Start(self: ActionService) end
+
+function ActionService.Subscribe(self: ActionService, player: Player, actionName: string, callback: (number) -> ())
+	return ActionServiceSubscription.new(player, actionName, callback, self)
+end
 
 return ActionService

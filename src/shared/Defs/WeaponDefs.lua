@@ -6,6 +6,7 @@ local Weapons = {
 	WoodenBow = {
 		Name = "Wooden Bow",
 		Power = 1,
+		AttackCooldownTime = 0.4,
 		HoldPartName = "LeftHand",
 		Animations = {
 			Idle = "BowIdle",

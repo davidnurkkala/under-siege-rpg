@@ -3,6 +3,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 
 local ActionService = require(ServerScriptService.Server.Services.ActionService)
 local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
+local Cooldown = require(ReplicatedStorage.Shared.Classes.Cooldown)
 local EffectEmission = require(ReplicatedStorage.Shared.Effects.EffectEmission)
 local EffectFaceTarget = require(ReplicatedStorage.Shared.Effects.EffectFaceTarget)
 local EffectProjectile = require(ReplicatedStorage.Shared.Effects.EffectProjectile)
@@ -28,6 +29,7 @@ type LobbySession = typeof(setmetatable(
 		Model: Model,
 		Animator: Animator.Animator,
 		WeaponDef: any,
+		AttackCooldown: Cooldown.Cooldown,
 	},
 	LobbySession
 ))
@@ -51,19 +53,6 @@ function LobbySession.new(args: {
 		motor.Part1 = part1
 		motor.Part0 = part0
 		motor.Enabled = true
-
-		task.defer(function()
-			print(motor.Parent)
-			print(motor.Part1)
-			print(motor.Part0)
-		end)
-
-		task.delay(1, function()
-			print(motor.Parent)
-			print(motor.Part1)
-			print(motor.Part0)
-			motor.Enabled = true
-		end)
 	end
 
 	local animator = trove:Construct(Animator, args.Human)
@@ -75,68 +64,14 @@ function LobbySession.new(args: {
 		Model = model,
 		Animator = animator,
 		WeaponDef = args.WeaponDef,
+		AttackCooldown = Cooldown.new(args.WeaponDef.AttackCooldownTime),
 	}, LobbySession)
 
 	self.Animator:Play(self.WeaponDef.Animations.Idle)
 
-	self.Trove:Connect(ActionService.ActionStarted, function(player, actionName)
-		if player ~= self.Player then return end
-		if actionName ~= "Primary" then return end
-
-		self.Animator:Play(self.WeaponDef.Animations.Shoot, 0)
-
-		local dummy = PlayAreaService:GetTrainingDummy()
-
-		EffectService:Effect(
-			self.Player,
-			EffectFaceTarget({
-				Root = self.Character.PrimaryPart,
-				Target = dummy,
-				Duration = 0.25,
-			})
-		)
-
-		-- temporary!!
-		Promise.delay(0.05)
-			:andThen(function()
-				local part = self.Model:FindFirstChild("Weapon")
-				local here = part.Position
-				local there = dummy.Body.Core.WorldPosition
-				local start = CFrame.lookAt(here, there)
-				local finish = start - here + there
-
-				return EffectService:All(
-					EffectProjectile({
-						Model = ReplicatedStorage.Assets.Models.Arrow1,
-						Start = start,
-						Finish = finish,
-						Speed = 128,
-					}),
-					EffectSound({
-						SoundId = PickRandom(self.WeaponDef.Sounds.Shoot),
-						Parent = part,
-					})
-				)
-			end)
-			:andThen(function()
-				LevelService:AddExperience(self.Player, self.WeaponDef.Power)
-
-				EffectService:All(
-					EffectEmission({
-						Emitter = ReplicatedStorage.Assets.Emitters.Impact1,
-						ParticleCount = 2,
-						Target = dummy.Body.Core,
-					}),
-					EffectSound({
-						SoundId = PickRandom(self.WeaponDef.Sounds.Hit),
-						Parent = dummy.Body,
-					}),
-					EffectShakeModel({
-						Model = dummy,
-					})
-				)
-			end)
-	end)
+	trove:Add(ActionService:Subscribe(self.Player, "Primary", function()
+		self:Attack()
+	end))
 
 	return self
 end
@@ -150,22 +85,93 @@ function LobbySession.promised(player: Player)
 		end
 	end):andThen(function(character)
 		return WeaponService:GetEquippedWeapon(player):andThen(function(weaponId)
-			local def = WeaponDefs[weaponId]
+			return Promise.new(function(resolve, reject, onCancel)
+				local def = WeaponDefs[weaponId]
 
-			local holdPart = character:WaitForChild(def.HoldPartName, 5)
-			local human = character:WaitForChild("Humanoid", 5)
-			task.wait(1)
-			if not (holdPart and human) then return Promise.reject("Bad character") end
+				local holdPart = character:WaitForChild(def.HoldPartName, 5)
+				local human = character:WaitForChild("Humanoid", 5)
 
-			return LobbySession.new({
-				Player = player,
-				Character = character,
-				WeaponDef = def,
-				HoldPart = holdPart,
-				Human = human,
-			})
+				if onCancel() then return end
+
+				if not (holdPart and human) then
+					reject("Bad character")
+					return
+				end
+
+				while not character.Parent do
+					task.wait()
+				end
+
+				if onCancel() then return end
+
+				resolve(LobbySession.new({
+					Player = player,
+					Character = character,
+					WeaponDef = def,
+					HoldPart = holdPart,
+					Human = human,
+				}))
+			end)
 		end)
 	end)
+end
+
+function LobbySession.Attack(self: LobbySession)
+	if not self.AttackCooldown:IsReady() then return end
+	self.AttackCooldown:Use()
+
+	self.Animator:Play(self.WeaponDef.Animations.Shoot, 0)
+
+	local dummy = PlayAreaService:GetTrainingDummy()
+
+	EffectService:Effect(
+		self.Player,
+		EffectFaceTarget({
+			Root = self.Character.PrimaryPart,
+			Target = dummy,
+			Duration = 0.25,
+		})
+	)
+
+	return Promise.delay(0.05)
+		:andThen(function()
+			local part = self.Model:FindFirstChild("Weapon")
+			local here = part.Position
+			local there = dummy.Body.Core.WorldPosition
+			local start = CFrame.lookAt(here, there)
+			local finish = start - here + there
+
+			return EffectService:All(
+				EffectProjectile({
+					Model = ReplicatedStorage.Assets.Models.Arrow1,
+					Start = start,
+					Finish = finish,
+					Speed = 128,
+				}),
+				EffectSound({
+					SoundId = PickRandom(self.WeaponDef.Sounds.Shoot),
+					Parent = part,
+				})
+			)
+		end)
+		:andThen(function()
+			LevelService:AddExperience(self.Player, self.WeaponDef.Power)
+
+			EffectService:All(
+				EffectEmission({
+					Emitter = ReplicatedStorage.Assets.Emitters.Impact1,
+					ParticleCount = 2,
+					Target = dummy.Body.Core,
+				}),
+				EffectSound({
+					SoundId = PickRandom(self.WeaponDef.Sounds.Hit),
+					Parent = dummy.Body,
+				}),
+				EffectShakeModel({
+					Model = dummy,
+				})
+			)
+		end)
 end
 
 function LobbySession.Destroy(self: LobbySession)

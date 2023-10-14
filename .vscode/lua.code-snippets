@@ -22,7 +22,7 @@
 			"local $TM_FILENAME_BASE = {}",
 			"$TM_FILENAME_BASE.__index = $TM_FILENAME_BASE",
 			"",
-			"type $TM_FILENAME_BASE = typeof(setmetatable({} :: {",
+			"export type $TM_FILENAME_BASE = typeof(setmetatable({} :: {",
 			"",
 			"}, $TM_FILENAME_BASE))",
 			"",
