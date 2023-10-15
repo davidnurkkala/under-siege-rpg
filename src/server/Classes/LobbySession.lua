@@ -88,6 +88,12 @@ function LobbySession.promised(player: Player)
 			return Promise.new(function(resolve, reject, onCancel)
 				local def = WeaponDefs[weaponId]
 
+				while not character:IsDescendantOf(workspace) do
+					task.wait()
+				end
+
+				if onCancel() then return end
+
 				local holdPart = character:WaitForChild(def.HoldPartName, 5)
 				local human = character:WaitForChild("Humanoid", 5)
 
@@ -98,7 +104,7 @@ function LobbySession.promised(player: Player)
 					return
 				end
 
-				while not character.Parent do
+				while not holdPart:IsDescendantOf(workspace) do
 					task.wait()
 				end
 
