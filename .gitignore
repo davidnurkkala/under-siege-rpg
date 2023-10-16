@@ -8,6 +8,9 @@ game.rbxlx
 
 *.ptex.mmcr
 
+api-key.txt
+place-id.txt
+
 sourcemap.json
 Packages
 ServerPackages
