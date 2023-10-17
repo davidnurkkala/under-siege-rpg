@@ -11,6 +11,7 @@ local EffectService = require(ServerScriptService.Server.Services.EffectService)
 local EffectShakeModel = require(ReplicatedStorage.Shared.Effects.EffectShakeModel)
 local EffectSound = require(ReplicatedStorage.Shared.Effects.EffectSound)
 local LevelService = require(ServerScriptService.Server.Services.LevelService)
+local LobbySessions = require(ServerScriptService.Server.Singletons.LobbySessions)
 local PickRandom = require(ReplicatedStorage.Shared.Util.PickRandom)
 local PlayAreaService = require(ServerScriptService.Server.Services.PlayAreaService)
 local Promise = require(ReplicatedStorage.Packages.Promise)
@@ -41,6 +42,8 @@ function LobbySession.new(args: {
 	HoldPart: BasePart,
 	Human: Humanoid,
 }): LobbySession
+	assert(LobbySessions.Get(args.Player) == nil, `Player already has a lobby session`)
+
 	local trove = Trove.new()
 
 	local model = trove:Clone(args.WeaponDef.Model)
@@ -73,11 +76,21 @@ function LobbySession.new(args: {
 		self:Attack()
 	end))
 
+	LobbySessions.Add(self.Player, self)
+	trove:Add(function()
+		LobbySessions.Remove(self.Player)
+	end)
+
 	return self
 end
 
 function LobbySession.promised(player: Player)
-	return Promise.new(function(resolve)
+	return Promise.new(function(resolve, reject)
+		if LobbySessions.Get(player) then
+			reject("Player already has a lobby session")
+			return
+		end
+
 		if player.Character then
 			resolve(player.Character)
 		else
