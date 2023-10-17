@@ -1,9 +1,14 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local BattleService = require(ServerScriptService.Server.Services.BattleService)
 local Battler = require(ServerScriptService.Server.Classes.Battler)
 local PartPath = require(ReplicatedStorage.Shared.Classes.PartPath)
+local PlayerBattler = require(ServerScriptService.Server.Classes.PlayerBattler)
 local Promise = require(ReplicatedStorage.Packages.Promise)
+local Sift = require(ReplicatedStorage.Packages.Sift)
+local Signal = require(ReplicatedStorage.Packages.Signal)
+local Trove = require(ReplicatedStorage.Packages.Trove)
 local Updater = require(ReplicatedStorage.Shared.Classes.Updater)
 
 local Battle = {}
@@ -28,7 +33,7 @@ type BattlegroundModel = Model & {
 
 export type Battle = typeof(setmetatable(
 	{} :: {
-		Battlers: { Battler.Battler },
+		Battlers: { any },
 		Field: { [Fieldable]: boolean },
 		Model: BattlegroundModel,
 		Path: PartPath.PartPath,
@@ -48,6 +53,9 @@ function Battle.new(args: {
 		Model = args.Model,
 		Field = {},
 		Path = PartPath.new(pathFolder),
+		Trove = Trove.new(),
+		Destroyed = Signal.new(),
+		Changed = Signal.new(),
 	}, Battle)
 
 	self.Model:PivotTo(CFrame.new(256, 0, 0))
@@ -68,73 +76,124 @@ function Battle.new(args: {
 	self.Model.Spawns:Destroy()
 
 	self.Model.Parent = workspace
+	self.Trove:Add(self.Model)
 
 	BattleUpdater:Add(self)
+	self.Trove:Add(function()
+		BattleUpdater:Remove(self)
+	end)
+
+	for _, battler in self.Battlers do
+		self.Trove:Connect(battler.Destroyed, function()
+			self:Destroy()
+		end)
+	end
+
+	self.Trove:Add(function()
+		for object in self.Field do
+			object:Destroy()
+		end
+
+		for _, battler in self.Battlers do
+			battler:Destroy()
+		end
+	end)
 
 	return self
 end
 
-function Battle.fromPlayerVersusComputer(player: Player, battlerId: string, battlegroundName: string)
+function Battle.fromPlayerVersusBattler(player: Player, battlerId: string, battlegroundName: string)
 	-- TODO: get the castle that the player has
 
-	return Promise.new(function(resolve, reject, onCancel)
-		local char = player.Character or player.CharacterAdded:Wait()
+	return BattleService:Promise(player, function()
+		return Promise.new(function(resolve, reject, onCancel)
+			if BattleService:Get(player) then
+				reject(`Player {player} already has a battle`)
+				return
+			end
 
-		if onCancel() then return end
+			local char = player.Character or player.CharacterAdded:Wait()
 
-		while not char:IsDescendantOf(workspace) do
-			task.wait()
-		end
+			if onCancel() then return end
 
-		if onCancel() then return end
+			while not char:IsDescendantOf(workspace) do
+				task.wait()
+			end
 
-		local root = char:FindFirstChild("HumanoidRootPart")
-		if not root then
-			reject("Bad character")
-			return
-		end
+			if onCancel() then return end
 
-		resolve(char, root)
-	end):andThen(function(char, root)
-		local leftBase = ReplicatedStorage.Assets.Models.Bases.Basic:Clone()
-		root.Anchored = true
+			local root = char:FindFirstChild("HumanoidRootPart")
+			if not root then
+				reject("Bad character")
+				return
+			end
 
-		local left = Battler.new({
-			BaseModel = leftBase,
-			CharModel = char,
-			Direction = 1,
-			Position = 0,
-			HealthMax = 100,
-		})
-
-		left.Destroyed:Connect(function()
-			root.Anchored = false
+			resolve(char, root)
 		end)
+			:andThen(function(char, root)
+				local leftBase = ReplicatedStorage.Assets.Models.Bases.Basic:Clone()
+				root.Anchored = true
 
-		local rightBase = ReplicatedStorage.Assets.Models.Bases.Basic:Clone()
+				local left = PlayerBattler.new(
+					player,
+					Battler.new({
+						BaseModel = leftBase,
+						CharModel = char,
+						Direction = 1,
+						Position = 0,
+						HealthMax = 100,
+					})
+				)
 
-		local rightChar = ReplicatedStorage.Assets.Models.Battlers[battlerId]:Clone()
-		rightChar.Parent = workspace
+				left.Battler.Destroyed:Connect(function()
+					root.Anchored = false
+				end)
 
-		local right = Battler.new({
-			BaseModel = rightBase,
-			CharModel = rightChar,
-			Direction = -1,
-			Position = 1,
-			HealthMax = 100,
-		})
+				local rightBase = ReplicatedStorage.Assets.Models.Bases.Basic:Clone()
 
-		right.Destroyed:Connect(function()
-			rightChar:Destroy()
-		end)
+				local rightChar = ReplicatedStorage.Assets.Models.Battlers[battlerId]:Clone()
+				rightChar.Parent = workspace
 
-		local battleground = ReplicatedStorage.Assets.Models.Battlegrounds[battlegroundName]:Clone()
+				local right = Battler.new({
+					BaseModel = rightBase,
+					CharModel = rightChar,
+					Direction = -1,
+					Position = 1,
+					HealthMax = 100,
+				})
 
-		return Battle.new({
-			Battlers = { left, right },
-			Model = battleground,
-		})
+				right.Destroyed:Connect(function()
+					rightChar:Destroy()
+				end)
+
+				local battleground = ReplicatedStorage.Assets.Models.Battlegrounds[battlegroundName]:Clone()
+
+				return Battle.new({
+					Battlers = { left.Battler, right },
+					Model = battleground,
+				})
+			end)
+			:tap(function(battle)
+				BattleService:Add(player, battle)
+				battle.Destroyed:Connect(function()
+					BattleService:Remove(player)
+				end)
+			end)
 	end)
+end
+
+function Battle.GetStatus(self: Battle)
+	return {
+		Battlers = Sift.Array.map(self.Battlers, function(battler)
+			return battler:GetStatus()
+		end),
+	}
+end
+
+function Battle.Observe(self: Battle, callback)
+	local connection = self.Changed:Connect(callback)
+	callback(self:GetStatus())
+	return connection
 end
 
 function Battle.Add(self: Battle, object: Fieldable)
@@ -178,17 +237,8 @@ function Battle.GetVictor(self: Battle): Battler.Battler?
 end
 
 function Battle.Destroy(self: Battle)
-	self.Model:Destroy()
-
-	for object in self.Field do
-		object:Destroy()
-	end
-
-	for _, battler in self.Battlers do
-		battler:Destroy()
-	end
-
-	BattleUpdater:Remove(self)
+	self.Trove:Clean()
+	self.Destroyed:Fire()
 end
 
 return Battle

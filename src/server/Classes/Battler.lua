@@ -32,9 +32,27 @@ function Battler.new(args: {
 		BaseModel = args.BaseModel,
 		CharModel = args.CharModel,
 		Destroyed = Signal.new(),
+		Changed = Signal.new(),
 	}, Battler)
 
+	self.Health:Observe(function()
+		self.Changed:Fire(self:GetStatus())
+	end)
+
 	return self
+end
+
+function Battler.GetStatus(self: Battler)
+	return {
+		Health = self.Health:Get(),
+		HealthMax = self.Health.Max,
+	}
+end
+
+function Battler.Observe(self: Battler, callback)
+	local connection = self.Changed:Connect(callback)
+	callback(self:GetStatus())
+	return connection
 end
 
 function Battler.IsActive(self: Battler)
