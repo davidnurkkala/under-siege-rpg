@@ -14,6 +14,7 @@ local LevelService = require(ServerScriptService.Server.Services.LevelService)
 local LobbySessions = require(ServerScriptService.Server.Singletons.LobbySessions)
 local PickRandom = require(ReplicatedStorage.Shared.Util.PickRandom)
 local PlayAreaService = require(ServerScriptService.Server.Services.PlayAreaService)
+local PlayerLeaving = require(ReplicatedStorage.Shared.Util.PlayerLeaving)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local WeaponDefs = require(ReplicatedStorage.Shared.Defs.WeaponDefs)
@@ -80,6 +81,8 @@ function LobbySession.new(args: {
 	trove:Add(function()
 		LobbySessions.Remove(self.Player)
 	end)
+
+	trove:AddPromise(PlayerLeaving(self.Player):andThenCall(self.Destroy, self))
 
 	return self
 end
