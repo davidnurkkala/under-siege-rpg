@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Health = require(ReplicatedStorage.Shared.Classes.Health)
+local Promise = require(ReplicatedStorage.Packages.Promise)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 
 local Battler = {}
@@ -14,6 +15,9 @@ export type Battler = typeof(setmetatable(
 		BaseModel: Model,
 		CharModel: Model,
 		Destroyed: any,
+		Battle: any?,
+		TeamId: string,
+		Active: boolean,
 	},
 	Battler
 ))
@@ -24,6 +28,7 @@ function Battler.new(args: {
 	Direction: number,
 	BaseModel: Model,
 	CharModel: Model,
+	TeamId: string,
 }): Battler
 	local self: Battler = setmetatable({
 		Health = Health.new(args.HealthMax),
@@ -31,8 +36,10 @@ function Battler.new(args: {
 		Direction = args.Direction,
 		BaseModel = args.BaseModel,
 		CharModel = args.CharModel,
+		TeamId = args.TeamId,
 		Destroyed = Signal.new(),
 		Changed = Signal.new(),
+		Active = true,
 	}, Battler)
 
 	self.Health:Observe(function()
@@ -42,8 +49,45 @@ function Battler.new(args: {
 	return self
 end
 
+function Battler.fromBattlerId(battlerId: string, position: number, direction: number)
+	local base = ReplicatedStorage.Assets.Models.Bases.Basic:Clone()
+
+	local char = ReplicatedStorage.Assets.Models.Battlers[battlerId]:Clone()
+	char.Parent = workspace
+
+	local battler = Battler.new({
+		BaseModel = base,
+		CharModel = char,
+		Position = position,
+		Direction = direction,
+		TeamId = `NON_PLAYER_{battlerId}`,
+		HealthMax = 100,
+	})
+
+	battler.Destroyed:Connect(function()
+		char:Destroy()
+	end)
+
+	return battler
+end
+
+function Battler:GetWorldCFrame()
+	local cframe = self.BaseModel:GetBoundingBox()
+	return cframe
+end
+
+function Battler:SetBattle(battle)
+	self.Battle = battle
+end
+
+function Battler:GetBattle()
+	return self.Battle
+end
+
 function Battler.GetStatus(self: Battler)
 	return {
+		BaseModel = self.BaseModel,
+		CharModel = self.CharModel,
 		Health = self.Health:Get(),
 		HealthMax = self.Health.Max,
 	}
@@ -56,10 +100,13 @@ function Battler.Observe(self: Battler, callback)
 end
 
 function Battler.IsActive(self: Battler)
+	if not self.Active then return false end
+
 	return self.Health:Get() > 0
 end
 
 function Battler.Destroy(self: Battler)
+	self.Active = false
 	self.Destroyed:Fire()
 end
 

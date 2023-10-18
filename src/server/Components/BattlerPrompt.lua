@@ -3,7 +3,13 @@ local ServerScriptService = game:GetService("ServerScriptService")
 
 local Battle = require(ServerScriptService.Server.Classes.Battle)
 local BattlerDefs = require(ReplicatedStorage.Shared.Defs.BattlerDefs)
+local EffectService = require(ServerScriptService.Server.Services.EffectService)
+local EffectUpdate = require(ReplicatedStorage.Shared.Effects.EffectUpdate)
+local EffectWipeTransition = require(ReplicatedStorage.Shared.Effects.EffectWipeTransition)
+local Guid = require(ReplicatedStorage.Shared.Util.Guid)
+local LobbySession = require(ServerScriptService.Server.Classes.LobbySession)
 local LobbySessions = require(ServerScriptService.Server.Singletons.LobbySessions)
+local Promise = require(ReplicatedStorage.Packages.Promise)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local BattlerPrompt = {}
 BattlerPrompt.__index = BattlerPrompt
@@ -38,11 +44,27 @@ function BattlerPrompt.new(model: Model): BattlerPrompt
 		local session = LobbySessions.Get(player)
 		if not session then return end
 
-		Battle.fromPlayerVersusBattler(player, self.Id, "Basic"):andThen(function(battle)
-			session:Destroy()
-			task.wait(5)
-			battle:Destroy()
-		end, warn)
+		session:Destroy()
+
+		local wipeGuid = Guid()
+		EffectService:Effect(player, EffectWipeTransition({ Guid = wipeGuid }))
+			:andThen(function()
+				return Battle.fromPlayerVersusBattler(player, self.Id, "Basic")
+			end)
+			:andThen(function(battle)
+				EffectService:Effect(player, EffectUpdate({ Guid = wipeGuid }))
+
+				return Promise.fromEvent(battle.Ended):andThenReturn(battle)
+			end, warn)
+			:andThen(function(battle)
+				return EffectService:Effect(player, EffectWipeTransition({ Guid = wipeGuid })):andThenCall(battle.Destroy, battle)
+			end)
+			:andThen(function()
+				return LobbySession.promised(player)
+			end)
+			:andThen(function()
+				EffectService:Effect(player, EffectUpdate({ Guid = wipeGuid }))
+			end)
 	end)
 	prompt.Parent = self.Model.PrimaryPart
 

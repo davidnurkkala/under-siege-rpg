@@ -1,9 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Comm = require(ReplicatedStorage.Packages.Comm)
+local Promise = require(ReplicatedStorage.Packages.Promise)
 
 local EffectController = {
 	Priority = 0,
+	Persistents = {},
 }
 
 type EffectController = typeof(EffectController)
@@ -27,5 +29,22 @@ function EffectController.Effect(self: EffectController, _serverImpl, clientImpl
 end
 
 function EffectController.Start(self: EffectController) end
+
+function EffectController.Persist(self: EffectController, guid: string, handler: (any, () -> ()) -> ())
+	local failsafe = Promise.delay(60):andThen(function()
+		self:Desist(guid)
+	end)
+
+	self.Persistents[guid] = function(update: any)
+		handler(update, function()
+			failsafe:cancel()
+			self:Desist(guid)
+		end)
+	end
+end
+
+function EffectController.Desist(self: EffectController, guid: string)
+	self.Persistents[guid] = nil
+end
 
 return EffectController

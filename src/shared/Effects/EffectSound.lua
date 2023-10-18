@@ -7,28 +7,39 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 
 return function(args: {
 	SoundId: string,
-	Parent: Instance?,
-	Position: Vector3?,
+	Target: Instance | Vector3,
 })
-	assert(args.Parent ~= nil or args.Position ~= nil, "Must at least have Parent or Position")
-
 	return function()
 		return script.Name, args, Promise.resolve()
 	end, function()
 		local trove = Trove.new()
 
-		local parent = args.Parent
-		if args.Position then
+		local parent
+		if typeof(args.Target) == "Vector3" then
 			parent = trove:Add(EffectPart())
 			parent.Transparency = 1
-			parent.Position = args.Position
+			parent.Position = args.Target
 			parent.Parent = workspace.Effects
+		else
+			parent = args.Target
 		end
 
 		local sound = trove:Clone(SoundDefs[args.SoundId])
 		sound.Parent = parent
 		sound:Play()
 
-		return Promise.delay(sound.TimeLength) --:andThenCall(trove.Clean, trove)
+		return Promise.new(function(resolve, _, onCancel)
+			while sound.TimeLength == 0 do
+				task.wait()
+				if onCancel() then return end
+			end
+
+			resolve(sound.TimeLength)
+		end)
+			:timeout(1)
+			:andThen(function(duration)
+				return Promise.delay(duration)
+			end, function() end)
+			:finallyCall(trove.Clean, trove)
 	end
 end
