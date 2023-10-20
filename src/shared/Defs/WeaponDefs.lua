@@ -13,7 +13,7 @@ local Weapons = {
 			Shoot = "BowShoot",
 		},
 		Sounds = {
-			Shoot = { "BowShoot1", "BowShoot2", "BowShoot3" },
+			Shoot = { "BowShoot1", "BowShoot2", "BowShoot3", "BowShoot4" },
 			Hit = { "BowHit1", "BowHit2", "BowHit3", "BowHit4" },
 		},
 	},
