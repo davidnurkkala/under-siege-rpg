@@ -5,6 +5,7 @@ local ActionService = require(ServerScriptService.Server.Services.ActionService)
 local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
 local Battler = require(ServerScriptService.Server.Classes.Battler)
 local Cooldown = require(ReplicatedStorage.Shared.Classes.Cooldown)
+local EffectEmission = require(ReplicatedStorage.Shared.Effects.EffectEmission)
 local EffectProjectile = require(ReplicatedStorage.Shared.Effects.EffectProjectile)
 local EffectService = require(ServerScriptService.Server.Services.EffectService)
 local EffectSound = require(ReplicatedStorage.Shared.Effects.EffectSound)
@@ -141,43 +142,56 @@ function BattleSession.Attack(self: BattleSession)
 		Position = self.Battler.Position,
 		Range = math.huge,
 		Filter = battle:DefaultFilter(self.Battler.TeamId),
-	}) or battle:TargetEnemyBattler(self.Battler.TeamId)
+	})
 
 	if not target then return end
+
+	local root = target:GetRoot()
 
 	self.AttackCooldown:Use()
 
 	self.Animator:Play(self.WeaponDef.Animations.Shoot, 0)
 
-	return Promise.delay(0.05)
-		:andThen(function()
-			local part = self.Model:FindFirstChild("Weapon")
-			local here = part.Position
-			local there = target:GetWorldCFrame().Position
-			local start = CFrame.lookAt(here, there)
-			local finish = start - here + there
+	local attackPromise = Promise.delay(0.05):andThen(function()
+		local part = self.Model:FindFirstChild("Weapon")
+		local here = part.Position
+		local there = root.Position
+		local start = CFrame.lookAt(here, there)
 
-			return EffectService:All(
-				EffectProjectile({
-					Model = ReplicatedStorage.Assets.Models.Arrow1,
-					Start = start,
-					Finish = finish,
-					Speed = 128,
-				}),
+		EffectService:All(
+			EffectProjectile({
+				Model = ReplicatedStorage.Assets.Models.Arrow1,
+				Start = start,
+				Finish = root,
+				Speed = 128,
+			}),
+			EffectSound({
+				SoundId = PickRandom(self.WeaponDef.Sounds.Shoot),
+				Target = part,
+			})
+		):andThen(function()
+			target.Health:Adjust(-10)
+
+			EffectService:All(
 				EffectSound({
-					SoundId = PickRandom(self.WeaponDef.Sounds.Shoot),
-					Target = part,
+					SoundId = PickRandom(self.WeaponDef.Sounds.Hit),
+					Target = target:GetWorldCFrame().Position,
+				}),
+				EffectEmission({
+					Emitter = ReplicatedStorage.Assets.Emitters.Impact1,
+					ParticleCount = 2,
+					Target = root,
 				})
 			)
 		end)
-		:andThen(function()
-			target.Health:Adjust(-10)
+	end)
 
-			EffectService:All(EffectSound({
-				SoundId = PickRandom(self.WeaponDef.Sounds.Hit),
-				Target = target:GetWorldCFrame().Position,
-			}))
-		end)
+	local cancelPromise = Promise.fromEvent(target.Destroyed):andThen(function()
+		self.Animator:StopHard(self.WeaponDef.Animations.Shoot)
+		self.AttackCooldown:Reset()
+	end)
+
+	return Promise.race({ attackPromise, cancelPromise })
 end
 
 function BattleSession.Destroy(self: BattleSession)

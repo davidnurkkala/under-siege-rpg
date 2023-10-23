@@ -1,7 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 
+local Goon = require(ServerScriptService.Server.Classes.Goon)
 local Health = require(ReplicatedStorage.Shared.Classes.Health)
-local Promise = require(ReplicatedStorage.Packages.Promise)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 
 local Battler = {}
@@ -68,19 +69,43 @@ function Battler.fromBattlerId(battlerId: string, position: number, direction: n
 		char:Destroy()
 	end)
 
+	-- VERY TESTING
+	task.delay(3, function()
+		while battler.Active do
+			assert(battler.Battle, `no battle`)
+
+			Goon.fromId({
+				Battle = battler.Battle,
+				Direction = battler.Direction,
+				Position = battler.Position,
+				TeamId = battler.TeamId,
+				Id = "Conscript",
+				Level = 1,
+			})
+
+			task.wait(3)
+		end
+	end)
+
 	return battler
 end
 
-function Battler:GetWorldCFrame()
+function Battler.GetWorldCFrame(self: Battler)
 	local cframe = self.BaseModel:GetBoundingBox()
 	return cframe
 end
 
-function Battler:SetBattle(battle)
+function Battler.GetRoot(self: Battler): BasePart
+	local root = self.CharModel.PrimaryPart
+	assert(root, `No primary part in char root`)
+	return root
+end
+
+function Battler.SetBattle(self: Battler, battle)
 	self.Battle = battle
 end
 
-function Battler:GetBattle()
+function Battler.GetBattle(self: Battler)
 	return self.Battle
 end
 

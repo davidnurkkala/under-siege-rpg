@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Sift = require(ReplicatedStorage.Packages.Sift)
+local StateMachine = require(ReplicatedStorage.Shared.Util.StateMachine)
 
 local Goons = {
 	Conscript = {
@@ -8,14 +9,33 @@ local Goons = {
 		Animations = {
 			Walk = "ConscriptWalk",
 			Attack = "ConscriptAttack",
+			Die = "GenericGoonDie",
 		},
 		Speed = function()
 			return 5
 		end,
 		Damage = function(level)
-			return 1 + level
+			return level
 		end,
-		OnUpdated = function(self, dt) end,
+		HealthMax = function(level)
+			return 10 + 2 * (level - 1)
+		end,
+		GetOnUpdated = function()
+			return StateMachine({
+				{
+					Name = "Walking",
+					Start = function(self)
+						self.Animator:Play(self.Def.Animations.Walk)
+					end,
+					Run = function(self, _, dt)
+						self.Position += self.Direction * (self.Def.Speed() / 100) * dt
+					end,
+					Finish = function(self)
+						self.Animator:StopHard(self.Def.Animations.Walk)
+					end,
+				},
+			})
+		end,
 	},
 }
 

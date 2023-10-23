@@ -90,7 +90,7 @@ function LobbySession.promised(player: Player)
 		if player.Character then
 			resolve(player.Character)
 		else
-			task.defer(function()
+			Promise.defer(function()
 				player:LoadCharacter()
 			end)
 			resolve(Promise.fromEvent(player.CharacterAdded):timeout(5))
@@ -131,7 +131,7 @@ function LobbySession.promised(player: Player)
 				}))
 			end)
 		end)
-	end)
+	end, function() end)
 end
 
 function LobbySession.Attack(self: LobbySession)

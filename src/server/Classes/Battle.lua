@@ -24,6 +24,12 @@ type Fieldable = {
 	Update: (Fieldable, number) -> (),
 }
 
+type BattleTarget = {
+	Position: number,
+	Size: number,
+	TeamId: string,
+}
+
 type BattlegroundModel = Model & {
 	Spawns: Folder & {
 		Left: BasePart,
@@ -49,6 +55,8 @@ function Battle.new(args: {
 	local pathFolder = args.Model:FindFirstChild("Path")
 	assert(pathFolder, "No path folder")
 
+	args.Model:PivotTo(CFrame.new(256, 0, 0))
+
 	local self: Battle = setmetatable({
 		Battlers = args.Battlers,
 		Model = args.Model,
@@ -60,8 +68,6 @@ function Battle.new(args: {
 		Changed = Signal.new(),
 		State = "Active",
 	}, Battle)
-
-	self.Model:PivotTo(CFrame.new(256, 0, 0))
 
 	for _, entry in { { self.Battlers[1], self.Model.Spawns.Left }, { self.Battlers[2], self.Model.Spawns.Right } } do
 		local battler, part = entry[1], entry[2]
@@ -188,8 +194,18 @@ function Battle.GetVictor(self: Battle): Battler.Battler?
 end
 
 function Battle.DefaultFilter(_self: Battle, teamId: string)
-	return function(object: Fieldable)
+	return function(object: BattleTarget)
 		return object.TeamId ~= teamId
+	end
+end
+
+function Battle.ForEachTarget(self: Battle, check: (BattleTarget) -> ())
+	for target in self.Field do
+		check(target)
+	end
+
+	for _, battler in self.Battlers do
+		check(battler)
 	end
 end
 
@@ -198,22 +214,22 @@ function Battle.TargetNearest(
 	args: {
 		Position: number,
 		Range: number,
-		Filter: (Fieldable) -> boolean,
+		Filter: (BattleTarget) -> boolean,
 	}
-): Fieldable?
+): BattleTarget?
 	local bestTarget = nil
 	local bestDistance = args.Range
 	local filter = args.Filter
 
-	for target in self.Field do
-		if not filter(target) then continue end
+	self:ForEachTarget(function(target)
+		if not filter(target) then return end
 
 		local distance = math.abs(target.Position - args.Position)
 		if distance < bestDistance then
 			bestTarget = target
 			bestDistance = distance
 		end
-	end
+	end)
 
 	return bestTarget
 end
