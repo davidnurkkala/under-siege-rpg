@@ -39,6 +39,11 @@ function Cooldown.SetTime(self: Cooldown, t: number)
 	end
 end
 
+function Cooldown.SetTimeMax(self: Cooldown, timeMax: number)
+	self.TimeMax = timeMax
+	self:SetTime(math.clamp(self.Time, 0, self.TimeMax))
+end
+
 function Cooldown.Update(self: Cooldown, dt: number)
 	self:SetTime(math.max(0, self.Time - dt))
 end

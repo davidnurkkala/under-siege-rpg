@@ -1,12 +1,13 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerScriptService = game:GetService("ServerScriptService")
 
-local GoonBasicMelee = require(ServerScriptService.Server.GoonHelpers.GoonBasicMelee)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 
 local Goons = {
-	Conscript = GoonBasicMelee({
+	Conscript = {
 		ModelName = "Conscript",
+		Brain = {
+			Id = "BasicMelee",
+		},
 		Animations = {
 			Walk = "ConscriptWalk",
 			Attack = "ConscriptAttack",
@@ -32,7 +33,7 @@ local Goons = {
 		HealthMax = function(level)
 			return 10 + 2 * (level - 1)
 		end,
-	}),
+	},
 }
 
 return Sift.Dictionary.map(Goons, function(goon, id)

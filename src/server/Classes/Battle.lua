@@ -196,7 +196,7 @@ function Battle.Update(self: Battle, dt: number)
 	if self.RoundCooldown:IsReady() then
 		self.RoundCooldown:Use()
 
-		Promise.all({
+		self.Trove:AddPromise(Promise.all({
 			Promise.all(Sift.Array.map(self.Battlers, function(battler)
 				return battler.DeckPlayer:ChooseCard():andThen(function(card)
 					return { Battler = battler, Card = card }
@@ -207,7 +207,7 @@ function Battle.Update(self: Battle, dt: number)
 			for _, cardChoice in results[1] do
 				self:PlayCard(cardChoice.Battler, cardChoice.Card.Id, cardChoice.Card.Level)
 			end
-		end)
+		end))
 	end
 
 	for object in self.Field do

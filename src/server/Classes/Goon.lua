@@ -1,16 +1,9 @@
+local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
-local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
-local EffectColorFadeModel = require(ReplicatedStorage.Shared.Effects.EffectColorFadeModel)
-local EffectFadeModel = require(ReplicatedStorage.Shared.Effects.EffectFadeModel)
-local EffectJitterModel = require(ReplicatedStorage.Shared.Effects.EffectJitterModel)
-local EffectMoveModel = require(ReplicatedStorage.Shared.Effects.EffectMoveModel)
-local EffectService = require(ServerScriptService.Server.Services.EffectService)
-local EffectSound = require(ReplicatedStorage.Shared.Effects.EffectSound)
 local GoonDefs = require(ReplicatedStorage.Shared.Defs.GoonDefs)
 local Health = require(ReplicatedStorage.Shared.Classes.Health)
-local PickRandom = require(ReplicatedStorage.Shared.Util.PickRandom)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local Signal = require(ReplicatedStorage.Packages.Signal)
@@ -24,51 +17,84 @@ export type Goon = typeof(setmetatable(
 		Size: number,
 		TeamId: string,
 		Direction: number,
-		Model: Model,
 		Health: Health.Health,
-		OnUpdated: (Goon, number) -> (),
 		Battle: any,
 		Def: any,
 		Animator: any,
 		Destroyed: any,
 		Level: number,
+		Root: Part,
+		Brain: any,
 	},
 	Goon
 ))
+
+local function createRoot(goonId)
+	local root = Instance.new("Part")
+	root.Name = goonId
+	root.Anchored = true
+	root.CanCollide = false
+	root.CanTouch = false
+	root.CanQuery = false
+	root.Color = Color3.new(1, 0, 1)
+	root.Size = Vector3.new(4, 5, 1)
+
+	local remote = Instance.new("RemoteEvent")
+	remote.Name = "Remote"
+	remote.Parent = root
+
+	CollectionService:AddTag(root, "GoonModel")
+
+	return root
+end
+
+local function createAnimator(root)
+	local remote: RemoteEvent = root.Remote
+
+	return Sift.Dictionary.map({ "Play", "Stop", "StopHard", "StopHardAll" }, function(funcName)
+		return function(_, ...)
+			remote:FireAllClients("Animator", funcName, ...)
+		end, funcName
+	end)
+end
 
 function Goon.new(args: {
 	Position: number,
 	Direction: number,
 	TeamId: string,
-	Model: Model,
 	Def: any,
 	Level: number,
-	OnUpdated: (Goon, number) -> (),
 	Battle: any,
+	Brain: any,
 }): Goon
+	local root = createRoot(args.Def.Id)
+	local animator = createAnimator(root)
+
 	local self: Goon = setmetatable({
 		Level = args.Level,
 		Health = Health.new(args.Def.HealthMax(args.Level)),
 		Position = args.Position,
 		Direction = args.Direction,
-		Model = args.Model,
+		Root = root,
+		Animator = animator,
 		Size = args.Def.Size,
 		TeamId = args.TeamId,
 		Battle = args.Battle,
 		Def = args.Def,
-		OnUpdated = args.OnUpdated,
+		Brain = args.Brain,
 		Destroyed = Signal.new(),
 	}, Goon)
 
-	self.Model.Parent = workspace
-	self.Animator = Animator.new(self.Model:FindFirstChildWhichIsA("AnimationController") :: AnimationController)
+	self.Root.Parent = workspace
 
 	self.Health:Observe(function(old, new)
 		local change = new - old
-		if change <= -5 then self:InjuryEffect() end
+		if change <= -5 then self.Brain:OnInjured() end
 	end)
 
 	self.Battle:Add(self)
+
+	self.Brain:SetGoon(self)
 
 	return self
 end
@@ -84,9 +110,17 @@ function Goon.fromId(args: {
 	local def = GoonDefs[args.Id]
 	assert(def, `No def found for {args.Id}`)
 
+	local brainId = def.Brain and def.Brain.Id
+	assert(def, `Def {def.Id} has no brain`)
+
+	local brainScript = ServerScriptService.Server.Classes.GoonBrains:FindFirstChild(brainId)
+	assert(brainScript, `No brain script with name {brainId}`)
+
+	local brainClass = require(brainScript)
+	local brain = brainClass.new(def.Brain)
+
 	return Goon.new(Sift.Dictionary.merge(args, {
-		Model = def.Model:Clone(),
-		OnUpdated = def.GetOnUpdated(),
+		Brain = brain,
 		Def = def,
 	}))
 end
@@ -99,36 +133,16 @@ function Goon.IsActive(self: Goon)
 	return self.Health:Get() > 0
 end
 
-function Goon.InjuryEffect(self: Goon)
-	EffectService:All(
-		EffectColorFadeModel({
-			Model = self.Model,
-			Color = Color3.new(1, 0, 0),
-			Duration = 0.5,
-		}),
-		EffectJitterModel({
-			Model = self.Model,
-			Intensity = 0.5,
-			Duration = 0.5,
-		})
-	)
-end
-
 function Goon.Update(self: Goon, dt: number)
-	self:OnUpdated(dt)
+	self.Brain:Update(dt)
 
 	local position = self.Battle.Path:ToWorld(self.Position)
-	if not self.Model:GetPivot().Position:FuzzyEq(position, 0.0001) then
-		EffectService:All(EffectMoveModel({
-			Model = self.Model,
-			CFrame = CFrame.fromMatrix(position, if self.Direction < 0 then Vector3.zAxis else -Vector3.zAxis, Vector3.yAxis),
-		}))
-	end
+	local dy = CFrame.new(0, self.Root.Size.Y / 2, 0)
+	self.Root.CFrame = CFrame.fromMatrix(position, if self.Direction < 0 then Vector3.zAxis else -Vector3.zAxis, Vector3.yAxis) * dy
 end
 
 function Goon.GetRoot(self: Goon): BasePart
-	assert(self.Model.PrimaryPart, `No primary part`)
-	return self.Model.PrimaryPart
+	return self.Root
 end
 
 function Goon.GetWorldCFrame(self: Goon)
@@ -146,20 +160,13 @@ function Goon.Destroy(self: Goon)
 	self.Battle:Remove(self)
 
 	if self.Health:Get() > 0 then
-		self.Model:Destroy()
+		self.Root:Destroy()
+		self.Brain:Destroy()
 	else
-		self.Animator:StopHardAll()
-		self.Animator:Play(self.Def.Animations.Die)
-		EffectService:All(
-			EffectSound({
-				SoundId = PickRandom(self.Def.Sounds.Death),
-				Target = self:GetRoot(),
-			}),
-			EffectFadeModel({
-				Model = self.Model,
-				FadeTime = 2,
-			})
-		):andThenCall(self.Model.Destroy, self.Model)
+		self.Brain:OnDied():andThen(function()
+			self.Root:Destroy()
+			self.Brain:Destroy()
+		end)
 	end
 
 	self.Destroyed:Fire()
