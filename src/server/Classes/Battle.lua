@@ -4,6 +4,9 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local BattleService = require(ServerScriptService.Server.Services.BattleService)
 local BattleSession = require(ServerScriptService.Server.Classes.BattleSession)
 local Battler = require(ServerScriptService.Server.Classes.Battler)
+local CardDefs = require(ReplicatedStorage.Shared.Defs.CardDefs)
+local Cooldown = require(ReplicatedStorage.Shared.Classes.Cooldown)
+local Goon = require(ServerScriptService.Server.Classes.Goon)
 local PartPath = require(ReplicatedStorage.Shared.Classes.PartPath)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Sift = require(ReplicatedStorage.Packages.Sift)
@@ -13,6 +16,9 @@ local Updater = require(ReplicatedStorage.Shared.Classes.Updater)
 
 local Battle = {}
 Battle.__index = Battle
+
+local ChooseDuration = 4
+local RoundDuration = ChooseDuration + 1
 
 local BattleUpdater = Updater.new()
 
@@ -43,6 +49,7 @@ export type Battle = typeof(setmetatable(
 		Field: { [Fieldable]: boolean },
 		Model: BattlegroundModel,
 		Path: PartPath.PartPath,
+		RoundCooldown: any,
 		State: "Active" | "Ended",
 	},
 	Battle
@@ -83,6 +90,8 @@ function Battle.new(args: {
 	end
 
 	self.Model.Spawns:Destroy()
+
+	self.RoundCooldown = Cooldown.new(RoundDuration)
 
 	self.Model.Parent = workspace
 	self.Trove:Add(self.Model)
@@ -163,8 +172,43 @@ function Battle.Remove(self: Battle, object: Fieldable)
 	self.Field[object] = nil
 end
 
+function Battle.PlayCard(self: Battle, battler: Battler.Battler, cardId: string, cardLevel: number)
+	local card = CardDefs[cardId]
+	assert(card, `No card for id {cardId}`)
+
+	if card.Type == "Goon" then
+		Goon.fromId({
+			Id = card.GoonId,
+			Battle = self,
+			Direction = battler.Direction,
+			Position = battler.Position,
+			TeamId = battler.TeamId,
+			Level = cardLevel,
+		})
+	else
+		error(`Unimplemented card type {card.Type}`)
+	end
+end
+
 function Battle.Update(self: Battle, dt: number)
 	if self.State ~= "Active" then return end
+
+	if self.RoundCooldown:IsReady() then
+		self.RoundCooldown:Use()
+
+		Promise.all({
+			Promise.all(Sift.Array.map(self.Battlers, function(battler)
+				return battler.DeckPlayer:ChooseCard():andThen(function(card)
+					return { Battler = battler, Card = card }
+				end)
+			end)),
+			Promise.delay(ChooseDuration),
+		}):andThen(function(results)
+			for _, cardChoice in results[1] do
+				self:PlayCard(cardChoice.Battler, cardChoice.Card.Id, cardChoice.Card.Level)
+			end
+		end)
+	end
 
 	for object in self.Field do
 		object:Update(dt)
@@ -240,6 +284,34 @@ function Battle.TargetEnemyBattler(self: Battle, teamId: string)
 	end)
 	if not index then return nil end
 	return self.Battlers[index]
+end
+
+function Battle.MoveFieldable(self: Battle, mover: Fieldable, movement: number)
+	local direction = math.sign(movement)
+
+	for object in self.Field do
+		if object == mover then continue end
+
+		local delta = object.Position - mover.Position
+		if math.sign(delta) ~= direction then continue end
+
+		delta = object.Position - (mover.Position + movement)
+		local distance = math.abs(delta)
+		local desiredDistance = (object.Size / 2) + (mover.Size / 2)
+		local tooClose = distance < desiredDistance
+		local movingPast = math.sign(delta) ~= direction
+		if (not tooClose) and not movingPast then continue end
+
+		local desiredPosition = object.Position + desiredDistance * -direction
+		movement = desiredPosition - mover.Position
+		if movement == 0 then return false end
+	end
+
+	local position = math.clamp(mover.Position + movement, 0, 1)
+	if mover.Position == position then return false end
+
+	mover.Position = position
+	return true
 end
 
 function Battle.End(self: Battle, victor: Battler.Battler)

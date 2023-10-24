@@ -5,6 +5,9 @@ local Sift = require(ReplicatedStorage.Packages.Sift)
 local Battlers = {
 	Noob = {
 		Name = "Noob",
+		Deck = {
+			Conscript = 1,
+		},
 	},
 }
 

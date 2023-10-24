@@ -1,42 +1,38 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 
+local GoonBasicMelee = require(ServerScriptService.Server.GoonHelpers.GoonBasicMelee)
 local Sift = require(ReplicatedStorage.Packages.Sift)
-local StateMachine = require(ReplicatedStorage.Shared.Util.StateMachine)
 
 local Goons = {
-	Conscript = {
+	Conscript = GoonBasicMelee({
 		ModelName = "Conscript",
 		Animations = {
 			Walk = "ConscriptWalk",
 			Attack = "ConscriptAttack",
 			Die = "GenericGoonDie",
 		},
+		Sounds = {
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Size = 0.03,
 		Speed = function()
-			return 5
+			return 0.05
+		end,
+		Range = function()
+			return 0.1
+		end,
+		AttackRate = function()
+			return 0.75
 		end,
 		Damage = function(level)
-			return level
+			return 4 + level
 		end,
 		HealthMax = function(level)
 			return 10 + 2 * (level - 1)
 		end,
-		GetOnUpdated = function()
-			return StateMachine({
-				{
-					Name = "Walking",
-					Start = function(self)
-						self.Animator:Play(self.Def.Animations.Walk)
-					end,
-					Run = function(self, _, dt)
-						self.Position += self.Direction * (self.Def.Speed() / 100) * dt
-					end,
-					Finish = function(self)
-						self.Animator:StopHard(self.Def.Animations.Walk)
-					end,
-				},
-			})
-		end,
-	},
+	}),
 }
 
 return Sift.Dictionary.map(Goons, function(goon, id)

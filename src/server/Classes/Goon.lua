@@ -2,10 +2,16 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
+local EffectColorFadeModel = require(ReplicatedStorage.Shared.Effects.EffectColorFadeModel)
 local EffectFadeModel = require(ReplicatedStorage.Shared.Effects.EffectFadeModel)
+local EffectJitterModel = require(ReplicatedStorage.Shared.Effects.EffectJitterModel)
+local EffectMoveModel = require(ReplicatedStorage.Shared.Effects.EffectMoveModel)
 local EffectService = require(ServerScriptService.Server.Services.EffectService)
+local EffectSound = require(ReplicatedStorage.Shared.Effects.EffectSound)
 local GoonDefs = require(ReplicatedStorage.Shared.Defs.GoonDefs)
 local Health = require(ReplicatedStorage.Shared.Classes.Health)
+local PickRandom = require(ReplicatedStorage.Shared.Util.PickRandom)
+local Promise = require(ReplicatedStorage.Packages.Promise)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 
@@ -33,7 +39,6 @@ export type Goon = typeof(setmetatable(
 function Goon.new(args: {
 	Position: number,
 	Direction: number,
-	Size: number,
 	TeamId: string,
 	Model: Model,
 	Def: any,
@@ -47,7 +52,7 @@ function Goon.new(args: {
 		Position = args.Position,
 		Direction = args.Direction,
 		Model = args.Model,
-		Size = args.Size,
+		Size = args.Def.Size,
 		TeamId = args.TeamId,
 		Battle = args.Battle,
 		Def = args.Def,
@@ -57,6 +62,11 @@ function Goon.new(args: {
 
 	self.Model.Parent = workspace
 	self.Animator = Animator.new(self.Model:FindFirstChildWhichIsA("AnimationController") :: AnimationController)
+
+	self.Health:Observe(function(old, new)
+		local change = new - old
+		if change <= -5 then self:InjuryEffect() end
+	end)
 
 	self.Battle:Add(self)
 
@@ -81,16 +91,39 @@ function Goon.fromId(args: {
 	}))
 end
 
+function Goon.FromDef(self: Goon, key: string)
+	return self.Def[key](self.Level)
+end
+
 function Goon.IsActive(self: Goon)
 	return self.Health:Get() > 0
+end
+
+function Goon.InjuryEffect(self: Goon)
+	EffectService:All(
+		EffectColorFadeModel({
+			Model = self.Model,
+			Color = Color3.new(1, 0, 0),
+			Duration = 0.5,
+		}),
+		EffectJitterModel({
+			Model = self.Model,
+			Intensity = 0.5,
+			Duration = 0.5,
+		})
+	)
 end
 
 function Goon.Update(self: Goon, dt: number)
 	self:OnUpdated(dt)
 
 	local position = self.Battle.Path:ToWorld(self.Position)
-	local cframe = CFrame.fromMatrix(position, if self.Direction < 0 then Vector3.zAxis else -Vector3.zAxis, Vector3.yAxis)
-	self.Model:PivotTo(cframe)
+	if not self.Model:GetPivot().Position:FuzzyEq(position, 0.0001) then
+		EffectService:All(EffectMoveModel({
+			Model = self.Model,
+			CFrame = CFrame.fromMatrix(position, if self.Direction < 0 then Vector3.zAxis else -Vector3.zAxis, Vector3.yAxis),
+		}))
+	end
 end
 
 function Goon.GetRoot(self: Goon): BasePart
@@ -102,6 +135,13 @@ function Goon.GetWorldCFrame(self: Goon)
 	return self:GetRoot().CFrame
 end
 
+function Goon.WhileAlive(self: Goon, promise)
+	return Promise.race({
+		Promise.fromEvent(self.Destroyed),
+		promise,
+	})
+end
+
 function Goon.Destroy(self: Goon)
 	self.Battle:Remove(self)
 
@@ -110,10 +150,16 @@ function Goon.Destroy(self: Goon)
 	else
 		self.Animator:StopHardAll()
 		self.Animator:Play(self.Def.Animations.Die)
-		EffectService:All(EffectFadeModel({
-			Model = self.Model,
-			FadeTime = 2,
-		})):andThenCall(self.Model.Destroy, self.Model)
+		EffectService:All(
+			EffectSound({
+				SoundId = PickRandom(self.Def.Sounds.Death),
+				Target = self:GetRoot(),
+			}),
+			EffectFadeModel({
+				Model = self.Model,
+				FadeTime = 2,
+			})
+		):andThenCall(self.Model.Destroy, self.Model)
 	end
 
 	self.Destroyed:Fire()

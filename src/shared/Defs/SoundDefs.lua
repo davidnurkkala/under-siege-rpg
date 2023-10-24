@@ -11,6 +11,12 @@ local Ids = {
 	BowHit2 = "rbxassetid://14833357229",
 	BowHit3 = "rbxassetid://14833357068",
 	BowHit4 = "rbxassetid://14833357145",
+	GenericStab1 = "rbxassetid://15153699247",
+	GenericStab2 = "rbxassetid://15153699199",
+	GenericStab3 = "rbxassetid://15153699299",
+	GenericStab4 = "rbxassetid://15153699139",
+	MaleUgh1 = "rbxassetid://15153710616",
+	MaleUgh2 = "rbxassetid://15153710567",
 }
 
 return Sift.Dictionary.map(Ids, function(id, name)

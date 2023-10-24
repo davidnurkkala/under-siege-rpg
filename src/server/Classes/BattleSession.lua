@@ -5,6 +5,8 @@ local ActionService = require(ServerScriptService.Server.Services.ActionService)
 local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
 local Battler = require(ServerScriptService.Server.Classes.Battler)
 local Cooldown = require(ReplicatedStorage.Shared.Classes.Cooldown)
+local Deck = require(ServerScriptService.Server.Classes.Deck)
+local DeckPlayerRandom = require(ServerScriptService.Server.Classes.DeckPlayerRandom)
 local EffectEmission = require(ReplicatedStorage.Shared.Effects.EffectEmission)
 local EffectProjectile = require(ReplicatedStorage.Shared.Effects.EffectProjectile)
 local EffectService = require(ServerScriptService.Server.Services.EffectService)
@@ -124,6 +126,7 @@ function BattleSession.promised(player: Player, position: number, direction: num
 					Position = position,
 					Direction = direction,
 					TeamId = `PLAYER_{player.Name}`,
+					DeckPlayer = DeckPlayerRandom.new(Deck.new({ Conscript = 1 })),
 					HealthMax = 100,
 				},
 			}))

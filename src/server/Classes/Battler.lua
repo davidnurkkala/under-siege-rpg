@@ -1,12 +1,18 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
-local Goon = require(ServerScriptService.Server.Classes.Goon)
+local BattlerDefs = require(ReplicatedStorage.Shared.Defs.BattlerDefs)
+local Deck = require(ServerScriptService.Server.Classes.Deck)
+local DeckPlayerRandom = require(ServerScriptService.Server.Classes.DeckPlayerRandom)
 local Health = require(ReplicatedStorage.Shared.Classes.Health)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 
 local Battler = {}
 Battler.__index = Battler
+
+type DeckPlayer = {
+	ChooseCard: (DeckPlayer) -> any,
+} | any
 
 export type Battler = typeof(setmetatable(
 	{} :: {
@@ -19,6 +25,7 @@ export type Battler = typeof(setmetatable(
 		Battle: any?,
 		TeamId: string,
 		Active: boolean,
+		DeckPlayer: DeckPlayer,
 	},
 	Battler
 ))
@@ -30,6 +37,7 @@ function Battler.new(args: {
 	BaseModel: Model,
 	CharModel: Model,
 	TeamId: string,
+	DeckPlayer: DeckPlayer,
 }): Battler
 	local self: Battler = setmetatable({
 		Health = Health.new(args.HealthMax),
@@ -38,6 +46,7 @@ function Battler.new(args: {
 		BaseModel = args.BaseModel,
 		CharModel = args.CharModel,
 		TeamId = args.TeamId,
+		DeckPlayer = args.DeckPlayer,
 		Destroyed = Signal.new(),
 		Changed = Signal.new(),
 		Active = true,
@@ -51,9 +60,12 @@ function Battler.new(args: {
 end
 
 function Battler.fromBattlerId(battlerId: string, position: number, direction: number)
+	local def = BattlerDefs[battlerId]
+	assert(def, `No def found for battler id {battlerId}`)
+
 	local base = ReplicatedStorage.Assets.Models.Bases.Basic:Clone()
 
-	local char = ReplicatedStorage.Assets.Models.Battlers[battlerId]:Clone()
+	local char = def.Model:Clone()
 	char.Parent = workspace
 
 	local battler = Battler.new({
@@ -62,29 +74,12 @@ function Battler.fromBattlerId(battlerId: string, position: number, direction: n
 		Position = position,
 		Direction = direction,
 		TeamId = `NON_PLAYER_{battlerId}`,
+		DeckPlayer = DeckPlayerRandom.new(Deck.new(def.Deck)),
 		HealthMax = 100,
 	})
 
 	battler.Destroyed:Connect(function()
 		char:Destroy()
-	end)
-
-	-- VERY TESTING
-	task.delay(3, function()
-		while battler.Active do
-			assert(battler.Battle, `no battle`)
-
-			Goon.fromId({
-				Battle = battler.Battle,
-				Direction = battler.Direction,
-				Position = battler.Position,
-				TeamId = battler.TeamId,
-				Id = "Conscript",
-				Level = 1,
-			})
-
-			task.wait(3)
-		end
 	end)
 
 	return battler

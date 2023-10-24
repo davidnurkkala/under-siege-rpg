@@ -21,7 +21,7 @@ end
 
 function Health.Observe(self: Health, callback)
 	local connection = self.Changed:Connect(callback)
-	callback()
+	callback(self.Amount, self.Amount)
 	return connection
 end
 
@@ -32,8 +32,10 @@ end
 function Health.Set(self: Health, amount: number)
 	if amount == self.Amount then return end
 
+	local oldAmount = self.Amount
+
 	self.Amount = math.clamp(amount, 0, self.Max)
-	self.Changed:Fire()
+	self.Changed:Fire(oldAmount, self.Amount)
 end
 
 function Health.Adjust(self: Health, delta: number)
