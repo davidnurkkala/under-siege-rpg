@@ -10,11 +10,11 @@ local EffectProjectile = require(ReplicatedStorage.Shared.Effects.EffectProjecti
 local EffectService = require(ServerScriptService.Server.Services.EffectService)
 local EffectShakeModel = require(ReplicatedStorage.Shared.Effects.EffectShakeModel)
 local EffectSound = require(ReplicatedStorage.Shared.Effects.EffectSound)
-local LevelService = require(ServerScriptService.Server.Services.LevelService)
 local LobbySessions = require(ServerScriptService.Server.Singletons.LobbySessions)
 local PickRandom = require(ReplicatedStorage.Shared.Util.PickRandom)
 local PlayAreaService = require(ServerScriptService.Server.Services.PlayAreaService)
 local PlayerLeaving = require(ReplicatedStorage.Shared.Util.PlayerLeaving)
+local PowerService = require(ServerScriptService.Server.Services.PowerService)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local WeaponDefs = require(ReplicatedStorage.Shared.Defs.WeaponDefs)
@@ -174,7 +174,7 @@ function LobbySession.Attack(self: LobbySession)
 			)
 		end)
 		:andThen(function()
-			LevelService:AddExperience(self.Player, self.WeaponDef.Power)
+			PowerService:AddPower(self.Player, self.WeaponDef.Power)
 
 			EffectService:All(
 				EffectEmission({
