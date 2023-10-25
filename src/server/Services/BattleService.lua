@@ -11,6 +11,7 @@ type BattleService = typeof(BattleService)
 
 local BattlesByPlayer = {}
 local PromisesByPlayer = {}
+local BattleSlots = {}
 
 function BattleService.PrepareBlocking(self: BattleService)
 	self.Comm = Comm.ServerComm.new(ReplicatedStorage, "BattleService")
@@ -56,6 +57,20 @@ function BattleService.Remove(self: BattleService, player: Player)
 	BattlesByPlayer[player] = nil
 
 	self.StatusRemote:SetFor(player, nil)
+end
+
+function BattleService.ReserveSlot(_self: BattleService, callback: (Vector3) -> ()): () -> ()
+	local index = 1
+	while BattleSlots[index] do
+		index += 1
+	end
+	BattleSlots[index] = true
+
+	callback(Vector3.new(256 + 64 * index, 1024, 0))
+
+	return function()
+		BattleSlots[index] = false
+	end
 end
 
 return BattleService

@@ -10,7 +10,7 @@ local DefaultProps = {
 	BorderSizePixel = 0,
 	BorderColor3 = Color3.new(0, 0, 0),
 	BackgroundColor3 = Color3.new(1, 1, 1),
-	Image = "rbxassetid://15162666041",
+	Image = "rbxassetid://15169414872",
 	ScaleType = Enum.ScaleType.Crop,
 }
 
@@ -22,6 +22,7 @@ local SizeHovered = UDim2.new(1, 2, 1, 2)
 
 return function(props)
 	local hoverBinding, hoverMotor = UseMotor(0)
+	local borderThickness = props.BorderSizePixel or 4
 
 	return React.createElement(Container, Sift.Dictionary.withKeys(props, "SizeConstraint", "Size", "Position", "AnchorPoint"), {
 		Button = React.createElement(
@@ -66,7 +67,7 @@ return function(props)
 
 				Stroke = React.createElement("UIStroke", {
 					Color = props.BorderColor3 or Color3.new(0, 0, 0),
-					Thickness = 4,
+					Thickness = borderThickness,
 				}),
 			}
 		),

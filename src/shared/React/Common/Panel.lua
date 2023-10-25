@@ -8,7 +8,7 @@ local DefaultProps = {
 	BorderSizePixel = 0,
 	BorderColor3 = Color3.new(0, 0, 0),
 	BackgroundColor3 = Color3.new(1, 1, 1),
-	Image = "rbxassetid://15162666041",
+	Image = "rbxassetid://15169414872",
 	ScaleType = Enum.ScaleType.Crop,
 }
 

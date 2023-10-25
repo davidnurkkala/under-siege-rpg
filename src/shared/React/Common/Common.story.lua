@@ -1,40 +1,41 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Button = require(ReplicatedStorage.Shared.React.Common.Button)
+local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
+local Flipper = require(ReplicatedStorage.Packages.Flipper)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local React = require(ReplicatedStorage.Packages.React)
 local ReactRoblox = require(ReplicatedStorage.Packages.ReactRoblox)
+local SquishWindow = require(ReplicatedStorage.Shared.React.Common.SquishWindow)
+local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
+local UseMotor = require(ReplicatedStorage.Shared.React.Hooks.UseMotor)
+local Window = require(ReplicatedStorage.Shared.React.Common.Window)
 
-local function element(props)
-	local text, setText = React.useState("Play!")
-	local debounce = React.useRef(false)
+local function element()
+	local visible, setVisible = React.useState(true)
 
-	return React.createElement(Button, {
+	return React.createElement(SquishWindow, {
+		Visible = visible,
+		Size = UDim2.fromScale(16 / 23, 9 / 23),
 		Position = UDim2.fromScale(0.1, 0.1),
-		Size = UDim2.fromScale(0.16, 0.09),
-		SizeConstraint = Enum.SizeConstraint.RelativeXX,
-		ImageColor3 = BrickColor.new("Bright green").Color,
-		BorderColor3 = BrickColor.new("Earth green").Color,
+		BackgroundColor3 = CurrencyDefs.Primary.Colors.Secondary,
+		ImageColor3 = CurrencyDefs.Primary.Colors.Primary,
+		HeaderText = TextStroke("Test Window", 2),
 		[React.Event.Activated] = function()
-			if debounce.current then return end
-			debounce.current = true
-
-			setText("~click~")
-			task.wait(0.5)
-			setText("Play!")
-			debounce.current = false
+			setVisible(false)
+			task.wait(1)
+			setVisible(true)
 		end,
 	}, {
-		Text = React.createElement(Label, {
-			Size = UDim2.fromScale(1, 1),
-			Text = text,
+		Button = React.createElement(Button, {
+			Size = UDim2.fromScale(0.1, 0.1),
 		}),
 	})
 end
 
 return function(target)
 	local root = ReactRoblox.createRoot(target)
-	root:render(React.createElement(element, {}))
+	root:render(React.createElement(element))
 
 	return function()
 		root:unmount()

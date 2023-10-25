@@ -3,7 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local Animate = require(ReplicatedStorage.Shared.Util.Animate)
-local PowerService = require(ServerScriptService.Server.Services.PowerService)
+local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
 local ExperienceButton = {}
@@ -32,7 +32,7 @@ function ExperienceButton.new(instance): ExperienceButton
 		local player = Players:GetPlayerFromCharacter(part.Parent)
 		if not player then return end
 
-		PowerService:AddPower(player, 1)
+		CurrencyService:AddCurrency(player, "Primary", 1)
 
 		active = false
 		Animate(1, function(scalar)

@@ -15,6 +15,14 @@ export type SaveFile = typeof(setmetatable({} :: {
 	Observers: { [string]: { [Observer]: boolean } },
 }, SaveFile))
 
+local function compare(a, b)
+	if typeof(a) == "table" and typeof(b) == "table" then
+		return Sift.Dictionary.equalsDeep(a, b)
+	else
+		return a == b
+	end
+end
+
 function SaveFile.new(document): SaveFile
 	local self: SaveFile = setmetatable({
 		Document = document,
@@ -55,7 +63,7 @@ end
 
 function SaveFile.Set(self: SaveFile, key: string, value: any)
 	local data = self.Document:read()
-	if data[key] == value then return end
+	if compare(data[key], value) then return end
 
 	self.Document:write(Sift.Dictionary.set(data, key, value))
 

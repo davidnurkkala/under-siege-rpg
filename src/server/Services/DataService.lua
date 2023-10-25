@@ -6,6 +6,7 @@ local Lapis = require(ServerScriptService.ServerPackages.Lapis)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local SaveFile = require(ServerScriptService.Server.Classes.SaveFile)
+local Sift = require(ReplicatedStorage.Packages.Sift)
 
 local COLLECTION_NAME = "DataService" .. Configuration.DataStoreVersion
 
@@ -28,14 +29,40 @@ function DataService.PrepareBlocking(self: DataService)
 			return true
 		end,
 		defaultData = {
-			Power = 0,
-			PrestigeCount = 0,
 			Weapons = {
 				Equipped = "WoodenBow",
 				Owned = {
 					WoodenBow = true,
 				},
 			},
+			Currency = {
+				Primary = 0,
+				Secondary = 0,
+				Premium = 0,
+				Prestige = 0,
+			},
+		},
+		migrations = {
+			function(data)
+				return Sift.Dictionary.merge(data, {
+					Currency = {
+						Normal = 0,
+						Premium = 0,
+					},
+				})
+			end,
+			function(data)
+				return Sift.Dictionary.removeKeys(
+					Sift.Dictionary.set(data, "Currency", {
+						Primary = data.Power,
+						Secondary = data.Currency.Normal,
+						Premium = data.Currency.Premium,
+						Prestige = data.PrestigeCount,
+					}),
+					"Power",
+					"PrestigeCount"
+				)
+			end,
 		},
 	})
 

@@ -4,8 +4,10 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local BattleService = require(ServerScriptService.Server.Services.BattleService)
 local BattleSession = require(ServerScriptService.Server.Classes.BattleSession)
 local Battler = require(ServerScriptService.Server.Classes.Battler)
+local BattlerDefs = require(ReplicatedStorage.Shared.Defs.BattlerDefs)
 local CardDefs = require(ReplicatedStorage.Shared.Defs.CardDefs)
 local Cooldown = require(ReplicatedStorage.Shared.Classes.Cooldown)
+local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local Goon = require(ServerScriptService.Server.Classes.Goon)
 local PartPath = require(ReplicatedStorage.Shared.Classes.PartPath)
 local Promise = require(ReplicatedStorage.Packages.Promise)
@@ -59,17 +61,21 @@ function Battle.new(args: {
 	Model: BattlegroundModel,
 	Battlers: { Battler.Battler },
 }): Battle
+	local trove = Trove.new()
+
 	local pathFolder = args.Model:FindFirstChild("Path")
 	assert(pathFolder, "No path folder")
 
-	args.Model:PivotTo(CFrame.new(256, 0, 0))
+	trove:Add(BattleService:ReserveSlot(function(position)
+		args.Model:PivotTo(CFrame.new(position))
+	end))
 
 	local self: Battle = setmetatable({
 		Battlers = args.Battlers,
 		Model = args.Model,
 		Field = {},
 		Path = PartPath.new(pathFolder),
-		Trove = Trove.new(),
+		Trove = trove,
 		Destroyed = Signal.new(),
 		Ended = Signal.new(),
 		Changed = Signal.new(),
@@ -140,6 +146,9 @@ function Battle.fromPlayerVersusBattler(player: Player, battlerId: string, battl
 				BattleService:Add(player, battle)
 				battle.Destroyed:Connect(function()
 					BattleService:Remove(player)
+
+					local def = BattlerDefs[battlerId]
+					CurrencyService:AddCurrency(player, "Secondary", def.Reward)
 				end)
 			end)
 	end)
