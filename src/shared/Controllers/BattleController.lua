@@ -2,17 +2,22 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Animate = require(ReplicatedStorage.Shared.Util.Animate)
 local Comm = require(ReplicatedStorage.Packages.Comm)
+local Compare = require(ReplicatedStorage.Shared.Util.Compare)
 local Sift = require(ReplicatedStorage.Packages.Sift)
+local Signal = require(ReplicatedStorage.Packages.Signal)
 local SmoothStep = require(ReplicatedStorage.Shared.Util.SmoothStep)
 
 local BattleController = {
 	Priority = 0,
 	InBattle = false,
+	StatusChanged = Signal.new(),
 }
 
 type BattleController = typeof(BattleController)
 
 function BattleController.PrepareBlocking(self: BattleController)
+	self.Status = nil
+
 	self.Comm = Comm.ClientComm.new(ReplicatedStorage, true, "BattleService")
 
 	self.Comm:GetProperty("Status"):Observe(function(...)
@@ -21,6 +26,20 @@ function BattleController.PrepareBlocking(self: BattleController)
 end
 
 function BattleController.Start(self: BattleController) end
+
+function BattleController.ObserveStatus(self: BattleController, callback: (any) -> ()): () -> ()
+	local connection = self.StatusChanged:Connect(callback)
+	callback(self.Status)
+	return function()
+		connection:Disconnect()
+	end
+end
+
+function BattleController.SetStatus(self: BattleController, status: any?)
+	if Compare(status, self.Status) then return end
+	self.Status = status
+	self.StatusChanged:Fire(status)
+end
 
 function BattleController:SetInBattle(inBattle: boolean, status: any)
 	if inBattle == self.InBattle then return end
@@ -57,6 +76,7 @@ function BattleController:SetInBattle(inBattle: boolean, status: any)
 end
 
 function BattleController.OnStatusUpdated(self: BattleController, status: any?)
+	self:SetStatus(status)
 	self:SetInBattle(status ~= nil, status)
 end
 

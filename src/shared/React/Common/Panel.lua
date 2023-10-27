@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local PaddingAll = require(ReplicatedStorage.Shared.React.Common.PaddingAll)
 local React = require(ReplicatedStorage.Packages.React)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 
@@ -13,18 +14,20 @@ local DefaultProps = {
 }
 
 return function(props)
+	local corner = props.Corner or UDim.new(0, 8)
+	local padding = props.Padding or corner
+
+	props = Sift.Dictionary.removeKeys(props, "Corner", "Padding")
+
 	return React.createElement("ImageLabel", Sift.Dictionary.merge(DefaultProps, props), {
 		Children = React.createElement(React.Fragment, nil, props.children),
 
 		Corner = React.createElement("UICorner", {
-			CornerRadius = UDim.new(0, 8),
+			CornerRadius = corner,
 		}),
 
-		Padding = React.createElement("UIPadding", {
-			PaddingTop = UDim.new(0, 8),
-			PaddingBottom = UDim.new(0, 8),
-			PaddingRight = UDim.new(0, 8),
-			PaddingLeft = UDim.new(0, 8),
+		Padding = React.createElement(PaddingAll, {
+			Padding = padding,
 		}),
 
 		Stroke = React.createElement("UIStroke", {

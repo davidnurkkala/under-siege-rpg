@@ -93,6 +93,10 @@ function Battle.new(args: {
 		local dy = char:GetPivot().Y - (cframe.Y - size.Y / 2)
 		char:PivotTo(base.Spawn.CFrame + Vector3.new(0, dy, 0))
 		base.Spawn:Destroy()
+
+		battler:Observe(function()
+			self.Changed:Fire(self:GetStatus())
+		end)
 	end
 
 	self.Model.Spawns:Destroy()
@@ -157,7 +161,7 @@ end
 function Battle.GetStatus(self: Battle)
 	return {
 		Model = self.Model,
-		Battlers = Sift.Array.map(self.Battlers, function(battler)
+		Battlers = Sift.Array.map(self.Battlers, function(battler: Battler.Battler)
 			return battler:GetStatus()
 		end),
 	}

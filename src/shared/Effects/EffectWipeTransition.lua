@@ -19,7 +19,7 @@ return function(args: {
 	end, function()
 		local sg = Instance.new("ScreenGui")
 		sg.Name = "WipeTransition"
-		sg.DisplayOrder = -1024
+		sg.DisplayOrder = 1024
 		sg.IgnoreGuiInset = true
 
 		local frame = Instance.new("Frame")

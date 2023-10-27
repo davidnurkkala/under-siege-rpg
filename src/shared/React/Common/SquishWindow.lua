@@ -21,11 +21,12 @@ return function(props)
 		end
 	end, { visible })
 
-	local containerProps = Sift.Dictionary.merge(Sift.Dictionary.withKeys(props, "Size", "SizeConstraint", "Position", "AnchorPoint"), {
-		Visible = binding:map(function(value)
-			return value > 0.1
-		end),
-	})
+	local containerProps =
+		Sift.Dictionary.merge(Sift.Dictionary.withKeys(props, "ZIndex", "Size", "SizeConstraint", "Position", "AnchorPoint", "LayoutOrder"), {
+			Visible = binding:map(function(value)
+				return value > 0.1
+			end),
+		})
 
 	local windowProps = Sift.Dictionary.merge(props, {
 		Size = binding:map(function(value)

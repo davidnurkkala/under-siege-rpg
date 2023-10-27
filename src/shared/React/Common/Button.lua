@@ -24,7 +24,7 @@ return function(props)
 	local hoverBinding, hoverMotor = UseMotor(0)
 	local borderThickness = props.BorderSizePixel or 4
 
-	return React.createElement(Container, Sift.Dictionary.withKeys(props, "SizeConstraint", "Size", "Position", "AnchorPoint"), {
+	return React.createElement(Container, Sift.Dictionary.withKeys(props, "ZIndex", "SizeConstraint", "Size", "Position", "AnchorPoint", "LayoutOrder"), {
 		Button = React.createElement(
 			"ImageButton",
 			Sift.Dictionary.merge(DefaultProps, props, {

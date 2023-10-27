@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Compare = require(ReplicatedStorage.Shared.Util.Compare)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local SaveFile = {}
 SaveFile.__index = SaveFile
@@ -14,14 +15,6 @@ export type SaveFile = typeof(setmetatable({} :: {
 	Document: any,
 	Observers: { [string]: { [Observer]: boolean } },
 }, SaveFile))
-
-local function compare(a, b)
-	if typeof(a) == "table" and typeof(b) == "table" then
-		return Sift.Dictionary.equalsDeep(a, b)
-	else
-		return a == b
-	end
-end
 
 function SaveFile.new(document): SaveFile
 	local self: SaveFile = setmetatable({
@@ -63,7 +56,7 @@ end
 
 function SaveFile.Set(self: SaveFile, key: string, value: any)
 	local data = self.Document:read()
-	if compare(data[key], value) then return end
+	if Compare(data[key], value) then return end
 
 	self.Document:write(Sift.Dictionary.set(data, key, value))
 

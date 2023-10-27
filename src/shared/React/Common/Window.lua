@@ -17,7 +17,7 @@ return function(props)
 
 	return React.createElement(
 		"ImageLabel",
-		Sift.Dictionary.merge(Sift.Dictionary.withKeys(props, "Size", "SizeConstraint", "Position", "AnchorPoint", "ImageColor3"), {
+		Sift.Dictionary.merge(Sift.Dictionary.withKeys(props, "ZIndex", "Size", "SizeConstraint", "Position", "AnchorPoint", "ImageColor3", "LayoutOrder"), {
 			Image = "rbxassetid://15169414872",
 			ScaleType = Enum.ScaleType.Crop,
 		}),

@@ -1,15 +1,14 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local ActionController = require(ReplicatedStorage.Shared.Controllers.ActionController)
-local Button = require(ReplicatedStorage.Shared.React.Common.Button)
 local Image = require(ReplicatedStorage.Shared.React.Common.Image)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
+local PrimaryButton = require(ReplicatedStorage.Shared.React.Common.PrimaryButton)
 local React = require(ReplicatedStorage.Packages.React)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 local WeaponController = require(ReplicatedStorage.Shared.Controllers.WeaponController)
 local WeaponDefs = require(ReplicatedStorage.Shared.Defs.WeaponDefs)
 
-return function(props)
+return function()
 	local powerGain, setPowerGain = React.useState(0)
 
 	React.useEffect(function()
@@ -27,18 +26,8 @@ return function(props)
 			connection:Disconnect()
 		end
 	end, {})
-	return React.createElement(Button, {
-		Size = UDim2.fromScale(0.075, 0.075),
-		SizeConstraint = Enum.SizeConstraint.RelativeXX,
-		AnchorPoint = Vector2.new(0.5, 1),
-		Position = UDim2.fromScale(0.5, 1),
-		ImageColor3 = BrickColor.new("Bright red").Color,
-		BorderColor3 = BrickColor.new("Crimson").Color,
 
-		[React.Event.Activated] = function()
-			ActionController:Once("Primary")
-		end,
-	}, {
+	return React.createElement(PrimaryButton, nil, {
 		Icon = React.createElement(Image, {
 			Image = "rbxassetid://15162828605",
 		}),
