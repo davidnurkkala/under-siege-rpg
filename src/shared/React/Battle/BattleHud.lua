@@ -24,7 +24,6 @@ return function(props: {
 		if not props.Visible then return end
 
 		return BattleController:ObserveStatus(function(st)
-			print("status changed", st)
 			setStatus(st)
 		end)
 	end, { props.Visible })

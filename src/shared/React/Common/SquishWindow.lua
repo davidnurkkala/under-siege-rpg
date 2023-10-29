@@ -11,7 +11,9 @@ return function(props)
 	local binding, motor = UseMotor(0)
 
 	local visible = if props.Visible == nil then true else props.Visible
-	props = Sift.Dictionary.removeKey(props, "Visible")
+	local renderContainer = props.RenderContainer or function() end
+
+	props = Sift.Dictionary.removeKeys(props, "Visible", "RenderContainer")
 
 	React.useEffect(function()
 		if visible then
@@ -39,5 +41,6 @@ return function(props)
 
 	return React.createElement(Container, containerProps, {
 		Window = React.createElement(Window, windowProps),
+		Container = renderContainer(),
 	})
 end

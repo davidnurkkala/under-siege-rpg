@@ -17,6 +17,48 @@ local Weapons = {
 			Hit = { "BowHit1", "BowHit2", "BowHit3", "BowHit4" },
 		},
 	},
+	Crossbow = {
+		Name = "Crossbow",
+		Power = 10,
+		AttackCooldownTime = 0.4,
+		HoldPartName = "LeftHand",
+		Animations = {
+			Idle = "BowIdle",
+			Shoot = "BowShoot",
+		},
+		Sounds = {
+			Shoot = { "BowShoot1", "BowShoot2", "BowShoot3", "BowShoot4" },
+			Hit = { "BowHit1", "BowHit2", "BowHit3", "BowHit4" },
+		},
+	},
+	SimpleWand = {
+		Name = "Apprentice Wand",
+		Power = 50,
+		AttackCooldownTime = 0.4,
+		HoldPartName = "LeftHand",
+		Animations = {
+			Idle = "BowIdle",
+			Shoot = "BowShoot",
+		},
+		Sounds = {
+			Shoot = { "BowShoot1", "BowShoot2", "BowShoot3", "BowShoot4" },
+			Hit = { "BowHit1", "BowHit2", "BowHit3", "BowHit4" },
+		},
+	},
+	RecurveBow = {
+		Name = "Recurve Bow",
+		Power = 200,
+		AttackCooldownTime = 0.4,
+		HoldPartName = "LeftHand",
+		Animations = {
+			Idle = "BowIdle",
+			Shoot = "BowShoot",
+		},
+		Sounds = {
+			Shoot = { "BowShoot1", "BowShoot2", "BowShoot3", "BowShoot4" },
+			Hit = { "BowHit1", "BowHit2", "BowHit3", "BowHit4" },
+		},
+	},
 }
 
 return Sift.Dictionary.map(Weapons, function(def, id)

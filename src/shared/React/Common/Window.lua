@@ -14,6 +14,7 @@ return function(props)
 	local borderSizePixel = props.BorderSizePixel or 2
 	local borderColor3 = props.BorderColor3 or Color3.new(0, 0, 0)
 	local headerText = props.HeaderText or "Window"
+	local renderWindow = props.RenderWindow or function() end
 
 	return React.createElement(
 		"ImageLabel",
@@ -30,6 +31,8 @@ return function(props)
 				Thickness = borderSizePixel,
 				Color = borderColor3,
 			}),
+
+			Window = renderWindow(),
 
 			Header = React.createElement("Frame", {
 				Size = UDim2.fromScale(1, 0.1),
