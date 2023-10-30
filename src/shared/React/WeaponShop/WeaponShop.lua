@@ -101,8 +101,8 @@ return function(props: {
 							end,
 						}, {
 							Name = React.createElement(Label, {
-								Position = UDim2.fromScale(0, 0.8),
-								AnchorPoint = Vector2.new(0, 1),
+								Position = UDim2.fromScale(0, 0),
+								AnchorPoint = Vector2.new(0, 0),
 								Size = UDim2.fromScale(1, 0.15),
 								Text = TextStroke(def.Name, 2),
 								TextXAlignment = Enum.TextXAlignment.Left,
@@ -110,8 +110,7 @@ return function(props: {
 							}),
 
 							Power = React.createElement(Label, {
-								Position = UDim2.fromScale(1, 1),
-								AnchorPoint = Vector2.new(1, 1),
+								Position = UDim2.fromScale(0, 0.2),
 								Size = UDim2.fromScale(1, 0.15),
 								Text = TextStroke(`+{def.Power}`, 2),
 								TextColor3 = BrickColor.new("Light red").Color,
@@ -122,14 +121,16 @@ return function(props: {
 							Price = (not isOwned) and React.createElement(React.Fragment, nil, {
 								CurrencyIcon = React.createElement(Image, {
 									Size = UDim2.fromScale(0.15, 0.15),
-									Position = UDim2.fromScale(0, 0),
+									Position = UDim2.fromScale(0, 1),
+									AnchorPoint = Vector2.new(0, 1),
 									Image = CurrencyDefs.Primary.Image,
 									ZIndex = 4,
 								}),
 
 								Price = React.createElement(Label, {
 									Size = UDim2.fromScale(0.8, 0.15),
-									Position = UDim2.fromScale(0.2, 0),
+									Position = UDim2.fromScale(0.2, 1),
+									AnchorPoint = Vector2.new(0, 1),
 									Text = TextStroke(def.Requirements.Currency.Primary, 2),
 									TextXAlignment = Enum.TextXAlignment.Left,
 									ZIndex = 4,
@@ -139,7 +140,8 @@ return function(props: {
 							Equip = isOwned and React.createElement(React.Fragment, nil, {
 								Label = React.createElement(Label, {
 									Size = UDim2.fromScale(1, 0.15),
-									Position = UDim2.fromScale(0, 0),
+									Position = UDim2.fromScale(0, 1),
+									AnchorPoint = Vector2.new(0, 1),
 									TextXAlignment = Enum.TextXAlignment.Left,
 									Text = if isEquipped then TextStroke("EQUIPPED", 2) else TextStroke("Equip", 2),
 								}),
