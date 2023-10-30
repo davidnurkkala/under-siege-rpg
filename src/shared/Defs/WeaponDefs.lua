@@ -17,6 +17,20 @@ local Weapons = {
 			Hit = { "BowHit1", "BowHit2", "BowHit3", "BowHit4" },
 		},
 	},
+	SimpleBow = {
+		Name = "Simple Bow",
+		Power = 5,
+		AttackCooldownTime = 0.4,
+		HoldPartName = "LeftHand",
+		Animations = {
+			Idle = "BowIdle",
+			Shoot = "BowShoot",
+		},
+		Sounds = {
+			Shoot = { "BowShoot1", "BowShoot2", "BowShoot3", "BowShoot4" },
+			Hit = { "BowHit1", "BowHit2", "BowHit3", "BowHit4" },
+		},
+	},
 	Crossbow = {
 		Name = "Crossbow",
 		Power = 10,
@@ -64,6 +78,14 @@ local Weapons = {
 return Sift.Dictionary.map(Weapons, function(def, id)
 	local model = ReplicatedStorage.Assets.Weapons:FindFirstChild(id)
 	assert(model, `Missing model for weapon {id}`)
+
+	if not def.Requirements then def = Sift.Dictionary.merge(def, {
+		Requirements = {
+			Currency = {
+				Primary = def.Power * 25,
+			},
+		},
+	}) end
 
 	return Sift.Dictionary.merge(def, {
 		Id = id,
