@@ -59,6 +59,8 @@ return function(props: {
 		AnchorPoint = Vector2.new(0.5, 0),
 		Size = UDim2.fromScale(1, 1),
 		HeaderText = TextStroke("Weapons", 2),
+		BackgroundColor3 = Color3.fromHex("#BD7975"),
+		ImageColor3 = Color3.fromHex("#BD9F75"),
 
 		RenderContainer = function()
 			return React.createElement("UISizeConstraint", {
