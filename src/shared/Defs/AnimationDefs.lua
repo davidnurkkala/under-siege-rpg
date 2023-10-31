@@ -6,6 +6,8 @@ local Ids = {
 	BowIdle = 14817002033,
 	BowShoot = 14817098342,
 
+	GenericGoonDie = 15152357009,
+
 	ConscriptWalk = 15082639586,
 	ConscriptAttack = 15082678435,
 }

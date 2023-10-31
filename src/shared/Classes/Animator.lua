@@ -1,6 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local AnimationDefs = require(ReplicatedStorage.Shared.Defs.AnimationDefs)
+local Sift = require(ReplicatedStorage.Packages.Sift)
+
 local Animator = {}
 Animator.__index = Animator
 
@@ -47,6 +49,10 @@ function Animator.StopHard(self: Animator, ...)
 		track:Stop(0)
 		track:AdjustWeight(0)
 	end
+end
+
+function Animator.StopHardAll(self: Animator)
+	self:StopHard(unpack(Sift.Dictionary.keys(self.Tracks)))
 end
 
 function Animator.Destroy(self: Animator)

@@ -20,6 +20,10 @@ function ActionServiceSubscription.new(player: Player, actionName: string, callb
 		Active = false,
 	}, ActionServiceSubscription)
 
+	self.Trove:Add(function()
+		self.Active = false
+	end)
+
 	self:SetUpConnections(callback, actionService)
 
 	return self

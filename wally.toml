@@ -20,6 +20,7 @@ Input = "sleitnick/input@2.1.1"
 WaitFor = "sleitnick/wait-for@0.2.2"
 Observers = "sleitnick/observers@^0.3.3"
 Shake = "sleitnick/shake@0.1.7"
+Flipper = "reselim/flipper@2.0.0"
 
 [server-dependencies]
 Cmdr = "evaera/cmdr@1.11.0"

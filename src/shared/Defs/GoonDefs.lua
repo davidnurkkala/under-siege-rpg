@@ -5,17 +5,34 @@ local Sift = require(ReplicatedStorage.Packages.Sift)
 local Goons = {
 	Conscript = {
 		ModelName = "Conscript",
+		Brain = {
+			Id = "BasicMelee",
+		},
 		Animations = {
 			Walk = "ConscriptWalk",
 			Attack = "ConscriptAttack",
+			Die = "GenericGoonDie",
 		},
+		Sounds = {
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Size = 0.03,
 		Speed = function()
-			return 5
+			return 0.05
+		end,
+		Range = function()
+			return 0.1
+		end,
+		AttackRate = function()
+			return 0.75
 		end,
 		Damage = function(level)
-			return 1 + level
+			return 4 + level
 		end,
-		OnUpdated = function(self, dt) end,
+		HealthMax = function(level)
+			return 10 + 2 * (level - 1)
+		end,
 	},
 }
 

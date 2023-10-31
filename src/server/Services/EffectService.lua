@@ -37,6 +37,14 @@ function EffectService.Effect(self: EffectService, player: Player, ...)
 	end, ...)
 end
 
+function EffectService.EffectPlayers(self: EffectService, players: { Player }, ...)
+	local args = { ... }
+
+	return Promise.all(Sift.Array.map(players, function(player)
+		return self:Effect(player, unpack(args))
+	end))
+end
+
 function EffectService.Start(self: EffectService) end
 
 return EffectService

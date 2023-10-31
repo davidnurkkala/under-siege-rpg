@@ -7,9 +7,10 @@ local Sift = require(ReplicatedStorage.Packages.Sift)
 
 return function(args: {
 	Model: Model,
+	FadeTime: number?,
 })
 	return function()
-		return script.Name, args, Promise.resolve()
+		return script.Name, args, if args.FadeTime then Promise.delay(args.FadeTime) else Promise.resolve()
 	end, function()
 		local fadeTime = 0
 
@@ -38,6 +39,8 @@ return function(args: {
 
 			return
 		end)
+
+		if args.FadeTime then fadeTime = math.max(fadeTime, args.FadeTime) end
 
 		return Promise.all(Sift.Array.append(
 			Sift.Array.map(fadeCallbacks, function(callback)

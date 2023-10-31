@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Compare = require(ReplicatedStorage.Shared.Util.Compare)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local SaveFile = {}
 SaveFile.__index = SaveFile
@@ -55,7 +56,7 @@ end
 
 function SaveFile.Set(self: SaveFile, key: string, value: any)
 	local data = self.Document:read()
-	if data[key] == value then return end
+	if Compare(data[key], value) then return end
 
 	self.Document:write(Sift.Dictionary.set(data, key, value))
 

@@ -4,13 +4,13 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local ActionService = require(ServerScriptService.Server.Services.ActionService)
 local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
 local Cooldown = require(ReplicatedStorage.Shared.Classes.Cooldown)
+local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local EffectEmission = require(ReplicatedStorage.Shared.Effects.EffectEmission)
 local EffectFaceTarget = require(ReplicatedStorage.Shared.Effects.EffectFaceTarget)
 local EffectProjectile = require(ReplicatedStorage.Shared.Effects.EffectProjectile)
 local EffectService = require(ServerScriptService.Server.Services.EffectService)
 local EffectShakeModel = require(ReplicatedStorage.Shared.Effects.EffectShakeModel)
 local EffectSound = require(ReplicatedStorage.Shared.Effects.EffectSound)
-local LevelService = require(ServerScriptService.Server.Services.LevelService)
 local LobbySessions = require(ServerScriptService.Server.Singletons.LobbySessions)
 local PickRandom = require(ReplicatedStorage.Shared.Util.PickRandom)
 local PlayAreaService = require(ServerScriptService.Server.Services.PlayAreaService)
@@ -18,6 +18,7 @@ local PlayerLeaving = require(ReplicatedStorage.Shared.Util.PlayerLeaving)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local WeaponDefs = require(ReplicatedStorage.Shared.Defs.WeaponDefs)
+local WeaponHelper = require(ReplicatedStorage.Shared.Util.WeaponHelper)
 local WeaponService = require(ServerScriptService.Server.Services.WeaponService)
 
 local LobbySession = {}
@@ -47,18 +48,7 @@ function LobbySession.new(args: {
 
 	local trove = Trove.new()
 
-	local model = trove:Clone(args.WeaponDef.Model)
-	do
-		model.Parent = args.Character
-
-		local part1 = model.Weapon
-		local part0 = args.HoldPart
-		local motor = part1.Grip
-		motor.Part1 = part1
-		motor.Part0 = part0
-		motor.Enabled = true
-	end
-
+	local model = trove:Add(WeaponHelper.attachModel(args.WeaponDef, args.Character, args.HoldPart))
 	local animator = trove:Construct(Animator, args.Human)
 
 	local self: LobbySession = setmetatable({
@@ -70,6 +60,9 @@ function LobbySession.new(args: {
 		WeaponDef = args.WeaponDef,
 		AttackCooldown = Cooldown.new(args.WeaponDef.AttackCooldownTime),
 	}, LobbySession)
+
+	-- TODO: link up to a spawn zone?
+	self.Character:MoveTo(Vector3.new(0, 16, 0))
 
 	self.Animator:Play(self.WeaponDef.Animations.Idle)
 
@@ -97,6 +90,10 @@ function LobbySession.promised(player: Player)
 		if player.Character then
 			resolve(player.Character)
 		else
+			Promise.defer(function()
+				player:LoadCharacter()
+			end):catch(function() end)
+
 			resolve(Promise.fromEvent(player.CharacterAdded):timeout(5))
 		end
 	end):andThen(function(character)
@@ -135,7 +132,7 @@ function LobbySession.promised(player: Player)
 				}))
 			end)
 		end)
-	end)
+	end, function() end)
 end
 
 function LobbySession.Attack(self: LobbySession)
@@ -172,12 +169,12 @@ function LobbySession.Attack(self: LobbySession)
 				}),
 				EffectSound({
 					SoundId = PickRandom(self.WeaponDef.Sounds.Shoot),
-					Parent = part,
+					Target = part,
 				})
 			)
 		end)
 		:andThen(function()
-			LevelService:AddExperience(self.Player, self.WeaponDef.Power)
+			CurrencyService:AddCurrency(self.Player, "Primary", self.WeaponDef.Power)
 
 			EffectService:All(
 				EffectEmission({
@@ -187,7 +184,7 @@ function LobbySession.Attack(self: LobbySession)
 				}),
 				EffectSound({
 					SoundId = PickRandom(self.WeaponDef.Sounds.Hit),
-					Parent = dummy.Body,
+					Target = dummy.Body,
 				}),
 				EffectShakeModel({
 					Model = dummy,
