@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Hud = require(ReplicatedStorage.Shared.React.Hud.Hud)
 local PaddingAll = require(ReplicatedStorage.Shared.React.Common.PaddingAll)
 local React = require(ReplicatedStorage.Packages.React)
+local WeaponShopBridge = require(ReplicatedStorage.Shared.React.WeaponShop.WeaponShopBridge)
 
 return function()
 	return React.createElement(React.Fragment, nil, {
@@ -11,5 +12,7 @@ return function()
 		}),
 
 		Hud = React.createElement(Hud),
+
+		WeaponBridge = React.createElement(WeaponShopBridge),
 	})
 end

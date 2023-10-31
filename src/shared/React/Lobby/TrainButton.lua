@@ -12,7 +12,7 @@ return function()
 	local powerGain, setPowerGain = React.useState(0)
 
 	React.useEffect(function()
-		local connection = WeaponController:ObserveWeapons(function(weapons)
+		return WeaponController:ObserveWeapons(function(weapons)
 			if not weapons then return end
 			if not weapons.Equipped then return end
 
@@ -21,10 +21,6 @@ return function()
 
 			setPowerGain(def.Power)
 		end)
-
-		return function()
-			connection:Disconnect()
-		end
 	end, {})
 
 	return React.createElement(PrimaryButton, nil, {

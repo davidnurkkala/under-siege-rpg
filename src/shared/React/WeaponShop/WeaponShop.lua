@@ -1,12 +1,16 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Aspect = require(ReplicatedStorage.Shared.React.Common.Aspect)
 local Button = require(ReplicatedStorage.Shared.React.Common.Button)
+local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
-local GridLayout = require(ReplicatedStorage.Shared.React.Common.GridLayout)
 local Image = require(ReplicatedStorage.Shared.React.Common.Image)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local LayoutContainer = require(ReplicatedStorage.Shared.React.Common.LayoutContainer)
+local ListLayout = require(ReplicatedStorage.Shared.React.Common.ListLayout)
+local Panel = require(ReplicatedStorage.Shared.React.Common.Panel)
 local React = require(ReplicatedStorage.Packages.React)
+local ScrollingFrame = require(ReplicatedStorage.Shared.React.Common.ScrollingFrame)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local SquishWindow = require(ReplicatedStorage.Shared.React.Common.SquishWindow)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
@@ -52,6 +56,7 @@ return function(props: {
 	Visible: boolean,
 	Weapons: any,
 	Select: (string) -> (),
+	Close: () -> (),
 })
 	return React.createElement(SquishWindow, {
 		Visible = props.Visible,
@@ -67,96 +72,123 @@ return function(props: {
 				MaxSize = Vector2.new(500, 300),
 			})
 		end,
+
+		[React.Event.Activated] = props.Close,
 	}, {
-		Layout = React.createElement(GridLayout, {
-			CellSize = UDim2.fromScale(0.25, 1),
-			CellPadding = UDim2.new(),
+		ScrollingFrame = React.createElement(ScrollingFrame, {
+			RenderLayout = function(setCanvasSize)
+				return React.createElement(ListLayout, {
+					[React.Change.AbsoluteContentSize] = function(object)
+						setCanvasSize(UDim2.fromOffset(0, object.AbsoluteContentSize.Y))
+					end,
+				})
+			end,
 		}, {
-			Constraint = React.createElement("UIAspectRatioConstraint", {
-				AspectRatio = 1,
-			}),
-		}),
+			Panels = React.createElement(
+				React.Fragment,
+				nil,
+				Sift.Dictionary.map(
+					Sift.Array.sort(Sift.Dictionary.keys(WeaponDefs), function(idA, idB)
+						local a, b = WeaponDefs[idA], WeaponDefs[idB]
+						return a.Power < b.Power
+					end),
+					function(id, index)
+						local def = WeaponDefs[id]
 
-		Buttons = React.createElement(
-			React.Fragment,
-			nil,
-			Sift.Dictionary.map(
-				Sift.Array.sort(Sift.Dictionary.keys(WeaponDefs), function(idA, idB)
-					local a, b = WeaponDefs[idA], WeaponDefs[idB]
-					return a.Power < b.Power
-				end),
-				function(id, index)
-					local def = WeaponDefs[id]
+						local isOwned = props.Weapons.Owned[id] ~= nil
+						local isEquipped = props.Weapons.Equipped == id
 
-					local isOwned = props.Weapons.Owned[id] ~= nil
-					local isEquipped = props.Weapons.Equipped == id
-
-					return React.createElement(LayoutContainer, {
-						Padding = 8,
-						LayoutOrder = index,
-					}, {
-						Button = React.createElement(Button, {
-							ImageColor3 = Color3.fromHex("#BD4549"),
-							BorderColor3 = if isEquipped then Color3.fromHex("#BD5946") else nil,
-							[React.Event.Activated] = function()
-								props.Select(id)
-							end,
+						return React.createElement(LayoutContainer, {
+							Size = UDim2.fromScale(1, 0),
+							Padding = 8,
+							LayoutOrder = index,
 						}, {
-							Name = React.createElement(Label, {
-								Position = UDim2.fromScale(0, 0),
-								AnchorPoint = Vector2.new(0, 0),
-								Size = UDim2.fromScale(1, 0.15),
-								Text = TextStroke(def.Name, 2),
-								TextXAlignment = Enum.TextXAlignment.Left,
-								ZIndex = 4,
+							Aspect = React.createElement(Aspect, {
+								AspectRatio = 5,
 							}),
 
-							Power = React.createElement(Label, {
-								Position = UDim2.fromScale(0, 0.2),
-								Size = UDim2.fromScale(1, 0.15),
-								Text = TextStroke(`+{def.Power}`, 2),
-								TextColor3 = BrickColor.new("Light red").Color,
-								TextXAlignment = Enum.TextXAlignment.Left,
-								ZIndex = 4,
-							}),
-
-							Price = (not isOwned) and React.createElement(React.Fragment, nil, {
-								CurrencyIcon = React.createElement(Image, {
-									Size = UDim2.fromScale(0.15, 0.15),
-									Position = UDim2.fromScale(0, 1),
-									AnchorPoint = Vector2.new(0, 1),
-									Image = CurrencyDefs.Primary.Image,
-									ZIndex = 4,
+							Panel = React.createElement(Panel, {
+								ImageColor3 = Color3.fromHex("#ec9497"),
+							}, {
+								PreviewContainer = React.createElement(Container, {
+									Size = UDim2.fromScale(1, 1),
+									SizeConstraint = Enum.SizeConstraint.RelativeYY,
+								}, {
+									Preview = React.createElement(weaponPreview, {
+										Def = def,
+									}),
 								}),
 
-								Price = React.createElement(Label, {
-									Size = UDim2.fromScale(0.8, 0.15),
-									Position = UDim2.fromScale(0.2, 1),
-									AnchorPoint = Vector2.new(0, 1),
-									Text = TextStroke(def.Requirements.Currency.Primary, 2),
+								Name = React.createElement(Label, {
+									Position = UDim2.fromScale(0.2, 0),
+									Size = UDim2.fromScale(0.5, 0.5),
+									Text = TextStroke(def.Name, 2),
 									TextXAlignment = Enum.TextXAlignment.Left,
 									ZIndex = 4,
 								}),
-							}),
 
-							Equip = isOwned and React.createElement(React.Fragment, nil, {
-								Label = React.createElement(Label, {
-									Size = UDim2.fromScale(1, 0.15),
-									Position = UDim2.fromScale(0, 1),
-									AnchorPoint = Vector2.new(0, 1),
+								Power = React.createElement(Label, {
+									Position = UDim2.fromScale(0.2, 0.5),
+									Size = UDim2.fromScale(0.5, 0.5),
+									Text = TextStroke(`+{def.Power}`, 2),
+									TextColor3 = BrickColor.new("Light red").Color,
 									TextXAlignment = Enum.TextXAlignment.Left,
-									Text = if isEquipped then TextStroke("EQUIPPED", 2) else TextStroke("Equip", 2),
+									ZIndex = 4,
 								}),
-							}),
 
-							Preview = React.createElement(weaponPreview, {
-								Def = def,
+								Button = React.createElement(Button, {
+									Size = UDim2.fromScale(0.25, 1),
+									AnchorPoint = Vector2.new(1, 0),
+									Position = UDim2.fromScale(1, 0),
+									ImageColor3 = Color3.fromHex("#BD4549"),
+									BorderColor3 = if isEquipped then Color3.fromHex("#BD5946") else nil,
+									[React.Event.Activated] = function()
+										props.Select(id)
+									end,
+								}, {
+									Price = (not isOwned) and React.createElement(React.Fragment, nil, {
+										Layout = React.createElement(ListLayout, {
+											FillDirection = Enum.FillDirection.Horizontal,
+											HorizontalAlignment = Enum.HorizontalAlignment.Center,
+											VerticalAlignment = Enum.VerticalAlignment.Center,
+											Padding = UDim.new(0.05, 0),
+										}),
+
+										CurrencyIcon = React.createElement(Image, {
+											LayoutOrder = 1,
+											Size = UDim2.fromScale(0.6, 0.6),
+											SizeConstraint = Enum.SizeConstraint.RelativeYY,
+											Image = CurrencyDefs.Primary.Image,
+											ZIndex = 4,
+										}),
+
+										Price = React.createElement(Label, {
+											LayoutOrder = 2,
+											AutomaticSize = Enum.AutomaticSize.X,
+											Size = UDim2.fromScale(0, 0.5),
+											Position = UDim2.fromScale(0.25, 0.5),
+											AnchorPoint = Vector2.new(0, 0.5),
+											Text = TextStroke(def.Requirements.Currency.Primary, 2),
+											TextXAlignment = Enum.TextXAlignment.Left,
+											ZIndex = 4,
+										}),
+									}),
+
+									Equip = isOwned and React.createElement(React.Fragment, nil, {
+										Label = React.createElement(Label, {
+											Size = UDim2.fromScale(1, 0.5),
+											Position = UDim2.fromScale(0.5, 0.5),
+											AnchorPoint = Vector2.new(0.5, 0.5),
+											Text = if isEquipped then TextStroke("EQUIPPED", 2) else TextStroke("Equip", 2),
+										}),
+									}),
+								}),
 							}),
 						}),
-					}),
-						def.Id
-				end
-			)
-		),
+							def.Id
+					end
+				)
+			),
+		}),
 	})
 end

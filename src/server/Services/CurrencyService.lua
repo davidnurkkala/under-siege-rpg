@@ -34,6 +34,14 @@ function CurrencyService.PrepareBlocking(self: CurrencyService)
 	end)
 end
 
+function CurrencyService.GetCurrency(_self: CurrencyService, player: Player, currencyType: string)
+	assert(Sift.Dictionary.has(CurrencyDefs, currencyType), `Invalid currency type {currencyType}`)
+
+	return DataService:GetSaveFile(player):andThen(function(saveFile)
+		return saveFile:Get("Currency")[currencyType]
+	end)
+end
+
 function CurrencyService.AddCurrency(_self: CurrencyService, player: Player, currencyType: string, amount: number)
 	assert(Sift.Dictionary.has(CurrencyDefs, currencyType), `Invalid currency type {currencyType}`)
 
