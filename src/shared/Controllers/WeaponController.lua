@@ -17,6 +17,7 @@ function WeaponController.PrepareBlocking(self: WeaponController)
 	self.Comm:GetProperty("Weapons"):Observe(function(weapons)
 		self:SetWeapons(weapons)
 	end)
+	self.UnlockWeaponRemote = self.Comm:GetFunction("UnlockWeapon")
 end
 
 function WeaponController.SetWeapons(self: WeaponController, weapons: any)
@@ -29,7 +30,13 @@ end
 function WeaponController.ObserveWeapons(self: WeaponController, callback: (any) -> ())
 	local connection = self.WeaponsChanged:Connect(callback)
 	callback(self.Weapons)
-	return connection
+	return function()
+		connection:Disconnect()
+	end
+end
+
+function WeaponController.UnlockWeapon(self: WeaponController, weaponId: string)
+	return self.UnlockWeaponRemote(weaponId)
 end
 
 function WeaponController.Start(self: WeaponController) end
