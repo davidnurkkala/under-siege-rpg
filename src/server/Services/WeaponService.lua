@@ -24,6 +24,11 @@ function WeaponService.PrepareBlocking(self: WeaponService)
 
 		return self:UnlockWeapon(player, weaponId)
 	end)
+	self.Comm:BindFunction("EquipWeapon", function(player, weaponId)
+		if not t.string(weaponId) then return end
+
+		return self:EquipWeapon(player, weaponId)
+	end)
 
 	Observers.observePlayer(function(player)
 		local promise = DataService:GetSaveFile(player):andThen(function(saveFile)
@@ -58,7 +63,7 @@ function WeaponService.EquipWeapon(_self: WeaponService, player: Player, weaponI
 	end)
 end
 
-function WeaponService.UnlockWeapon(_self: WeaponService, player: Player, weaponId: string)
+function WeaponService.UnlockWeapon(self: WeaponService, player: Player, weaponId: string)
 	local def = WeaponDefs[weaponId]
 	if not def then return Promise.resolve(false) end
 
@@ -80,7 +85,7 @@ function WeaponService.UnlockWeapon(_self: WeaponService, player: Player, weapon
 			end
 		end
 
-		return true
+		return self:OwnWeapon(player, weaponId)
 	end)
 end
 

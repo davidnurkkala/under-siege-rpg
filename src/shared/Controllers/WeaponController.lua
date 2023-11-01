@@ -18,6 +18,7 @@ function WeaponController.PrepareBlocking(self: WeaponController)
 		self:SetWeapons(weapons)
 	end)
 	self.UnlockWeaponRemote = self.Comm:GetFunction("UnlockWeapon")
+	self.EquipWeaponRemote = self.Comm:GetFunction("EquipWeapon")
 end
 
 function WeaponController.SetWeapons(self: WeaponController, weapons: any)
@@ -37,6 +38,10 @@ end
 
 function WeaponController.UnlockWeapon(self: WeaponController, weaponId: string)
 	return self.UnlockWeaponRemote(weaponId)
+end
+
+function WeaponController.EquipWeapon(self: WeaponController, weaponId: string)
+	return self.EquipWeaponRemote(weaponId)
 end
 
 function WeaponController.Start(self: WeaponController) end
