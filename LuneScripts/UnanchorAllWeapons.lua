@@ -15,10 +15,8 @@ for _, name in fs.readDir(directory) do
 				object.CanTouch = false
 				object.CanQuery = false
 				object.Massless = true
-
-				if object:IsA("MeshPart") then object.CollisionFidelity = roblox.Enum.CollisionFidelity.Box end
 			end
 		end
-		fs.writeFile(filePath, roblox.serializeModel({ model }, true))
+		fs.writeFile(filePath, roblox.serializeModel({ model }))
 	end
 end
