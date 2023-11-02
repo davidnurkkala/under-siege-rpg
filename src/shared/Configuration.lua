@@ -1,3 +1,3 @@
 return {
-	DataStoreVersion = 10,
+	DataStoreVersion = 11,
 }
