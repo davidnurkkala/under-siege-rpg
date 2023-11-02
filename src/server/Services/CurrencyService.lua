@@ -22,15 +22,9 @@ function CurrencyService.PrepareBlocking(self: CurrencyService)
 	)
 
 	Observers.observePlayer(function(player)
-		local promise = DataService:GetSaveFile(player):andThen(function(saveFile)
-			saveFile:Observe("Currency", function(currency)
-				self.CurrencyRemote:SetFor(player, currency)
-			end)
+		return DataService:ObserveKey(player, "Currency", function(currency)
+			self.CurrencyRemote:SetFor(player, currency)
 		end)
-
-		return function()
-			promise:cancel()
-		end
 	end)
 end
 

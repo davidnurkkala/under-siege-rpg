@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Aspect = require(ReplicatedStorage.Shared.React.Common.Aspect)
 local Button = require(ReplicatedStorage.Shared.React.Common.Button)
+local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
 local Image = require(ReplicatedStorage.Shared.React.Common.Image)
@@ -64,8 +65,8 @@ return function(props: {
 		AnchorPoint = Vector2.new(0.5, 0),
 		Size = UDim2.fromScale(1, 1),
 		HeaderText = TextStroke("Weapons", 2),
-		BackgroundColor3 = Color3.fromHex("#BD7975"),
-		ImageColor3 = Color3.fromHex("#BD9F75"),
+		BackgroundColor3 = ColorDefs.LightBlue,
+		ImageColor3 = ColorDefs.PaleBlue,
 
 		RenderContainer = function()
 			return React.createElement("UISizeConstraint", {
@@ -108,7 +109,7 @@ return function(props: {
 							}),
 
 							Panel = React.createElement(Panel, {
-								ImageColor3 = Color3.fromHex("#ec9497"),
+								ImageColor3 = ColorDefs.PaleRed,
 							}, {
 								PreviewContainer = React.createElement(Container, {
 									Size = UDim2.fromScale(1, 1),
@@ -131,7 +132,6 @@ return function(props: {
 									Position = UDim2.fromScale(0.2, 0.5),
 									Size = UDim2.fromScale(0.5, 0.5),
 									Text = TextStroke(`+{def.Power}`, 2),
-									TextColor3 = BrickColor.new("Light red").Color,
 									TextXAlignment = Enum.TextXAlignment.Left,
 									ZIndex = 4,
 								}),
@@ -140,8 +140,8 @@ return function(props: {
 									Size = UDim2.fromScale(0.25, 1),
 									AnchorPoint = Vector2.new(1, 0),
 									Position = UDim2.fromScale(1, 0),
-									ImageColor3 = Color3.fromHex("#BD4549"),
-									BorderColor3 = if isEquipped then Color3.fromHex("#BD5946") else nil,
+									ImageColor3 = ColorDefs.DarkRed,
+									BorderColor3 = if isEquipped then ColorDefs.Red else nil,
 									[React.Event.Activated] = function()
 										props.Select(id)
 									end,

@@ -5,6 +5,7 @@ local ActionService = require(ServerScriptService.Server.Services.ActionService)
 local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
 local Cooldown = require(ReplicatedStorage.Shared.Classes.Cooldown)
 local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
+local DataService = require(ServerScriptService.Server.Services.DataService)
 local EffectEmission = require(ReplicatedStorage.Shared.Effects.EffectEmission)
 local EffectFaceTarget = require(ReplicatedStorage.Shared.Effects.EffectFaceTarget)
 local EffectProjectile = require(ReplicatedStorage.Shared.Effects.EffectProjectile)
@@ -48,7 +49,7 @@ function LobbySession.new(args: {
 
 	local trove = Trove.new()
 
-	local model = trove:Add(WeaponHelper.attachModel(args.WeaponDef, args.Character, args.HoldPart))
+	local model = WeaponHelper.attachModel(args.WeaponDef, args.Character, args.HoldPart)
 	local animator = trove:Construct(Animator, args.Human)
 
 	local self: LobbySession = setmetatable({
@@ -66,6 +67,10 @@ function LobbySession.new(args: {
 
 	self.Animator:Play(self.WeaponDef.Animations.Idle)
 
+	trove:Add(function()
+		if self.Model then self.Model:Destroy() end
+	end)
+
 	trove:Add(ActionService:Subscribe(self.Player, "Primary", function()
 		self:Attack()
 	end))
@@ -76,6 +81,12 @@ function LobbySession.new(args: {
 	end)
 
 	trove:AddPromise(PlayerLeaving(self.Player):andThenCall(self.Destroy, self))
+
+	trove:Add(DataService:ObserveKey(self.Player, "Weapons", function(weapons)
+		if weapons.Equipped == self.WeaponDef.Id then return end
+
+		self:SetWeapon(WeaponDefs[weapons.Equipped])
+	end))
 
 	return self
 end
@@ -133,6 +144,21 @@ function LobbySession.promised(player: Player)
 			end)
 		end)
 	end, function() end)
+end
+
+function LobbySession.SetWeapon(self: LobbySession, weaponDef)
+	return Promise.try(function()
+		local holdPart = self.Character:FindFirstChild(weaponDef.HoldPartName)
+		return WeaponHelper.attachModel(weaponDef, self.Character, holdPart)
+	end):andThen(function(model)
+		self.WeaponDef = weaponDef
+
+		self.Model:Destroy()
+		self.Model = model
+
+		self.Animator:StopHardAll()
+		self.Animator:Play(weaponDef.Animations.Idle)
+	end)
 end
 
 function LobbySession.Attack(self: LobbySession)

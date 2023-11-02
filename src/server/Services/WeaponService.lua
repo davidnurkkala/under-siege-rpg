@@ -31,15 +31,9 @@ function WeaponService.PrepareBlocking(self: WeaponService)
 	end)
 
 	Observers.observePlayer(function(player)
-		local promise = DataService:GetSaveFile(player):andThen(function(saveFile)
-			saveFile:Observe("Weapons", function(weapons)
-				self.WeaponsRemote:SetFor(player, Sift.Dictionary.copyDeep(weapons))
-			end)
+		return DataService:ObserveKey(player, "Weapons", function(weapons)
+			self.WeaponsRemote:SetFor(player, Sift.Dictionary.copyDeep(weapons))
 		end)
-
-		return function()
-			promise:cancel()
-		end
 	end)
 end
 

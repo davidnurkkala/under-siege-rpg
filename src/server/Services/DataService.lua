@@ -7,6 +7,7 @@ local Observers = require(ReplicatedStorage.Packages.Observers)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local SaveFile = require(ServerScriptService.Server.Classes.SaveFile)
 local Sift = require(ReplicatedStorage.Packages.Sift)
+local Trove = require(ReplicatedStorage.Packages.Trove)
 
 local COLLECTION_NAME = "DataService" .. Configuration.DataStoreVersion
 
@@ -98,6 +99,18 @@ function DataService.GetSaveFile(self: DataService, player: Player)
 		end
 
 		return LoadPromisesByPlayer[player]
+	end
+end
+
+function DataService.ObserveKey(self: DataService, player: Player, key: string, callback)
+	local trove = Trove.new()
+
+	trove:AddPromise(self:GetSaveFile(player):andThen(function(saveFile)
+		trove:Add(saveFile:Observe(key, callback))
+	end))
+
+	return function()
+		trove:Clean()
 	end
 end
 

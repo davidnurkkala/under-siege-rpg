@@ -25,7 +25,7 @@ function SaveFile.new(document): SaveFile
 	return self
 end
 
-function SaveFile.Observe(self: SaveFile, key: string, callback: (any) -> ()): Observer
+function SaveFile.Observe(self: SaveFile, key: string, callback: (any) -> ()): () -> ()
 	if not self.Observers[key] then self.Observers[key] = {} end
 
 	local observer: Observer = {
@@ -45,7 +45,9 @@ function SaveFile.Observe(self: SaveFile, key: string, callback: (any) -> ()): O
 
 	observer.Callback(self:Get(key))
 
-	return observer
+	return function()
+		observer:Disconnect()
+	end
 end
 
 function SaveFile.Update(self: SaveFile, key: string, callback: (any) -> any)

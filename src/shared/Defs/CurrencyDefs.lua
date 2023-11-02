@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 
 local Currencies = {
@@ -7,24 +8,24 @@ local Currencies = {
 		Name = "Power",
 		Image = "rbxassetid://15243978990",
 		Colors = {
-			Primary = Color3.fromHex("#4093E6"),
-			Secondary = Color3.fromHex("#405FE6"),
+			Primary = ColorDefs.LightRed,
+			Secondary = ColorDefs.Red,
 		},
 	},
 	Secondary = {
 		Name = "Gold",
 		Image = "rbxassetid://15243978848",
 		Colors = {
-			Primary = Color3.fromHex("#E5A43A"),
-			Secondary = Color3.fromHex("#E6B839"),
+			Primary = ColorDefs.LightYellow,
+			Secondary = ColorDefs.Yellow,
 		},
 	},
 	Premium = {
 		Name = "Gems",
 		Image = "rbxassetid://15243979110",
 		Colors = {
-			Primary = Color3.fromHex("#AB79E5"),
-			Secondary = Color3.fromHex("#CF7AE6"),
+			Primary = ColorDefs.LightPurple,
+			Secondary = ColorDefs.Purple,
 		},
 	},
 	Prestige = {
