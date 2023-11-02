@@ -5,7 +5,7 @@ local Sift = require(ReplicatedStorage.Packages.Sift)
 local Currencies = {
 	Primary = {
 		Name = "Power",
-		Image = "rbxassetid://15243745387",
+		Image = "rbxassetid://15243978990",
 		Colors = {
 			Primary = Color3.fromHex("#4093E6"),
 			Secondary = Color3.fromHex("#405FE6"),
@@ -13,7 +13,7 @@ local Currencies = {
 	},
 	Secondary = {
 		Name = "Gold",
-		Image = "rbxassetid://15243745236",
+		Image = "rbxassetid://15243978848",
 		Colors = {
 			Primary = Color3.fromHex("#E5A43A"),
 			Secondary = Color3.fromHex("#E6B839"),
@@ -21,7 +21,7 @@ local Currencies = {
 	},
 	Premium = {
 		Name = "Gems",
-		Image = "rbxassetid://15243745512",
+		Image = "rbxassetid://15243979110",
 		Colors = {
 			Primary = Color3.fromHex("#AB79E5"),
 			Secondary = Color3.fromHex("#CF7AE6"),

@@ -6,6 +6,8 @@ game.rbxlx
 /*.rbxlx.lock
 /*.rbxl.lock
 
+*~
+
 *.ptex.mmcr
 
 api-key.txt

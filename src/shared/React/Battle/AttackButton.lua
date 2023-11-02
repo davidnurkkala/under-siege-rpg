@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
 local Image = require(ReplicatedStorage.Shared.React.Common.Image)
 local PrimaryButton = require(ReplicatedStorage.Shared.React.Common.PrimaryButton)
 local React = require(ReplicatedStorage.Packages.React)
@@ -11,7 +12,7 @@ return function(props: {
 		LayoutOrder = props.LayoutOrder,
 	}, {
 		Icon = React.createElement(Image, {
-			Image = "rbxassetid://15162828605",
+			Image = CurrencyDefs.Primary.Image,
 		}),
 	})
 end
