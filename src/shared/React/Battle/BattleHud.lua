@@ -70,7 +70,7 @@ return function(props: {
 
 			HealthRight = React.createElement(healthBar, {
 				LayoutOrder = 3,
-				Alignment = Enum.HorizontalAlignment.Right,
+				Alignment = Enum.HorizontalAlignment.Left,
 				Percent = getHealthPercent(status, 2),
 			}),
 		}),

@@ -21,7 +21,7 @@ return function(props: {
 			Size = UDim2.fromScale(props.Percent, 1),
 			AnchorPoint = Vector2.new(if isLeft then 0 else 1, 0.5),
 			Position = UDim2.fromScale(if isLeft then 0 else 1, 0.5),
-			BackgroundColor3 = ColorDefs.Green,
+			BackgroundColor3 = ColorDefs.LightGreen,
 		}, {
 			Corner = React.createElement("UICorner", {
 				CornerRadius = UDim.new(0, 8),
