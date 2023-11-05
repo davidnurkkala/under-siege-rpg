@@ -65,13 +65,13 @@ return function(props: {
 			HealthLeft = React.createElement(healthBar, {
 				LayoutOrder = 1,
 				Alignment = Enum.HorizontalAlignment.Right,
-				Status = getHealthPercent(status, 1),
+				Percent = getHealthPercent(status, 1),
 			}),
 
 			HealthRight = React.createElement(healthBar, {
-				LayoutOrder = 1,
+				LayoutOrder = 3,
 				Alignment = Enum.HorizontalAlignment.Right,
-				Status = getHealthPercent(status, 2),
+				Percent = getHealthPercent(status, 2),
 			}),
 		}),
 	})
