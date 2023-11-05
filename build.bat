@@ -3,7 +3,6 @@ rojo sourcemap -o sourcemap.json
 wally-package-types --sourcemap sourcemap.json Packages
 wally-package-types --sourcemap sourcemap.json ServerPackages
 rojo sourcemap -o sourcemap.json
-taskkill /im server.exe /f
 lune LuneScripts/UnanchorAllWeapons.lua
 rojo build -o game.rbxl
 set /p key=<"api-key.txt"

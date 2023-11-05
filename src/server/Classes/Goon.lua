@@ -136,6 +136,9 @@ end
 function Goon.Update(self: Goon, dt: number)
 	self.Brain:Update(dt)
 
+	self.Root:SetAttribute("Health", self.Health:Get())
+	self.Root:SetAttribute("HealthMax", self.Health:GetMax())
+
 	local position = self.Battle.Path:ToWorld(self.Position)
 	local dy = CFrame.new(0, self.Root.Size.Y / 2, 0)
 	self.Root.CFrame = CFrame.fromMatrix(position, if self.Direction < 0 then Vector3.zAxis else -Vector3.zAxis, Vector3.yAxis) * dy
