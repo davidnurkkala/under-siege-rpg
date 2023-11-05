@@ -15,6 +15,22 @@ local function getHealthPercent(status, index)
 	end, 1)
 end
 
+local function healthBar(props: {
+	LayoutOrder: number,
+	Alignment: Enum.HorizontalAlignment,
+	Percent: number,
+})
+	return React.createElement(Container, {
+		LayoutOrder = props.LayoutOrder,
+		Size = UDim2.fromScale(0.3, 0.3),
+	}, {
+		Bar = React.createElement(HealthBar, {
+			Alignment = props.Alignment,
+			Percent = props.Percent,
+		}),
+	})
+end
+
 return function(props: {
 	Visible: boolean,
 })
@@ -46,13 +62,13 @@ return function(props: {
 				LayoutOrder = 2,
 			}),
 
-			HealthLeft = React.createElement(HealthBar, {
+			HealthLeft = React.createElement(healthBar, {
 				LayoutOrder = 1,
 				Alignment = Enum.HorizontalAlignment.Right,
 				Percent = getHealthPercent(status, 1),
 			}),
 
-			HealthRight = React.createElement(HealthBar, {
+			HealthRight = React.createElement(healthBar, {
 				LayoutOrder = 3,
 				Alignment = Enum.HorizontalAlignment.Left,
 				Percent = getHealthPercent(status, 2),

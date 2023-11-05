@@ -25,6 +25,10 @@ function Health.Observe(self: Health, callback)
 	return connection
 end
 
+function Health.GetMax(self: Health)
+	return self.Max
+end
+
 function Health.Get(self: Health)
 	return self.Amount
 end

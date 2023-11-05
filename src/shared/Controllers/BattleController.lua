@@ -54,7 +54,7 @@ function BattleController:SetInBattle(inBattle: boolean, status: any)
 			local left, right = unpack(Sift.Array.map(status.Battlers, function(battler)
 				return battler.CharModel:GetBoundingBox().Position
 			end))
-			local midpoint = CFrame.new((left + right) / 2)
+			local midpoint = CFrame.new((left + right) / 2 + Vector3.new(0, -8, 0))
 			local distance = (right - left).Magnitude
 			local length = (6 * distance) / (10 * math.tan(math.rad(camera.MaxAxisFieldOfView / 2)))
 

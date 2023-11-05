@@ -25,4 +25,4 @@ t = "osyrisrblx/t@3.0.0"
 
 [server-dependencies]
 Cmdr = "evaera/cmdr@1.11.0"
-Lapis = "davidnurkkala/lapis@0.2.4"
+Lapis = "davidnurkkala/lapis@0.2.7"

@@ -26,10 +26,13 @@ end
 
 function DataService.PrepareBlocking(self: DataService)
 	self.Collection = Lapis.createCollection(COLLECTION_NAME, {
-		lockExpireTime = 5.5 * 60,
+		disableLockInStudio = true,
+		lockExpireTime = 10 * 60,
+
 		validate = function()
 			return true
 		end,
+
 		defaultData = {
 			Weapons = {
 				Equipped = "WoodenBow",
@@ -44,6 +47,7 @@ function DataService.PrepareBlocking(self: DataService)
 				Prestige = 0,
 			},
 		},
+
 		migrations = {
 			function(data)
 				return Sift.Dictionary.merge(data, {
