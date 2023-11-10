@@ -14,7 +14,7 @@ local DefaultProps = {
 }
 
 return function(props)
-	local corner = props.Corner or UDim.new(0, 8)
+	local corner = props.Corner or UDim.new(0, 4)
 	local padding = props.Padding or corner
 
 	props = Sift.Dictionary.removeKeys(props, "Corner", "Padding")

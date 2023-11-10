@@ -77,11 +77,12 @@ return function(props)
 						AnchorPoint = Vector2.new(1, 0.5),
 						Position = UDim2.fromScale(1, 0.5),
 						BorderSizePixel = borderSizePixel,
+						Padding = UDim.new(0, 0),
 						ImageColor3 = Color3.new(1, 0, 0),
 						[React.Event.Activated] = props[React.Event.Activated],
 					}, {
 						Text = React.createElement(Label, {
-							Size = UDim2.fromScale(2.5, 2.5),
+							Size = UDim2.fromScale(1, 1),
 							Position = UDim2.fromScale(0.5, 0.5),
 							AnchorPoint = Vector2.new(0.5, 0.5),
 							Text = TextStroke(`<b>X</b>`, 2),

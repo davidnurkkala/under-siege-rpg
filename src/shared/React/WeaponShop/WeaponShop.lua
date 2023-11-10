@@ -63,7 +63,8 @@ return function(props: {
 		Visible = props.Visible,
 		Position = UDim2.fromScale(0.5, 0),
 		AnchorPoint = Vector2.new(0.5, 0),
-		Size = UDim2.fromScale(1, 1),
+		Size = UDim2.fromScale(0.8, 0.6),
+		SizeConstraint = Enum.SizeConstraint.RelativeXX,
 		HeaderText = TextStroke("Weapons", 2),
 		BackgroundColor3 = ColorDefs.LightBlue,
 		ImageColor3 = ColorDefs.PaleBlue,
@@ -142,6 +143,7 @@ return function(props: {
 									Position = UDim2.fromScale(1, 0),
 									ImageColor3 = ColorDefs.DarkRed,
 									BorderColor3 = if isEquipped then ColorDefs.Red else nil,
+									BorderSizePixel = 2,
 									[React.Event.Activated] = function()
 										props.Select(id)
 									end,

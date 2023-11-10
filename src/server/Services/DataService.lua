@@ -46,6 +46,10 @@ function DataService.PrepareBlocking(self: DataService)
 				Premium = 0,
 				Prestige = 0,
 			},
+			Deck = {
+				Equipped = {},
+				Owned = {},
+			},
 		},
 
 		migrations = {
@@ -68,6 +72,12 @@ function DataService.PrepareBlocking(self: DataService)
 					"Power",
 					"PrestigeCount"
 				)
+			end,
+			function(data)
+				return Sift.Dictionary.set(data, "Deck", {
+					Equipped = {},
+					Owned = {},
+				})
 			end,
 		},
 	})

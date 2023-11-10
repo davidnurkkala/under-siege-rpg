@@ -6,6 +6,7 @@ local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local Sift = require(ReplicatedStorage.Packages.Sift)
+
 local CurrencyService = {
 	Priority = 0,
 }
