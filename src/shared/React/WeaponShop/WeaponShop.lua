@@ -13,7 +13,7 @@ local Panel = require(ReplicatedStorage.Shared.React.Common.Panel)
 local React = require(ReplicatedStorage.Packages.React)
 local ScrollingFrame = require(ReplicatedStorage.Shared.React.Common.ScrollingFrame)
 local Sift = require(ReplicatedStorage.Packages.Sift)
-local SquishWindow = require(ReplicatedStorage.Shared.React.Common.SquishWindow)
+local SystemWindow = require(ReplicatedStorage.Shared.React.Common.SystemWindow)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local WeaponDefs = require(ReplicatedStorage.Shared.Defs.WeaponDefs)
@@ -59,22 +59,9 @@ return function(props: {
 	Select: (string) -> (),
 	Close: () -> (),
 })
-	return React.createElement(SquishWindow, {
+	return React.createElement(SystemWindow, {
 		Visible = props.Visible,
-		Position = UDim2.fromScale(0.5, 0),
-		AnchorPoint = Vector2.new(0.5, 0),
-		Size = UDim2.fromScale(0.8, 0.6),
-		SizeConstraint = Enum.SizeConstraint.RelativeXX,
 		HeaderText = TextStroke("Weapons", 2),
-		BackgroundColor3 = ColorDefs.LightBlue,
-		ImageColor3 = ColorDefs.PaleBlue,
-
-		RenderContainer = function()
-			return React.createElement("UISizeConstraint", {
-				MaxSize = Vector2.new(500, 300),
-			})
-		end,
-
 		[React.Event.Activated] = props.Close,
 	}, {
 		ScrollingFrame = React.createElement(ScrollingFrame, {

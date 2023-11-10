@@ -5,12 +5,6 @@ local Sift = require(ReplicatedStorage.Packages.Sift)
 local WeightTable = {}
 WeightTable.__index = WeightTable
 
-export type WeightTable = typeof(setmetatable({} :: {
-	Entries: { WeightTableEntry },
-	Weight: number,
-	Random: Random,
-}, WeightTable))
-
 export type WeightTableEntryDef = {
 	Result: any,
 	Weight: number,
@@ -23,6 +17,12 @@ type WeightTableEntry = WeightTableEntryDef & {
 	},
 	Chance: number,
 }
+
+export type WeightTable = typeof(setmetatable({} :: {
+	Entries: { WeightTableEntry },
+	Weight: number,
+	Random: Random,
+}, WeightTable))
 
 function WeightTable.new(entries: { WeightTableEntryDef }, random: Random?): WeightTable
 	entries = Sift.Dictionary.copyDeep(entries)
@@ -47,6 +47,10 @@ function WeightTable.new(entries: { WeightTableEntryDef }, random: Random?): Wei
 	}, WeightTable)
 
 	return self
+end
+
+function WeightTable.GetEntries(self: WeightTable)
+	return self.Entries
 end
 
 function WeightTable.Roll(self: WeightTable): any

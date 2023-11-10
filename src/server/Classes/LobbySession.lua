@@ -3,6 +3,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 
 local ActionService = require(ServerScriptService.Server.Services.ActionService)
 local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
+local ComponentService = require(ServerScriptService.Server.Services.ComponentService)
 local Cooldown = require(ReplicatedStorage.Shared.Classes.Cooldown)
 local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local DataService = require(ServerScriptService.Server.Services.DataService)
@@ -14,9 +15,9 @@ local EffectShakeModel = require(ReplicatedStorage.Shared.Effects.EffectShakeMod
 local EffectSound = require(ReplicatedStorage.Shared.Effects.EffectSound)
 local LobbySessions = require(ServerScriptService.Server.Singletons.LobbySessions)
 local PickRandom = require(ReplicatedStorage.Shared.Util.PickRandom)
-local PlayAreaService = require(ServerScriptService.Server.Services.PlayAreaService)
 local PlayerLeaving = require(ReplicatedStorage.Shared.Util.PlayerLeaving)
 local Promise = require(ReplicatedStorage.Packages.Promise)
+local Sift = require(ReplicatedStorage.Packages.Sift)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local WeaponDefs = require(ReplicatedStorage.Shared.Defs.WeaponDefs)
 local WeaponHelper = require(ReplicatedStorage.Shared.Util.WeaponHelper)
@@ -167,13 +168,13 @@ function LobbySession.Attack(self: LobbySession)
 
 	self.Animator:Play(self.WeaponDef.Animations.Shoot, 0)
 
-	local dummy = PlayAreaService:GetTrainingDummy()
+	local dummy = Sift.Dictionary.values(ComponentService:GetComponentsByName("TrainingDummy"))[1]
 
 	EffectService:Effect(
 		self.Player,
 		EffectFaceTarget({
 			Root = self.Character.PrimaryPart,
-			Target = dummy,
+			Target = dummy.Model,
 			Duration = 0.25,
 		})
 	)
@@ -182,7 +183,7 @@ function LobbySession.Attack(self: LobbySession)
 		:andThen(function()
 			local part = self.Model:FindFirstChild("Weapon")
 			local here = part.Position
-			local there = dummy.Body.Core.WorldPosition
+			local there = dummy:GetPosition()
 			local start = CFrame.lookAt(here, there)
 			local finish = start - here + there
 
@@ -202,20 +203,7 @@ function LobbySession.Attack(self: LobbySession)
 		:andThen(function()
 			CurrencyService:AddCurrency(self.Player, "Primary", self.WeaponDef.Power)
 
-			EffectService:All(
-				EffectEmission({
-					Emitter = ReplicatedStorage.Assets.Emitters.Impact1,
-					ParticleCount = 2,
-					Target = dummy.Body.Core,
-				}),
-				EffectSound({
-					SoundId = PickRandom(self.WeaponDef.Sounds.Hit),
-					Target = dummy.Body,
-				}),
-				EffectShakeModel({
-					Model = dummy,
-				})
-			)
+			dummy:HitEffect(PickRandom(self.WeaponDef.Sounds.Hit))
 		end)
 end
 

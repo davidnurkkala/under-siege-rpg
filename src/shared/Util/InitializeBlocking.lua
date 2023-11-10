@@ -12,6 +12,6 @@ return function(folder)
 	end
 
 	for _, module in modules do
-		task.spawn(module.Start, module)
+		if module.Start then task.spawn(module.Start, module) end
 	end
 end

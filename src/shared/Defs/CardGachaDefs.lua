@@ -1,18 +1,39 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local CardDefs = require(ReplicatedStorage.Shared.Defs.CardDefs)
+local CurrencyHelper = require(ReplicatedStorage.Shared.Util.CurrencyHelper)
+local Sift = require(ReplicatedStorage.Packages.Sift)
 local WeightTable = require(ServerScriptService.Server.Classes.WeightTable)
 
-local Gachas: { [string]: WeightTable.WeightTable } = {
-	World1 = WeightTable.new({
-		{ Result = "Peasant", Weight = 3 },
-		{ Result = "Soldier", Weight = 1 },
-		{ Result = "Hunter", Weight = 1 },
-	}),
+export type Gacha = {
+	Name: string,
+	Id: string,
+	Price: CurrencyHelper.Price,
+	WeightTable: WeightTable.WeightTable,
 }
 
-for gachaId, gacha in Gachas do
-	print(gachaId)
-	gacha:Print()
-end
+local Gachas = {
+	World1Goons = {
+		Name = "World 1 Soldiers",
+		Price = {
+			Secondary = 5,
+		},
+		WeightTable = {
+			{ Result = "Peasant", Weight = 3 },
+			{ Result = "Soldier", Weight = 1 },
+			{ Result = "Hunter", Weight = 1 },
+		},
+	},
+}
 
-return Gachas
+return Sift.Dictionary.map(Gachas, function(gacha, id)
+	for _, entry in gacha.WeightTable do
+		assert(CardDefs[entry.Result], `Gacha {id} has result {entry.Result} which has no card def`)
+	end
+
+	return Sift.Dictionary.merge(gacha, {
+		Id = id,
+		WeightTable = WeightTable.new(gacha.WeightTable),
+	})
+end) :: { [string]: Gacha }

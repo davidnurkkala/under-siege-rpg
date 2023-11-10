@@ -7,7 +7,7 @@ local Battlers = {
 		Name = "Noob",
 		Reward = 1,
 		Deck = {
-			Conscript = 1,
+			Peasant = 1,
 		},
 	},
 }
