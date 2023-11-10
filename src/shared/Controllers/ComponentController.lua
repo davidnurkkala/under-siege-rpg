@@ -41,6 +41,4 @@ function ComponentController.GetComponent(self: ComponentController, instance: I
 	return ComponentGroupsByInstance[instance][name]
 end
 
-function ComponentController.Start(_self: ComponentController) end
-
 return ComponentController

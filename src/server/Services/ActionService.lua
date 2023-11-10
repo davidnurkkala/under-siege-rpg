@@ -27,8 +27,6 @@ function ActionService.PrepareBlocking(self: ActionService)
 	end)
 end
 
-function ActionService.Start(self: ActionService) end
-
 function ActionService.Subscribe(self: ActionService, player: Player, actionName: string, callback: (number) -> ())
 	return ActionServiceSubscription.new(player, actionName, callback, self)
 end

@@ -47,6 +47,4 @@ function ActionController.Once(self: ActionController, actionName: string)
 	end)
 end
 
-function ActionController.Start(self: ActionController) end
-
 return ActionController

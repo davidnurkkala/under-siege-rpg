@@ -13,6 +13,4 @@ function CurrencyController.PrepareBlocking(self: CurrencyController)
 	self.CurrencyRemote = self.Comm:GetProperty("Currency")
 end
 
-function CurrencyController.Start(self: CurrencyController) end
-
 return CurrencyController

@@ -17,6 +17,4 @@ function GameService.PrepareBlocking(self: GameService)
 	end)
 end
 
-function GameService.Start(self: GameService) end
-
 return GameService

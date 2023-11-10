@@ -28,6 +28,4 @@ function ComponentService.PrepareBlocking(_self: ComponentService)
 	end
 end
 
-function ComponentService.Start(_self: ComponentService) end
-
 return ComponentService

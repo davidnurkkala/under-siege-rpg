@@ -25,8 +25,6 @@ function BattleController.PrepareBlocking(self: BattleController)
 	end)
 end
 
-function BattleController.Start(self: BattleController) end
-
 function BattleController.ObserveStatus(self: BattleController, callback: (any) -> ()): () -> ()
 	local connection = self.StatusChanged:Connect(callback)
 	callback(self.Status)

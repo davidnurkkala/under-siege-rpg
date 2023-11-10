@@ -24,8 +24,6 @@ function DeckService.PrepareBlocking(self: DeckService)
 	end)
 end
 
-function DeckService.Start(self: DeckService) end
-
 function DeckService.AddCard(self: DeckService, player: Player, cardId: string)
 	assert(CardDefs[cardId], `No card with id {cardId}`)
 

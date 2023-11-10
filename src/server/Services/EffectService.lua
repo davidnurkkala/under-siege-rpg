@@ -45,6 +45,4 @@ function EffectService.EffectPlayers(self: EffectService, players: { Player }, .
 	end))
 end
 
-function EffectService.Start(self: EffectService) end
-
 return EffectService

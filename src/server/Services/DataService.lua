@@ -128,6 +128,4 @@ function DataService.ObserveKey(self: DataService, player: Player, key: string, 
 	end
 end
 
-function DataService.Start(_self: DataService) end
-
 return DataService

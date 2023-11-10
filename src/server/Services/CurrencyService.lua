@@ -47,6 +47,4 @@ function CurrencyService.AddCurrency(_self: CurrencyService, player: Player, cur
 	end)
 end
 
-function CurrencyService.Start(self: CurrencyService) end
-
 return CurrencyService
