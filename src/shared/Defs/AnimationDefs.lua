@@ -3,8 +3,14 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Sift = require(ReplicatedStorage.Packages.Sift)
 
 local Ids = {
-	BowIdle = 14817002033,
+	BowIdle = 15330893056,
 	BowShoot = 14817098342,
+	CrossbowIdle = 15331058136,
+	CrossbowBowShoot = 15330795280,
+	JavelinIdle = 15331107164,
+	JavelinThrow = 15330799715,
+	WandIdle = 15331170210,
+	WandShoot = 15330801847,
 
 	GenericGoonDie = 15152357009,
 

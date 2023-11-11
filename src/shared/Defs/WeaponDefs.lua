@@ -35,10 +35,10 @@ local Weapons = {
 		Name = "Crossbow",
 		Power = 10,
 		AttackCooldownTime = 0.4,
-		HoldPartName = "LeftHand",
+		HoldPartName = "RightHand",
 		Animations = {
-			Idle = "BowIdle",
-			Shoot = "BowShoot",
+			Idle = "CrossbowIdle",
+			Shoot = "CrossbowShoot",
 		},
 		Sounds = {
 			Shoot = { "BowShoot1", "BowShoot2", "BowShoot3", "BowShoot4" },
@@ -49,10 +49,10 @@ local Weapons = {
 		Name = "Apprentice Wand",
 		Power = 50,
 		AttackCooldownTime = 0.4,
-		HoldPartName = "LeftHand",
+		HoldPartName = "RightHand",
 		Animations = {
-			Idle = "BowIdle",
-			Shoot = "BowShoot",
+			Idle = "WandIdle",
+			Shoot = "WandShoot",
 		},
 		Sounds = {
 			Shoot = { "BowShoot1", "BowShoot2", "BowShoot3", "BowShoot4" },
@@ -63,10 +63,24 @@ local Weapons = {
 		Name = "Recurve Bow",
 		Power = 200,
 		AttackCooldownTime = 0.4,
-		HoldPartName = "LeftHand",
+		HoldPartName = "RightHand",
 		Animations = {
 			Idle = "BowIdle",
 			Shoot = "BowShoot",
+		},
+		Sounds = {
+			Shoot = { "BowShoot1", "BowShoot2", "BowShoot3", "BowShoot4" },
+			Hit = { "BowHit1", "BowHit2", "BowHit3", "BowHit4" },
+		},
+	},
+	Javelin = {
+		Name = "Javelin",
+		Power = 250,
+		AttackCooldownTime = 0.4,
+		HoldPartName = "RightHand",
+		Animations = {
+			Idle = "JavelinIdle",
+			Shoot = "JavelinThrow",
 		},
 		Sounds = {
 			Shoot = { "BowShoot1", "BowShoot2", "BowShoot3", "BowShoot4" },
