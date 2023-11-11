@@ -17,7 +17,7 @@ local Weapons = {
 			Hit = { "BowHit1", "BowHit2", "BowHit3", "BowHit4" },
 		},
 	},
-	SimpleBow = {
+	HuntersBow = {
 		Name = "Hunters Bow",
 		Power = 5,
 		AttackCooldownTime = 0.4,
