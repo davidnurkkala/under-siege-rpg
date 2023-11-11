@@ -5,7 +5,7 @@ local Sift = require(ReplicatedStorage.Packages.Sift)
 local Goons = {
 	Peasant = {
 		Name = "Peasant",
-		ModelName = "Conscript",
+		ModelName = "Peasant",
 		Brain = {
 			Id = "BasicMelee",
 		},

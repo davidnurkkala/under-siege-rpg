@@ -25,6 +25,7 @@ export type Goon = typeof(setmetatable(
 		Level: number,
 		Root: Part,
 		Brain: any,
+		Remote: RemoteEvent,
 	},
 	Goon
 ))
@@ -45,7 +46,7 @@ local function createRoot(goonId)
 
 	CollectionService:AddTag(root, "GoonModel")
 
-	return root
+	return root, remote
 end
 
 local function createAnimator(root)
@@ -67,7 +68,7 @@ function Goon.new(args: {
 	Battle: any,
 	Brain: any,
 }): Goon
-	local root = createRoot(args.Def.Id)
+	local root, remote = createRoot(args.Def.Id)
 	local animator = createAnimator(root)
 
 	local self: Goon = setmetatable({
@@ -83,6 +84,7 @@ function Goon.new(args: {
 		Def = args.Def,
 		Brain = args.Brain,
 		Destroyed = Signal.new(),
+		Remote = remote,
 	}, Goon)
 
 	self.Root.Parent = workspace
@@ -90,6 +92,8 @@ function Goon.new(args: {
 	self.Health:Observe(function(old, new)
 		local change = new - old
 		if change <= -5 then self.Brain:OnInjured() end
+
+		remote:FireAllClients("Health", "Update", self.Health:GetMax(), self.Health:Get())
 	end)
 
 	self.Battle:Add(self)
