@@ -18,7 +18,7 @@ local Weapons = {
 		},
 	},
 	SimpleBow = {
-		Name = "Simple Bow",
+		Name = "Hunters Bow",
 		Power = 5,
 		AttackCooldownTime = 0.4,
 		HoldPartName = "LeftHand",
