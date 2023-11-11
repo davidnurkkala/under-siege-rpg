@@ -3,6 +3,18 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 
+export type CurrencyType = "Primary" | "Secondary" | "Premium" | "Prestige"
+
+export type Currency = {
+	Name: string,
+	Id: string,
+	Image: string,
+	Colors: {
+		Primary: Color3,
+		Secondary: Color3,
+	},
+}
+
 local Currencies = {
 	Primary = {
 		Name = "Power",
@@ -42,4 +54,4 @@ return Sift.Dictionary.map(Currencies, function(currency, id)
 	return Sift.Dictionary.merge(currency, {
 		Id = id,
 	})
-end)
+end) :: { [string]: Currency }

@@ -44,6 +44,4 @@ function WeaponController.EquipWeapon(self: WeaponController, weaponId: string)
 	return self.EquipWeaponRemote(weaponId)
 end
 
-function WeaponController.Start(self: WeaponController) end
-
 return WeaponController

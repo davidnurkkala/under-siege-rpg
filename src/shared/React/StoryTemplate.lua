@@ -9,7 +9,7 @@ end
 
 return function(target)
 	local root = ReactRoblox.createRoot(target)
-	root.render(React.createElement(element, {}))
+	root:render(React.createElement(element, {}))
 
 	return function()
 		root:unmount()

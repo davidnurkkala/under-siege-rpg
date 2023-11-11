@@ -37,8 +37,6 @@ function WeaponService.PrepareBlocking(self: WeaponService)
 	end)
 end
 
-function WeaponService.Start(_self: WeaponService) end
-
 function WeaponService.GetEquippedWeapon(_self: WeaponService, player: Player)
 	return DataService:GetSaveFile(player):andThen(function(saveFile)
 		return saveFile:Get("Weapons").Equipped

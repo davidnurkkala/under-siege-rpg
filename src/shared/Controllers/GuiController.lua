@@ -4,6 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
 
 local App = require(ReplicatedStorage.Shared.React.App)
+local Promise = require(ReplicatedStorage.Packages.Promise)
 local React = require(ReplicatedStorage.Packages.React)
 local ReactRoblox = require(ReplicatedStorage.Packages.ReactRoblox)
 
@@ -15,6 +16,12 @@ type GuiController = typeof(GuiController)
 
 function GuiController.Start(_self: GuiController)
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false)
+
+	Promise.retryWithDelay(function()
+		return Promise.try(function()
+			StarterGui:SetCore("ResetButtonCallback", false)
+		end)
+	end, 32, 1)
 
 	local gui = Instance.new("ScreenGui")
 	gui.Name = "GameGui"

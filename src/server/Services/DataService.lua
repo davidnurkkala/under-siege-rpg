@@ -46,6 +46,10 @@ function DataService.PrepareBlocking(self: DataService)
 				Premium = 0,
 				Prestige = 0,
 			},
+			Deck = {
+				Equipped = {},
+				Owned = {},
+			},
 		},
 
 		migrations = {
@@ -67,6 +71,25 @@ function DataService.PrepareBlocking(self: DataService)
 					}),
 					"Power",
 					"PrestigeCount"
+				)
+			end,
+			function(data)
+				return Sift.Dictionary.set(data, "Deck", {
+					Equipped = {},
+					Owned = {},
+				})
+			end,
+			function(data)
+				return Sift.Dictionary.set(
+					data,
+					"Deck",
+					Sift.Dictionary.set(
+						data.Deck,
+						"Equipped",
+						Sift.Dictionary.map(data.Deck.Owned, function(_, cardId)
+							return true, cardId
+						end)
+					)
 				)
 			end,
 		},
@@ -117,7 +140,5 @@ function DataService.ObserveKey(self: DataService, player: Player, key: string, 
 		trove:Clean()
 	end
 end
-
-function DataService.Start(_self: DataService) end
 
 return DataService

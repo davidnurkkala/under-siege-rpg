@@ -186,6 +186,8 @@ function Battle.Remove(self: Battle, object: Fieldable)
 end
 
 function Battle.PlayCard(self: Battle, battler: Battler.Battler, cardId: string, cardLevel: number)
+	if not cardId then return end
+
 	local card = CardDefs[cardId]
 	assert(card, `No card for id {cardId}`)
 

@@ -28,8 +28,6 @@ function EffectController.Effect(self: EffectController, _serverImpl, clientImpl
 	return clientImpl()
 end
 
-function EffectController.Start(self: EffectController) end
-
 function EffectController.Persist(self: EffectController, guid: string, handler: (any, () -> ()) -> ())
 	local failsafe = Promise.delay(60):andThen(function()
 		self:Desist(guid)

@@ -4,8 +4,18 @@ local GoonDefs = require(ReplicatedStorage.Shared.Defs.GoonDefs)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 
 local Cards = {
-	Conscript = {
-		GoonId = "Conscript",
+	Peasant = {
+		GoonId = "Peasant",
+		Type = "Goon",
+		Rank = 1,
+	},
+	Soldier = {
+		GoonId = "Peasant",
+		Type = "Goon",
+		Rank = 1,
+	},
+	Hunter = {
+		GoonId = "Peasant",
 		Type = "Goon",
 		Rank = 1,
 	},

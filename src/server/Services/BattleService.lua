@@ -18,8 +18,6 @@ function BattleService.PrepareBlocking(self: BattleService)
 	self.StatusRemote = self.Comm:CreateProperty("Status", nil)
 end
 
-function BattleService.Start(_self: BattleService) end
-
 function BattleService.Get(_self: BattleService, player: Player)
 	return BattlesByPlayer[player]
 end

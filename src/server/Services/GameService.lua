@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local FormatBigNumber = require(ReplicatedStorage.Shared.Util.FormatBigNumber)
 local LobbySession = require(ServerScriptService.Server.Classes.LobbySession)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 
@@ -15,7 +16,5 @@ function GameService.PrepareBlocking(self: GameService)
 		LobbySession.promised(player)
 	end)
 end
-
-function GameService.Start(self: GameService) end
 
 return GameService

@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local CurrencyController = require(ReplicatedStorage.Shared.Controllers.CurrencyController)
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
+local FormatBigNumber = require(ReplicatedStorage.Shared.Util.FormatBigNumber)
 local Image = require(ReplicatedStorage.Shared.React.Common.Image)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local ListLayout = require(ReplicatedStorage.Shared.React.Common.ListLayout)
@@ -29,7 +30,7 @@ local function currencyPanel(props: {
 			Size = UDim2.fromScale(0.75, 1),
 			Position = UDim2.fromScale(0.75, 0.5),
 			AnchorPoint = Vector2.new(1, 0.5),
-			Text = TextStroke(`{props.Amount}`, 2),
+			Text = TextStroke(`{FormatBigNumber(props.Amount)}`, 2),
 		}),
 
 		Icon = React.createElement(Image, {

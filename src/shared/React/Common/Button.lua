@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local Flipper = require(ReplicatedStorage.Packages.Flipper)
+local PaddingAll = require(ReplicatedStorage.Shared.React.Common.PaddingAll)
 local React = require(ReplicatedStorage.Packages.React)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local UseMotor = require(ReplicatedStorage.Shared.React.Hooks.UseMotor)
@@ -23,18 +24,27 @@ local SizeHovered = UDim2.new(1, 2, 1, 2)
 return function(props)
 	local hoverBinding, hoverMotor = UseMotor(0)
 	local borderThickness = props.BorderSizePixel or 4
+	local corner = props.Corner or UDim.new(0, 4)
+	local padding = props.Padding or corner
+	local active = if props.Active ~= nil then props.Active else true
+
+	props = Sift.Dictionary.removeKeys(props, "Corner", "Padding")
 
 	return React.createElement(Container, Sift.Dictionary.withKeys(props, "ZIndex", "SizeConstraint", "Size", "Position", "AnchorPoint", "LayoutOrder"), {
 		Button = React.createElement(
 			"ImageButton",
 			Sift.Dictionary.merge(DefaultProps, props, {
 				[React.Event.MouseEnter] = function()
+					if not active then return end
+
 					hoverMotor:setGoal(Flipper.Spring.new(1))
 				end,
 				[React.Event.MouseLeave] = function()
 					hoverMotor:setGoal(Flipper.Spring.new(0))
 				end,
 				[React.Event.Activated] = function()
+					if not active then return end
+
 					hoverMotor:setGoal(Flipper.Instant.new(-1))
 					hoverMotor:step()
 					hoverMotor:setGoal(Flipper.Spring.new(1))
@@ -55,14 +65,11 @@ return function(props)
 				Children = React.createElement(React.Fragment, nil, props.children),
 
 				Corner = React.createElement("UICorner", {
-					CornerRadius = UDim.new(0, 8),
+					CornerRadius = corner,
 				}),
 
-				Padding = React.createElement("UIPadding", {
-					PaddingTop = UDim.new(0, 8),
-					PaddingBottom = UDim.new(0, 8),
-					PaddingRight = UDim.new(0, 8),
-					PaddingLeft = UDim.new(0, 8),
+				Padding = React.createElement(PaddingAll, {
+					Padding = padding,
 				}),
 
 				Stroke = React.createElement("UIStroke", {

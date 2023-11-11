@@ -37,7 +37,7 @@ function Zoner.new(player, tagName, callback): Zoner
 			end
 
 			onCancel(function()
-				if currentZone then callback(false) end
+				if currentZone then callback(false, nil) end
 			end)
 
 			local root = char.PrimaryPart
@@ -49,13 +49,13 @@ function Zoner.new(player, tagName, callback): Zoner
 
 						if inZone(root, object) then
 							currentZone = object
-							callback(true)
+							callback(true, currentZone)
 						end
 					end
 				else
 					if not inZone(root, currentZone) then
 						currentZone = nil
-						callback(false)
+						callback(false, nil)
 					end
 				end
 

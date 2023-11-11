@@ -3,7 +3,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Sift = require(ReplicatedStorage.Packages.Sift)
 
 local Goons = {
-	Conscript = {
+	Peasant = {
+		Name = "Peasant",
 		ModelName = "Conscript",
 		Brain = {
 			Id = "BasicMelee",
