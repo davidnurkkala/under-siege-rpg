@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Comm = require(ReplicatedStorage.Packages.Comm)
 local CurrencyHelper = require(ReplicatedStorage.Shared.Util.CurrencyHelper)
+local Trove = require(ReplicatedStorage.Packages.Trove)
 
 local CurrencyController = {
 	Priority = 0,
@@ -14,8 +15,17 @@ function CurrencyController.PrepareBlocking(self: CurrencyController)
 	self.CurrencyRemote = self.Comm:GetProperty("Currency")
 end
 
+function CurrencyController:ObserveCurrency(callback)
+	local connection = self.CurrencyRemote:Observe(callback)
+	return function()
+		connection:Disconnect()
+	end
+end
+
 function CurrencyController.CheckPrice(self: CurrencyController, price: CurrencyHelper.Price)
-	return CurrencyHelper.CheckPrice(self.CurrencyRemote:Get(), price)
+	return self.CurrencyRemote:OnReady():andThen(function(currency)
+		CurrencyHelper.CheckPrice(currency, price)
+	end)
 end
 
 return CurrencyController

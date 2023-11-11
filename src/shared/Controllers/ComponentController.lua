@@ -39,7 +39,7 @@ function ComponentController.PrepareBlocking(_self: ComponentController)
 				if next(ComponentGroupsByInstance[instance]) == nil then ComponentGroupsByInstance[instance] = nil end
 
 				ComponentGroupsByName[name][instance] = nil
-				if next(ComponentGroupsByName[name][instance]) == nil then ComponentGroupsByName[name] = nil end
+				if next(ComponentGroupsByName[name]) == nil then ComponentGroupsByName[name] = nil end
 
 				component:Destroy()
 			end

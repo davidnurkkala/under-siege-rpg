@@ -1,10 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerScriptService = game:GetService("ServerScriptService")
 
 local CardDefs = require(ReplicatedStorage.Shared.Defs.CardDefs)
 local CurrencyHelper = require(ReplicatedStorage.Shared.Util.CurrencyHelper)
 local Sift = require(ReplicatedStorage.Packages.Sift)
-local WeightTable = require(ServerScriptService.Server.Classes.WeightTable)
+local WeightTable = require(ReplicatedStorage.Shared.Classes.WeightTable)
 
 export type Gacha = {
 	Name: string,

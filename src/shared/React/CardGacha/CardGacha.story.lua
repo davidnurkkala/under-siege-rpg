@@ -9,6 +9,9 @@ local function element(props)
 		GachaId = "World1Goons",
 		Visible = true,
 		Close = function() end,
+		Wallet = {
+			Secondary = 5,
+		},
 	})
 end
 

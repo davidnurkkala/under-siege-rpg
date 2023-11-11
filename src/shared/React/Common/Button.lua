@@ -26,6 +26,7 @@ return function(props)
 	local borderThickness = props.BorderSizePixel or 4
 	local corner = props.Corner or UDim.new(0, 4)
 	local padding = props.Padding or corner
+	local active = if props.Active ~= nil then props.Active else true
 
 	props = Sift.Dictionary.removeKeys(props, "Corner", "Padding")
 
@@ -34,12 +35,16 @@ return function(props)
 			"ImageButton",
 			Sift.Dictionary.merge(DefaultProps, props, {
 				[React.Event.MouseEnter] = function()
+					if not active then return end
+
 					hoverMotor:setGoal(Flipper.Spring.new(1))
 				end,
 				[React.Event.MouseLeave] = function()
 					hoverMotor:setGoal(Flipper.Spring.new(0))
 				end,
 				[React.Event.Activated] = function()
+					if not active then return end
+
 					hoverMotor:setGoal(Flipper.Instant.new(-1))
 					hoverMotor:step()
 					hoverMotor:setGoal(Flipper.Spring.new(1))

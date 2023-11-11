@@ -71,17 +71,16 @@ function CurrencyService.ApplyPrice(self: CurrencyService, player: Player, price
 		if not hasCurrency then return false end
 
 		return DataService:GetSaveFile(player):andThen(function(saveFile)
-			saveFile
-				:Update("Currency", function(oldCurrency)
-					return Sift.Dictionary.map(oldCurrency, function(amount, currencyType)
-						if price[currencyType] then
-							return amount - price[currencyType]
-						else
-							return amount
-						end
-					end)
+			saveFile:Update("Currency", function(oldCurrency)
+				return Sift.Dictionary.map(oldCurrency, function(amount, currencyType)
+					if price[currencyType] then
+						return amount - price[currencyType]
+					else
+						return amount
+					end
 				end)
-				:andThenReturn(true)
+			end)
+			return true
 		end)
 	end)
 end

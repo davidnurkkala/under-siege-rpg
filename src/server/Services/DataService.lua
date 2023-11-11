@@ -79,6 +79,19 @@ function DataService.PrepareBlocking(self: DataService)
 					Owned = {},
 				})
 			end,
+			function(data)
+				return Sift.Dictionary.set(
+					data,
+					"Deck",
+					Sift.Dictionary.set(
+						data.Deck,
+						"Equipped",
+						Sift.Dictionary.map(data.Deck.Owned, function(_, cardId)
+							return true, cardId
+						end)
+					)
+				)
+			end,
 		},
 	})
 

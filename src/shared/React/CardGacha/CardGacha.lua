@@ -6,6 +6,7 @@ local CardGachaDefs = require(ReplicatedStorage.Shared.Defs.CardGachaDefs)
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
+local CurrencyHelper = require(ReplicatedStorage.Shared.Util.CurrencyHelper)
 local FormatChance = require(ReplicatedStorage.Shared.Util.FormatChance)
 local GoonDefs = require(ReplicatedStorage.Shared.Defs.GoonDefs)
 local Image = require(ReplicatedStorage.Shared.React.Common.Image)
@@ -21,12 +22,14 @@ local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 local CardWidth = 2.5 / 3.5
 
 return function(props: {
-	Name: string,
 	GachaId: string,
 	Visible: boolean,
 	Close: () -> (),
+	Buy: () -> (),
+	Wallet: CurrencyHelper.Wallet,
 })
 	local gacha = CardGachaDefs[props.GachaId]
+	local canAfford = CurrencyHelper.CheckPrice(props.Wallet, gacha.Price)
 
 	return React.createElement(SystemWindow, {
 		Visible = props.Visible,
@@ -37,7 +40,10 @@ return function(props: {
 			Size = UDim2.new(0.4, 0, 0.2, -8),
 			Position = UDim2.fromScale(0.5, 1),
 			AnchorPoint = Vector2.new(0.5, 1),
-			ImageColor3 = ColorDefs.Yellow,
+			ImageColor3 = if canAfford then ColorDefs.Yellow else ColorDefs.PaleBlue,
+			BorderColor3 = if canAfford then nil else ColorDefs.PaleBlue,
+			Active = canAfford,
+			[React.Event.Activated] = props.Buy,
 		}, {
 			Layout = React.createElement(ListLayout, {
 				HorizontalAlignment = Enum.HorizontalAlignment.Center,
@@ -46,10 +52,13 @@ return function(props: {
 			}),
 
 			Text = React.createElement(Label, {
-				Text = TextStroke(`<b>BUY!</b>   <font color="#{CurrencyDefs.Secondary.Colors.Primary:ToHex()}">{gacha.Price.Secondary}</font>`),
+				Text = TextStroke(
+					`<b>{if canAfford then "Buy!" else "Need"}</b>   <font color="#{CurrencyDefs.Secondary.Colors.Primary:ToHex()}">{gacha.Price.Secondary}</font>`
+				),
 				AutomaticSize = Enum.AutomaticSize.X,
 				Size = UDim2.fromScale(0, 1),
 				LayoutOrder = 1,
+				TextColor3 = if canAfford then nil else ColorDefs.PaleRed,
 			}),
 
 			Icon = React.createElement(Image, {

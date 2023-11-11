@@ -112,7 +112,7 @@ function BattleSession.promised(player: Player, position: number, direction: num
 				return
 			end
 
-			local deck = DeckService:GetDeck(player):expect()
+			local deck = DeckService:GetDeckForBattle(player):expect()
 			if onCancel() then return end
 
 			local base = ReplicatedStorage.Assets.Models.Bases.Basic:Clone()
