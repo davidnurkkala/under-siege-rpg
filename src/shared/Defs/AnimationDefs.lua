@@ -4,7 +4,7 @@ local Sift = require(ReplicatedStorage.Packages.Sift)
 
 local Ids = {
 	BowIdle = 15330893056,
-	BowShoot = 14817098342,
+	BowShoot = 15330791004,
 	CrossbowIdle = 15331058136,
 	CrossbowShoot = 15330795280,
 	JavelinIdle = 15331107164,
