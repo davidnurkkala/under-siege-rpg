@@ -50,6 +50,10 @@ function DataService.PrepareBlocking(self: DataService)
 				Equipped = {},
 				Owned = {},
 			},
+			Pets = {
+				Equipped = {},
+				Owned = {},
+			},
 		},
 
 		migrations = {
@@ -91,6 +95,21 @@ function DataService.PrepareBlocking(self: DataService)
 						end)
 					)
 				)
+			end,
+			function(data)
+				return Sift.Dictionary.set(data, "Pets", {
+					Equipped = {},
+					Owned = {},
+				})
+			end,
+			function(data)
+				return Sift.Dictionary.set(data, "Pets", Sift.Dictionary.withKeys(data.Pets, "Equipped", "Owned"))
+			end,
+			function(data)
+				return Sift.Dictionary.set(data, "Pets", {
+					Equipped = {},
+					Owned = {},
+				})
 			end,
 		},
 	})
