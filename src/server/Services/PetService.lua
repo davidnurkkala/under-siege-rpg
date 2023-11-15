@@ -72,6 +72,12 @@ function PetService.TogglePetEquipped(self: PetService, player: Player, slotId: 
 	end)
 end
 
+function PetService.GetPets(_self: PetService, player: Player)
+	return DataService:GetSaveFile(player):andThen(function(saveFile)
+		return saveFile:Get("Pets")
+	end)
+end
+
 function PetService.SetPetEquipped(self: PetService, player: Player, slotId: string, equipped: boolean)
 	return Promise.all({
 		DataService:GetSaveFile(player),

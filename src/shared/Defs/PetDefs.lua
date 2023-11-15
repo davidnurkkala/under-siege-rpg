@@ -6,27 +6,27 @@ local Pets = {
 	Bunny = {
 		Name = "Bunny",
 		ModelName = "BunnyPet",
-		Rank = 1,
+		Power = 1.6,
 	},
 	Doggy = {
 		Name = "Doggy",
 		ModelName = "DoggyPet",
-		Rank = 1,
+		Power = 1,
 	},
 	Kitty = {
 		Name = "Kitty",
 		ModelName = "KittyPet",
-		Rank = 1,
+		Power = 1.2,
 	},
 	Piggy = {
 		Name = "Piggy",
 		ModelName = "PiggyPet",
-		Rank = 1,
+		Power = 1.4,
 	},
 	Wolfy = {
 		Name = "Wolfy",
 		ModelName = "WolfyPet",
-		Rank = 2,
+		Power = 2,
 	},
 }
 

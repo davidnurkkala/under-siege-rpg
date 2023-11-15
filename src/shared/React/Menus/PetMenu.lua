@@ -3,10 +3,16 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Aspect = require(ReplicatedStorage.Shared.React.Common.Aspect)
 local Button = require(ReplicatedStorage.Shared.React.Common.Button)
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
+local Container = require(ReplicatedStorage.Shared.React.Common.Container)
+local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
 local GridLayout = require(ReplicatedStorage.Shared.React.Common.GridLayout)
+local Image = require(ReplicatedStorage.Shared.React.Common.Image)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local LayoutContainer = require(ReplicatedStorage.Shared.React.Common.LayoutContainer)
+local ListLayout = require(ReplicatedStorage.Shared.React.Common.ListLayout)
+local Panel = require(ReplicatedStorage.Shared.React.Common.Panel)
 local PetDefs = require(ReplicatedStorage.Shared.Defs.PetDefs)
+local PetHelper = require(ReplicatedStorage.Shared.Util.PetHelper)
 local PetPreview = require(ReplicatedStorage.Shared.React.PetGacha.PetPreview)
 local React = require(ReplicatedStorage.Packages.React)
 local ScrollingFrame = require(ReplicatedStorage.Shared.React.Common.ScrollingFrame)
@@ -27,8 +33,38 @@ return function(props: {
 		Visible = props.Visible,
 		HeaderText = TextStroke("Pets"),
 		[React.Event.Activated] = props.Close,
+		Ratio = 4 / 3,
 	}, {
-		Frame = React.createElement(ScrollingFrame, {
+		Stats = React.createElement(Panel, {
+			Size = UDim2.new(1, 0, 0.2, -4),
+			Position = UDim2.fromScale(0, 1),
+			AnchorPoint = Vector2.new(0, 1),
+			ImageColor3 = ColorDefs.PaleRed,
+		}, {
+			Layout = React.createElement(ListLayout, {
+				FillDirection = Enum.FillDirection.Horizontal,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				Padding = UDim.new(0.025, 0),
+			}),
+
+			Icon = React.createElement(Image, {
+				LayoutOrder = 2,
+				Size = UDim2.fromScale(0.8, 0.8),
+				SizeConstraint = Enum.SizeConstraint.RelativeYY,
+				Image = CurrencyDefs.Primary.Image,
+			}),
+
+			Total = React.createElement(Label, {
+				LayoutOrder = 1,
+				Size = UDim2.fromScale(0, 1),
+				AutomaticSize = Enum.AutomaticSize.X,
+				Text = TextStroke(`Bonus\nx{PetHelper.GetTotalPower(props.Pets) // 0.1 / 10}`),
+				TextXAlignment = Enum.TextXAlignment.Right,
+			}),
+		}),
+
+		Pets = React.createElement(ScrollingFrame, {
+			Size = UDim2.fromScale(1, 0.8),
 			RenderLayout = function(setCanvasSize)
 				return React.createElement(GridLayout, {
 					CellSize = UDim2.fromScale(1 / 5, 1),
@@ -67,6 +103,7 @@ return function(props: {
 						local petSlot = props.Pets.Owned[slotId]
 						local petDef = PetDefs[petSlot.PetId]
 						local isEquipped = props.Pets.Equipped[slotId] == true
+						local power = PetHelper.GetPetPower(petSlot.PetId, petSlot.Tier)
 
 						return React.createElement(LayoutContainer, {
 							Padding = 8,
@@ -84,15 +121,42 @@ return function(props: {
 									ZIndex = 4,
 								}),
 
+								Power = React.createElement(Container, {
+									Size = UDim2.fromScale(1, 0.25),
+									AnchorPoint = Vector2.new(0, 1),
+									Position = UDim2.fromScale(0, 1),
+								}, {
+									Layout = React.createElement(ListLayout, {
+										HorizontalAlignment = Enum.HorizontalAlignment.Center,
+										FillDirection = Enum.FillDirection.Horizontal,
+										Padding = UDim.new(0, 2),
+									}),
+
+									Text = React.createElement(Label, {
+										LayoutOrder = 1,
+										Size = UDim2.fromScale(0.5, 1),
+										Text = TextStroke(`x{power // 0.1 / 10}`),
+										TextXAlignment = Enum.TextXAlignment.Right,
+									}),
+
+									Icon = React.createElement(Image, {
+										LayoutOrder = 2,
+										Size = UDim2.fromScale(1, 1),
+										SizeConstraint = Enum.SizeConstraint.RelativeYY,
+										Image = CurrencyDefs.Primary.Image,
+									}),
+								}),
+
 								Preview = React.createElement(PetPreview, {
 									PetId = petSlot.PetId,
 								}),
 
-								Equipped = isEquipped and React.createElement(Label, {
-									Size = UDim2.fromScale(1, 0.2),
-									Text = TextStroke(`<b>Equipped</b>`, 2),
-									Position = UDim2.fromScale(0, 1),
-									AnchorPoint = Vector2.new(0, 1),
+								Equipped = isEquipped and React.createElement(Image, {
+									Size = UDim2.fromScale(0.2, 0.2),
+									Position = UDim2.fromScale(1, 0),
+									AnchorPoint = Vector2.new(1, 0),
+									Image = "rbxassetid://15360109124",
+									ImageColor3 = ColorDefs.LightGreen,
 								}),
 							}),
 						})
