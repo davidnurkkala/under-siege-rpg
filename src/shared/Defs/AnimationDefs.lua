@@ -22,6 +22,8 @@ local Ids = {
 	SwordsmanWalk = 15082639586,
 	PeasantAttack = 15340591603,
 	MageAttack = 15340597447,
+	AxemanAttack = 15366912173,
+	BerserkerAttack = 15366913772,
 }
 
 return Sift.Dictionary.map(Ids, function(id, name)
