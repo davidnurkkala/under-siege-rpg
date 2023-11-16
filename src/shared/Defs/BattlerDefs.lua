@@ -15,7 +15,7 @@ local Battlers = {
 		Name = "VikingWarrior",
 		Reward = 3,
 		Deck = {
-			Berserker = 2,
+			Berserker = 1,
 		},
 	},
 
@@ -23,7 +23,7 @@ local Battlers = {
 		Name = "VikingChief",
 		Reward = 5,
 		Deck = {
-			VikingWarrior = 2,
+			VikingWarrior = 1,
 		},
 	},
 
@@ -31,7 +31,7 @@ local Battlers = {
 		Name = "VikingKing",
 		Reward = 10,
 		Deck = {
-			VikingWarrior = 3,
+			VikingWarrior = 1,
 		},
 	},
 }
