@@ -9,7 +9,7 @@ type DeckController = typeof(DeckController)
 
 function DeckController.PrepareBlocking(self: DeckController)
 	self.Comm = Comm.ClientComm.new(ReplicatedStorage, true, "DeckService")
-
+	self.DeckRemote = self.Comm:GetProperty("Deck")
 	self.DrawCardFromGachaRemote = self.Comm:GetFunction("DrawCardFromGacha")
 end
 

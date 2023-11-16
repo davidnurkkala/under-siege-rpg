@@ -2,18 +2,27 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
 local GoonDefs = require(ReplicatedStorage.Shared.Defs.GoonDefs)
+local Guid = require(ReplicatedStorage.Shared.Util.Guid)
+local Health = require(ReplicatedStorage.Shared.Classes.Health)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local Updater = require(ReplicatedStorage.Shared.Classes.Updater)
+
 local GoonModel = {}
 GoonModel.__index = GoonModel
 
-export type GoonModel = typeof(setmetatable({} :: {
-	Model: Model,
-	Root: Part,
-	Trove: any,
-	Animator: any,
-}, GoonModel))
+export type GoonModel = typeof(setmetatable(
+	{} :: {
+		Model: Model,
+		Root: Part,
+		Trove: any,
+		Animator: any,
+		Guid: string,
+		Health: any,
+		OverheadPoint: Attachment,
+	},
+	GoonModel
+))
 
 local GoonUpdater = Updater.new()
 
@@ -29,10 +38,13 @@ function GoonModel.new(root): GoonModel
 	local animator = trove:Construct(Animator, model.AnimationController)
 
 	local self: GoonModel = setmetatable({
+		Guid = Guid(),
 		Root = root,
 		Model = model,
 		Trove = trove,
 		Animator = animator,
+		Health = Health.new(1),
+		OverheadPoint = model.PrimaryPart.OverheadPoint,
 	}, GoonModel)
 
 	self.Root.Transparency = 1
@@ -62,7 +74,16 @@ function GoonModel.new(root): GoonModel
 end
 
 function GoonModel.OnRemote(self: GoonModel, systemName, funcName, ...)
-	if systemName == "Animator" then self.Animator[funcName](self.Animator, ...) end
+	if systemName == "Animator" then
+		self.Animator[funcName](self.Animator, ...)
+	elseif systemName == "Health" then
+		if funcName == "Update" then self:UpdateHealth(...) end
+	end
+end
+
+function GoonModel:UpdateHealth(max, amount)
+	self.Health:SetMax(max)
+	self.Health:Set(amount)
 end
 
 function GoonModel.Update(self: GoonModel, dt: number)

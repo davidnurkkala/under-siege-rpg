@@ -8,13 +8,17 @@ SaveFile.__index = SaveFile
 type Observer = {
 	Callback: (any) -> (),
 	Disconnect: (Observer) -> (),
+	Run: (Observer, ...any) -> () -> (),
 	Disconnected: boolean,
 }
 
-export type SaveFile = typeof(setmetatable({} :: {
-	Document: any,
-	Observers: { [string]: { [Observer]: boolean } },
-}, SaveFile))
+export type SaveFile = typeof(setmetatable(
+	{} :: {
+		Document: any,
+		Observers: { [string]: { [Observer]: boolean } },
+	},
+	SaveFile
+))
 
 function SaveFile.new(document): SaveFile
 	local self: SaveFile = setmetatable({
@@ -39,11 +43,16 @@ function SaveFile.Observe(self: SaveFile, key: string, callback: (any) -> ()): (
 
 			if next(self.Observers[key]) == nil then self.Observers[key] = nil end
 		end,
+		Cleanup = nil,
+		Run = function(runningObserver, ...)
+			if runningObserver.Cleanup then runningObserver.Cleanup() end
+			runningObserver.Cleanup = runningObserver.Callback(...)
+		end,
 	}
 
 	self.Observers[key][observer] = true
 
-	observer.Callback(self:Get(key))
+	observer:Run(self:Get(key))
 
 	return function()
 		observer:Disconnect()
@@ -65,7 +74,7 @@ function SaveFile.Set(self: SaveFile, key: string, value: any)
 	local set = self.Observers[key]
 	if set then
 		for observer in set do
-			task.spawn(observer.Callback, value)
+			task.spawn(observer.Run, observer, value)
 		end
 	end
 end

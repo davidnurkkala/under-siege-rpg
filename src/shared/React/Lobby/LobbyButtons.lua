@@ -8,6 +8,7 @@ local GridLayout = require(ReplicatedStorage.Shared.React.Common.GridLayout)
 local Image = require(ReplicatedStorage.Shared.React.Common.Image)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local LayoutContainer = require(ReplicatedStorage.Shared.React.Common.LayoutContainer)
+local MenuContext = require(ReplicatedStorage.Shared.React.MenuContext.MenuContext)
 local React = require(ReplicatedStorage.Packages.React)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 
@@ -40,8 +41,11 @@ local function lobbyButton(props: {
 	})
 end
 
-return function(props)
+return function()
+	local menu = React.useContext(MenuContext)
+
 	return React.createElement(Container, {
+		Visible = menu.Is(nil),
 		Size = UDim2.fromScale(0.1, 1),
 	}, {
 		SizeConstraint = React.createElement("UISizeConstraint", {
@@ -99,6 +103,9 @@ return function(props)
 			Text = TextStroke("Pets"),
 			Color = ColorDefs.LightGreen,
 			Image = "rbxassetid://15308000264",
+			Activate = function()
+				menu.Set("Pets")
+			end,
 		}),
 		DeckButton = React.createElement(lobbyButton, {
 			LayoutOrder = 8,

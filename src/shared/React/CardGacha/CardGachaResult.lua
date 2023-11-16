@@ -8,6 +8,7 @@ local Flipper = require(ReplicatedStorage.Packages.Flipper)
 local GoonDefs = require(ReplicatedStorage.Shared.Defs.GoonDefs)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local Panel = require(ReplicatedStorage.Shared.React.Common.Panel)
+local Promise = require(ReplicatedStorage.Packages.Promise)
 local PromiseMotor = require(ReplicatedStorage.Shared.Util.PromiseMotor)
 local React = require(ReplicatedStorage.Packages.React)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
@@ -35,6 +36,7 @@ return function(props: {
 	local width, widthMotor = UseMotor(1)
 	local contentsVisible, setContentsVisible = React.useState(false)
 	local buttonSize, buttonMotor = UseMotor(0)
+	local active = React.useRef(true)
 
 	local setDelta = React.useCallback(function(position)
 		dxMotor:setGoal(Flipper.Spring.new(position.X))
@@ -101,7 +103,19 @@ return function(props: {
 			AnchorPoint = Vector2.new(0.5, 0),
 			Position = UDim2.fromScale(0.5, 0.7),
 			ImageColor3 = ColorDefs.PalePurple,
-			[React.Event.Activated] = props.Close,
+			[React.Event.Activated] = function()
+				if not active.current then return end
+				active.current = false
+
+				Promise.all({
+					PromiseMotor(buttonMotor, Flipper.Spring.new(0), function(value)
+						return value <= 0.05
+					end),
+					PromiseMotor(widthMotor, Flipper.Spring.new(0), function(value)
+						return value <= 0.05
+					end),
+				}):andThenCall(props.Close)
+			end,
 		}, {
 			Label = React.createElement(Label, {
 				Text = TextStroke("Okay"),

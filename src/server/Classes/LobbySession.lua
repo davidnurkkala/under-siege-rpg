@@ -14,6 +14,9 @@ local EffectService = require(ServerScriptService.Server.Services.EffectService)
 local EffectShakeModel = require(ReplicatedStorage.Shared.Effects.EffectShakeModel)
 local EffectSound = require(ReplicatedStorage.Shared.Effects.EffectSound)
 local LobbySessions = require(ServerScriptService.Server.Singletons.LobbySessions)
+local PetDefs = require(ReplicatedStorage.Shared.Defs.PetDefs)
+local PetHelper = require(ReplicatedStorage.Shared.Util.PetHelper)
+local PetService = require(ServerScriptService.Server.Services.PetService)
 local PickRandom = require(ReplicatedStorage.Shared.Util.PickRandom)
 local PlayerLeaving = require(ReplicatedStorage.Shared.Util.PlayerLeaving)
 local Promise = require(ReplicatedStorage.Packages.Promise)
@@ -87,6 +90,43 @@ function LobbySession.new(args: {
 		if weapons.Equipped == self.WeaponDef.Id then return end
 
 		self:SetWeapon(WeaponDefs[weapons.Equipped])
+	end))
+
+	trove:Add(DataService:ObserveKey(self.Player, "Pets", function(pets)
+		local equipped = Sift.Dictionary.keys(pets.Equipped)
+		if #equipped == 0 then return end
+
+		local root = self.Character.PrimaryPart
+		if not root then return end
+
+		local petTrove = Trove.new()
+
+		local number = 0
+		local radius = 5
+		for slotId in pets.Equipped do
+			local slot = pets.Owned[slotId]
+			local petDef = PetDefs[slot.PetId]
+
+			local angle = math.rad(30) + math.rad(60) * number
+			local dx = math.cos(angle) * radius
+			local dz = math.sin(angle) * radius
+			local cframe = root.CFrame * CFrame.new(dx, -1.5, dz)
+
+			local pet = petTrove:Clone(petDef.Model)
+			pet:PivotTo(cframe)
+			pet.Parent = self.Character
+
+			local weld = Instance.new("WeldConstraint")
+			weld.Part0 = root
+			weld.Part1 = pet.PrimaryPart
+			weld.Parent = pet.PrimaryPart
+
+			number += 1
+		end
+
+		return function()
+			petTrove:Clean()
+		end
 	end))
 
 	return self
@@ -201,7 +241,12 @@ function LobbySession.Attack(self: LobbySession)
 			)
 		end)
 		:andThen(function()
-			CurrencyService:AddCurrency(self.Player, "Primary", self.WeaponDef.Power)
+			return PetService:GetPets(self.Player)
+		end)
+		:andThen(function(pets)
+			local multiplier = PetHelper.GetTotalPower(pets)
+
+			CurrencyService:AddCurrency(self.Player, "Primary", self.WeaponDef.Power * multiplier)
 
 			dummy:HitEffect(PickRandom(self.WeaponDef.Sounds.Hit))
 		end)

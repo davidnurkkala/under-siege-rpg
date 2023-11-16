@@ -22,7 +22,13 @@ end
 function Health.Observe(self: Health, callback)
 	local connection = self.Changed:Connect(callback)
 	callback(self.Amount, self.Amount)
-	return connection
+	return function()
+		connection:Disconnect()
+	end
+end
+
+function Health.GetPercent(self: Health)
+	return self:Get() / self:GetMax()
 end
 
 function Health.GetMax(self: Health)
@@ -39,6 +45,17 @@ function Health.Set(self: Health, amount: number)
 	local oldAmount = self.Amount
 
 	self.Amount = math.clamp(amount, 0, self.Max)
+	self.Changed:Fire(oldAmount, self.Amount)
+end
+
+function Health.SetMax(self: Health, amount: number)
+	if amount == self.Max then return end
+
+	self.Max = amount
+
+	local oldAmount = self.Amount
+	if self.Amount > self.Max then self.Amount = self.Max end
+
 	self.Changed:Fire(oldAmount, self.Amount)
 end
 
