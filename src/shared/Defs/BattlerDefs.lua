@@ -10,6 +10,30 @@ local Battlers = {
 			Peasant = 1,
 		},
 	},
+
+	VikingWarrior = {
+		Name = "VikingWarrior",
+		Reward = 3,
+		Deck = {
+			Berserker = 1,
+		},
+	},
+
+	VikingChief = {
+		Name = "VikingChief",
+		Reward = 5,
+		Deck = {
+			VikingWarrior = 1,
+		},
+	},
+
+	VikingKing = {
+		Name = "VikingKing",
+		Reward = 10,
+		Deck = {
+			VikingWarrior = 1,
+		},
+	},
 }
 
 return Sift.Dictionary.map(Battlers, function(battler, id)

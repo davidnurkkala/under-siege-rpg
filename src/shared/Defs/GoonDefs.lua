@@ -167,6 +167,72 @@ local Goons = {
 			return 10 + 2 * (level - 1)
 		end,
 	},
+
+	VikingWarrior = {
+		Name = "VikingWarrior",
+		ModelName = "VikingWarrior",
+		Brain = {
+			Id = "BasicMelee",
+		},
+		Animations = {
+			Walk = "SwordsmanWalk",
+			Attack = "AxemanAttack",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Size = 0.03,
+		Speed = function()
+			return 0.05
+		end,
+		Range = function()
+			return 0.1
+		end,
+		AttackRate = function()
+			return 0.75
+		end,
+		Damage = function(level)
+			return 4 + level
+		end,
+		HealthMax = function(level)
+			return 10 + 2 * (level - 1)
+		end,
+	},
+
+	Berserker = {
+		Name = "Berserker",
+		ModelName = "Berserker",
+		Brain = {
+			Id = "BasicMelee",
+		},
+		Animations = {
+			Walk = "SwordsmanWalk",
+			Attack = "BerserkerAttack",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Size = 0.03,
+		Speed = function()
+			return 0.05
+		end,
+		Range = function()
+			return 0.1
+		end,
+		AttackRate = function()
+			return 0.75
+		end,
+		Damage = function(level)
+			return 4 + level
+		end,
+		HealthMax = function(level)
+			return 10 + 2 * (level - 1)
+		end,
+	},
 }
 
 return Sift.Dictionary.map(Goons, function(goon, id)
