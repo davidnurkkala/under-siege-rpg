@@ -15,6 +15,7 @@ export type SessionRewardsSession = typeof(setmetatable(
 		RewardStates: { ("Available" | "Claimed")? },
 		Changed: any,
 		Promise: any,
+		Player: Player,
 	},
 	SessionRewardsSession
 ))
@@ -24,6 +25,7 @@ function SessionRewardsSession.new(player: Player): SessionRewardsSession
 		Timestamp = Timestamp(),
 		RewardStates = {},
 		Changed = Signal.new(),
+		Player = player,
 	}, SessionRewardsSession)
 
 	self.Promise = Promise.new(function(resolve, _, onCancel)

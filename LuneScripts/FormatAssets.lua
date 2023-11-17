@@ -26,3 +26,22 @@ end
 
 forEachModel("Assets/Weapons", makeModelIntangible)
 forEachModel("Assets/Models/Pets", makeModelIntangible)
+
+forEachModel("Assets/Models/Goons", function(model)
+	local animSaves = model:FindFirstChild("AnimSaves")
+	if animSaves and animSaves:IsA("Model") then animSaves:Destroy() end
+
+	makeModelIntangible(model)
+	model.PrimaryPart.Anchored = true
+end)
+
+forEachModel("Assets/Models/Battlers", function(model)
+	local animSaves = model:FindFirstChild("AnimSaves")
+	if animSaves and animSaves:IsA("Model") then animSaves:Destroy() end
+
+	local animate = model:FindFirstChild("Animate")
+	if animate and animate:IsA("LocalScript") then animate:Destroy() end
+
+	makeModelIntangible(model)
+	model.PrimaryPart.Anchored = true
+end)

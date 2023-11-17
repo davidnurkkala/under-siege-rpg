@@ -10,8 +10,6 @@ type LoginStreakController = typeof(LoginStreakController)
 function LoginStreakController.PrepareBlocking(self: LoginStreakController)
 	self.Comm = Comm.ClientComm.new(ReplicatedStorage, true, "LoginStreakService")
 	self.StatusRemote = self.Comm:GetProperty("Status")
-
-	self.StatusRemote:Observe(print)
 end
 
 return LoginStreakController
