@@ -1,4 +1,6 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SocialService = game:GetService("SocialService")
 
 local Aspect = require(ReplicatedStorage.Shared.React.Common.Aspect)
 local Button = require(ReplicatedStorage.Shared.React.Common.Button)
@@ -9,6 +11,7 @@ local Image = require(ReplicatedStorage.Shared.React.Common.Image)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local LayoutContainer = require(ReplicatedStorage.Shared.React.Common.LayoutContainer)
 local MenuContext = require(ReplicatedStorage.Shared.React.MenuContext.MenuContext)
+local Promise = require(ReplicatedStorage.Packages.Promise)
 local React = require(ReplicatedStorage.Packages.React)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 
@@ -67,6 +70,15 @@ return function()
 			Text = TextStroke("Invite"),
 			Color = ColorDefs.Blue,
 			Image = "rbxassetid://15308000385",
+			Activate = function()
+				Promise.try(function()
+					return SocialService:CanSendGameInviteAsync(Players.LocalPlayer)
+				end):andThen(function(canSend)
+					if not canSend then return end
+
+					SocialService:PromptGameInvite(Players.LocalPlayer)
+				end)
+			end,
 		}),
 		VipButton = React.createElement(lobbyButton, {
 			LayoutOrder = 2,
