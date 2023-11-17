@@ -12,7 +12,7 @@ local SessionRewardsService = {
 type SessionRewardsService = typeof(SessionRewardsService)
 
 function SessionRewardsService.PrepareBlocking(self: SessionRewardsService)
-	self.Comm = Comm.ServerComm.new(ReplicatedStorage, "SessionRewards")
+	self.Comm = Comm.ServerComm.new(ReplicatedStorage, "SessionRewardsService")
 	self.StatusRemote = self.Comm:CreateProperty("Status", {})
 
 	Observers.observePlayer(function(player)

@@ -111,6 +111,19 @@ function DataService.PrepareBlocking(self: DataService)
 					Owned = {},
 				})
 			end,
+			function(data)
+				data = Sift.Dictionary.set(data, "Deck", {
+					Equipped = {},
+					Owned = {},
+				})
+
+				data = Sift.Dictionary.set(data, "LoginStreakData", {
+					Timestamp = 0,
+					Streak = 0,
+				})
+
+				return data
+			end,
 		},
 	})
 
