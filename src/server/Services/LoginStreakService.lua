@@ -21,7 +21,6 @@ function LoginStreakService.PrepareBlocking(self: LoginStreakService)
 
 	Observers.observePlayer(function(player)
 		local promise = DataService:GetSaveFile(player):andThen(function(saveFile)
-			print(saveFile:Get("LoginStreakData"))
 			local now = Timestamp()
 			local elapsed = now - saveFile:Get("LoginStreakData").Timestamp
 
@@ -38,8 +37,6 @@ function LoginStreakService.PrepareBlocking(self: LoginStreakService)
 			saveFile:Update("LoginStreakData", function(oldData)
 				return Sift.Dictionary.set(oldData, "Streak", oldData.Streak + 1)
 			end)
-
-			print(`LOGIN STREAK FOR PLAYER {player} AT {saveFile:Get("LoginStreakData").Streak}`)
 		end)
 
 		return function()

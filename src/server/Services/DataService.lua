@@ -19,6 +19,7 @@ type DataService = typeof(DataService)
 
 local SaveFilesByPlayer: { [Player]: SaveFile.SaveFile } = {}
 local LoadPromisesByPlayer: { [Player]: any } = {}
+local FirstSessionsByPlayer: { [Player]: boolean } = {}
 
 local function getDocumentKey(player: Player): string
 	return tostring(player.UserId)
@@ -54,6 +55,11 @@ function DataService.PrepareBlocking(self: DataService)
 				Equipped = {},
 				Owned = {},
 			},
+			LoginStreakData = {
+				Timestamp = 0,
+				Streak = 0,
+			},
+			IsFirstSession = true,
 		},
 
 		migrations = {
@@ -140,6 +146,8 @@ function DataService.PrepareBlocking(self: DataService)
 				SaveFilesByPlayer[player]:Destroy()
 				SaveFilesByPlayer[player] = nil
 			end
+
+			FirstSessionsByPlayer[player] = nil
 		end
 	end)
 end
@@ -151,13 +159,28 @@ function DataService.GetSaveFile(self: DataService, player: Player)
 		if not LoadPromisesByPlayer[player] then
 			LoadPromisesByPlayer[player] = self.Collection:load(getDocumentKey(player)):andThen(function(document)
 				local saveFile = SaveFile.new(document)
+
+				if saveFile:Get("IsFirstSession") then
+					saveFile:Set("IsFirstSession", nil)
+					FirstSessionsByPlayer[player] = true
+				end
+
 				SaveFilesByPlayer[player] = saveFile
 				LoadPromisesByPlayer[player] = nil
+
 				return saveFile
 			end)
 		end
 
 		return LoadPromisesByPlayer[player]
+	end
+end
+
+function DataService.IsFirstSession(_self: DataService, player: Player)
+	if LoadPromisesByPlayer[player] then
+		return LoadPromisesByPlayer[player]:andThenReturn(FirstSessionsByPlayer[player])
+	else
+		return Promise.resolve(FirstSessionsByPlayer[player])
 	end
 end
 
