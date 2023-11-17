@@ -19,6 +19,9 @@ local Goons = {
 			Death = { "MaleUgh1", "MaleUgh2" },
 		},
 		Size = 0.03,
+		AttackWindupTime = function()
+			return 1
+		end,
 		Speed = function()
 			return 0.05
 		end,
@@ -36,9 +39,9 @@ local Goons = {
 		end,
 	},
 
-	Conscript = {
-		Name = "Conscript",
-		ModelName = "Conscript",
+	Recruit = {
+		Name = "Recruit",
+		ModelName = "Recruit",
 		Brain = {
 			Id = "BasicMelee",
 		},
@@ -52,6 +55,9 @@ local Goons = {
 			Death = { "MaleUgh1", "MaleUgh2" },
 		},
 		Size = 0.03,
+		AttackWindupTime = function()
+			return 0.27
+		end,
 		Speed = function()
 			return 0.05
 		end,
@@ -85,6 +91,9 @@ local Goons = {
 			Death = { "MaleUgh1", "MaleUgh2" },
 		},
 		Size = 0.03,
+		AttackWindupTime = function()
+			return 0.27
+		end,
 		Speed = function()
 			return 0.05
 		end,
@@ -118,6 +127,9 @@ local Goons = {
 			Death = { "MaleUgh1", "MaleUgh2" },
 		},
 		Size = 0.03,
+		AttackWindupTime = function()
+			return 0.55
+		end,
 		Speed = function()
 			return 0.05
 		end,
@@ -128,10 +140,10 @@ local Goons = {
 			return 0.75
 		end,
 		Damage = function(level)
-			return 4 + level
+			return 5 + level
 		end,
 		HealthMax = function(level)
-			return 10 + 2 * (level - 1)
+			return 9 + 2 * (level - 1)
 		end,
 	},
 
@@ -151,6 +163,9 @@ local Goons = {
 			Death = { "MaleUgh1", "MaleUgh2" },
 		},
 		Size = 0.03,
+		AttackWindupTime = function()
+			return 0.55
+		end,
 		Speed = function()
 			return 0.05
 		end,
@@ -161,10 +176,10 @@ local Goons = {
 			return 0.75
 		end,
 		Damage = function(level)
-			return 4 + level
+			return 8 + level
 		end,
 		HealthMax = function(level)
-			return 10 + 2 * (level - 1)
+			return 8 + 2 * (level - 1)
 		end,
 	},
 
@@ -184,6 +199,9 @@ local Goons = {
 			Death = { "MaleUgh1", "MaleUgh2" },
 		},
 		Size = 0.03,
+		AttackWindupTime = function()
+			return 0.55
+		end,
 		Speed = function()
 			return 0.05
 		end,
@@ -194,10 +212,10 @@ local Goons = {
 			return 0.75
 		end,
 		Damage = function(level)
-			return 4 + level
+			return 9 + level
 		end,
 		HealthMax = function(level)
-			return 10 + 2 * (level - 1)
+			return 12 + 2 * (level - 1)
 		end,
 	},
 
@@ -217,6 +235,9 @@ local Goons = {
 			Death = { "MaleUgh1", "MaleUgh2" },
 		},
 		Size = 0.03,
+		AttackWindupTime = function()
+			return 0.43
+		end,
 		Speed = function()
 			return 0.05
 		end,
@@ -227,10 +248,10 @@ local Goons = {
 			return 0.75
 		end,
 		Damage = function(level)
-			return 4 + level
+			return 8 + level
 		end,
 		HealthMax = function(level)
-			return 10 + 2 * (level - 1)
+			return 12 + 2 * (level - 1)
 		end,
 	},
 }

@@ -20,7 +20,7 @@ local Gachas = {
 		},
 		WeightTable = {
 			{ Result = "Peasant", Weight = 3 },
-			{ Result = "Soldier", Weight = 1 },
+			{ Result = "Recruit", Weight = 1 },
 			{ Result = "Hunter", Weight = 1 },
 		},
 	},
