@@ -9,13 +9,23 @@ local Cards = {
 		Type = "Goon",
 		Rank = 1,
 	},
-	Soldier = {
-		GoonId = "Peasant",
+	Recruit = {
+		GoonId = "Recruit",
+		Type = "Goon",
+		Rank = 1,
+	},
+	Footman = {
+		GoonId = "Footman",
 		Type = "Goon",
 		Rank = 1,
 	},
 	Hunter = {
-		GoonId = "Peasant",
+		GoonId = "Hunter",
+		Type = "Goon",
+		Rank = 1,
+	},
+	Mage = {
+		GoonId = "Mage",
 		Type = "Goon",
 		Rank = 1,
 	},

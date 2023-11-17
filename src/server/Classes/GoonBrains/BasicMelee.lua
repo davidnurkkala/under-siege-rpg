@@ -63,7 +63,7 @@ function BasicMelee.SetUpStateMachine(self: BasicMelee)
 
 						self.Goon.Animator:Play(self.Goon.Def.Animations.Attack)
 
-						data.Promise = self.Goon:WhileAlive(Promise.delay(1):andThen(function()
+						data.Promise = self.Goon:WhileAlive(Promise.delay(self.Goon:FromDef("AttackWindupTime") or 1):andThen(function()
 							target.Health:Adjust(-self.Goon:FromDef("Damage"))
 
 							EffectService:All(
