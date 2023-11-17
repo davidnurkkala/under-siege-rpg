@@ -18,25 +18,35 @@ type LoginStreakService = typeof(LoginStreakService)
 
 function LoginStreakService.PrepareBlocking(self: LoginStreakService)
 	self.Comm = Comm.ServerComm.new(ReplicatedStorage, "LoginStreakService")
+	self.StatusRemote = self.Comm:CreateProperty("Status")
 
 	Observers.observePlayer(function(player)
 		local promise = DataService:GetSaveFile(player):andThen(function(saveFile)
 			local now = Timestamp()
 			local elapsed = now - saveFile:Get("LoginStreakData").Timestamp
 
-			if elapsed < OneDay then return end
+			if elapsed > OneDay then
+				saveFile:Update("LoginStreakData", function(oldData)
+					return Sift.Dictionary.set(oldData, "Timestamp", now)
+				end)
 
-			saveFile:Update("LoginStreakData", function(oldData)
-				return Sift.Dictionary.set(oldData, "Timestamp", now)
-			end)
+				if elapsed > TwoDays then
+					saveFile:Update("LoginStreakData", function(oldData)
+						return Sift.Dictionary.set(oldData, "Streak", 0)
+					end)
+				end
 
-			if elapsed > TwoDays then saveFile:Update("LoginStreakData", function(oldData)
-				return Sift.Dictionary.set(oldData, "Streak", 0)
-			end) end
+				saveFile:Update("LoginStreakData", function(oldData)
+					local newStreak = oldData.Streak + 1
 
-			saveFile:Update("LoginStreakData", function(oldData)
-				return Sift.Dictionary.set(oldData, "Streak", oldData.Streak + 1)
-			end)
+					return Sift.Dictionary.merge(oldData, {
+						Streak = newStreak,
+						AvailableRewardIndices = Sift.Array.append(oldData.AvailableRewardIndices, newStreak),
+					})
+				end)
+			end
+
+			self.StatusRemote:SetFor(player, saveFile:Get("LoginStreakData"))
 		end)
 
 		return function()

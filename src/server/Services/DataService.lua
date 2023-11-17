@@ -58,79 +58,12 @@ function DataService.PrepareBlocking(self: DataService)
 			LoginStreakData = {
 				Timestamp = 0,
 				Streak = 0,
+				AvailableRewardIndices = {},
 			},
 			IsFirstSession = true,
 		},
 
-		migrations = {
-			function(data)
-				return Sift.Dictionary.merge(data, {
-					Currency = {
-						Normal = 0,
-						Premium = 0,
-					},
-				})
-			end,
-			function(data)
-				return Sift.Dictionary.removeKeys(
-					Sift.Dictionary.set(data, "Currency", {
-						Primary = data.Power,
-						Secondary = data.Currency.Normal,
-						Premium = data.Currency.Premium,
-						Prestige = data.PrestigeCount,
-					}),
-					"Power",
-					"PrestigeCount"
-				)
-			end,
-			function(data)
-				return Sift.Dictionary.set(data, "Deck", {
-					Equipped = {},
-					Owned = {},
-				})
-			end,
-			function(data)
-				return Sift.Dictionary.set(
-					data,
-					"Deck",
-					Sift.Dictionary.set(
-						data.Deck,
-						"Equipped",
-						Sift.Dictionary.map(data.Deck.Owned, function(_, cardId)
-							return true, cardId
-						end)
-					)
-				)
-			end,
-			function(data)
-				return Sift.Dictionary.set(data, "Pets", {
-					Equipped = {},
-					Owned = {},
-				})
-			end,
-			function(data)
-				return Sift.Dictionary.set(data, "Pets", Sift.Dictionary.withKeys(data.Pets, "Equipped", "Owned"))
-			end,
-			function(data)
-				return Sift.Dictionary.set(data, "Pets", {
-					Equipped = {},
-					Owned = {},
-				})
-			end,
-			function(data)
-				data = Sift.Dictionary.set(data, "Deck", {
-					Equipped = {},
-					Owned = {},
-				})
-
-				data = Sift.Dictionary.set(data, "LoginStreakData", {
-					Timestamp = 0,
-					Streak = 0,
-				})
-
-				return data
-			end,
-		},
+		migrations = {},
 	})
 
 	Observers.observePlayer(function(player: Player)

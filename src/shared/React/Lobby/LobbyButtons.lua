@@ -18,17 +18,23 @@ local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 local function lobbyButton(props: {
 	LayoutOrder: number,
 	Text: string,
-	Activate: () -> (),
+	Activate: () -> any,
 	Color: Color3,
 	Image: string,
 })
+	local active, setActive = React.useState(true)
+
 	return React.createElement(LayoutContainer, {
 		LayoutOrder = props.LayoutOrder,
 		Padding = 6,
 	}, {
 		Button = React.createElement(Button, {
+			Active = active,
 			ImageColor3 = props.Color,
-			[React.Event.Activated] = props.Activate,
+			[React.Event.Activated] = function()
+				setActive(false)
+				props.Activate():finallyCall(setActive, true)
+			end,
 		}, {
 			Image = React.createElement(Image, {
 				Image = props.Image,
@@ -71,7 +77,7 @@ return function()
 			Color = ColorDefs.Blue,
 			Image = "rbxassetid://15308000385",
 			Activate = function()
-				Promise.try(function()
+				return Promise.try(function()
 					return SocialService:CanSendGameInviteAsync(Players.LocalPlayer)
 				end):andThen(function(canSend)
 					if not canSend then return end
@@ -117,6 +123,7 @@ return function()
 			Image = "rbxassetid://15308000264",
 			Activate = function()
 				menu.Set("Pets")
+				return Promise.resolve()
 			end,
 		}),
 		DeckButton = React.createElement(lobbyButton, {
