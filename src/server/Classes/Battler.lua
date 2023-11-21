@@ -59,7 +59,11 @@ function Battler.new(args: {
 		Active = true,
 	}, Battler)
 
-	self.Health:Observe(function()
+	self.Health:Observe(function(oldAmount, newAmount)
+		local change = newAmount - oldAmount
+
+		if change <= -2 then self:InjuryAnimation() end
+
 		self.Changed:Fire(self:GetStatus())
 	end)
 
@@ -102,6 +106,10 @@ function Battler.DefeatAnimation(self: Battler)
 	}))
 
 	return Promise.delay(2.5)
+end
+
+function Battler.InjuryAnimation(self: Battler)
+	self.Animator:Play("GenericBattlerFlinch", 0)
 end
 
 function Battler.GetWorldCFrame(self: Battler)

@@ -1,19 +1,17 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Button = require(ReplicatedStorage.Shared.React.Common.Button)
-local CardDefs = require(ReplicatedStorage.Shared.Defs.CardDefs)
+local CardContents = require(ReplicatedStorage.Shared.React.Cards.CardContents)
 local CardGachaDefs = require(ReplicatedStorage.Shared.Defs.CardGachaDefs)
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
 local CurrencyHelper = require(ReplicatedStorage.Shared.Util.CurrencyHelper)
 local FormatChance = require(ReplicatedStorage.Shared.Util.FormatChance)
-local GoonDefs = require(ReplicatedStorage.Shared.Defs.GoonDefs)
 local Image = require(ReplicatedStorage.Shared.React.Common.Image)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local LayoutContainer = require(ReplicatedStorage.Shared.React.Common.LayoutContainer)
 local ListLayout = require(ReplicatedStorage.Shared.React.Common.ListLayout)
-local Panel = require(ReplicatedStorage.Shared.React.Common.Panel)
 local React = require(ReplicatedStorage.Packages.React)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local SystemWindow = require(ReplicatedStorage.Shared.React.Common.SystemWindow)
@@ -89,36 +87,22 @@ return function(props: {
 						end
 					end),
 					function(entry, index)
-						local cardDef = CardDefs[entry.Result]
-						local name
-
-						if cardDef.Type == "Goon" then
-							local goonDef = GoonDefs[cardDef.GoonId]
-							name = goonDef.Name
-						else
-							error(`Card type {cardDef.Type} not yet implemented`)
-						end
-
 						return React.createElement(LayoutContainer, {
 							Padding = 4,
 							Size = UDim2.fromScale(CardWidth, 1),
 							SizeConstraint = Enum.SizeConstraint.RelativeYY,
 							LayoutOrder = index,
 						}, {
-							Panel = React.createElement(Panel, {
-								ImageColor3 = ColorDefs.PaleGreen,
-							}, {
-								Name = React.createElement(Label, {
-									Size = UDim2.fromScale(1, 0.2),
-									Text = TextStroke(name),
-								}),
+							Card = React.createElement(CardContents, {
+								CardId = entry.Result,
+							}),
 
-								Chance = React.createElement(Label, {
-									Size = UDim2.fromScale(1, 0.2),
-									Text = TextStroke(FormatChance(entry.Chance)),
-									AnchorPoint = Vector2.new(0, 1),
-									Position = UDim2.fromScale(0, 1),
-								}),
+							Chance = React.createElement(Label, {
+								ZIndex = 8,
+								Size = UDim2.fromScale(1, 0.2),
+								Text = TextStroke(FormatChance(entry.Chance)),
+								AnchorPoint = Vector2.new(0, 1),
+								Position = UDim2.fromScale(0, 1),
 							}),
 						}),
 							entry.Result

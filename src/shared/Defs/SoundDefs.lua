@@ -17,6 +17,8 @@ local Ids = {
 	GenericStab4 = "rbxassetid://15153699139",
 	MaleUgh1 = "rbxassetid://15153710616",
 	MaleUgh2 = "rbxassetid://15153710567",
+	RevealRiser1 = "rbxassetid://15419146893",
+	RevealImpact1 = "rbxassetid://15419119975",
 }
 
 return Sift.Dictionary.map(Ids, function(id, name)

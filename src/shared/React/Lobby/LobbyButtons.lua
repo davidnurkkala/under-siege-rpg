@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local SocialService = game:GetService("SocialService")
 
 local Aspect = require(ReplicatedStorage.Shared.React.Common.Aspect)
@@ -11,9 +12,43 @@ local Image = require(ReplicatedStorage.Shared.React.Common.Image)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local LayoutContainer = require(ReplicatedStorage.Shared.React.Common.LayoutContainer)
 local MenuContext = require(ReplicatedStorage.Shared.React.MenuContext.MenuContext)
+local ObserveSignal = require(ReplicatedStorage.Shared.Util.ObserveSignal)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local React = require(ReplicatedStorage.Packages.React)
+local SessionRewardsController = require(ReplicatedStorage.Shared.Controllers.SessionRewardsController)
+local Sift = require(ReplicatedStorage.Packages.Sift)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
+
+local function numberNotification(props: {
+	Number: number,
+})
+	local text = TextStroke(if props.Number > 9 then "9+" else tostring(math.floor(props.Number)), 2)
+
+	local rotation, setRotation = React.useBinding(0)
+
+	React.useEffect(function()
+		return ObserveSignal(RunService.Heartbeat, function()
+			local scalar = tick() % 2 / 2
+			setRotation(360 * scalar)
+		end)
+	end, {})
+
+	return React.createElement(React.Fragment, nil, {
+		Image = React.createElement(Image, {
+			Image = "rbxassetid://15418387657",
+			Rotation = rotation,
+			Size = UDim2.fromScale(2, 2),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromScale(0.5, 0.5),
+			ImageColor3 = ColorDefs.PaleRed,
+		}),
+
+		Text = React.createElement(Label, {
+			Text = text,
+			ZIndex = 4,
+		}),
+	})
+end
 
 local function lobbyButton(props: {
 	LayoutOrder: number,
@@ -21,6 +56,7 @@ local function lobbyButton(props: {
 	Activate: () -> any,
 	Color: Color3,
 	Image: string,
+	children: any,
 })
 	local active, setActive = React.useState(true)
 
@@ -45,6 +81,42 @@ local function lobbyButton(props: {
 				Size = UDim2.fromScale(1, 0.5),
 				AnchorPoint = Vector2.new(0.5, 1),
 				Position = UDim2.new(0.5, 0, 1, 2),
+			}),
+		}, props.children),
+	})
+end
+
+local function giftButton()
+	local menu = React.useContext(MenuContext)
+
+	local count, setCount = React.useState(0)
+
+	React.useEffect(function()
+		return SessionRewardsController:ObserveStatus(function(status)
+			setCount(Sift.Array.count(status.RewardStates, function(state)
+				return state == "Available"
+			end))
+		end)
+	end, {})
+
+	return React.createElement(lobbyButton, {
+		LayoutOrder = 4,
+		Text = TextStroke("Gifts"),
+		Color = ColorDefs.DarkRed,
+		Image = "rbxassetid://15308000505",
+		Activate = function()
+			menu.Set("SessionRewards")
+			return Promise.resolve()
+		end,
+	}, {
+		Notification = (count > 0) and React.createElement(Container, {
+			ZIndex = 8,
+			Size = UDim2.fromScale(0.5, 0.5),
+			Position = UDim2.fromScale(1, 1),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+		}, {
+			Notification = React.createElement(numberNotification, {
+				Number = count,
 			}),
 		}),
 	})
@@ -98,12 +170,7 @@ return function()
 			Color = ColorDefs.LightRed,
 			Image = "rbxassetid://15307999952",
 		}),
-		GiftsButton = React.createElement(lobbyButton, {
-			LayoutOrder = 4,
-			Text = TextStroke("Gifts"),
-			Color = ColorDefs.DarkRed,
-			Image = "rbxassetid://15308000505",
-		}),
+		GiftsButton = React.createElement(giftButton),
 		RebirthButton = React.createElement(lobbyButton, {
 			LayoutOrder = 5,
 			Text = TextStroke("Rebirth"),

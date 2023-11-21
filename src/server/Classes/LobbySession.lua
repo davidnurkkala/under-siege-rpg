@@ -251,7 +251,7 @@ function LobbySession.Attack(self: LobbySession)
 				Text = `+{amountAdded // 0.1 / 10}`,
 				Image = CurrencyDefs.Primary.Image,
 				Start = there,
-				Destination = "GuiPanelPrimary",
+				EndGui = "GuiPanelPrimary",
 			})
 
 			dummy:HitEffect(PickRandom(self.WeaponDef.Sounds.Hit))

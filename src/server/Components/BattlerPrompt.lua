@@ -8,6 +8,7 @@ local LobbySessions = require(ServerScriptService.Server.Singletons.LobbySession
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local ServerFade = require(ServerScriptService.Server.Util.ServerFade)
 local Trove = require(ReplicatedStorage.Packages.Trove)
+local TryNow = require(ReplicatedStorage.Shared.Util.TryNow)
 local BattlerPrompt = {}
 BattlerPrompt.__index = BattlerPrompt
 
@@ -46,16 +47,29 @@ function BattlerPrompt.new(model: Model): BattlerPrompt
 
 		session:Destroy()
 
-		ServerFade(player, nil, function()
-			return Battle.fromPlayerVersusBattler(player, self.Id, "Basic")
-		end):andThen(function(battle)
-			return Promise.fromEvent(battle.Finished):andThenReturn(battle)
-		end):andThen(function(battle)
-			return ServerFade(player, nil, function()
-				battle:Destroy()
-				return LobbySession.promised(player)
-			end)
+		local cframe = TryNow(function()
+			return player.Character.PrimaryPart.CFrame
 		end)
+
+		if not cframe then return end
+
+		ServerFade(player, nil, function()
+				return Battle.fromPlayerVersusBattler(player, self.Id, "Basic")
+			end)
+			:andThen(function(battle)
+				return Promise.fromEvent(battle.Finished):andThenReturn(battle)
+			end)
+			:andThen(function(battle)
+				return ServerFade(player, nil, function()
+					battle:Destroy()
+					return LobbySession.promised(player)
+				end)
+			end)
+			:andThen(function()
+				TryNow(function()
+					player.Character.PrimaryPart.CFrame = cframe
+				end)
+			end)
 	end)
 	prompt.Parent = self.Model.PrimaryPart
 

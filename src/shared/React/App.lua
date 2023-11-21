@@ -9,6 +9,7 @@ local PaddingAll = require(ReplicatedStorage.Shared.React.Common.PaddingAll)
 local PetGachaBridge = require(ReplicatedStorage.Shared.React.PetGacha.PetGachaBridge)
 local PetMenuBridge = require(ReplicatedStorage.Shared.React.Menus.PetMenuBridge)
 local React = require(ReplicatedStorage.Packages.React)
+local SessionRewardsMenuBridge = require(ReplicatedStorage.Shared.React.Menus.SessionRewardsMenuBridge)
 local WeaponShopBridge = require(ReplicatedStorage.Shared.React.WeaponShop.WeaponShopBridge)
 
 return function()
@@ -26,6 +27,7 @@ return function()
 
 			-- menus
 			PetMenu = React.createElement(PetMenuBridge),
+			SessionRewardsMenu = React.createElement(SessionRewardsMenuBridge),
 		}),
 
 		Indicators = React.createElement(IndicatorBridge),

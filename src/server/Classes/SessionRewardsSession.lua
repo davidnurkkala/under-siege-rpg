@@ -60,7 +60,10 @@ function SessionRewardsSession.ClaimReward(self: SessionRewardsSession, index: n
 end
 
 function SessionRewardsSession.GetStatus(self: SessionRewardsSession)
-	return Sift.Dictionary.copyDeep(self.RewardStates)
+	return {
+		Timestamp = self.Timestamp,
+		RewardStates = Sift.Dictionary.copyDeep(self.RewardStates),
+	}
 end
 
 function SessionRewardsSession.Observe(self: SessionRewardsSession, callback)

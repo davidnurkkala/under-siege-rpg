@@ -20,7 +20,7 @@ local function worldToScreen(position: Vector3)
 	end
 end
 
-local function destinationToScreen(tagName: string)
+local function guiToScreen(tagName: string)
 	local object = CollectionService:GetTagged(tagName)[1]
 	if not object then return UDim2.fromScale(0.5, 0.5) end
 
@@ -33,12 +33,9 @@ return function()
 
 	React.useEffect(function()
 		local connection = GuiEffectController.IndicatorRequestedRemote:Connect(function(data)
+			if data.StartGui then data = Sift.Dictionary.removeKey(Sift.Dictionary.set(data, "StartPosition", guiToScreen(data.StartGui)), "StartGui") end
 			if data.Start then data = Sift.Dictionary.removeKey(Sift.Dictionary.set(data, "StartPosition", worldToScreen(data.Start)), "Start") end
-
-			if data.Destination then
-				data = Sift.Dictionary.removeKey(Sift.Dictionary.set(data, "EndPosition", destinationToScreen(data.Destination)), "Destination")
-			end
-
+			if data.EndGui then data = Sift.Dictionary.removeKey(Sift.Dictionary.set(data, "EndPosition", guiToScreen(data.EndGui)), "Destination") end
 			if data.Finish then data = Sift.Dictionary.removeKey(Sift.Dictionary.set(data, "EndPosition", worldToScreen(data.Finish)), "Finish") end
 
 			setIndicators(function(oldIndicators)
