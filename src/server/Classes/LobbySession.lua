@@ -5,14 +5,14 @@ local ActionService = require(ServerScriptService.Server.Services.ActionService)
 local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
 local ComponentService = require(ServerScriptService.Server.Services.ComponentService)
 local Cooldown = require(ReplicatedStorage.Shared.Classes.Cooldown)
+local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
 local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local DataService = require(ServerScriptService.Server.Services.DataService)
-local EffectEmission = require(ReplicatedStorage.Shared.Effects.EffectEmission)
 local EffectFaceTarget = require(ReplicatedStorage.Shared.Effects.EffectFaceTarget)
 local EffectProjectile = require(ReplicatedStorage.Shared.Effects.EffectProjectile)
 local EffectService = require(ServerScriptService.Server.Services.EffectService)
-local EffectShakeModel = require(ReplicatedStorage.Shared.Effects.EffectShakeModel)
 local EffectSound = require(ReplicatedStorage.Shared.Effects.EffectSound)
+local GuiEffectService = require(ServerScriptService.Server.Services.GuiEffectService)
 local LobbySessions = require(ServerScriptService.Server.Singletons.LobbySessions)
 local PetDefs = require(ReplicatedStorage.Shared.Defs.PetDefs)
 local PetHelper = require(ReplicatedStorage.Shared.Util.PetHelper)
@@ -209,6 +209,7 @@ function LobbySession.Attack(self: LobbySession)
 	self.Animator:Play(self.WeaponDef.Animations.Shoot, 0)
 
 	local dummy = Sift.Dictionary.values(ComponentService:GetComponentsByName("TrainingDummy"))[1]
+	local there = dummy:GetPosition()
 
 	EffectService:Effect(
 		self.Player,
@@ -223,7 +224,6 @@ function LobbySession.Attack(self: LobbySession)
 		:andThen(function()
 			local part = self.Model:FindFirstChild("Weapon")
 			local here = part.Position
-			local there = dummy:GetPosition()
 			local start = CFrame.lookAt(here, there)
 			local finish = start - here + there
 
@@ -245,10 +245,21 @@ function LobbySession.Attack(self: LobbySession)
 		end)
 		:andThen(function(pets)
 			local multiplier = PetHelper.GetTotalPower(pets)
+			local amountAdded = self.WeaponDef.Power * multiplier
 
-			CurrencyService:AddCurrency(self.Player, "Primary", self.WeaponDef.Power * multiplier)
+			GuiEffectService.IndicatorRequestedRemote:Fire(self.Player, {
+				Text = `+{amountAdded // 0.1 / 10}`,
+				Image = CurrencyDefs.Primary.Image,
+				Start = there,
+				Destination = "GuiPanelPrimary",
+			})
 
 			dummy:HitEffect(PickRandom(self.WeaponDef.Sounds.Hit))
+
+			return Promise.delay(0.5):andThenReturn(amountAdded)
+		end)
+		:andThen(function(amountAdded)
+			CurrencyService:AddCurrency(self.Player, "Primary", amountAdded)
 		end)
 end
 

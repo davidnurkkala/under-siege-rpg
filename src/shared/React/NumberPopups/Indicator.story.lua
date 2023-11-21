@@ -3,15 +3,11 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
 local Guid = require(ReplicatedStorage.Shared.Util.Guid)
-local NumberPopup = require(ReplicatedStorage.Shared.React.NumberPopups.NumberPopup)
+local Indicator = require(ReplicatedStorage.Shared.React.NumberPopups.Indicator)
 local React = require(ReplicatedStorage.Packages.React)
 local ReactRoblox = require(ReplicatedStorage.Packages.ReactRoblox)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
-
-local function randomPoint()
-	return Vector2.new(math.random(0, 500), math.random(0, 500))
-end
 
 local function element(props)
 	local popups, setPopups = React.useState({})
@@ -42,7 +38,7 @@ local function element(props)
 		Container,
 		nil,
 		Sift.Dictionary.map(popups, function(data, guid)
-			return React.createElement(NumberPopup, {
+			return React.createElement(Indicator, {
 				TextProps = { Text = TextStroke(`+{data.Number}`) },
 				ImageProps = { Image = CurrencyDefs.Primary.Image },
 				StartPosition = data.StartPosition,

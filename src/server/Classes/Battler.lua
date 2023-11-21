@@ -1,10 +1,14 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
 local BattlerDefs = require(ReplicatedStorage.Shared.Defs.BattlerDefs)
 local Deck = require(ServerScriptService.Server.Classes.Deck)
 local DeckPlayerRandom = require(ServerScriptService.Server.Classes.DeckPlayerRandom)
+local EffectBattlerCollapse = require(ReplicatedStorage.Shared.Effects.EffectBattlerCollapse)
+local EffectService = require(ServerScriptService.Server.Services.EffectService)
 local Health = require(ReplicatedStorage.Shared.Classes.Health)
+local Promise = require(ReplicatedStorage.Packages.Promise)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 
 local Battler = {}
@@ -26,6 +30,7 @@ export type Battler = typeof(setmetatable(
 		TeamId: string,
 		Active: boolean,
 		DeckPlayer: DeckPlayer,
+		Animator: Animator.Animator,
 	},
 	Battler
 ))
@@ -38,6 +43,7 @@ function Battler.new(args: {
 	CharModel: Model,
 	TeamId: string,
 	DeckPlayer: DeckPlayer,
+	Animator: Animator.Animator,
 }): Battler
 	local self: Battler = setmetatable({
 		Health = Health.new(args.HealthMax),
@@ -47,6 +53,7 @@ function Battler.new(args: {
 		CharModel = args.CharModel,
 		TeamId = args.TeamId,
 		DeckPlayer = args.DeckPlayer,
+		Animator = args.Animator,
 		Destroyed = Signal.new(),
 		Changed = Signal.new(),
 		Active = true,
@@ -75,6 +82,7 @@ function Battler.fromBattlerId(battlerId: string, position: number, direction: n
 		Direction = direction,
 		TeamId = `NON_PLAYER_{battlerId}`,
 		DeckPlayer = DeckPlayerRandom.new(Deck.new(def.Deck)),
+		Animator = Animator.new(char.Humanoid),
 		HealthMax = 100,
 	})
 
@@ -83,6 +91,17 @@ function Battler.fromBattlerId(battlerId: string, position: number, direction: n
 	end)
 
 	return battler
+end
+
+function Battler.DefeatAnimation(self: Battler)
+	self.Animator:Play("GenericBattlerDie", 0)
+
+	EffectService:All(EffectBattlerCollapse({
+		CharModel = self.CharModel,
+		BaseModel = self.BaseModel,
+	}))
+
+	return Promise.delay(2.5)
 end
 
 function Battler.GetWorldCFrame(self: Battler)

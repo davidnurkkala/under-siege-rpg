@@ -16,6 +16,9 @@ local Ids = {
 	GenericGoon1hMelee = 15340578529,
 	GenericGoonShoot = 15340585721,
 
+	GenericBattlerFlinch = 15408070949,
+	GenericBattlerDie = 15408391566,
+
 	PeasantWalk = 15082639586,
 	MageWalk = 15082639586,
 	HunterWalk = 15340683379,

@@ -11,11 +11,14 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 local BattlerPrompt = {}
 BattlerPrompt.__index = BattlerPrompt
 
-export type BattlerPrompt = typeof(setmetatable({} :: {
-	Model: Model,
-	Id: string,
-	Def: any,
-}, BattlerPrompt))
+export type BattlerPrompt = typeof(setmetatable(
+	{} :: {
+		Model: Model,
+		Id: string,
+		Def: any,
+	},
+	BattlerPrompt
+))
 
 function BattlerPrompt.new(model: Model): BattlerPrompt
 	local id = model:GetAttribute("BattlerId")
@@ -46,7 +49,7 @@ function BattlerPrompt.new(model: Model): BattlerPrompt
 		ServerFade(player, nil, function()
 			return Battle.fromPlayerVersusBattler(player, self.Id, "Basic")
 		end):andThen(function(battle)
-			return Promise.fromEvent(battle.Ended):andThenReturn(battle)
+			return Promise.fromEvent(battle.Finished):andThenReturn(battle)
 		end):andThen(function(battle)
 			return ServerFade(player, nil, function()
 				battle:Destroy()

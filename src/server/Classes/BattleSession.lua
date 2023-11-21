@@ -15,6 +15,7 @@ local EffectSound = require(ReplicatedStorage.Shared.Effects.EffectSound)
 local PickRandom = require(ReplicatedStorage.Shared.Util.PickRandom)
 local PlayerLeaving = require(ReplicatedStorage.Shared.Util.PlayerLeaving)
 local Promise = require(ReplicatedStorage.Packages.Promise)
+local Sift = require(ReplicatedStorage.Packages.Sift)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local WeaponDefs = require(ReplicatedStorage.Shared.Defs.WeaponDefs)
 local WeaponHelper = require(ReplicatedStorage.Shared.Util.WeaponHelper)
@@ -23,12 +24,15 @@ local WeaponService = require(ServerScriptService.Server.Services.WeaponService)
 local BattleSession = {}
 BattleSession.__index = BattleSession
 
-export type BattleSession = typeof(setmetatable({} :: {
-	Player: Player,
-	Battler: Battler.Battler,
-	Animator: any,
-	Model: Model,
-}, BattleSession))
+export type BattleSession = typeof(setmetatable(
+	{} :: {
+		Player: Player,
+		Battler: Battler.Battler,
+		Animator: any,
+		Model: Model,
+	},
+	BattleSession
+))
 
 function BattleSession.new(args: {
 	Player: Player,
@@ -41,7 +45,6 @@ function BattleSession.new(args: {
 }): BattleSession
 	local self = setmetatable({
 		Player = args.Player,
-		Battler = Battler.new(args.BattlerArgs),
 		Trove = Trove.new(),
 		WeaponDef = args.WeaponDef,
 		AttackCooldown = Cooldown.new(args.WeaponDef.AttackCooldownTime),
@@ -50,9 +53,9 @@ function BattleSession.new(args: {
 	self.Animator = self.Trove:Construct(Animator, args.Human)
 	self.Animator:Play(self.WeaponDef.Animations.Idle)
 
-	self.Model = self.Trove:Add(WeaponHelper.attachModel(args.WeaponDef, args.Character, args.HoldPart))
+	self.Battler = self.Trove:Construct(Battler, Sift.Dictionary.set(args.BattlerArgs, "Animator", self.Animator))
 
-	self.Trove:Add(self.Battler)
+	self.Model = self.Trove:Add(WeaponHelper.attachModel(args.WeaponDef, args.Character, args.HoldPart))
 
 	self.Trove:AddPromise(PlayerLeaving(self.Player):andThenCall(self.Destroy, self))
 

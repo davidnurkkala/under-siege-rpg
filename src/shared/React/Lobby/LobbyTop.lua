@@ -21,6 +21,8 @@ local function currencyPanel(props: {
 	local def = CurrencyDefs[props.Id]
 
 	return React.createElement(Container, {
+		[React.Tag] = `GuiPanel{props.Id}`,
+
 		Size = UDim2.fromScale(0.1, 0.033),
 		SizeConstraint = Enum.SizeConstraint.RelativeXX,
 		LayoutOrder = props.LayoutOrder,

@@ -7,8 +7,10 @@ local Battler = require(ServerScriptService.Server.Classes.Battler)
 local BattlerDefs = require(ReplicatedStorage.Shared.Defs.BattlerDefs)
 local CardDefs = require(ReplicatedStorage.Shared.Defs.CardDefs)
 local Cooldown = require(ReplicatedStorage.Shared.Classes.Cooldown)
+local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
 local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local Goon = require(ServerScriptService.Server.Classes.Goon)
+local GuiEffectService = require(ServerScriptService.Server.Services.GuiEffectService)
 local PartPath = require(ReplicatedStorage.Shared.Classes.PartPath)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Sift = require(ReplicatedStorage.Packages.Sift)
@@ -76,8 +78,9 @@ function Battle.new(args: {
 		Field = {},
 		Path = PartPath.new(pathFolder),
 		Trove = trove,
-		Destroyed = Signal.new(),
 		Ended = Signal.new(),
+		Finished = Signal.new(),
+		Destroyed = Signal.new(),
 		Changed = Signal.new(),
 		State = "Active",
 	}, Battle)
@@ -137,24 +140,39 @@ function Battle.fromPlayerVersusBattler(player: Player, battlerId: string, battl
 			end
 
 			resolve(BattleSession.promised(player, 0, 1))
-		end)
-			:andThen(function(battleSession)
-				local battleground = ReplicatedStorage.Assets.Models.Battlegrounds[battlegroundName]:Clone()
+		end):andThen(function(battleSession)
+			local battleground = ReplicatedStorage.Assets.Models.Battlegrounds[battlegroundName]:Clone()
+			local opponent = Battler.fromBattlerId(battlerId, 1, -1)
 
-				return Battle.new({
-					Battlers = { battleSession.Battler, Battler.fromBattlerId(battlerId, 1, -1) },
-					Model = battleground,
+			local battle = Battle.new({
+				Battlers = { battleSession.Battler, opponent },
+				Model = battleground,
+			})
+
+			BattleService:Add(player, battle)
+			battle.Ended:Connect(function(victor)
+				if victor ~= battleSession.Battler then return end
+
+				local def = BattlerDefs[battlerId]
+				local reward = def.Reward
+
+				GuiEffectService.IndicatorRequestedRemote:Fire(player, {
+					Text = `+{reward // 0.1 / 10}`,
+					Image = CurrencyDefs.Secondary.Image,
+					Start = opponent:GetRoot().Position,
+					Finish = victor:GetRoot().Position,
 				})
-			end)
-			:tap(function(battle)
-				BattleService:Add(player, battle)
-				battle.Destroyed:Connect(function()
-					BattleService:Remove(player)
 
-					local def = BattlerDefs[battlerId]
-					CurrencyService:AddCurrency(player, "Secondary", def.Reward)
+				Promise.delay(0.5):andThen(function()
+					CurrencyService:AddCurrency(player, "Secondary", reward)
 				end)
 			end)
+			battle.Destroyed:Connect(function()
+				BattleService:Remove(player)
+			end)
+
+			return battle
+		end)
 	end)
 end
 
@@ -334,6 +352,17 @@ function Battle.End(self: Battle, victor: Battler.Battler)
 
 	self.State = "Ended"
 	self.Ended:Fire(victor)
+
+	Promise.all(Sift.Array.map(
+		Sift.Array.filter(self.Battlers, function(battler)
+			return battler ~= victor
+		end),
+		function(loser)
+			return loser:DefeatAnimation()
+		end
+	)):andThen(function()
+		self.Finished:Fire()
+	end)
 end
 
 function Battle.Destroy(self: Battle)
