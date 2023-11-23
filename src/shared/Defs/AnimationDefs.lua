@@ -30,16 +30,20 @@ local Ids = {
 
 	GenericPetIdle = 15421734157,
 	GenericPetWalk = 15421736818,
-	PetBlink = 15421776463,
+	GenericPetBlink = 15421776463,
 
 	KittyIdleExtras = 15422083467,
 	KittyWalkExtras = 15423233124,
+
 	DoggyIdleExtras = 15423345319,
 	DoggyWalkExtras = 15423413607,
+
 	WolfyIdleExtras = 15423453939,
 	WolfyWalkExtras = 15423512212,
+
 	PiggyIdleExtras = 15422083467,
 	PiggyWalkExtras = 15423233124,
+
 	BunnyIdleExtras = 15421849690,
 	BunnyWalkExtras = 15421956230,
 

@@ -14,6 +14,7 @@ local EffectService = require(ServerScriptService.Server.Services.EffectService)
 local EffectSound = require(ReplicatedStorage.Shared.Effects.EffectSound)
 local GuiEffectService = require(ServerScriptService.Server.Services.GuiEffectService)
 local LobbySessions = require(ServerScriptService.Server.Singletons.LobbySessions)
+local Pet = require(ServerScriptService.Server.Classes.Pet)
 local PetDefs = require(ReplicatedStorage.Shared.Defs.PetDefs)
 local PetHelper = require(ReplicatedStorage.Shared.Util.PetHelper)
 local PetService = require(ServerScriptService.Server.Services.PetService)
@@ -105,21 +106,13 @@ function LobbySession.new(args: {
 		local radius = 5
 		for slotId in pets.Equipped do
 			local slot = pets.Owned[slotId]
-			local petDef = PetDefs[slot.PetId]
 
 			local angle = math.rad(30) + math.rad(60) * number
 			local dx = math.cos(angle) * radius
 			local dz = math.sin(angle) * radius
 			local cframe = root.CFrame * CFrame.new(dx, -1.5, dz)
 
-			local pet = petTrove:Clone(petDef.Model)
-			pet:PivotTo(cframe)
-			pet.Parent = self.Character
-
-			local weld = Instance.new("WeldConstraint")
-			weld.Part0 = root
-			weld.Part1 = pet.PrimaryPart
-			weld.Parent = pet.PrimaryPart
+			petTrove:Construct(Pet, slot.PetId, root, args.Human, cframe)
 
 			number += 1
 		end

@@ -63,7 +63,8 @@ function BattleSession.new(args: {
 		self:Destroy()
 	end)
 
-	self.Trove:Add(ActionService:Subscribe(self.Player, "Primary", function()
+	self.AttackCooldown:Use()
+	self.Trove:Add(self.AttackCooldown:OnReady(function()
 		self:Attack()
 	end))
 

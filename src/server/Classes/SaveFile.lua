@@ -8,6 +8,7 @@ SaveFile.__index = SaveFile
 type Observer = {
 	Callback: (any) -> (),
 	Disconnect: (Observer) -> (),
+	Cleanup: (() -> ())?,
 	Run: (Observer, ...any) -> () -> (),
 	Disconnected: boolean,
 }
@@ -55,6 +56,7 @@ function SaveFile.Observe(self: SaveFile, key: string, callback: (any) -> ()): (
 	observer:Run(self:Get(key))
 
 	return function()
+		if observer.Cleanup then observer.Cleanup() end
 		observer:Disconnect()
 	end
 end

@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Signal = require(ReplicatedStorage.Packages.Signal)
 local Updater = require(ReplicatedStorage.Shared.Classes.Updater)
 
 local Cooldown = {}
@@ -7,18 +8,31 @@ Cooldown.__index = Cooldown
 
 local CooldownUpdater = Updater.new()
 
-export type Cooldown = typeof(setmetatable({} :: {
-	Time: number,
-	TimeMax: number,
-}, Cooldown))
+export type Cooldown = typeof(setmetatable(
+	{} :: {
+		Time: number,
+		TimeMax: number,
+		Completed: any,
+	},
+	Cooldown
+))
 
 function Cooldown.new(timeMax: number): Cooldown
 	local self: Cooldown = setmetatable({
 		TimeMax = timeMax,
 		Time = 0,
+		Completed = Signal.new(),
 	}, Cooldown)
 
 	return self
+end
+
+function Cooldown.OnReady(self: Cooldown, callback)
+	if self:IsReady() then callback() end
+	local connection = self.Completed:Connect(callback)
+	return function()
+		connection:Disconnect()
+	end
 end
 
 function Cooldown.Use(self: Cooldown)
@@ -34,6 +48,7 @@ function Cooldown.SetTime(self: Cooldown, t: number)
 
 	if self:IsReady() then
 		CooldownUpdater:Remove(self)
+		self.Completed:Fire()
 	else
 		CooldownUpdater:Add(self)
 	end
