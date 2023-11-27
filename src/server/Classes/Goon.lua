@@ -19,6 +19,7 @@ export type Goon = typeof(setmetatable(
 		Direction: number,
 		Health: Health.Health,
 		Battle: any,
+		Battler: any,
 		Def: any,
 		Animator: any,
 		Destroyed: any,
@@ -66,6 +67,7 @@ function Goon.new(args: {
 	Def: any,
 	Level: number,
 	Battle: any,
+	Battler: any,
 	Brain: any,
 }): Goon
 	local root, remote = createRoot(args.Def.Id)
@@ -81,6 +83,7 @@ function Goon.new(args: {
 		Size = args.Def.Size,
 		TeamId = args.TeamId,
 		Battle = args.Battle,
+		Battler = args.Battler,
 		Def = args.Def,
 		Brain = args.Brain,
 		Destroyed = Signal.new(),
@@ -91,7 +94,7 @@ function Goon.new(args: {
 
 	self.Health:Observe(function(old, new)
 		local change = new - old
-		if change <= -5 then self.Brain:OnInjured() end
+		if change <= -0.25 then self.Brain:OnInjured() end
 
 		remote:FireAllClients("Health", "Update", self.Health:GetMax(), self.Health:Get())
 	end)
@@ -109,6 +112,7 @@ function Goon.fromId(args: {
 	Direction: number,
 	TeamId: string,
 	Battle: any,
+	Battler: any,
 	Level: number,
 })
 	local def = GoonDefs[args.Id]
@@ -127,6 +131,10 @@ function Goon.fromId(args: {
 		Brain = brain,
 		Def = def,
 	}))
+end
+
+function Goon.Is(object)
+	return getmetatable(object) == Goon
 end
 
 function Goon.FromDef(self: Goon, key: string)

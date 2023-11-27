@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Sift = require(ReplicatedStorage.Packages.Sift)
 
-local SessionLength = 20 * 60
+local SessionLength = 90 * 60
 
 local Rewards = {
 	{ Type = "Currency", CurrencyType = "Primary", Amount = 150 },

@@ -13,12 +13,15 @@ local StateMachine = require(ServerScriptService.Server.Classes.StateMachine)
 local BasicMelee = {}
 BasicMelee.__index = BasicMelee
 
-export type BasicMelee = typeof(setmetatable({} :: {
-	Goon: any,
-	Battle: any,
-	StateMachine: any,
-	AttackCooldown: any,
-}, BasicMelee))
+export type BasicMelee = typeof(setmetatable(
+	{} :: {
+		Goon: any,
+		Battle: any,
+		StateMachine: any,
+		AttackCooldown: any,
+	},
+	BasicMelee
+))
 
 function BasicMelee.new(): BasicMelee
 	local self: BasicMelee = setmetatable({}, BasicMelee)
@@ -64,7 +67,7 @@ function BasicMelee.SetUpStateMachine(self: BasicMelee)
 						self.Goon.Animator:Play(self.Goon.Def.Animations.Attack)
 
 						data.Promise = self.Goon:WhileAlive(Promise.delay(self.Goon:FromDef("AttackWindupTime") or 1):andThen(function()
-							target.Health:Adjust(-self.Goon:FromDef("Damage"))
+							self.Battle:Damage(self.Goon, target, self.Goon:FromDef("Damage"))
 
 							EffectService:All(
 								EffectSound({

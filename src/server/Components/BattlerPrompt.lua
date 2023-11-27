@@ -35,6 +35,10 @@ function BattlerPrompt.new(model: Model): BattlerPrompt
 		Trove = Trove.new(),
 	}, BattlerPrompt)
 
+	Promise.try(function()
+		((self.Model :: Model):FindFirstChild("Humanoid") :: Humanoid).DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+	end):catch(warn)
+
 	local prompt: ProximityPrompt = self.Trove:Construct(Instance, "ProximityPrompt")
 	prompt.ObjectText = def.Name
 	prompt.ActionText = "Challenge!"

@@ -89,12 +89,17 @@ return function(props: {
 					function(entry, index)
 						return React.createElement(LayoutContainer, {
 							Padding = 4,
-							Size = UDim2.fromScale(CardWidth, 1),
-							SizeConstraint = Enum.SizeConstraint.RelativeYY,
+							Size = UDim2.fromScale(0.25, 1),
 							LayoutOrder = index,
 						}, {
-							Card = React.createElement(CardContents, {
-								CardId = entry.Result,
+							Card = React.createElement(Container, {
+								Size = UDim2.fromScale(CardWidth * 0.8, 0.8),
+								SizeConstraint = Enum.SizeConstraint.RelativeYY,
+							}, {
+								Contents = React.createElement(CardContents, {
+									CardId = entry.Result,
+									StatsDisabled = true,
+								}),
 							}),
 
 							Chance = React.createElement(Label, {

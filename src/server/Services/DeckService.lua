@@ -8,6 +8,7 @@ local CurrencyService = require(ServerScriptService.Server.Services.CurrencyServ
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local OptionsService = require(ServerScriptService.Server.Services.OptionsService)
+local Promise = require(ReplicatedStorage.Packages.Promise)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local t = require(ReplicatedStorage.Packages.t)
 
@@ -53,20 +54,23 @@ function DeckService.AddCard(self: DeckService, player: Player, cardId: string)
 
 	return DataService:GetSaveFile(player):andThen(function(saveFile)
 		local isNewCard = saveFile:Get("Deck").Owned[cardId] == nil
+		local count = 0
 
 		saveFile:Update("Deck", function(oldDeck)
-			local level = (oldDeck.Owned[cardId] or 0) + 1
-			local owned = Sift.Dictionary.set(oldDeck.Owned, cardId, level)
+			count = (oldDeck.Owned[cardId] or 0) + 1
+			local owned = Sift.Dictionary.set(oldDeck.Owned, cardId, count)
 			return Sift.Dictionary.set(oldDeck, "Owned", owned)
 		end)
 
-		if not isNewCard then return end
+		if not isNewCard then return Promise.resolve(count) end
 
-		return OptionsService:GetOption(player, "AutoEquipCards"):andThen(function(autoEquip)
-			if not autoEquip then return end
+		return OptionsService:GetOption(player, "AutoEquipCards")
+			:andThen(function(autoEquip)
+				if not autoEquip then return end
 
-			return self:SetCardEquipped(player, cardId, true)
-		end)
+				return self:SetCardEquipped(player, cardId, true)
+			end)
+			:andThenReturn(count)
 	end)
 end
 
@@ -99,7 +103,9 @@ function DeckService.DrawCardFromGacha(self: DeckService, player: Player, gachaI
 			if not success then return false, "notEnoughCurrency" end
 
 			local cardId = gacha.WeightTable:Roll()
-			return self:AddCard(player, cardId):andThenReturn(true, cardId)
+			return self:AddCard(player, cardId):andThen(function(cardCount)
+				return true, cardId, cardCount
+			end)
 		end)
 		:catch(function(problem)
 			warn(problem)

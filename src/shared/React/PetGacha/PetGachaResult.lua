@@ -1,11 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Button = require(ReplicatedStorage.Shared.React.Common.Button)
+local CelebrationEffect = require(ReplicatedStorage.Shared.React.Effects.CelebrationEffect)
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local Flipper = require(ReplicatedStorage.Packages.Flipper)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
-local Panel = require(ReplicatedStorage.Shared.React.Common.Panel)
 local PetDefs = require(ReplicatedStorage.Shared.Defs.PetDefs)
 local PetPreview = require(ReplicatedStorage.Shared.React.PetGacha.PetPreview)
 local PromiseMotor = require(ReplicatedStorage.Shared.Util.PromiseMotor)
@@ -25,7 +25,9 @@ return function(props: {
 	React.useEffect(function()
 		slideMotor:setGoal(Flipper.Instant.new(-1))
 		slideMotor:step()
-		slideMotor:setGoal(Flipper.Spring.new(0))
+		PromiseMotor(slideMotor, Flipper.Spring.new(0), function(value)
+			return value < 0.05
+		end)
 	end, { props.PetId })
 
 	return React.createElement(Container, {
@@ -33,12 +35,11 @@ return function(props: {
 			return UDim2.fromScale(0, value)
 		end),
 	}, {
-		Result = React.createElement(Panel, {
+		Result = React.createElement(Container, {
 			Size = UDim2.fromScale(0.35, 0.35),
 			SizeConstraint = Enum.SizeConstraint.RelativeYY,
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Position = UDim2.fromScale(0.5, 0.4),
-			ImageColor3 = ColorDefs.PaleGreen,
 		}, {
 			Contents = React.createElement(React.Fragment, nil, {
 				Name = React.createElement(Label, {
@@ -50,6 +51,16 @@ return function(props: {
 				Preview = React.createElement(PetPreview, {
 					PetId = props.PetId,
 				}),
+			}),
+
+			Effect = React.createElement(Container, {
+				ZIndex = -4,
+				Size = UDim2.fromScale(1.5, 1.5),
+				SizeConstraint = Enum.SizeConstraint.RelativeXX,
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Position = UDim2.fromScale(0.5, 0.5),
+			}, {
+				Effect = React.createElement(CelebrationEffect),
 			}),
 		}),
 

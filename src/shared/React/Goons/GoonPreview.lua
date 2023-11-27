@@ -6,6 +6,7 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 
 return function(props: {
 	GoonId: string,
+	children: any,
 })
 	local goonDef = GoonDefs[props.GoonId]
 
@@ -36,5 +37,5 @@ return function(props: {
 		BackgroundTransparency = 1,
 		Size = UDim2.fromScale(1, 1),
 		ref = viewportRef,
-	})
+	}, props.children)
 end

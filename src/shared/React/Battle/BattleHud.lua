@@ -2,13 +2,17 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local AttackButton = require(ReplicatedStorage.Shared.React.Battle.AttackButton)
 local BattleController = require(ReplicatedStorage.Shared.Controllers.BattleController)
+local Button = require(ReplicatedStorage.Shared.React.Common.Button)
+local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local ComponentController = require(ReplicatedStorage.Shared.Controllers.ComponentController)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local HealthBar = require(ReplicatedStorage.Shared.React.Battle.HealthBar)
+local Image = require(ReplicatedStorage.Shared.React.Common.Image)
 local ListLayout = require(ReplicatedStorage.Shared.React.Common.ListLayout)
-local Panel = require(ReplicatedStorage.Shared.React.Common.Panel)
+local PromptWindow = require(ReplicatedStorage.Shared.React.Common.PromptWindow)
 local React = require(ReplicatedStorage.Packages.React)
 local Sift = require(ReplicatedStorage.Packages.Sift)
+local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 local TryNow = require(ReplicatedStorage.Shared.Util.TryNow)
 
 local function getHealthPercent(status, index)
@@ -64,6 +68,8 @@ return function(props: {
 })
 	local status, setStatus = React.useState(nil)
 	local goonModels, setGoonModels = React.useState({})
+
+	local surrendering, setSurrendering = React.useState(false)
 
 	React.useEffect(function()
 		if not props.Visible then return end
@@ -129,6 +135,45 @@ return function(props: {
 				LayoutOrder = 3,
 				Alignment = Enum.HorizontalAlignment.Left,
 				Percent = getHealthPercent(status, 2),
+			}),
+		}),
+
+		SurrenderPrompt = React.createElement(PromptWindow, {
+			Visible = surrendering,
+
+			HeaderText = TextStroke("Surrender"),
+			Text = TextStroke("Are you sure you want to surrender?"),
+			Options = {
+				{
+					Text = "Yes",
+					Select = function()
+						setSurrendering(false)
+						BattleController.SurrenderRequested:Fire()
+					end,
+				},
+				{
+					Text = "No",
+					Select = function()
+						setSurrendering(false)
+					end,
+				},
+			},
+		}),
+
+		Surrender = React.createElement(Button, {
+			Visible = not surrendering,
+			Size = UDim2.fromScale(0.1, 0.1),
+			SizeConstraint = Enum.SizeConstraint.RelativeYY,
+			ImageColor3 = ColorDefs.PaleGreen,
+			BorderColor3 = ColorDefs.LightGreen,
+			Position = UDim2.fromScale(0, 1),
+			AnchorPoint = Vector2.new(0, 1),
+			[React.Event.Activated] = function()
+				setSurrendering(true)
+			end,
+		}, {
+			Image = React.createElement(Image, {
+				Image = "rbxassetid://15484464238",
 			}),
 		}),
 	})

@@ -214,6 +214,7 @@ function Battle.PlayCard(self: Battle, battler: Battler.Battler, cardId: string,
 		Goon.fromId({
 			Id = card.GoonId,
 			Battle = self,
+			Battler = battler,
 			Direction = battler.Direction,
 			Position = battler.Position,
 			TeamId = battler.TeamId,
@@ -346,6 +347,16 @@ function Battle.MoveFieldable(self: Battle, mover: Fieldable, movement: number)
 
 	mover.Position = position
 	return true
+end
+
+function Battle.Damage(_self: Battle, source: Battler.Battler | Goon.Goon, target: Battler.Battler | Goon.Goon, damage: number)
+	local attackPower = if Battler.Is(source) then source.Power else source.Battler.Power
+	local defendPower = if Battler.Is(target) then target.Power else target.Battler.Power
+
+	local advantage = math.sqrt(attackPower / defendPower)
+	damage *= advantage
+
+	target.Health:Adjust(-damage)
 end
 
 function Battle.End(self: Battle, victor: Battler.Battler)

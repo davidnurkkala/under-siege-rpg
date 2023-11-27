@@ -6,6 +6,8 @@ local Battlers = {
 	Noob = {
 		Name = "Noob",
 		Reward = 1,
+		WeaponId = "WoodenBow",
+		Power = 100,
 		Deck = {
 			Peasant = 1,
 			Recruit = 1,
@@ -13,35 +15,41 @@ local Battlers = {
 	},
 
 	VikingWarrior = {
-		Name = "VikingWarrior",
+		Name = "Viking Warrior",
 		Reward = 3,
+		WeaponId = "WoodenBow",
+		Power = 1000,
 		Deck = {
 			Berserker = 1,
-			Recruit = 1,
-			VikingWarrior = 1,
+			Recruit = 4,
+			VikingWarrior = 4,
 		},
 	},
 
 	VikingChief = {
-		Name = "VikingChief",
+		Name = "Viking Chief",
 		Reward = 5,
+		WeaponId = "WoodenBow",
+		Power = 10000,
 		Deck = {
-			Recruit = 1,
-			VikingWarrior = 1,
-			Hunter = 1,
-			Berserker = 2,
+			Recruit = 8,
+			VikingWarrior = 8,
+			Hunter = 16,
+			Berserker = 4,
 		},
 	},
 
 	VikingKing = {
-		Name = "VikingKing",
+		Name = "Viking King",
 		Reward = 10,
+		WeaponId = "WoodenBow",
+		Power = 100000,
 		Deck = {
-			Recruit = 1,
-			Footman = 2,
-			VikingWarrior = 2,
-			Hunter = 3,
-			Berserker = 2,
+			Recruit = 32,
+			Footman = 4,
+			VikingWarrior = 16,
+			Hunter = 32,
+			Berserker = 16,
 		},
 	},
 }

@@ -16,6 +16,7 @@ return function()
 	local gachaId, setGachaId = React.useState(nil)
 	local state, setState = React.useState("Shop")
 	local resultCardId = React.useRef(nil)
+	local resultCardCount = React.useRef(nil)
 
 	React.useEffect(function()
 		local trove = Trove.new()
@@ -45,13 +46,14 @@ return function()
 			Wallet = currency,
 			Buy = function()
 				setState("Waiting")
-				DeckController:DrawCardFromGacha(gachaId):andThen(function(success, cardId)
+				DeckController:DrawCardFromGacha(gachaId):andThen(function(success, cardId, cardCount)
 					if not success then
 						setState("Shop")
 						return
 					end
 
 					resultCardId.current = cardId
+					resultCardCount.current = cardCount
 					setState("Result")
 				end)
 			end,
@@ -62,6 +64,7 @@ return function()
 
 		Result = (state == "Result") and React.createElement(CardGachaResult, {
 			CardId = resultCardId.current,
+			CardCount = resultCardCount.current,
 			Close = function()
 				setState("Shop")
 			end,

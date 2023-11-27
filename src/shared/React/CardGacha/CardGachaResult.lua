@@ -23,6 +23,7 @@ local FastSpring = { frequency = 16 }
 
 return function(props: {
 	CardId: string,
+	CardCount: number?,
 	Close: () -> (),
 })
 	local dx, dxMotor = UseMotor(0)
@@ -87,6 +88,7 @@ return function(props: {
 		Card = contentsVisible and React.createElement(Container, cardProps, {
 			Contents = React.createElement(CardContents, {
 				CardId = props.CardId,
+				CardCount = props.CardCount,
 			}),
 
 			Effect = React.createElement(Container, {

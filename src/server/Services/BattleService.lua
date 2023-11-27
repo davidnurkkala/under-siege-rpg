@@ -16,6 +16,16 @@ local BattleSlots = {}
 function BattleService.PrepareBlocking(self: BattleService)
 	self.Comm = Comm.ServerComm.new(ReplicatedStorage, "BattleService")
 	self.StatusRemote = self.Comm:CreateProperty("Status", nil)
+
+	self.Comm:CreateSignal("SurrenderRequested"):Connect(function(player)
+		local battle = self:Get(player)
+		if not battle then return end
+
+		-- TODO: better way to find the player's battler?
+		for _, battler in battle.Battlers do
+			if battler.CharModel == player.Character then battler.Health:Set(-100) end
+		end
+	end)
 end
 
 function BattleService.Get(_self: BattleService, player: Player)

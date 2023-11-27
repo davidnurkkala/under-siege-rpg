@@ -14,6 +14,7 @@ return function(props)
 	local borderSizePixel = props.BorderSizePixel or 2
 	local borderColor3 = props.BorderColor3 or Color3.new(0, 0, 0)
 	local headerText = props.HeaderText or "Window"
+	local headerSize = props.HeaderSize or 0.1
 
 	return React.createElement(
 		"ImageLabel",
@@ -34,7 +35,7 @@ return function(props)
 			Window = if props.RenderWindow then props.RenderWindow() else nil,
 
 			Header = React.createElement("Frame", {
-				Size = UDim2.fromScale(1, 0.1),
+				Size = UDim2.fromScale(1, headerSize),
 				BackgroundColor3 = props.BackgroundColor3,
 			}, {
 				Corner = React.createElement("UICorner", {
@@ -92,8 +93,8 @@ return function(props)
 			}),
 
 			Content = React.createElement(Container, {
-				Size = UDim2.new(1, 0, 0.9, -borderSizePixel),
-				Position = UDim2.new(0, 0, 0.1, borderSizePixel),
+				Size = UDim2.new(1, 0, 1 - headerSize, -borderSizePixel),
+				Position = UDim2.new(0, 0, headerSize, borderSizePixel),
 			}, {
 				Children = React.createElement(React.Fragment, nil, props.children),
 

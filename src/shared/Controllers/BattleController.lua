@@ -23,6 +23,8 @@ function BattleController.PrepareBlocking(self: BattleController)
 	self.Comm:GetProperty("Status"):Observe(function(...)
 		self:OnStatusUpdated(...)
 	end)
+
+	self.SurrenderRequested = self.Comm:GetSignal("SurrenderRequested")
 end
 
 function BattleController.ObserveStatus(self: BattleController, callback: (any) -> ()): () -> ()
