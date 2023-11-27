@@ -6,6 +6,7 @@ local BattleSession = require(ServerScriptService.Server.Classes.BattleSession)
 local Battler = require(ServerScriptService.Server.Classes.Battler)
 local BattlerDefs = require(ReplicatedStorage.Shared.Defs.BattlerDefs)
 local CardDefs = require(ReplicatedStorage.Shared.Defs.CardDefs)
+local CardHelper = require(ReplicatedStorage.Shared.Util.CardHelper)
 local Cooldown = require(ReplicatedStorage.Shared.Classes.Cooldown)
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
 local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
@@ -203,7 +204,7 @@ function Battle.Remove(self: Battle, object: Fieldable)
 	self.Field[object] = nil
 end
 
-function Battle.PlayCard(self: Battle, battler: Battler.Battler, cardId: string, cardLevel: number)
+function Battle.PlayCard(self: Battle, battler: Battler.Battler, cardId: string, cardCount: number)
 	if not cardId then return end
 
 	local card = CardDefs[cardId]
@@ -216,7 +217,7 @@ function Battle.PlayCard(self: Battle, battler: Battler.Battler, cardId: string,
 			Direction = battler.Direction,
 			Position = battler.Position,
 			TeamId = battler.TeamId,
-			Level = cardLevel,
+			Level = CardHelper.CountToLevel(cardCount),
 		})
 	else
 		error(`Unimplemented card type {card.Type}`)
