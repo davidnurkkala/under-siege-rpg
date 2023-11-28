@@ -8,6 +8,7 @@ local WeightTable = require(ReplicatedStorage.Shared.Classes.WeightTable)
 export type Gacha = {
 	Name: string,
 	Id: string,
+	EggId: string,
 	Price: CurrencyHelper.Price,
 	WeightTable: WeightTable.WeightTable,
 }
@@ -15,6 +16,7 @@ export type Gacha = {
 local Gachas = {
 	World1Pets = {
 		Name = "World 1 Pets",
+		EggId = "World1",
 		Price = {
 			Secondary = 10,
 		},

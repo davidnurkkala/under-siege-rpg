@@ -21,12 +21,15 @@ local Ids = {
 
 	PeasantWalk = 15082639586,
 	MageWalk = 15082639586,
-	HunterWalk = 15340683379,
 	SwordsmanWalk = 15082639586,
 	PeasantAttack = 15340591603,
 	MageAttack = 15340597447,
 	AxemanAttack = 15366912173,
 	BerserkerAttack = 15366913772,
+
+	HunterIdle = 15484910251,
+	HunterWalk = 15484942080,
+	HunterAttack = 15484935063,
 
 	GenericPetIdle = 15421734157,
 	GenericPetWalk = 15421736818,

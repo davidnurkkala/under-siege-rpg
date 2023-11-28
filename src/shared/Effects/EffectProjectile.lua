@@ -40,7 +40,7 @@ return function(args: {
 
 		return Animate(duration, function(scalar)
 			local position = Lerp(start().Position, finish().Position, scalar)
-			model:PivotTo(cframe.Rotation + position)
+			model:PivotTo(CFrame.lookAt(position, finish().Position).Rotation + position)
 		end):andThenCall(function()
 			EffectController:Effect(EffectFadeModel({
 				Model = model,

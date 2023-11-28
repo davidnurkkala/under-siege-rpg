@@ -5,9 +5,11 @@ local CurrencyController = require(ReplicatedStorage.Shared.Controllers.Currency
 local MenuContext = require(ReplicatedStorage.Shared.React.MenuContext.MenuContext)
 local PetController = require(ReplicatedStorage.Shared.Controllers.PetController)
 local PetGacha = require(ReplicatedStorage.Shared.React.PetGacha.PetGacha)
+local PetGachaDefs = require(ReplicatedStorage.Shared.Defs.PetGachaDefs)
 local PetGachaResult = require(ReplicatedStorage.Shared.React.PetGacha.PetGachaResult)
 local React = require(ReplicatedStorage.Packages.React)
 local Trove = require(ReplicatedStorage.Packages.Trove)
+local TryNow = require(ReplicatedStorage.Shared.Util.TryNow)
 local Zoner = require(ReplicatedStorage.Shared.Classes.Zoner)
 
 return function()
@@ -62,6 +64,9 @@ return function()
 
 		Result = (state == "Result") and React.createElement(PetGachaResult, {
 			PetId = resultPetId.current,
+			EggId = TryNow(function()
+				return PetGachaDefs[gachaId].EggId
+			end, "World1"),
 			Close = function()
 				setState("Shop")
 			end,
