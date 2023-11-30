@@ -32,7 +32,7 @@ local Goons = {
 			return 0.75
 		end,
 		Damage = function(level)
-			return 4 + level
+			return 1 + 0.4 * level
 		end,
 		HealthMax = function(level)
 			return 10 + 2 * (level - 1)
@@ -68,7 +68,7 @@ local Goons = {
 			return 0.75
 		end,
 		Damage = function(level)
-			return 4 + level
+			return 2 + 0.75 * level
 		end,
 		HealthMax = function(level)
 			return 10 + 2 * (level - 1)
@@ -104,7 +104,7 @@ local Goons = {
 			return 0.75
 		end,
 		Damage = function(level)
-			return 4 + level
+			return 2 + level
 		end,
 		HealthMax = function(level)
 			return 10 + 2 * (level - 1)
@@ -115,14 +115,17 @@ local Goons = {
 		Name = "Hunter",
 		ModelName = "Hunter",
 		Brain = {
-			Id = "BasicMelee",
+			Id = "BasicRanged",
+			ProjectileOffset = CFrame.new(0, 0.75, -2),
 		},
 		Animations = {
+			Idle = "HunterIdle",
 			Walk = "HunterWalk",
-			Attack = "GenericGoonShoot",
+			Attack = "HunterAttack",
 			Die = "GenericGoonDie",
 		},
 		Sounds = {
+			Shoot = { "BowShoot1", "BowShoot2", "BowShoot3", "BowShoot4" },
 			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
 			Death = { "MaleUgh1", "MaleUgh2" },
 		},
@@ -134,16 +137,16 @@ local Goons = {
 			return 0.05
 		end,
 		Range = function()
-			return 0.1
+			return 0.35
 		end,
 		AttackRate = function()
 			return 0.75
 		end,
 		Damage = function(level)
-			return 5 + level
+			return 2.5 + level * 0.75
 		end,
 		HealthMax = function(level)
-			return 9 + 2 * (level - 1)
+			return 9 + 1.5 * (level - 1)
 		end,
 	},
 
@@ -212,7 +215,7 @@ local Goons = {
 			return 0.75
 		end,
 		Damage = function(level)
-			return 9 + level
+			return 1 + 0.75 * level
 		end,
 		HealthMax = function(level)
 			return 12 + 2 * (level - 1)
@@ -248,10 +251,10 @@ local Goons = {
 			return 0.75
 		end,
 		Damage = function(level)
-			return 8 + level
+			return 1 + level
 		end,
 		HealthMax = function(level)
-			return 12 + 2 * (level - 1)
+			return 12 + 1 * (level - 1)
 		end,
 	},
 }

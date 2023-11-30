@@ -8,10 +8,13 @@ Animator.__index = Animator
 
 type Animatable = Humanoid | AnimationController
 
-export type Animator = typeof(setmetatable({} :: {
-	Controller: any,
-	Tracks: { [string]: AnimationTrack },
-}, Animator))
+export type Animator = typeof(setmetatable(
+	{} :: {
+		Controller: any,
+		Tracks: { [string]: AnimationTrack },
+	},
+	Animator
+))
 
 function Animator.new(controller: Animatable): Animator
 	local self: Animator = setmetatable({
@@ -30,11 +33,15 @@ function Animator.Play(self: Animator, name: string, ...)
 		self.Tracks[name] = self.Controller:LoadAnimation(animation)
 	end
 
+	if self.Tracks[name].IsPlaying then return end
+
 	self.Tracks[name]:Play(...)
 end
 
 function Animator.Stop(self: Animator, name: string, ...)
 	if not self.Tracks[name] then return end
+
+	if not self.Tracks[name].IsPlaying then return end
 
 	self.Tracks[name]:Stop(...)
 end
@@ -45,6 +52,7 @@ function Animator.StopHard(self: Animator, ...)
 	for _, name in names do
 		local track = self.Tracks[name]
 		if not track then continue end
+		if not track.IsPlaying then continue end
 
 		track:Stop(0)
 		track:AdjustWeight(0)
@@ -56,9 +64,7 @@ function Animator.StopHardAll(self: Animator)
 end
 
 function Animator.Destroy(self: Animator)
-	for name in self.Tracks do
-		self:StopHard(name)
-	end
+	self:StopHardAll()
 end
 
 return Animator

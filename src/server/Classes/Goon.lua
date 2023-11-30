@@ -103,6 +103,11 @@ function Goon.new(args: {
 
 	self.Brain:SetGoon(self)
 
+	if self.Def.Animations.Idle then
+		print("Playing idle")
+		self.Animator:Play(self.Def.Animations.Idle)
+	end
+
 	return self
 end
 
