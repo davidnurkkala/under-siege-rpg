@@ -19,6 +19,10 @@ local Ids = {
 	GenericBattlerFlinch = 15408070949,
 	GenericBattlerDie = 15408391566,
 
+	MastermageIdle = 15418696124,
+	GuildmasterIdle = 15418693843,
+	ShopkeeperIdle = 15418697238,
+
 	PeasantWalk = 15082639586,
 	MageWalk = 15082639586,
 	SwordsmanWalk = 15082639586,

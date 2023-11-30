@@ -52,6 +52,62 @@ local Battlers = {
 			Berserker = 16,
 		},
 	},
+
+	ElfCommoner = {
+		Name = "Elf Commoner",
+		Reward = 25,
+		WeaponId = "WoodenBow",
+		Power = 200000,
+		Deck = {
+			Recruit = 32,
+			Footman = 4,
+			VikingWarrior = 16,
+			Hunter = 32,
+			Berserker = 16,
+		},
+	},
+
+	ElfHunter = {
+		Name = "Elf Hunter",
+		Reward = 50,
+		WeaponId = "WoodenBow",
+		Power = 300000,
+		Deck = {
+			Recruit = 32,
+			Footman = 4,
+			VikingWarrior = 16,
+			Hunter = 32,
+			Berserker = 16,
+		},
+	},
+
+	ElfWarrior = {
+		Name = "Elf Warrior",
+		Reward = 100,
+		WeaponId = "WoodenBow",
+		Power = 400000,
+		Deck = {
+			Recruit = 32,
+			Footman = 4,
+			VikingWarrior = 16,
+			Hunter = 32,
+			Berserker = 16,
+		},
+	},
+
+	ElfKing = {
+		Name = "Elf King",
+		Reward = 250,
+		WeaponId = "WoodenBow",
+		Power = 500000,
+		Deck = {
+			Recruit = 32,
+			Footman = 4,
+			VikingWarrior = 16,
+			Hunter = 32,
+			Berserker = 16,
+		},
+	},
 }
 
 return Sift.Dictionary.map(Battlers, function(battler, id)
