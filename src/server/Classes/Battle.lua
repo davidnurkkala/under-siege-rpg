@@ -10,6 +10,7 @@ local CardHelper = require(ReplicatedStorage.Shared.Util.CardHelper)
 local Cooldown = require(ReplicatedStorage.Shared.Classes.Cooldown)
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
 local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
+local Default = require(ReplicatedStorage.Shared.Util.Default)
 local Goon = require(ServerScriptService.Server.Classes.Goon)
 local GuiEffectService = require(ServerScriptService.Server.Services.GuiEffectService)
 local PartPath = require(ReplicatedStorage.Shared.Classes.PartPath)
@@ -56,6 +57,7 @@ export type Battle = typeof(setmetatable(
 		Path: PartPath.PartPath,
 		RoundCooldown: any,
 		State: "Active" | "Ended",
+		CritEnabled: boolean,
 	},
 	Battle
 ))
@@ -63,6 +65,7 @@ export type Battle = typeof(setmetatable(
 function Battle.new(args: {
 	Model: BattlegroundModel,
 	Battlers: { Battler.Battler },
+	CritEnabled: boolean?,
 }): Battle
 	local trove = Trove.new()
 
@@ -84,6 +87,7 @@ function Battle.new(args: {
 		Destroyed = Signal.new(),
 		Changed = Signal.new(),
 		State = "Active",
+		CritEnabled = Default(args.CritEnabled, true),
 	}, Battle)
 
 	for _, entry in { { self.Battlers[1], self.Model.Spawns.Left }, { self.Battlers[2], self.Model.Spawns.Right } } do
@@ -179,6 +183,7 @@ end
 
 function Battle.GetStatus(self: Battle)
 	return {
+		CritEnabled = self.CritEnabled,
 		Model = self.Model,
 		Battlers = Sift.Array.map(self.Battlers, function(battler: Battler.Battler)
 			return battler:GetStatus()

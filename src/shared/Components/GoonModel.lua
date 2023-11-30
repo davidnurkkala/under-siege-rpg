@@ -70,6 +70,15 @@ function GoonModel.new(root): GoonModel
 		end)
 		:catch(function() end)
 
+	self:Update(0)
+
+	-- move overhead point to the non-moving root
+	do
+		local offset = self.Root.CFrame:ToObjectSpace(self.OverheadPoint.WorldCFrame)
+		self.OverheadPoint.CFrame = offset
+		self.OverheadPoint.Parent = self.Root
+	end
+
 	return self
 end
 

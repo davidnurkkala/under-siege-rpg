@@ -36,8 +36,6 @@ return function(args: {
 				return args.Finish.CFrame
 			end
 
-		local cframe = start()
-
 		return Animate(duration, function(scalar)
 			local position = Lerp(start().Position, finish().Position, scalar)
 			model:PivotTo(CFrame.lookAt(position, finish().Position).Rotation + position)

@@ -1,8 +1,10 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local ActionService = require(ServerScriptService.Server.Services.ActionService)
 local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
 local Battler = require(ServerScriptService.Server.Classes.Battler)
+local Cooldown = require(ReplicatedStorage.Shared.Classes.Cooldown)
 local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local Deck = require(ServerScriptService.Server.Classes.Deck)
 local DeckPlayerRandom = require(ServerScriptService.Server.Classes.DeckPlayerRandom)
@@ -53,6 +55,29 @@ function BattleSession.new(args: {
 	self.Trove:Add(function()
 		root.Anchored = false
 	end)
+
+	self.Trove:AddPromise(Promise.new(function(resolve, _, onCancel)
+		local battle
+		repeat
+			battle = self.Battler:GetBattle()
+			if battle == nil then
+				task.wait()
+				if onCancel() then return end
+			end
+		until battle ~= nil
+
+		resolve(battle)
+	end):andThen(function(battle)
+		if not battle.CritEnabled then return end
+
+		local cooldown = Cooldown.new(0.1)
+		self.Trove:Add(ActionService:Subscribe(self.Player, "Primary", function()
+			if cooldown:IsReady() then
+				cooldown:Use()
+				self.Battler:AddCrit(0.2)
+			end
+		end))
+	end))
 
 	return self
 end

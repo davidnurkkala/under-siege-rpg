@@ -21,15 +21,18 @@ export type BasicRanged = typeof(setmetatable(
 		StateMachine: any,
 		AttackCooldown: any,
 		ProjectileOffset: CFrame,
+		ProjectileName: string,
 	},
 	BasicRanged
 ))
 
 function BasicRanged.new(args: {
 	ProjectileOffset: CFrame,
+	ProjectileName: string,
 }): BasicRanged
 	local self: BasicRanged = setmetatable({
 		ProjectileOffset = args.ProjectileOffset,
+		ProjectileName = args.ProjectileName,
 	}, BasicRanged)
 
 	return self
@@ -43,9 +46,9 @@ function BasicRanged.SetUpStateMachine(self: BasicRanged)
 				self.Goon.Animator:Play(self.Goon.Def.Animations.Walk)
 			end,
 			Run = function(_, dt)
-				if not self:Walk(dt) then return "Waiting" end
+				self:Walk(dt)
 
-				if self:GetTarget() then return "Attacking" end
+				if self.AttackCooldown:IsReady() and self:GetTarget() then return "Attacking" end
 
 				return
 			end,
@@ -63,19 +66,17 @@ function BasicRanged.SetUpStateMachine(self: BasicRanged)
 		},
 		{
 			Name = "Attacking",
-			Run = function(data, dt)
+			Run = function(data)
 				local target = self:GetTarget()
 
 				if target then
-					local distance = math.abs(target.Position - self.Goon.Position)
-					local isPastHalfRange = distance > self.Goon:FromDef("Range") * 0.5
-					local currentlyAttacking = data.Attacking == true
-					local shouldWalk = isPastHalfRange and not currentlyAttacking
-					if shouldWalk then
-						self:Walk(dt)
-						self.Goon.Animator:Play(self.Goon.Def.Animations.Walk)
-					else
-						self.Goon.Animator:Stop(self.Goon.Def.Animations.Walk)
+					if data.AttackIsFinished then
+						local distance = math.abs(target.Position - self.Goon.Position)
+						local isPastHalfRange = distance > self.Goon:FromDef("Range") * 0.5
+						local currentlyAttacking = data.Attacking == true
+						local shouldWalk = isPastHalfRange and not currentlyAttacking
+
+						if shouldWalk then return "Walking" end
 					end
 
 					if self.AttackCooldown:IsReady() then
@@ -83,41 +84,39 @@ function BasicRanged.SetUpStateMachine(self: BasicRanged)
 
 						self.Goon.Animator:Play(self.Goon.Def.Animations.Attack)
 
-						data.Attacking = true
-						data.Promise = self.Goon:WhileAlive(Promise.delay(self.Goon:FromDef("AttackWindupTime") or 1)
-							:andThen(function()
-								EffectService:All(
-									EffectProjectile({
-										Model = ReplicatedStorage.Assets.Models.Arrow1,
-										Start = self.Goon.Root.CFrame * self.ProjectileOffset,
-										Finish = target:GetRoot(),
-										Speed = 128,
-									}),
-									EffectSound({
-										SoundId = PickRandom(self.Goon.Def.Sounds.Shoot),
-										Target = self.Goon.Root,
-									})
-								):andThen(function()
-									self.Battle:Damage(self.Goon, target, self.Goon:FromDef("Damage"))
+						data.AttackIsFinished = nil
+						data.Promise = self.Goon:WhileAlive(Promise.delay(self.Goon:FromDef("AttackWindupTime") or 1):andThen(function()
+							data.AttackIsFinished = true
 
-									EffectService:All(
-										EffectSound({
-											SoundId = PickRandom(self.Goon.Def.Sounds.Hit),
-											Target = target:GetRoot(),
-										}),
-										EffectEmission({
-											Emitter = ReplicatedStorage.Assets.Emitters.Impact1,
-											ParticleCount = 2,
-											Target = target:GetRoot(),
-										})
-									)
-								end, function()
-									-- catch
-								end)
+							EffectService:All(
+								EffectProjectile({
+									Model = ReplicatedStorage.Assets.Models.Projectiles[self.ProjectileName],
+									Start = self.Goon.Root.CFrame * self.ProjectileOffset,
+									Finish = target:GetRoot(),
+									Speed = 128,
+								}),
+								EffectSound({
+									SoundId = PickRandom(self.Goon.Def.Sounds.Shoot),
+									Target = self.Goon.Root,
+								})
+							):andThen(function()
+								self.Battle:Damage(self.Goon, target, self.Goon:FromDef("Damage"))
+
+								EffectService:All(
+									EffectSound({
+										SoundId = PickRandom(self.Goon.Def.Sounds.Hit),
+										Target = target:GetRoot(),
+									}),
+									EffectEmission({
+										Emitter = ReplicatedStorage.Assets.Emitters.Impact1,
+										ParticleCount = 2,
+										Target = target:GetRoot(),
+									})
+								)
+							end, function()
+								-- catch
 							end)
-							:finally(function()
-								data.Attacking = nil
-							end))
+						end))
 					end
 				else
 					return "Walking"

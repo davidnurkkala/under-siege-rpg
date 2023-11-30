@@ -90,6 +90,7 @@ function Goon.new(args: {
 		Remote = remote,
 	}, Goon)
 
+	self.Root:SetAttribute("Level", self.Level)
 	self.Root.Parent = workspace
 
 	self.Health:Observe(function(old, new)
@@ -102,11 +103,6 @@ function Goon.new(args: {
 	self.Battle:Add(self)
 
 	self.Brain:SetGoon(self)
-
-	if self.Def.Animations.Idle then
-		print("Playing idle")
-		self.Animator:Play(self.Def.Animations.Idle)
-	end
 
 	return self
 end
@@ -143,7 +139,9 @@ function Goon.Is(object)
 end
 
 function Goon.FromDef(self: Goon, key: string)
-	return self.Def[key](self.Level)
+	local value = self.Def[key]
+	if typeof(value) == "function" then value = value(self.Level) end
+	return value
 end
 
 function Goon.IsActive(self: Goon)

@@ -26,16 +26,15 @@ local function labelIcon(props: {
 		}),
 		Image = React.createElement(Image, {
 			LayoutOrder = 1,
-			Size = UDim2.fromScale(1, 1),
-			SizeConstraint = Enum.SizeConstraint.RelativeYY,
+			Size = UDim2.fromScale(0.3, 1),
 			Image = props.Image,
 			ImageColor3 = props.Color,
 		}),
 		Label = React.createElement(Label, {
 			LayoutOrder = 2,
 			Text = props.Label,
-			AutomaticSize = Enum.AutomaticSize.X,
-			Size = UDim2.fromScale(0, 1),
+			Size = UDim2.fromScale(0.6, 1),
+			TextXAlignment = Enum.TextXAlignment.Left,
 		}),
 	})
 end

@@ -4,11 +4,14 @@ local Sift = require(ReplicatedStorage.Packages.Sift)
 local StateMachine = {}
 StateMachine.__index = StateMachine
 
-export type StateMachine = typeof(setmetatable({} :: {
-	States: any,
-	State: any,
-	StateData: any,
-}, StateMachine))
+export type StateMachine = typeof(setmetatable(
+	{} :: {
+		States: any,
+		State: any,
+		StateData: any,
+	},
+	StateMachine
+))
 
 function StateMachine.new(states): StateMachine
 	local self: StateMachine = setmetatable({

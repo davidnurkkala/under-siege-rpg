@@ -6,14 +6,21 @@ local Button = require(ReplicatedStorage.Shared.React.Common.Button)
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local ComponentController = require(ReplicatedStorage.Shared.Controllers.ComponentController)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
+local Flipper = require(ReplicatedStorage.Packages.Flipper)
+local Frame = require(ReplicatedStorage.Shared.React.Common.Frame)
 local HealthBar = require(ReplicatedStorage.Shared.React.Battle.HealthBar)
 local Image = require(ReplicatedStorage.Shared.React.Common.Image)
+local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local ListLayout = require(ReplicatedStorage.Shared.React.Common.ListLayout)
+local Observers = require(ReplicatedStorage.Packages.Observers)
+local Panel = require(ReplicatedStorage.Shared.React.Common.Panel)
 local PromptWindow = require(ReplicatedStorage.Shared.React.Common.PromptWindow)
 local React = require(ReplicatedStorage.Packages.React)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
+local Trove = require(ReplicatedStorage.Packages.Trove)
 local TryNow = require(ReplicatedStorage.Shared.Util.TryNow)
+local UseMotor = require(ReplicatedStorage.Shared.React.Hooks.UseMotor)
 
 local function getHealthPercent(status, index)
 	return TryNow(function()
@@ -42,23 +49,69 @@ local function goonHealthBar(props: {
 	GoonModel: any,
 })
 	local percent, setPercent = React.useState(1)
+	local level, setLevel = React.useState(0)
 
 	React.useEffect(function()
+		local trove = Trove.new()
+
 		local health = props.GoonModel.Health
-		return health:Observe(function()
+		trove:Add(health:Observe(function()
 			setPercent(health:GetPercent())
-		end)
+		end))
+
+		trove:Add(Observers.observeAttribute(props.GoonModel.Root, "Level", setLevel))
+
+		return function()
+			trove:Clean()
+		end
 	end, { props.GoonModel })
 
 	if percent <= 0 then return end
 
 	return React.createElement("BillboardGui", {
-		Size = UDim2.fromScale(4, 0.5),
+		Size = UDim2.fromScale(6, 2),
 		Adornee = props.GoonModel.OverheadPoint,
 	}, {
-		HealthBar = React.createElement(HealthBar, {
-			Alignment = Enum.HorizontalAlignment.Left,
-			Percent = percent,
+		Level = React.createElement(Label, {
+			Size = UDim2.fromScale(1, 1),
+			SizeConstraint = Enum.SizeConstraint.RelativeYY,
+			Text = TextStroke(level),
+		}),
+		HealthBar = React.createElement(Container, {
+			Size = UDim2.fromScale(0.7, 0.25),
+			Position = UDim2.fromScale(0.3, 0.5),
+			AnchorPoint = Vector2.new(0, 0.5),
+		}, {
+			HealthBar = React.createElement(HealthBar, {
+				Alignment = Enum.HorizontalAlignment.Left,
+				Percent = percent,
+			}),
+		}),
+	})
+end
+
+local function critBar(props: {
+	Percent: number,
+})
+	local percent, percentMotor = UseMotor(0)
+
+	React.useEffect(function()
+		percentMotor:setGoal(Flipper.Spring.new(props.Percent))
+	end, { props.Percent })
+
+	return React.createElement(Panel, {
+		BorderColor3 = Color3.new(),
+		ImageColor3 = Color3.new(),
+	}, {
+		Bar = React.createElement(Frame, {
+			Size = percent:map(function(value)
+				return UDim2.fromScale(value, 1)
+			end),
+			BackgroundColor3 = ColorDefs.DarkRed,
+		}, {
+			Corner = React.createElement("UICorner", {
+				CornerRadius = UDim.new(0, 8),
+			}),
 		}),
 	})
 end
@@ -68,8 +121,9 @@ return function(props: {
 })
 	local status, setStatus = React.useState(nil)
 	local goonModels, setGoonModels = React.useState({})
-
 	local surrendering, setSurrendering = React.useState(false)
+
+	local critEnabled = if status then status.CritEnabled else false
 
 	React.useEffect(function()
 		if not props.Visible then return end
@@ -110,6 +164,19 @@ return function(props: {
 			end)
 		),
 
+		CritBar = critEnabled and React.createElement(Container, {
+			Size = UDim2.fromScale(0.2, 0.025),
+			SizeConstraint = Enum.SizeConstraint.RelativeXX,
+			Position = UDim2.fromScale(0.5, 0.8),
+			AnchorPoint = Vector2.new(0.5, 1),
+		}, {
+			Bar = React.createElement(critBar, {
+				Percent = TryNow(function()
+					return status.Battlers[1].Crit
+				end, 0),
+			}),
+		}),
+
 		Bottom = React.createElement(Container, {
 			Size = UDim2.fromScale(1, 0.2),
 			AnchorPoint = Vector2.new(0.5, 1),
@@ -119,9 +186,10 @@ return function(props: {
 				FillDirection = Enum.FillDirection.Horizontal,
 				HorizontalAlignment = Enum.HorizontalAlignment.Center,
 				VerticalAlignment = Enum.VerticalAlignment.Center,
+				Padding = if critEnabled then UDim.new(0.01, 0) else UDim.new(0.05, 0),
 			}),
 
-			AttackButton = React.createElement(AttackButton, {
+			AttackButton = critEnabled and React.createElement(AttackButton, {
 				LayoutOrder = 2,
 			}),
 
