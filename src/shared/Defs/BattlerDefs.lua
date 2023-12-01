@@ -59,11 +59,8 @@ local Battlers = {
 		WeaponId = "WoodenBow",
 		Power = 200000,
 		Deck = {
-			Recruit = 32,
-			Footman = 4,
-			VikingWarrior = 16,
-			Hunter = 32,
-			Berserker = 16,
+			ElfBrawler = 12,
+			ElfRanger = 8,
 		},
 	},
 
@@ -73,11 +70,8 @@ local Battlers = {
 		WeaponId = "WoodenBow",
 		Power = 300000,
 		Deck = {
-			Recruit = 32,
-			Footman = 4,
-			VikingWarrior = 16,
-			Hunter = 32,
-			Berserker = 16,
+			ElfBrawler = 16,
+			ElfRanger = 12,
 		},
 	},
 
@@ -87,11 +81,8 @@ local Battlers = {
 		WeaponId = "WoodenBow",
 		Power = 400000,
 		Deck = {
-			Recruit = 32,
-			Footman = 4,
-			VikingWarrior = 16,
-			Hunter = 32,
-			Berserker = 16,
+			ElfBrawler = 18,
+			ElfRanger = 16,
 		},
 	},
 
@@ -101,11 +92,8 @@ local Battlers = {
 		WeaponId = "WoodenBow",
 		Power = 500000,
 		Deck = {
-			Recruit = 32,
-			Footman = 4,
-			VikingWarrior = 16,
-			Hunter = 32,
-			Berserker = 16,
+			ElfBrawler = 32,
+			ElfRanger = 18,
 		},
 	},
 }

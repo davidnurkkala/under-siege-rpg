@@ -272,6 +272,158 @@ local Goons = {
 			return scaling(5, 1, level)
 		end,
 	},
+
+	OrcWarrior = {
+		Name = "Orc Warrior",
+		Description = `A powerful orcish brute, clad in crude scraps of leather.`,
+		ModelName = "OrcWarrior",
+		Brain = {
+			Id = "BasicMelee",
+		},
+		Animations = {
+			Walk = "SwordsmanWalk",
+			Attack = "BerserkerAttack",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Size = 0.03,
+		AttackWindupTime = function()
+			return 0.43
+		end,
+		Speed = function()
+			return 0.1
+		end,
+		Range = function()
+			return 0.1
+		end,
+		AttackRate = function()
+			return 0.75
+		end,
+		Damage = function(level)
+			return scaling(5, 0.5, level)
+		end,
+		HealthMax = function(level)
+			return scaling(5, 1, level)
+		end,
+	},
+
+	OrcChampion = {
+		Name = "Orc Champion",
+		Description = `A heavily armored warrior, and the pride of the orcish highlands.`,
+		ModelName = "OrcChampion",
+		Brain = {
+			Id = "BasicMelee",
+		},
+		Animations = {
+			Walk = "SwordsmanWalk",
+			Attack = "BerserkerAttack",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Size = 0.03,
+		AttackWindupTime = function()
+			return 0.43
+		end,
+		Speed = function()
+			return 0.1
+		end,
+		Range = function()
+			return 0.1
+		end,
+		AttackRate = function()
+			return 0.75
+		end,
+		Damage = function(level)
+			return scaling(6, 0.5, level)
+		end,
+		HealthMax = function(level)
+			return scaling(6, 1, level)
+		end,
+	},
+
+	ElfBrawler = {
+		Name = "Elf Brawler",
+		Description = `An lightly armored, quick footed warrior - the backbone of the Elven armada.`,
+		ModelName = "ElfBrawler",
+		Brain = {
+			Id = "BasicMelee",
+		},
+		Animations = {
+			Walk = "SwordsmanWalk",
+			Attack = "BerserkerAttack",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Size = 0.03,
+		AttackWindupTime = function()
+			return 0.43
+		end,
+		Speed = function()
+			return 0.1
+		end,
+		Range = function()
+			return 0.1
+		end,
+		AttackRate = function()
+			return 0.75
+		end,
+		Damage = function(level)
+			return scaling(5, 0.5, level)
+		end,
+		HealthMax = function(level)
+			return scaling(5, 1, level)
+		end,
+	},
+
+	ElfRanger = {
+		Name = "Elf Ranger",
+		Description = "A highly skilled Elven archer.",
+		ModelName = "ElfRanger",
+		Brain = {
+			Id = "BasicRanged",
+			ProjectileOffset = CFrame.new(0, 0.75, -2),
+			ProjectileName = "Arrow1",
+		},
+		Animations = {
+			Idle = "HunterIdle",
+			Walk = "HunterWalk",
+			Attack = "HunterAttack",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Shoot = { "BowShoot1", "BowShoot2", "BowShoot3", "BowShoot4" },
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Size = 0.03,
+		AttackWindupTime = function()
+			return 0.55
+		end,
+		Speed = function()
+			return 0.05
+		end,
+		Range = function()
+			return 0.35
+		end,
+		AttackRate = function()
+			return 1.1
+		end,
+		Damage = function(level)
+			return scaling(0.5, 0.1, level)
+		end,
+		HealthMax = function(level)
+			return scaling(5, 1, level)
+		end,
+	},
 }
 
 return Sift.Dictionary.map(Goons, function(goon, id)
