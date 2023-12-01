@@ -39,6 +39,26 @@ local Cards = {
 		Type = "Goon",
 		Rank = 1,
 	},
+	ElfRanger = {
+		GoonId = "ElfRanger",
+		Type = "Goon",
+		Rank = 1,
+	},
+	ElfBrawler = {
+		GoonId = "ElfBrawler",
+		Type = "Goon",
+		Rank = 1,
+	},
+	OrcWarrior = {
+		GoonId = "OrcWarrior",
+		Type = "Goon",
+		Rank = 1,
+	},
+	OrcChampion = {
+		GoonId = "OrcChampion",
+		Type = "Goon",
+		Rank = 1,
+	},
 }
 
 return Sift.Dictionary.map(Cards, function(card, id)

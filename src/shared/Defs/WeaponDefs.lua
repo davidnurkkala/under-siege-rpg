@@ -93,6 +93,22 @@ local Weapons = {
 			Hit = { "MediumProjectileImpact1", "MediumProjectileImpact2", "MediumProjectileImpact3", "MediumProjectileImpact4" },
 		},
 	},
+
+	ElvenBow = {
+		Name = "Elven Bow",
+		Power = 250,
+		AttackCooldownTime = 0.4,
+		HoldPartName = "RightHand",
+		ProjectileName = "Arrow1",
+		Animations = {
+			Idle = "BowIdle",
+			Shoot = "BowShoot",
+		},
+		Sounds = {
+			Shoot = { "WhooshMedium1", "WhooshMedium2", "WhooshMedium3", "WhooshMedium4", "WhooshMedium5", "WhooshMedium6" },
+			Hit = { "MediumProjectileImpact1", "MediumProjectileImpact2", "MediumProjectileImpact3", "MediumProjectileImpact4" },
+		},
+	},
 }
 
 return Sift.Dictionary.map(Weapons, function(def, id)

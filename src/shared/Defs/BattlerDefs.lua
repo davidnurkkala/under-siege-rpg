@@ -56,7 +56,7 @@ local Battlers = {
 	ElfCommoner = {
 		Name = "Elf Commoner",
 		Reward = 25,
-		WeaponId = "WoodenBow",
+		WeaponId = "ElvenBow",
 		Power = 200000,
 		Deck = {
 			ElfBrawler = 12,
@@ -67,7 +67,7 @@ local Battlers = {
 	ElfHunter = {
 		Name = "Elf Hunter",
 		Reward = 50,
-		WeaponId = "WoodenBow",
+		WeaponId = "ElvenBow",
 		Power = 300000,
 		Deck = {
 			ElfBrawler = 16,
@@ -78,7 +78,7 @@ local Battlers = {
 	ElfWarrior = {
 		Name = "Elf Warrior",
 		Reward = 100,
-		WeaponId = "WoodenBow",
+		WeaponId = "ElvenBow",
 		Power = 400000,
 		Deck = {
 			ElfBrawler = 18,
@@ -89,11 +89,55 @@ local Battlers = {
 	ElfKing = {
 		Name = "Elf King",
 		Reward = 250,
-		WeaponId = "WoodenBow",
+		WeaponId = "ElvenBow",
 		Power = 500000,
 		Deck = {
 			ElfBrawler = 32,
 			ElfRanger = 18,
+		},
+	},
+
+	OrcGrunt = {
+		Name = "Orc Grunt",
+		Reward = 500,
+		WeaponId = "WoodenBow",
+		Power = 600000,
+		Deck = {
+			OrcWarrior = 40,
+			OrcChampion = 20,
+		},
+	},
+
+	OrcBrute = {
+		Name = "Orc Brute",
+		Reward = 1000,
+		WeaponId = "WoodenBow",
+		Power = 700000,
+		Deck = {
+			OrcWarrior = 42,
+			OrcChampion = 22,
+		},
+	},
+
+	OrcFighter = {
+		Name = "Orc Fighter",
+		Reward = 1500,
+		WeaponId = "Javelin",
+		Power = 800000,
+		Deck = {
+			OrcWarrior = 46,
+			OrcChampion = 24,
+		},
+	},
+
+	OrcGeneral = {
+		Name = "Orc General",
+		Reward = 3000,
+		WeaponId = "Javelin",
+		Power = 1000000,
+		Deck = {
+			OrcWarrior = 50,
+			OrcChampion = 30,
 		},
 	},
 }
