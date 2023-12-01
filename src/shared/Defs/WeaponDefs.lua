@@ -96,7 +96,7 @@ local Weapons = {
 
 	ElvenBow = {
 		Name = "Elven Bow",
-		Power = 250,
+		Power = 350,
 		AttackCooldownTime = 0.4,
 		HoldPartName = "RightHand",
 		ProjectileName = "Arrow1",
