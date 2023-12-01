@@ -48,6 +48,86 @@ local Pets = {
 		},
 		Power = 2,
 	},
+
+	Bull = {
+		Name = "Bully",
+		ModelName = "BullPet",
+		Animations = {
+			Idle = { "GenericPetBlink", "GenericPetIdle", "DoggyIdleExtras" },
+			Walk = { "GenericPetWalk", "DoggyWalkExtras" },
+		},
+		Power = 2.2,
+	},
+
+	Lion = {
+		Name = "Liony",
+		ModelName = "LionPet",
+		Animations = {
+			Idle = { "GenericPetBlink", "GenericPetIdle", "KittyIdleExtras" },
+			Walk = { "GenericPetWalk", "KittyWalkExtras" },
+		},
+		Power = 2.4,
+	},
+
+	Rhino = {
+		Name = "Rhiny",
+		ModelName = "RhinoPet",
+		Animations = {
+			Idle = { "GenericPetBlink", "GenericPetIdle", "WolfyIdleExtras" },
+			Walk = { "GenericPetWalk", "WolfyWalkExtras" },
+		},
+		Power = 2.6,
+	},
+
+	Slime = {
+		Name = "Slimey",
+		ModelName = "SlimePet",
+		Animations = {
+			Idle = { "GenericPetBlink", "GenericPetIdle", "WolfyIdleExtras" },
+			Walk = { "GenericPetWalk", "WolfyWalkExtras" },
+		},
+		Power = 2.8,
+	},
+
+	Goat = {
+		Name = "Goaty",
+		ModelName = "GoatPet",
+		Animations = {
+			Idle = { "GenericPetBlink", "GenericPetIdle", "DoggyIdleExtras" },
+			Walk = { "GenericPetWalk", "DoggyWalkExtras" },
+		},
+		Power = 3,
+	},
+
+	Fox = {
+		Name = "Foxy",
+		ModelName = "FoxPet",
+		Animations = {
+			Idle = { "GenericPetBlink", "GenericPetIdle", "KittyIdleExtras" },
+			Walk = { "GenericPetWalk", "KittyWalkExtras" },
+		},
+		Power = 3.2,
+	},
+
+	Mouse = {
+		Name = "Mousy",
+		ModelName = "MousePet",
+		Animations = {
+			Idle = { "GenericPetBlink", "GenericPetIdle", "KittyWalkExtras" },
+			Walk = { "GenericPetWalk", "KittyWalkExtras" },
+		},
+		Power = 3.4,
+	},
+
+	Bat = {
+		Name = "Batsy",
+		ModelName = "BatPet",
+		Animations = {
+			Idle = { "GenericPetBlink", "GenericPetIdle", "BatIdleExtras" },
+			Walk = { "GenericPetWalk", "BatWalkExtras" },
+		},
+		Power = 3.6,
+	},
 }
 
 return Sift.Dictionary.map(Pets, function(pet, id)

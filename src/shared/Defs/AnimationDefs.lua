@@ -38,6 +38,8 @@ local Ids = {
 
 	GenericPetIdle = 15421734157,
 	GenericPetWalk = 15421736818,
+	GenericPetHop = 15514879390,
+	GenericPetFly = 15421736818,
 	GenericPetBlink = 15421776463,
 
 	KittyIdleExtras = 15422083467,
@@ -54,6 +56,9 @@ local Ids = {
 
 	BunnyIdleExtras = 15421849690,
 	BunnyWalkExtras = 15421956230,
+
+	BatIdleExtras = 15514695992,
+	BatWalkExtras = 15514695992,
 
 	TestAnimation = 15381675619,
 }
