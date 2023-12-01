@@ -8,6 +8,7 @@ local Deck = require(ServerScriptService.Server.Classes.Deck)
 local DeckPlayerRandom = require(ServerScriptService.Server.Classes.DeckPlayerRandom)
 local EffectBattlerCollapse = require(ReplicatedStorage.Shared.Effects.EffectBattlerCollapse)
 local EffectEmission = require(ReplicatedStorage.Shared.Effects.EffectEmission)
+local EffectGrowFade = require(ReplicatedStorage.Shared.Effects.EffectGrowFade)
 local EffectProjectile = require(ReplicatedStorage.Shared.Effects.EffectProjectile)
 local EffectService = require(ServerScriptService.Server.Services.EffectService)
 local EffectSound = require(ReplicatedStorage.Shared.Effects.EffectSound)
@@ -46,6 +47,7 @@ export type Battler = typeof(setmetatable(
 		Power: number,
 		AttackDamage: number,
 		Trove: any,
+		Crit: number,
 	},
 	Battler
 ))
@@ -89,6 +91,7 @@ function Battler.new(args: {
 		Trove = trove,
 		Power = args.Power,
 		AttackDamage = attackDamage,
+		Crit = 0,
 	}, Battler)
 
 	self.Animator:Play(self.WeaponDef.Animations.Idle)
@@ -183,12 +186,29 @@ function Battler.SetBattle(self: Battler, battle)
 	self.Battle = battle
 end
 
+function Battler.GetBattle(self: Battler)
+	return self.Battle
+end
+
+function Battler.AddCrit(self: Battler, amount: number)
+	self:SetCrit(self.Crit + amount)
+end
+
+function Battler.SetCrit(self: Battler, amount: number)
+	amount = math.clamp(amount, 0, 1)
+	if self.Crit == amount then return end
+
+	self.Crit = amount
+	self.Changed:Fire(self:GetStatus())
+end
+
 function Battler.GetStatus(self: Battler)
 	return {
 		BaseModel = self.BaseModel,
 		CharModel = self.CharModel,
 		Health = self.Health:Get(),
 		HealthMax = self.Health.Max,
+		Crit = self.Crit,
 	}
 end
 
@@ -230,20 +250,39 @@ function Battler.Attack(self: Battler)
 		local here = part.Position
 		local there = root.Position
 		local start = CFrame.lookAt(here, there)
+		local speed = 128
+
+		local isCrit = self.Crit >= 1
+		if isCrit then
+			self:SetCrit(0)
+
+			EffectService:All(
+				EffectProjectile({
+					Model = ReplicatedStorage.Assets.Models.Effects.CritProjectile,
+					Start = start,
+					Finish = root,
+					Speed = speed,
+				}),
+				EffectSound({
+					SoundId = "CritStart1",
+					Target = part,
+				})
+			)
+		end
 
 		EffectService:All(
 			EffectProjectile({
-				Model = ReplicatedStorage.Assets.Models.Arrow1,
+				Model = ReplicatedStorage.Assets.Models.Projectiles[self.WeaponDef.ProjectileName],
 				Start = start,
 				Finish = root,
-				Speed = 128,
+				Speed = speed,
 			}),
 			EffectSound({
 				SoundId = PickRandom(self.WeaponDef.Sounds.Shoot),
 				Target = part,
 			})
 		):andThen(function()
-			battle:Damage(self, target, self.AttackDamage)
+			battle:Damage(self, target, self.AttackDamage * if isCrit then 5 else 1)
 
 			EffectService:All(
 				EffectSound({
@@ -256,6 +295,22 @@ function Battler.Attack(self: Battler)
 					Target = root,
 				})
 			)
+
+			if isCrit then
+				EffectService:All(
+					EffectGrowFade({
+						Part = ReplicatedStorage.Assets.Models.Effects.CritHitEffect,
+						Target = root,
+						Duration = 0.25,
+						StartSize = Vector3.zero,
+						EndSize = Vector3.one * 20,
+					}),
+					EffectSound({
+						SoundId = "CritImpact1",
+						Target = root,
+					})
+				)
+			end
 		end)
 	end)
 

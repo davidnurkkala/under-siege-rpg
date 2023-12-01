@@ -4,11 +4,14 @@ local Sift = require(ReplicatedStorage.Packages.Sift)
 local StateMachine = {}
 StateMachine.__index = StateMachine
 
-export type StateMachine = typeof(setmetatable({} :: {
-	States: any,
-	State: any,
-	StateData: any,
-}, StateMachine))
+export type StateMachine = typeof(setmetatable(
+	{} :: {
+		States: any,
+		State: any,
+		StateData: any,
+	},
+	StateMachine
+))
 
 function StateMachine.new(states): StateMachine
 	local self: StateMachine = setmetatable({
@@ -33,6 +36,12 @@ function StateMachine.SetState(self: StateMachine, stateName: string, stateData:
 		if self.State.Finish then self.State.Finish(self.StateData, stateName) end
 	end
 
+	if stateName == nil then
+		self.State = nil
+		self.StateData = nil
+		return
+	end
+
 	self.StateData = stateData or {}
 	self.State = self.States[stateName]
 
@@ -45,6 +54,8 @@ function StateMachine.Update(self: StateMachine, dt: number)
 	if stateName then self:SetState(stateName, stateData) end
 end
 
-function StateMachine.Destroy(self: StateMachine) end
+function StateMachine.Destroy(self: StateMachine)
+	self:SetState(nil)
+end
 
 return StateMachine

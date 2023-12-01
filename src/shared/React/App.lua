@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local BattlerPromptBridge = require(ReplicatedStorage.Shared.React.BattlerPromptBridge)
 local CardGachaBridge = require(ReplicatedStorage.Shared.React.CardGacha.CardGachaBridge)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
+local DeckMenuBridge = require(ReplicatedStorage.Shared.React.Menus.DeckMenuBridge)
 local Hud = require(ReplicatedStorage.Shared.React.Hud.Hud)
 local IndicatorBridge = require(ReplicatedStorage.Shared.React.NumberPopups.IndicatorBridge)
 local MenuProvider = require(ReplicatedStorage.Shared.React.MenuContext.MenuProvider)
@@ -27,6 +28,7 @@ return function()
 			PetGacha = React.createElement(PetGachaBridge),
 
 			-- menus
+			DeckMenu = React.createElement(DeckMenuBridge),
 			PetMenu = React.createElement(PetMenuBridge),
 			SessionRewardsMenu = React.createElement(SessionRewardsMenuBridge),
 		}),

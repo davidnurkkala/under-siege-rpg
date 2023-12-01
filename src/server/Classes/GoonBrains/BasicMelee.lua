@@ -37,9 +37,9 @@ function BasicMelee.SetUpStateMachine(self: BasicMelee)
 				self.Goon.Animator:Play(self.Goon.Def.Animations.Walk)
 			end,
 			Run = function(_, dt)
-				if not self:Walk(dt) then return "Waiting" end
+				self:Walk(dt)
 
-				if self:GetTarget() then return "Attacking" end
+				if self.AttackCooldown:IsReady() and self:GetTarget() then return "Attacking" end
 
 				return
 			end,
@@ -60,7 +60,7 @@ function BasicMelee.SetUpStateMachine(self: BasicMelee)
 			Run = function(data)
 				local target = self:GetTarget()
 
-				if target then
+				if target and (data.AttackIsFinished == nil) then
 					if self.AttackCooldown:IsReady() then
 						self.AttackCooldown:Use()
 
@@ -80,6 +80,8 @@ function BasicMelee.SetUpStateMachine(self: BasicMelee)
 									Target = target:GetRoot(),
 								})
 							)
+
+							data.AttackIsFinished = true
 						end))
 					end
 				else

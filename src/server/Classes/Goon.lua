@@ -8,6 +8,8 @@ local Promise = require(ReplicatedStorage.Packages.Promise)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 
+local Rand = Random.new()
+
 local Goon = {}
 Goon.__index = Goon
 
@@ -90,6 +92,7 @@ function Goon.new(args: {
 		Remote = remote,
 	}, Goon)
 
+	self.Root:SetAttribute("Level", self.Level)
 	self.Root.Parent = workspace
 
 	self.Health:Observe(function(old, new)
@@ -102,11 +105,6 @@ function Goon.new(args: {
 	self.Battle:Add(self)
 
 	self.Brain:SetGoon(self)
-
-	if self.Def.Animations.Idle then
-		print("Playing idle")
-		self.Animator:Play(self.Def.Animations.Idle)
-	end
 
 	return self
 end
@@ -143,7 +141,9 @@ function Goon.Is(object)
 end
 
 function Goon.FromDef(self: Goon, key: string)
-	return self.Def[key](self.Level)
+	local value = self.Def[key]
+	if typeof(value) == "function" then value = value(self.Level) end
+	return value
 end
 
 function Goon.IsActive(self: Goon)
@@ -174,6 +174,14 @@ function Goon.WhileAlive(self: Goon, promise)
 		Promise.fromEvent(self.Destroyed),
 		promise,
 	})
+end
+
+function Goon.VictoryAnimation(self: Goon)
+	self.Animator:Play(self.Def.Animations.Victory or "GenericGoonCheer", nil, nil, Rand:NextNumber(0.8, 1.2))
+end
+
+function Goon.DefeatAnimation(self: Goon)
+	self.Animator:Play(self.Def.Animations.Defeat or "GenericGoonDie")
 end
 
 function Goon.Destroy(self: Goon)

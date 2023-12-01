@@ -222,7 +222,7 @@ function LobbySession.Attack(self: LobbySession)
 
 			return EffectService:All(
 				EffectProjectile({
-					Model = ReplicatedStorage.Assets.Models.Arrow1,
+					Model = ReplicatedStorage.Assets.Models.Projectiles[self.WeaponDef.ProjectileName],
 					Start = start,
 					Finish = finish,
 					Speed = 128,

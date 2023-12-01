@@ -19,9 +19,10 @@ local Gachas = {
 			Secondary = 5,
 		},
 		WeightTable = {
-			{ Result = "Peasant", Weight = 3 },
-			{ Result = "Recruit", Weight = 1 },
-			{ Result = "Hunter", Weight = 1 },
+			{ Result = "Peasant", Weight = 6 },
+			{ Result = "Recruit", Weight = 2 },
+			{ Result = "Hunter", Weight = 2 },
+			{ Result = "Mage", Weight = 1 },
 		},
 	},
 }

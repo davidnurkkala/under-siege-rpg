@@ -26,16 +26,15 @@ local function labelIcon(props: {
 		}),
 		Image = React.createElement(Image, {
 			LayoutOrder = 1,
-			Size = UDim2.fromScale(1, 1),
-			SizeConstraint = Enum.SizeConstraint.RelativeYY,
+			Size = UDim2.fromScale(0.3, 1),
 			Image = props.Image,
 			ImageColor3 = props.Color,
 		}),
 		Label = React.createElement(Label, {
 			LayoutOrder = 2,
 			Text = props.Label,
-			AutomaticSize = Enum.AutomaticSize.X,
-			Size = UDim2.fromScale(0, 1),
+			Size = UDim2.fromScale(0.6, 1),
+			TextXAlignment = Enum.TextXAlignment.Left,
 		}),
 	})
 end
@@ -43,6 +42,7 @@ end
 return function(props: {
 	CardId: string,
 	CardCount: number?,
+	children: any,
 })
 	local cardDef = CardDefs[props.CardId]
 	local name
@@ -56,9 +56,9 @@ return function(props: {
 
 	local renderStats = (cardDef.Type == "Goon")
 
-	return React.createElement(Panel, {
-		ImageColor3 = ColorDefs.PaleGreen,
-	}, {
+	return React.createElement(React.Fragment, nil, {
+		Children = React.createElement(React.Fragment, nil, props.children),
+
 		Name = React.createElement(Label, {
 			Size = UDim2.fromScale(1, 0.125),
 			Text = TextStroke(name),

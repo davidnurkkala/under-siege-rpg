@@ -33,6 +33,18 @@ function DeckService.PrepareBlocking(self: DeckService)
 
 		return self:DrawCardFromGacha(player, gachaId):expect()
 	end)
+
+	self.Comm:CreateSignal("CardEquipToggleRequested"):Connect(function(player, cardId)
+		if not t.string(cardId) then return end
+
+		return self:GetDeck(player)
+			:andThen(function(deck)
+				if not deck.Owned[cardId] then return end
+
+				return self:SetCardEquipped(player, cardId, deck.Equipped[cardId] == nil)
+			end)
+			:expect()
+	end)
 end
 
 function DeckService.GetDeck(_self: DeckService, player: Player)
