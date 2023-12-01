@@ -6,7 +6,7 @@ local Promise = require(ReplicatedStorage.Packages.Promise)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
 local PromisesByModel = {}
-local Random = Random.new()
+local Rand = Random.new()
 
 return function(args: {
 	Model: Model,
@@ -44,7 +44,7 @@ return function(args: {
 			local passed = tick() - start
 			local scalar = math.clamp(passed / duration, 0, 1)
 
-			lastDelta = Random:NextUnitVector() * Lerp(intensity, 0, scalar)
+			lastDelta = Rand:NextUnitVector() * Lerp(intensity, 0, scalar)
 			model:TranslateBy(lastDelta)
 		end)
 

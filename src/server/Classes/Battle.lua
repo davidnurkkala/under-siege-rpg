@@ -370,6 +370,18 @@ function Battle.End(self: Battle, victor: Battler.Battler)
 	self.State = "Ended"
 	self.Ended:Fire(victor)
 
+	for object in self.Field do
+		if Goon.Is(object) then
+			object.Brain:Destroy()
+
+			if object.TeamId == victor.TeamId then
+				object:VictoryAnimation()
+			else
+				object:DefeatAnimation()
+			end
+		end
+	end
+
 	Promise.all(Sift.Array.map(
 		Sift.Array.filter(self.Battlers, function(battler)
 			return battler ~= victor

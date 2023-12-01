@@ -12,6 +12,7 @@ local Image = require(ReplicatedStorage.Shared.React.Common.Image)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local LayoutContainer = require(ReplicatedStorage.Shared.React.Common.LayoutContainer)
 local ListLayout = require(ReplicatedStorage.Shared.React.Common.ListLayout)
+local Panel = require(ReplicatedStorage.Shared.React.Common.Panel)
 local React = require(ReplicatedStorage.Packages.React)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local SystemWindow = require(ReplicatedStorage.Shared.React.Common.SystemWindow)
@@ -92,9 +93,10 @@ return function(props: {
 							Size = UDim2.fromScale(0.25, 1),
 							LayoutOrder = index,
 						}, {
-							Card = React.createElement(Container, {
+							Card = React.createElement(Panel, {
 								Size = UDim2.fromScale(CardWidth * 0.8, 0.8),
 								SizeConstraint = Enum.SizeConstraint.RelativeYY,
+								ImageColor3 = ColorDefs.PaleGreen,
 							}, {
 								Contents = React.createElement(CardContents, {
 									CardId = entry.Result,

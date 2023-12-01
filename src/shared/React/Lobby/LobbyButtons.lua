@@ -198,6 +198,10 @@ return function()
 			Text = TextStroke("Deck"),
 			Color = ColorDefs.PaleBlue,
 			Image = "rbxassetid://15308000608",
+			Activate = function()
+				menu.Set("Deck")
+				return Promise.resolve()
+			end,
 		}),
 	})
 end

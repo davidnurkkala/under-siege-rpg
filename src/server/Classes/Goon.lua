@@ -8,6 +8,8 @@ local Promise = require(ReplicatedStorage.Packages.Promise)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 
+local Rand = Random.new()
+
 local Goon = {}
 Goon.__index = Goon
 
@@ -172,6 +174,14 @@ function Goon.WhileAlive(self: Goon, promise)
 		Promise.fromEvent(self.Destroyed),
 		promise,
 	})
+end
+
+function Goon.VictoryAnimation(self: Goon)
+	self.Animator:Play(self.Def.Animations.Victory or "GenericGoonCheer", nil, nil, Rand:NextNumber(0.8, 1.2))
+end
+
+function Goon.DefeatAnimation(self: Goon)
+	self.Animator:Play(self.Def.Animations.Defeat or "GenericGoonDie")
 end
 
 function Goon.Destroy(self: Goon)

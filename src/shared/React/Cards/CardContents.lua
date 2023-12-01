@@ -42,6 +42,7 @@ end
 return function(props: {
 	CardId: string,
 	CardCount: number?,
+	children: any,
 })
 	local cardDef = CardDefs[props.CardId]
 	local name
@@ -55,9 +56,9 @@ return function(props: {
 
 	local renderStats = (cardDef.Type == "Goon")
 
-	return React.createElement(Panel, {
-		ImageColor3 = ColorDefs.PaleGreen,
-	}, {
+	return React.createElement(React.Fragment, nil, {
+		Children = React.createElement(React.Fragment, nil, props.children),
+
 		Name = React.createElement(Label, {
 			Size = UDim2.fromScale(1, 0.125),
 			Text = TextStroke(name),

@@ -1,5 +1,5 @@
-local Random = Random.new()
+local Rand = Random.new()
 
 return function(t)
-	return t[Random:NextInteger(1, #t)]
+	return t[Rand:NextInteger(1, #t)]
 end

@@ -15,6 +15,7 @@ local Ids = {
 	GenericGoonDie = 15152357009,
 	GenericGoon1hMelee = 15340578529,
 	GenericGoonShoot = 15340585721,
+	GenericGoonCheer = 15511129700,
 
 	GenericBattlerFlinch = 15408070949,
 	GenericBattlerDie = 15408391566,

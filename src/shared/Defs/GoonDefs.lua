@@ -9,6 +9,7 @@ end
 local Goons = {
 	Peasant = {
 		Name = "Peasant",
+		Description = "Untrained, unprepared, and underequipped.",
 		ModelName = "Peasant",
 		Brain = {
 			Id = "BasicMelee",
@@ -45,6 +46,7 @@ local Goons = {
 
 	Recruit = {
 		Name = "Recruit",
+		Description = "A regular soldier with a cheap sword and salvaged armor.",
 		ModelName = "Recruit",
 		Brain = {
 			Id = "BasicMelee",
@@ -81,6 +83,7 @@ local Goons = {
 
 	Footman = {
 		Name = "Footman",
+		Description = "A trained soldier with standard issue weapons and armor.",
 		ModelName = "Footman",
 		Brain = {
 			Id = "BasicMelee",
@@ -117,6 +120,7 @@ local Goons = {
 
 	Hunter = {
 		Name = "Hunter",
+		Description = "A villager with a bow, now hunting a very different kind of prey.",
 		ModelName = "Hunter",
 		Brain = {
 			Id = "BasicRanged",
@@ -145,7 +149,7 @@ local Goons = {
 			return 0.35
 		end,
 		AttackRate = function()
-			return 0.75
+			return 1.1
 		end,
 		Damage = function(level)
 			return scaling(0.5, 0.1, level)
@@ -157,6 +161,7 @@ local Goons = {
 
 	Mage = {
 		Name = "Mage",
+		Description = "A student of the magical arts lacking in any real practical experience.",
 		ModelName = "Mage",
 		Brain = {
 			Id = "BasicRanged",
@@ -184,10 +189,10 @@ local Goons = {
 			return 0.35
 		end,
 		AttackRate = function()
-			return 0.75
+			return 0.5
 		end,
 		Damage = function(level)
-			return scaling(0.5, 0.1, level)
+			return scaling(1, 0.5, level)
 		end,
 		HealthMax = function(level)
 			return scaling(5, 1, level)
@@ -195,7 +200,8 @@ local Goons = {
 	},
 
 	VikingWarrior = {
-		Name = "VikingWarrior",
+		Name = "Viking Warrior",
+		Description = "A ferocious fighter from frozen fjords fielded for fierce fighting.",
 		ModelName = "VikingWarrior",
 		Brain = {
 			Id = "BasicMelee",
@@ -232,6 +238,7 @@ local Goons = {
 
 	Berserker = {
 		Name = "Berserker",
+		Description = `An offense-focused fighter known for his signature battlecry: "AAAAAAAAA!!!"`,
 		ModelName = "Berserker",
 		Brain = {
 			Id = "BasicMelee",

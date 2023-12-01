@@ -86,9 +86,13 @@ return function(props: {
 		CardBack = (not contentsVisible) and React.createElement(Panel, Sift.Dictionary.set(cardProps, "ImageColor3", ColorDefs.DarkGreen)),
 
 		Card = contentsVisible and React.createElement(Container, cardProps, {
-			Contents = React.createElement(CardContents, {
-				CardId = props.CardId,
-				CardCount = props.CardCount,
+			Panel = React.createElement(Panel, {
+				ImageColor3 = ColorDefs.PaleGreen,
+			}, {
+				Contents = React.createElement(CardContents, {
+					CardId = props.CardId,
+					CardCount = props.CardCount,
+				}),
 			}),
 
 			Effect = React.createElement(Container, {
