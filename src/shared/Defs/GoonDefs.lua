@@ -165,7 +165,7 @@ local Goons = {
 		ModelName = "Mage",
 		Brain = {
 			Id = "BasicRanged",
-			ProjectileOffset = CFrame.new(0, 0.75, -2),
+			ProjectileOffset = CFrame.new(0, 0.75, -0.25),
 			ProjectileName = "MagicStar1",
 		},
 		Animations = {

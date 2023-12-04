@@ -136,7 +136,7 @@ function Battle.new(args: {
 	return self
 end
 
-function Battle.fromPlayerVersusBattler(player: Player, battlerId: string, battlegroundName: string)
+function Battle.fromPlayerVersusBattler(player: Player, battlerId: string)
 	return BattleService:Promise(player, function()
 		return Promise.new(function(resolve, reject)
 			if BattleService:Get(player) then
@@ -146,7 +146,10 @@ function Battle.fromPlayerVersusBattler(player: Player, battlerId: string, battl
 
 			resolve(BattleSession.promised(player, 0, 1))
 		end):andThen(function(battleSession)
-			local battleground = ReplicatedStorage.Assets.Models.Battlegrounds[battlegroundName]:Clone()
+			local battlerDef = BattlerDefs[battlerId]
+			assert(battlerDef, `No battler found for id {battlerId}`)
+
+			local battleground = ReplicatedStorage.Assets.Models.Battlegrounds[battlerDef.BattlegroundName]:Clone()
 			local opponent = Battler.fromBattlerId(battlerId, 1, -1)
 
 			local battle = Battle.new({
