@@ -16,6 +16,7 @@ type CurrencyService = typeof(CurrencyService)
 
 function CurrencyService.PrepareBlocking(self: CurrencyService)
 	self.Comm = Comm.ServerComm.new(ReplicatedStorage, "CurrencyService")
+
 	self.CurrencyRemote = self.Comm:CreateProperty(
 		"Currency",
 		Sift.Dictionary.map(CurrencyDefs, function()
