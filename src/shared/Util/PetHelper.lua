@@ -13,6 +13,8 @@ function PetHelper.GetPetPower(petId, tier)
 end
 
 function PetHelper.GetTotalPower(pets)
+	if pets == nil then return 1 end
+
 	return Sift.Array.reduce(Sift.Dictionary.keys(pets.Equipped), function(power, slotId)
 		local slot = pets.Owned[slotId]
 		return power * PetHelper.GetPetPower(slot.PetId, slot.Tier)

@@ -1,19 +1,26 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
+local FormatBigNumber = require(ReplicatedStorage.Shared.Util.FormatBigNumber)
 local Image = require(ReplicatedStorage.Shared.React.Common.Image)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
+local PetController = require(ReplicatedStorage.Shared.Controllers.PetController)
+local PetHelper = require(ReplicatedStorage.Shared.Util.PetHelper)
 local PrimaryButton = require(ReplicatedStorage.Shared.React.Common.PrimaryButton)
 local React = require(ReplicatedStorage.Packages.React)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
+local Trove = require(ReplicatedStorage.Packages.Trove)
 local WeaponController = require(ReplicatedStorage.Shared.Controllers.WeaponController)
 local WeaponDefs = require(ReplicatedStorage.Shared.Defs.WeaponDefs)
 
 return function()
 	local powerGain, setPowerGain = React.useState(0)
+	local petMultiplier, setPetMultiplier = React.useState(1)
 
 	React.useEffect(function()
-		return WeaponController:ObserveWeapons(function(weapons)
+		local trove = Trove.new()
+
+		trove:Add(WeaponController:ObserveWeapons(function(weapons)
 			if not weapons then return end
 			if not weapons.Equipped then return end
 
@@ -21,7 +28,15 @@ return function()
 			if not def then return end
 
 			setPowerGain(def.Power)
-		end)
+		end))
+
+		trove:Add(PetController:ObservePets(function(pets)
+			setPetMultiplier(PetHelper.GetTotalPower(pets))
+		end))
+
+		return function()
+			trove:Clean()
+		end
 	end, {})
 
 	return React.createElement(PrimaryButton, nil, {
@@ -35,7 +50,7 @@ return function()
 			AnchorPoint = Vector2.new(1, 1),
 			TextXAlignment = Enum.TextXAlignment.Right,
 			TextYAlignment = Enum.TextYAlignment.Bottom,
-			Text = TextStroke(`+{powerGain}`, 2, BrickColor.new("Crimson").Color),
+			Text = TextStroke(`+{FormatBigNumber(powerGain * petMultiplier)}`, 2, BrickColor.new("Crimson").Color),
 		}),
 	})
 end

@@ -20,7 +20,7 @@ local Ids = {
 	GenericBattlerFlinch = 15408070949,
 	GenericBattlerDie = 15408391566,
 
-	MastermageIdle = 15418696124,
+	MasterMageIdle = 15418696124,
 	GuildmasterIdle = 15418693843,
 	ShopkeeperIdle = 15418697238,
 
@@ -59,6 +59,8 @@ local Ids = {
 
 	BatIdleExtras = 15514695992,
 	BatWalkExtras = 15514695992,
+
+	ElfBattlerIdle = 15418698499,
 
 	TestAnimation = 15381675619,
 }
