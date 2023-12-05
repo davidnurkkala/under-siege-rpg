@@ -164,15 +164,17 @@ function Battle.fromPlayerVersusBattler(player: Player, battlerId: string)
 				local def = BattlerDefs[battlerId]
 				local reward = def.Reward
 
-				GuiEffectService.IndicatorRequestedRemote:Fire(player, {
-					Text = `+{reward // 0.1 / 10}`,
-					Image = CurrencyDefs.Secondary.Image,
-					Start = opponent:GetRoot().Position,
-					Finish = victor:GetRoot().Position,
-				})
+				CurrencyService:GetBoosted(player, "Secondary", reward):andThen(function(amountAdded)
+					GuiEffectService.IndicatorRequestedRemote:Fire(player, {
+						Text = `+{amountAdded // 0.1 / 10}`,
+						Image = CurrencyDefs.Secondary.Image,
+						Start = opponent:GetRoot().Position,
+						Finish = victor:GetRoot().Position,
+					})
 
-				Promise.delay(0.5):andThen(function()
-					CurrencyService:AddCurrency(player, "Secondary", reward)
+					Promise.delay(0.5):andThen(function()
+						CurrencyService:AddCurrency(player, "Secondary", amountAdded)
+					end)
 				end)
 			end)
 			battle.Destroyed:Connect(function()

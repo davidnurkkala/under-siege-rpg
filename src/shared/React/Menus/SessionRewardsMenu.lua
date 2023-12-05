@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Button = require(ReplicatedStorage.Shared.React.Common.Button)
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
+local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local FormatTime = require(ReplicatedStorage.Shared.Util.FormatTime)
 local GridLayout = require(ReplicatedStorage.Shared.React.Common.GridLayout)
 local Image = require(ReplicatedStorage.Shared.React.Common.Image)
@@ -57,6 +58,7 @@ return function(props: {
 			nil,
 			Sift.Dictionary.map(SessionRewardDefs, function(def, index)
 				local reward = def.Reward
+				local isBoost = reward.Type == "Boost"
 				local status = props.Status.RewardStates[index]
 
 				return React.createElement(LayoutContainer, {
@@ -82,8 +84,26 @@ return function(props: {
 							ZIndex = 4,
 						}),
 
-						Image = React.createElement(Image, {
-							Image = RewardDisplayHelper.GetRewardImage(reward),
+						Image = React.createElement(Container, {
+							Position = UDim2.fromScale(0.5, 0.5),
+							AnchorPoint = Vector2.new(0.5, 0.5),
+							Size = if isBoost then UDim2.fromScale(0.6, 0.6) else UDim2.fromScale(1, 1),
+						}, {
+							Image = React.createElement(Image, {
+								Image = RewardDisplayHelper.GetRewardImage(reward),
+								AnchorPoint = Vector2.new(0, 1),
+								Position = UDim2.fromScale(0, 1),
+								Size = if isBoost then UDim2.fromScale(0.75, 0.75) else UDim2.fromScale(1, 1),
+							}),
+
+							Arrow = isBoost and React.createElement(Image, {
+								Image = "rbxassetid://15548681925",
+								AnchorPoint = Vector2.new(1, 0),
+								Position = UDim2.fromScale(1, 0),
+								Size = UDim2.fromScale(0.75, 0.75),
+								ImageColor3 = ColorDefs.Yellow,
+								ZIndex = 2,
+							}),
 						}),
 
 						Timer = React.createElement(Label, {

@@ -257,8 +257,9 @@ function LobbySession.Attack(self: LobbySession)
 		end)
 		:andThen(function(pets)
 			local multiplier = PetHelper.GetTotalPower(pets)
-			local amountAdded = self.WeaponDef.Power * multiplier
-
+			return CurrencyService:GetBoosted(self.Player, "Primary", self.WeaponDef.Power * multiplier)
+		end)
+		:andThen(function(amountAdded)
 			GuiEffectService.IndicatorRequestedRemote:Fire(self.Player, {
 				Text = `+{amountAdded // 0.1 / 10}`,
 				Image = CurrencyDefs.Primary.Image,
