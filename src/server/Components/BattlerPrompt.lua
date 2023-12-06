@@ -58,7 +58,7 @@ function BattlerPrompt.new(model: Model): BattlerPrompt
 		if not cframe then return end
 
 		ServerFade(player, nil, function()
-				return Battle.fromPlayerVersusBattler(player, self.Id, "Basic")
+				return Battle.fromPlayerVersusBattler(player, self.Id)
 			end)
 			:andThen(function(battle)
 				return Promise.fromEvent(battle.Finished):andThenReturn(battle)

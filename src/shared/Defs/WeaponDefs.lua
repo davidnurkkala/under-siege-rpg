@@ -105,8 +105,8 @@ local Weapons = {
 			Shoot = "BowShoot",
 		},
 		Sounds = {
-			Shoot = { "WhooshMedium1", "WhooshMedium2", "WhooshMedium3", "WhooshMedium4", "WhooshMedium5", "WhooshMedium6" },
-			Hit = { "MediumProjectileImpact1", "MediumProjectileImpact2", "MediumProjectileImpact3", "MediumProjectileImpact4" },
+			Shoot = { "BowShoot1", "BowShoot2", "BowShoot3", "BowShoot4" },
+			Hit = { "BowHit1", "BowHit2", "BowHit3", "BowHit4" },
 		},
 	},
 }

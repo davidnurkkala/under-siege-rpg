@@ -42,6 +42,9 @@ forEachModel("Assets/Models/Battlers", function(model)
 	local animate = model:FindFirstChild("Animate")
 	if animate and animate:IsA("LocalScript") then animate:Destroy() end
 
+	model:RemoveTag("AnimatedModel")
+	model:RemoveTag("BattlerPrompt")
+
 	makeModelIntangible(model)
 	model.PrimaryPart.Anchored = true
 end)

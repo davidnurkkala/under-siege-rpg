@@ -195,13 +195,32 @@ function LobbySession.SetWeapon(self: LobbySession, weaponDef)
 	end)
 end
 
+function LobbySession.GetClosestDummy(self: LobbySession)
+	local bestDummy = nil
+	local bestDistance = math.huge
+
+	local root = self.Character.PrimaryPart
+	local here = root.Position
+
+	for _, dummy in ComponentService:GetComponentsByName("TrainingDummy") do
+		local there = dummy:GetPosition()
+		local distance = (there - here).Magnitude
+		if distance <= bestDistance then
+			bestDummy = dummy
+			bestDistance = distance
+		end
+	end
+
+	return bestDummy
+end
+
 function LobbySession.Attack(self: LobbySession)
 	if not self.AttackCooldown:IsReady() then return end
 	self.AttackCooldown:Use()
 
 	self.Animator:Play(self.WeaponDef.Animations.Shoot, 0)
 
-	local dummy = Sift.Dictionary.values(ComponentService:GetComponentsByName("TrainingDummy"))[1]
+	local dummy = self:GetClosestDummy()
 	local there = dummy:GetPosition()
 
 	EffectService:Effect(
@@ -238,8 +257,9 @@ function LobbySession.Attack(self: LobbySession)
 		end)
 		:andThen(function(pets)
 			local multiplier = PetHelper.GetTotalPower(pets)
-			local amountAdded = self.WeaponDef.Power * multiplier
-
+			return CurrencyService:GetBoosted(self.Player, "Primary", self.WeaponDef.Power * multiplier)
+		end)
+		:andThen(function(amountAdded)
 			GuiEffectService.IndicatorRequestedRemote:Fire(self.Player, {
 				Text = `+{amountAdded // 0.1 / 10}`,
 				Image = CurrencyDefs.Primary.Image,

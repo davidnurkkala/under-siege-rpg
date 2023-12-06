@@ -4,10 +4,13 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local Comm = require(ReplicatedStorage.Packages.Comm)
 local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local DataService = require(ServerScriptService.Server.Services.DataService)
+local EffectGrindPets = require(ReplicatedStorage.Shared.Effects.EffectGrindPets)
+local EffectService = require(ServerScriptService.Server.Services.EffectService)
 local Guid = require(ReplicatedStorage.Shared.Util.Guid)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local PetGachaDefs = require(ReplicatedStorage.Shared.Defs.PetGachaDefs)
 local Promise = require(ReplicatedStorage.Packages.Promise)
+local Range = require(ReplicatedStorage.Shared.Util.Range)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local t = require(ReplicatedStorage.Packages.t)
 
@@ -38,9 +41,17 @@ function PetService.PrepareBlocking(self: PetService)
 
 		return self:TogglePetEquipped(player, slotId):expect()
 	end)
+
+	self.Comm:BindFunction("MergePets", function(player, petId, tier)
+		if not t.string(petId) then return end
+		if not t.integer(tier) then return end
+		if tier < 1 then return end
+
+		return self:MergePets(player, petId, tier):expect()
+	end)
 end
 
-function PetService.AddPet(_self: PetService, player: Player, petId: string)
+function PetService.AddPet(_self: PetService, player: Player, petId: string, tier: number?)
 	return DataService:GetSaveFile(player):andThen(function(saveFile)
 		saveFile:Update("Pets", function(pets)
 			local slotId = Guid()
@@ -51,10 +62,35 @@ function PetService.AddPet(_self: PetService, player: Player, petId: string)
 				Sift.Dictionary.set(pets.Owned, slotId, {
 					PetId = petId,
 					Id = slotId,
-					Tier = 1,
+					Tier = tier or 1,
 				})
 			)
 		end)
+	end)
+end
+
+function PetService.MergePets(self: PetService, player: Player, petId: string, tier: number)
+	return self:GetPets(player):andThen(function(pets)
+		pets = Sift.Dictionary.values(Sift.Dictionary.filter(pets.Owned, function(pet)
+			return (pet.PetId == petId) and (pet.Tier == tier)
+		end))
+
+		if #pets < 3 then return false end
+
+		EffectService:Effect(
+			player,
+			EffectGrindPets({
+				PetId = petId,
+			})
+		)
+
+		return Promise.all(Sift.Array.map(Range(3), function(index)
+			return self:RemovePet(player, pets[index].Id)
+		end))
+			:andThen(function()
+				return self:AddPet(player, petId, tier + 1)
+			end)
+			:andThenReturn(true)
 	end)
 end
 

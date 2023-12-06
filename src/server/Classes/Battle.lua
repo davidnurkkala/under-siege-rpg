@@ -136,7 +136,7 @@ function Battle.new(args: {
 	return self
 end
 
-function Battle.fromPlayerVersusBattler(player: Player, battlerId: string, battlegroundName: string)
+function Battle.fromPlayerVersusBattler(player: Player, battlerId: string)
 	return BattleService:Promise(player, function()
 		return Promise.new(function(resolve, reject)
 			if BattleService:Get(player) then
@@ -146,7 +146,10 @@ function Battle.fromPlayerVersusBattler(player: Player, battlerId: string, battl
 
 			resolve(BattleSession.promised(player, 0, 1))
 		end):andThen(function(battleSession)
-			local battleground = ReplicatedStorage.Assets.Models.Battlegrounds[battlegroundName]:Clone()
+			local battlerDef = BattlerDefs[battlerId]
+			assert(battlerDef, `No battler found for id {battlerId}`)
+
+			local battleground = ReplicatedStorage.Assets.Models.Battlegrounds[battlerDef.BattlegroundName]:Clone()
 			local opponent = Battler.fromBattlerId(battlerId, 1, -1)
 
 			local battle = Battle.new({
@@ -161,15 +164,17 @@ function Battle.fromPlayerVersusBattler(player: Player, battlerId: string, battl
 				local def = BattlerDefs[battlerId]
 				local reward = def.Reward
 
-				GuiEffectService.IndicatorRequestedRemote:Fire(player, {
-					Text = `+{reward // 0.1 / 10}`,
-					Image = CurrencyDefs.Secondary.Image,
-					Start = opponent:GetRoot().Position,
-					Finish = victor:GetRoot().Position,
-				})
+				CurrencyService:GetBoosted(player, "Secondary", reward):andThen(function(amountAdded)
+					GuiEffectService.IndicatorRequestedRemote:Fire(player, {
+						Text = `+{amountAdded // 0.1 / 10}`,
+						Image = CurrencyDefs.Secondary.Image,
+						Start = opponent:GetRoot().Position,
+						Finish = victor:GetRoot().Position,
+					})
 
-				Promise.delay(0.5):andThen(function()
-					CurrencyService:AddCurrency(player, "Secondary", reward)
+					Promise.delay(0.5):andThen(function()
+						CurrencyService:AddCurrency(player, "Secondary", amountAdded)
+					end)
 				end)
 			end)
 			battle.Destroyed:Connect(function()

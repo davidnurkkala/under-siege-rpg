@@ -47,6 +47,7 @@ function DataService.PrepareBlocking(self: DataService)
 				Premium = 0,
 				Prestige = 0,
 			},
+			Boosts = {},
 			Deck = {
 				Equipped = {},
 				Owned = {},
@@ -60,10 +61,26 @@ function DataService.PrepareBlocking(self: DataService)
 				Streak = 0,
 				AvailableRewardIndices = {},
 			},
+			Worlds = {
+				World1 = true,
+			},
 			IsFirstSession = true,
 		},
 
-		migrations = {},
+		migrations = {
+			function(oldData)
+				return Sift.Dictionary.set(oldData, "Worlds", { "World1" })
+			end,
+			function(oldData)
+				return Sift.Dictionary.set(oldData, "Worlds", { World1 = true })
+			end,
+			function(oldData)
+				return Sift.Dictionary.set(oldData, "Worlds", { World1 = true })
+			end,
+			function(oldData)
+				return Sift.Dictionary.set(oldData, "Boosts", {})
+			end,
+		},
 	})
 
 	Observers.observePlayer(function(player: Player)

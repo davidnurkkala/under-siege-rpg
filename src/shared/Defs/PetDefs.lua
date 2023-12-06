@@ -19,7 +19,7 @@ local Pets = {
 			Idle = { "GenericPetBlink", "GenericPetIdle", "DoggyIdleExtras" },
 			Walk = { "GenericPetWalk", "DoggyWalkExtras" },
 		},
-		Power = 1,
+		Power = 1.1,
 	},
 	Kitty = {
 		Name = "Kitty",

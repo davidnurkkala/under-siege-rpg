@@ -5,6 +5,7 @@ local Sift = require(ReplicatedStorage.Packages.Sift)
 local Battlers = {
 	Noob = {
 		Name = "Noob",
+		BattlegroundName = "World1",
 		Reward = 1,
 		WeaponId = "WoodenBow",
 		Power = 100,
@@ -16,6 +17,7 @@ local Battlers = {
 
 	VikingWarrior = {
 		Name = "Viking Warrior",
+		BattlegroundName = "World1",
 		Reward = 3,
 		WeaponId = "WoodenBow",
 		Power = 1000,
@@ -28,6 +30,7 @@ local Battlers = {
 
 	VikingChief = {
 		Name = "Viking Chief",
+		BattlegroundName = "World1",
 		Reward = 5,
 		WeaponId = "WoodenBow",
 		Power = 10000,
@@ -41,6 +44,7 @@ local Battlers = {
 
 	VikingKing = {
 		Name = "Viking King",
+		BattlegroundName = "World1",
 		Reward = 10,
 		WeaponId = "WoodenBow",
 		Power = 100000,
@@ -55,6 +59,7 @@ local Battlers = {
 
 	ElfCommoner = {
 		Name = "Elf Commoner",
+		BattlegroundName = "World1",
 		Reward = 25,
 		WeaponId = "ElvenBow",
 		Power = 200000,
@@ -66,6 +71,7 @@ local Battlers = {
 
 	ElfHunter = {
 		Name = "Elf Hunter",
+		BattlegroundName = "World1",
 		Reward = 50,
 		WeaponId = "ElvenBow",
 		Power = 300000,
@@ -77,6 +83,7 @@ local Battlers = {
 
 	ElfWarrior = {
 		Name = "Elf Warrior",
+		BattlegroundName = "World1",
 		Reward = 100,
 		WeaponId = "ElvenBow",
 		Power = 400000,
@@ -88,6 +95,7 @@ local Battlers = {
 
 	ElfKing = {
 		Name = "Elf King",
+		BattlegroundName = "World1",
 		Reward = 250,
 		WeaponId = "ElvenBow",
 		Power = 500000,
@@ -99,6 +107,7 @@ local Battlers = {
 
 	OrcGrunt = {
 		Name = "Orc Grunt",
+		BattlegroundName = "World1",
 		Reward = 500,
 		WeaponId = "WoodenBow",
 		Power = 600000,
@@ -110,6 +119,7 @@ local Battlers = {
 
 	OrcBrute = {
 		Name = "Orc Brute",
+		BattlegroundName = "World1",
 		Reward = 1000,
 		WeaponId = "WoodenBow",
 		Power = 700000,
@@ -121,6 +131,7 @@ local Battlers = {
 
 	OrcFighter = {
 		Name = "Orc Fighter",
+		BattlegroundName = "World1",
 		Reward = 1500,
 		WeaponId = "Javelin",
 		Power = 800000,
@@ -132,6 +143,7 @@ local Battlers = {
 
 	OrcGeneral = {
 		Name = "Orc General",
+		BattlegroundName = "World1",
 		Reward = 3000,
 		WeaponId = "Javelin",
 		Power = 1000000,

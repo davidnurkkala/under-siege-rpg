@@ -97,7 +97,11 @@ return function(props: {
 							if equippedB then return false end
 						end
 
-						return petA.Name < petB.Name
+						if petA.Name == petB.Name then
+							return slotA.Tier < slotB.Tier
+						else
+							return petA.Name < petB.Name
+						end
 					end),
 					function(slotId, index)
 						local petSlot = props.Pets.Owned[slotId]
@@ -116,8 +120,9 @@ return function(props: {
 								end,
 							}, {
 								Name = React.createElement(Label, {
-									Size = UDim2.fromScale(1, 0.2),
-									Text = TextStroke(petDef.Name),
+									Size = UDim2.fromScale(1, 0.25),
+									Text = TextStroke(`{petDef.Name}{if petSlot.Tier > 1 then ` T{petSlot.Tier}` else ``}`),
+									TextXAlignment = Enum.TextXAlignment.Left,
 									ZIndex = 4,
 								}),
 

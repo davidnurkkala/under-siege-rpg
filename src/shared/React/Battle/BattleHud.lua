@@ -213,14 +213,14 @@ return function(props: {
 			Text = TextStroke("Are you sure you want to surrender?"),
 			Options = {
 				{
-					Text = "Yes",
+					Text = TextStroke("Yes"),
 					Select = function()
 						setSurrendering(false)
 						BattleController.SurrenderRequested:Fire()
 					end,
 				},
 				{
-					Text = "No",
+					Text = TextStroke("No"),
 					Select = function()
 						setSurrendering(false)
 					end,

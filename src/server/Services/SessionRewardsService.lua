@@ -52,15 +52,14 @@ function SessionRewardsService.PrepareBlocking(self: SessionRewardsService)
 
 		RewardHelper.GiveReward(player, reward)
 
-		local endGui
-		if reward.Type == "Currency" then endGui = `GuiPanel{reward.CurrencyType}` end
-
-		GuiEffectService.IndicatorRequestedRemote:Fire(player, {
-			Text = `{RewardDisplayHelper.GetRewardText(reward)}`,
-			Image = RewardDisplayHelper.GetRewardImage(reward),
-			StartGui = `SessionRewardButton{index}`,
-			EndGui = endGui,
-		})
+		if reward.Type == "Currency" then
+			GuiEffectService.IndicatorRequestedRemote:Fire(player, {
+				Text = `{RewardDisplayHelper.GetRewardText(reward)}`,
+				Image = RewardDisplayHelper.GetRewardImage(reward),
+				StartGui = `SessionRewardButton{index}`,
+				EndGui = `GuiPanel{reward.CurrencyType}`,
+			})
+		end
 	end)
 end
 

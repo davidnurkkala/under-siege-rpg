@@ -165,7 +165,7 @@ local Goons = {
 		ModelName = "Mage",
 		Brain = {
 			Id = "BasicRanged",
-			ProjectileOffset = CFrame.new(0, 0.75, -2),
+			ProjectileOffset = CFrame.new(0, 0.75, -0.25),
 			ProjectileName = "MagicStar1",
 		},
 		Animations = {
@@ -275,7 +275,7 @@ local Goons = {
 
 	OrcWarrior = {
 		Name = "Orc Warrior",
-		Description = `A powerful orcish brute, clad in crude scraps of leather.`,
+		Description = `A powerful Orcish brute clad in crude scraps of leather.`,
 		ModelName = "OrcWarrior",
 		Brain = {
 			Id = "BasicMelee",
@@ -312,7 +312,7 @@ local Goons = {
 
 	OrcChampion = {
 		Name = "Orc Champion",
-		Description = `A heavily armored warrior, and the pride of the orcish highlands.`,
+		Description = `A heavily-armored Orcish warrior. Soldiers like these are the pride of the Orcish highlands.`,
 		ModelName = "OrcChampion",
 		Brain = {
 			Id = "BasicMelee",
@@ -349,7 +349,7 @@ local Goons = {
 
 	ElfBrawler = {
 		Name = "Elf Brawler",
-		Description = `An lightly armored, quick footed warrior - the backbone of the Elven armada.`,
+		Description = `A lightly-armored, quick-footed soldier -- the backbone of the Elven military.`,
 		ModelName = "ElfBrawler",
 		Brain = {
 			Id = "BasicMelee",
@@ -386,7 +386,7 @@ local Goons = {
 
 	ElfRanger = {
 		Name = "Elf Ranger",
-		Description = "A highly skilled Elven archer.",
+		Description = "A naturally gifted Elven archer.",
 		ModelName = "ElfRanger",
 		Brain = {
 			Id = "BasicRanged",

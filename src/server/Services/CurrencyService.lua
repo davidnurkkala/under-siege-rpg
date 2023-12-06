@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local BoostService = require(ServerScriptService.Server.Services.BoostService)
 local Comm = require(ReplicatedStorage.Packages.Comm)
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
 local CurrencyHelper = require(ReplicatedStorage.Shared.Util.CurrencyHelper)
@@ -16,6 +17,7 @@ type CurrencyService = typeof(CurrencyService)
 
 function CurrencyService.PrepareBlocking(self: CurrencyService)
 	self.Comm = Comm.ServerComm.new(ReplicatedStorage, "CurrencyService")
+
 	self.CurrencyRemote = self.Comm:CreateProperty(
 		"Currency",
 		Sift.Dictionary.map(CurrencyDefs, function()
@@ -44,6 +46,14 @@ function CurrencyService.GetWallet(_self: CurrencyService, player: Player)
 	end)
 end
 
+function CurrencyService.GetBoosted(_self: CurrencyService, player: Player, currencyType: string, amount: number)
+	return BoostService:GetMultiplier(player, function(boost)
+		return (boost.Type == "Currency") and (boost.CurrencyType == currencyType)
+	end):andThen(function(multiplier)
+		return amount * multiplier
+	end)
+end
+
 function CurrencyService.AddCurrency(_self: CurrencyService, player: Player, currencyType: string, amount: number)
 	assert(Sift.Dictionary.has(CurrencyDefs, currencyType), `Invalid currency type {currencyType}`)
 
@@ -51,6 +61,8 @@ function CurrencyService.AddCurrency(_self: CurrencyService, player: Player, cur
 		saveFile:Update("Currency", function(oldCurrency)
 			return Sift.Dictionary.set(oldCurrency, currencyType, oldCurrency[currencyType] + amount)
 		end)
+
+		return amount
 	end)
 end
 

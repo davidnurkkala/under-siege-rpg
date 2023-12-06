@@ -1,9 +1,12 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local BoostController = require(ReplicatedStorage.Shared.Controllers.BoostController)
+local BoostHelper = require(ReplicatedStorage.Shared.Util.BoostHelper)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local CurrencyController = require(ReplicatedStorage.Shared.Controllers.CurrencyController)
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
 local FormatBigNumber = require(ReplicatedStorage.Shared.Util.FormatBigNumber)
+local FormatTime = require(ReplicatedStorage.Shared.Util.FormatTime)
 local Image = require(ReplicatedStorage.Shared.React.Common.Image)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local ListLayout = require(ReplicatedStorage.Shared.React.Common.ListLayout)
@@ -17,8 +20,35 @@ local function currencyPanel(props: {
 	Id: string,
 	Amount: number,
 	LayoutOrder: number,
+	Inverted: boolean,
 })
 	local def = CurrencyDefs[props.Id]
+
+	local boostInfo, setBoostInfo = React.useState(nil)
+
+	local predicate = React.useCallback(function(boost)
+		return (boost.Type == "Currency") and (boost.CurrencyType == props.Id)
+	end, { props.Id })
+
+	React.useEffect(function()
+		return BoostController:ObserveBoosts(function(boosts)
+			if boosts == nil then return end
+
+			local multiplier = BoostHelper.GetMultiplier(boosts, predicate)
+			local t = BoostHelper.GetTime(boosts, predicate)
+
+			if multiplier == 1 then
+				setBoostInfo(nil)
+				return
+			end
+			if t == 0 then
+				setBoostInfo(nil)
+				return
+			end
+
+			setBoostInfo({ Multiplier = multiplier, Time = t })
+		end)
+	end, { props.Id })
 
 	return React.createElement(Container, {
 		[React.Tag] = `GuiPanel{props.Id}`,
@@ -27,7 +57,19 @@ local function currencyPanel(props: {
 		SizeConstraint = Enum.SizeConstraint.RelativeXX,
 		LayoutOrder = props.LayoutOrder,
 	}, {
-		React.createElement(Panel, {
+		Layout = React.createElement(ListLayout, {
+			VerticalAlignment = if props.Inverted then Enum.VerticalAlignment.Bottom else Enum.VerticalAlignment.Top,
+			Padding = UDim.new(0, 6),
+		}),
+
+		Boost = (boostInfo ~= nil) and React.createElement(Label, {
+			Size = UDim2.fromScale(1, 0.5),
+			LayoutOrder = if props.Inverted then 1 else 2,
+			Text = TextStroke(`{boostInfo.Multiplier // 0.1 / 10}x {FormatTime(boostInfo.Time)}`),
+		}),
+
+		Panel = React.createElement(Panel, {
+			LayoutOrder = if props.Inverted then 2 else 1,
 			ImageColor3 = def.Colors.Primary,
 			BorderColor3 = def.Colors.Secondary,
 		}, {
@@ -77,7 +119,9 @@ return function()
 					Id = id,
 					Amount = currency[id] or 0,
 					LayoutOrder = index,
-				}), `{id}Panel`
+					Inverted = not menu.Is(nil),
+				}),
+					`{id}Panel`
 			end)
 		),
 	})

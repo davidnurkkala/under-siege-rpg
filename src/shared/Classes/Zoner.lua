@@ -7,9 +7,12 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 local Zoner = {}
 Zoner.__index = Zoner
 
-export type Zoner = typeof(setmetatable({} :: {
-	Trove: any,
-}, Zoner))
+export type Zoner = typeof(setmetatable(
+	{} :: {
+		Trove: any,
+	},
+	Zoner
+))
 
 local function inZone(root, zone)
 	local delta = zone.Position - root.Position
@@ -45,6 +48,8 @@ function Zoner.new(player, tagName, callback): Zoner
 			while true do
 				if currentZone == nil then
 					for _, object in CollectionService:GetTagged(tagName) do
+						if not object:IsDescendantOf(workspace) then continue end
+
 						assert(object:IsA("BasePart"), `Zoner expected {object:GetFullName()} to be a BasePart!`)
 
 						if inZone(root, object) then
