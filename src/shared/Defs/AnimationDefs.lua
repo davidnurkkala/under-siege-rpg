@@ -62,7 +62,8 @@ local Ids = {
 
 	ElfBattlerIdle = 15418698499,
 
-	TestAnimation = 15381675619,
+	GrinderIdle = 15556640531,
+	GrinderShake = 15556639103,
 }
 
 return Sift.Dictionary.map(Ids, function(id, name)

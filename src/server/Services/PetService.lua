@@ -4,6 +4,8 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local Comm = require(ReplicatedStorage.Packages.Comm)
 local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local DataService = require(ServerScriptService.Server.Services.DataService)
+local EffectGrindPets = require(ReplicatedStorage.Shared.Effects.EffectGrindPets)
+local EffectService = require(ServerScriptService.Server.Services.EffectService)
 local Guid = require(ReplicatedStorage.Shared.Util.Guid)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local PetGachaDefs = require(ReplicatedStorage.Shared.Defs.PetGachaDefs)
@@ -69,11 +71,18 @@ end
 
 function PetService.MergePets(self: PetService, player: Player, petId: string, tier: number)
 	return self:GetPets(player):andThen(function(pets)
-		pets = Sift.Dictionary.values(Sift.Dictionary.filter(pets, function(pet)
+		pets = Sift.Dictionary.values(Sift.Dictionary.filter(pets.Owned, function(pet)
 			return (pet.PetId == petId) and (pet.Tier == tier)
 		end))
 
 		if #pets < 3 then return false end
+
+		EffectService:Effect(
+			player,
+			EffectGrindPets({
+				PetId = petId,
+			})
+		)
 
 		return Promise.all(Sift.Array.map(Range(3), function(index)
 			return self:RemovePet(player, pets[index].Id)

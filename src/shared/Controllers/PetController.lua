@@ -13,6 +13,7 @@ function PetController.PrepareBlocking(self: PetController)
 	self.PetsRemote = self.Comm:GetProperty("Pets")
 	self.HatchPetFromGachaRemote = self.Comm:GetFunction("HatchPetFromGacha")
 	self.ToggleEquippedRemote = self.Comm:GetFunction("ToggleEquipped")
+	self.MergePetsRemote = self.Comm:GetFunction("MergePets")
 end
 
 function PetController.ToggleEquipped(self: PetController, slotId: string)

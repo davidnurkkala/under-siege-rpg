@@ -10,6 +10,7 @@ local MenuProvider = require(ReplicatedStorage.Shared.React.MenuContext.MenuProv
 local PaddingAll = require(ReplicatedStorage.Shared.React.Common.PaddingAll)
 local PetGachaBridge = require(ReplicatedStorage.Shared.React.PetGacha.PetGachaBridge)
 local PetMenuBridge = require(ReplicatedStorage.Shared.React.Menus.PetMenuBridge)
+local PetMergeMenuBridge = require(ReplicatedStorage.Shared.React.Menus.PetMergeMenuBridge)
 local React = require(ReplicatedStorage.Packages.React)
 local SessionRewardsMenuBridge = require(ReplicatedStorage.Shared.React.Menus.SessionRewardsMenuBridge)
 local TeleportMenuBridge = require(ReplicatedStorage.Shared.React.Teleport.TeleportMenuBridge)
@@ -27,9 +28,8 @@ return function()
 			WeaponShop = React.createElement(WeaponShopBridge),
 			CardGacha = React.createElement(CardGachaBridge),
 			PetGacha = React.createElement(PetGachaBridge),
+			PetMerge = React.createElement(PetMergeMenuBridge),
 			TeleportMenu = React.createElement(TeleportMenuBridge),
-
-			-- menus
 			DeckMenu = React.createElement(DeckMenuBridge),
 			PetMenu = React.createElement(PetMenuBridge),
 			SessionRewardsMenu = React.createElement(SessionRewardsMenuBridge),

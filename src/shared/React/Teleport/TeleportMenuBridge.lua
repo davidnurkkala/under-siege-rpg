@@ -49,7 +49,7 @@ return function()
 
 	return React.createElement(React.Fragment, nil, {
 		Prompt = worldBuying and React.createElement(PromptWindow, {
-			HeaderText = "Buy World",
+			HeaderText = TextStroke("Buy World"),
 			Text = TextStroke(`Would you like to buy permanent access to {WorldDefs[worldBuying].Name}?`),
 			Options = {
 				{
