@@ -12,6 +12,32 @@ local PetDefs = require(ReplicatedStorage.Shared.Defs.PetDefs)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local RandomSpin = require(ReplicatedStorage.Shared.Util.RandomSpin)
 
+local function getMainColor(model)
+	local massByColor = {}
+
+	for _, object in model:GetDescendants() do
+		if not object:IsA("BasePart") then continue end
+
+		print(object, object:GetMass(), object.Color)
+
+		local color = object.Color:ToHex()
+		local size = object.Size
+		local mass = size.X * size.Y * size.Z * (1 - object.Transparency)
+
+		massByColor[color] = (massByColor[color] or 0) + mass
+	end
+
+	local bestColor, bestMass = nil, 0
+	for color, mass in massByColor do
+		if mass > bestMass then
+			bestMass = mass
+			bestColor = color
+		end
+	end
+
+	return Color3.fromHex(bestColor)
+end
+
 return function(args: {
 	PetId: string,
 	Success: boolean,
@@ -62,6 +88,15 @@ return function(args: {
 						Target = bestGrinder.Root.DescentPoint,
 						SoundId = "MasherMash1",
 					}))
+
+					local emitter = ReplicatedStorage.Assets.Emitters.PetChunks1:Clone()
+					emitter.Color = ColorSequence.new(Color3.new(1, 1, 1))
+					emitter.Parent = bestGrinder.Root.DescentPoint
+					Promise.delay(0.5):andThen(function()
+						emitter.Enabled = false
+						task.wait(emitter.Lifetime.Max)
+						emitter:Destroy()
+					end)
 				end)
 
 				task.wait(0.75)
