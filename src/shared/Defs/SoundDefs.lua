@@ -37,6 +37,9 @@ local Ids = {
 	MediumProjectileImpact2 = "rbxassetid://15508157008",
 	MediumProjectileImpact3 = "rbxassetid://15508157008",
 	MediumProjectileImpact4 = "rbxassetid://15508156874",
+	MasherMash1 = "rbxassetid://15563256407",
+	CartoonPoof1 = "rbxassetid://15563398290",
+	CartoonPop1 = "rbxassetid://15563398410",
 }
 
 return Sift.Dictionary.map(Ids, function(id, name)

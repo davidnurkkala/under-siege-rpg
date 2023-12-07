@@ -18,7 +18,7 @@ local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 return function(props: {
 	Visible: boolean,
 	Close: () -> (),
-	Select: (string, number) -> any,
+	Select: (string, number, number) -> any,
 	Pets: any,
 })
 	local promptedEntry, setPromptedEntry = React.useState(nil)
@@ -26,24 +26,53 @@ return function(props: {
 
 	return React.createElement(React.Fragment, nil, {
 		Prompt = promptedEntry and React.createElement(PromptWindow, {
+			TextSize = 0.4,
 			HeaderText = TextStroke("Confirm Merge"),
-			Text = TextStroke(`Merge three tier {promptedEntry.Tier} {PetDefs[promptedEntry.PetId].Name} pets into one tier {promptedEntry.Tier + 1} pet?`),
+			Text = TextStroke(`Merge how many tier {promptedEntry.Tier} {PetDefs[promptedEntry.PetId].Name} pets?`),
+			[React.Event.Activated] = function()
+				setPromptedEntry(nil)
+			end,
 			Options = {
 				{
-					Text = TextStroke("Yes"),
+					Text = TextStroke("2\n50% chance"),
 					Select = function()
 						setAwaiting(true)
-						props.Select(promptedEntry.PetId, promptedEntry.Tier):andThen(function()
+						props.Select(promptedEntry.PetId, promptedEntry.Tier, 2):andThen(function()
 							setAwaiting(false)
 						end)
 						setPromptedEntry(nil)
 					end,
+					Props = {
+						ImageColor3 = ColorDefs.PaleGreen,
+					},
 				},
 				{
-					Text = TextStroke("No"),
+					Text = TextStroke("3\n75% chance"),
 					Select = function()
+						setAwaiting(true)
+						props.Select(promptedEntry.PetId, promptedEntry.Tier, 3):andThen(function()
+							setAwaiting(false)
+						end)
 						setPromptedEntry(nil)
 					end,
+					Props = {
+						ImageColor3 = if promptedEntry.Count >= 3 then ColorDefs.PaleGreen else nil,
+						Active = promptedEntry.Count >= 3,
+					},
+				},
+				{
+					Text = TextStroke("4\n100% chance"),
+					Select = function()
+						setAwaiting(true)
+						props.Select(promptedEntry.PetId, promptedEntry.Tier, 4):andThen(function()
+							setAwaiting(false)
+						end)
+						setPromptedEntry(nil)
+					end,
+					Props = {
+						ImageColor3 = if promptedEntry.Count >= 4 then ColorDefs.PaleGreen else nil,
+						Active = promptedEntry.Count >= 4,
+					},
 				},
 			},
 		}),
@@ -97,7 +126,7 @@ return function(props: {
 						),
 						function(entry, index)
 							local def = PetDefs[entry.PetId]
-							local canMerge = entry.Count >= 3
+							local canMerge = entry.Count >= 2
 
 							return React.createElement(LayoutContainer, {
 								LayoutOrder = index,

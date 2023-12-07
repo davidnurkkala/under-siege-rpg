@@ -4,16 +4,18 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Animate = require(ReplicatedStorage.Shared.Util.Animate)
 local ComponentController = require(ReplicatedStorage.Shared.Controllers.ComponentController)
 local EffectController = require(ReplicatedStorage.Shared.Controllers.EffectController)
-local EffectFadeModel = require(ReplicatedStorage.Shared.Effects.EffectFadeModel)
+local EffectEmission = require(ReplicatedStorage.Shared.Effects.EffectEmission)
 local EffectPart = require(ReplicatedStorage.Shared.Util.EffectPart)
+local EffectSound = require(ReplicatedStorage.Shared.Effects.EffectSound)
 local Lerp = require(ReplicatedStorage.Shared.Util.Lerp)
 local PetDefs = require(ReplicatedStorage.Shared.Defs.PetDefs)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local RandomSpin = require(ReplicatedStorage.Shared.Util.RandomSpin)
-local TryNow = require(ReplicatedStorage.Shared.Util.TryNow)
 
 return function(args: {
 	PetId: string,
+	Success: boolean,
+	Count: number,
 })
 	return function()
 		return script.Name, args, Promise.delay(3)
@@ -38,7 +40,7 @@ return function(args: {
 		local def = PetDefs[args.PetId]
 
 		return Promise.new(function(resolve, _, onCancel)
-			for _ = 1, 3 do
+			for _ = 1, args.Count do
 				local model = def.Model:Clone()
 				model.Parent = workspace.Effects
 
@@ -51,6 +53,17 @@ return function(args: {
 					model:Destroy()
 				end)
 
+				Animate(0.1, function(scalar)
+					model:ScaleTo(Lerp(0.1, 1, scalar))
+				end)
+
+				Promise.delay(0.1):andThen(function()
+					EffectController:Effect(EffectSound({
+						Target = bestGrinder.Root.DescentPoint,
+						SoundId = "MasherMash1",
+					}))
+				end)
+
 				task.wait(0.75)
 				if onCancel() then return end
 			end
@@ -58,6 +71,24 @@ return function(args: {
 			resolve()
 		end)
 			:andThen(function()
+				if not args.Success then
+					EffectController:Effect(EffectEmission({
+						Target = bestGrinder.Root.OutputPoint,
+						Emitter = ReplicatedStorage.Assets.Emitters.Poof1,
+						ParticleCount = 6,
+					}))
+					EffectController:Effect(EffectSound({
+						Target = bestGrinder.Root.OutputPoint,
+						SoundId = "CartoonPoof1",
+					}))
+					return
+				end
+
+				EffectController:Effect(EffectSound({
+					Target = bestGrinder.Root.OutputPoint,
+					SoundId = "CartoonPop1",
+				}))
+
 				local model = Instance.new("Model")
 				model.Name = "DroppedPet"
 
@@ -93,13 +124,19 @@ return function(args: {
 
 				model.Parent = workspace
 
+				Animate(0.1, function(scalar)
+					model:ScaleTo(Lerp(0.1, 1, scalar))
+				end)
+
 				Promise.delay(1):andThen(function()
 					local start = root.Position
 					root.Anchored = true
 					root.CanCollide = false
 
 					Animate(0.5, function(scalar)
-						root.CFrame = root.CFrame.Rotation + Lerp(start, playerRoot.Position, math.pow(scalar, 2))
+						scalar = math.pow(scalar, 2)
+						root.CFrame = root.CFrame.Rotation + Lerp(start, playerRoot.Position, scalar)
+						model:ScaleTo(Lerp(1, 0.01, scalar))
 					end):andThen(function()
 						model:Destroy()
 					end)
