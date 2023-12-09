@@ -30,13 +30,15 @@ return function(props: {
 	Text: string,
 	Options: any,
 	Ratio: number?,
+	TextSize: number?,
 	children: any,
 })
 	local ratio = props.Ratio or Ratio
 	local text = props.Text
 	local options = props.Options
+	local textSize = props.TextSize or 0.6
 
-	props = Sift.Dictionary.removeKeys(props, "Ratio", "Text", "Options")
+	props = Sift.Dictionary.removeKeys(props, "Ratio", "Text", "Options", "TextSize")
 
 	local defaultProps = Sift.Dictionary.merge(DefaultProps, {
 		RenderContainer = function()
@@ -53,13 +55,13 @@ return function(props: {
 
 	local children = Sift.Dictionary.merge({
 		Text = React.createElement(Label, {
-			Size = UDim2.fromScale(1, 0.6),
+			Size = UDim2.fromScale(1, textSize),
 			Text = text,
 		}),
 
 		Buttons = React.createElement(Container, {
-			Size = UDim2.fromScale(1, 0.4),
-			Position = UDim2.fromScale(0, 0.6),
+			Size = UDim2.fromScale(1, 1 - textSize),
+			Position = UDim2.fromScale(0, textSize),
 		}, {
 			Layout = React.createElement(ListLayout, {
 				FillDirection = Enum.FillDirection.Horizontal,
@@ -75,13 +77,17 @@ return function(props: {
 						LayoutOrder = index,
 						Padding = 6,
 					}, {
-						Button = React.createElement(Button, {
-							[React.Event.Activated] = option.Select,
-						}, {
-							Text = React.createElement(Label, {
-								Text = option.Text,
+						Button = React.createElement(
+							Button,
+							Sift.Dictionary.merge(option.Props or {}, {
+								[React.Event.Activated] = option.Select,
 							}),
-						}),
+							{
+								Text = React.createElement(Label, {
+									Text = option.Text,
+								}),
+							}
+						),
 					})
 				end)
 			),

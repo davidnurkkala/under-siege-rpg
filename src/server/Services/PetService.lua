@@ -14,6 +14,8 @@ local Range = require(ReplicatedStorage.Shared.Util.Range)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local t = require(ReplicatedStorage.Packages.t)
 
+local Rand = Random.new()
+
 local PetService = {
 	Priority = 0,
 }
@@ -42,12 +44,15 @@ function PetService.PrepareBlocking(self: PetService)
 		return self:TogglePetEquipped(player, slotId):expect()
 	end)
 
-	self.Comm:BindFunction("MergePets", function(player, petId, tier)
+	self.Comm:BindFunction("MergePets", function(player, petId, tier, count)
 		if not t.string(petId) then return end
 		if not t.integer(tier) then return end
 		if tier < 1 then return end
+		if not t.integer(count) then return end
+		if count < 2 then return end
+		if count > 4 then return end
 
-		return self:MergePets(player, petId, tier):expect()
+		return self:MergePets(player, petId, tier, count):expect()
 	end)
 end
 
@@ -69,28 +74,35 @@ function PetService.AddPet(_self: PetService, player: Player, petId: string, tie
 	end)
 end
 
-function PetService.MergePets(self: PetService, player: Player, petId: string, tier: number)
+function PetService.MergePets(self: PetService, player: Player, petId: string, tier: number, count: number)
 	return self:GetPets(player):andThen(function(pets)
 		pets = Sift.Dictionary.values(Sift.Dictionary.filter(pets.Owned, function(pet)
 			return (pet.PetId == petId) and (pet.Tier == tier)
 		end))
 
-		if #pets < 3 then return false end
+		if #pets < count then return false end
 
-		EffectService:Effect(
-			player,
-			EffectGrindPets({
-				PetId = petId,
-			})
-		)
-
-		return Promise.all(Sift.Array.map(Range(3), function(index)
+		return Promise.all(Sift.Array.map(Range(count), function(index)
 			return self:RemovePet(player, pets[index].Id)
-		end))
-			:andThen(function()
-				return self:AddPet(player, petId, tier + 1)
-			end)
-			:andThenReturn(true)
+		end)):andThen(function()
+			local roll = Rand:NextInteger(1, 4) - count
+			local success = roll < 1
+
+			EffectService:Effect(
+				player,
+				EffectGrindPets({
+					PetId = petId,
+					Success = success,
+					Count = count,
+				})
+			)
+
+			if success then
+				return self:AddPet(player, petId, tier + 1):andThenReturn(true)
+			else
+				return false
+			end
+		end)
 	end)
 end
 
