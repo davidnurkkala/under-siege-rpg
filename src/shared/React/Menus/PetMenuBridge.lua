@@ -25,5 +25,8 @@ return function()
 			Select = function(slotId)
 				return PetController:ToggleEquipped(slotId)
 			end,
+			EquipBest = function()
+				return PetController.EquipBestRemote()
+			end,
 		})
 end

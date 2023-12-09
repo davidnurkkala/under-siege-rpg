@@ -9,6 +9,7 @@ local EffectService = require(ServerScriptService.Server.Services.EffectService)
 local Guid = require(ReplicatedStorage.Shared.Util.Guid)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local PetGachaDefs = require(ReplicatedStorage.Shared.Defs.PetGachaDefs)
+local PetHelper = require(ReplicatedStorage.Shared.Util.PetHelper)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Range = require(ReplicatedStorage.Shared.Util.Range)
 local Sift = require(ReplicatedStorage.Packages.Sift)
@@ -53,6 +54,34 @@ function PetService.PrepareBlocking(self: PetService)
 		if count > 4 then return end
 
 		return self:MergePets(player, petId, tier, count):expect()
+	end)
+
+	self.Comm:BindFunction("EquipBest", function(player)
+		return self:EquipBest(player):expect()
+	end)
+end
+
+function PetService.EquipBest(self: PetService, player: Player)
+	return DataService:GetSaveFile(player):andThen(function(saveFile)
+		return Promise.all(Sift.Dictionary.map(saveFile:Get("Pets").Equipped, function(_, slotId)
+			return self:SetPetEquipped(player, slotId, false)
+		end))
+			:andThen(function()
+				local owned = saveFile:Get("Pets").Owned
+				local bestSlotIds = Sift.Array.sort(Sift.Dictionary.keys(owned), function(idA, idB)
+					local slotA, slotB = owned[idA], owned[idB]
+					local powerA, powerB = PetHelper.GetPetPower(slotA.PetId, slotA.Tier), PetHelper.GetPetPower(slotB.PetId, slotB.Tier)
+					return powerA > powerB
+				end)
+
+				return Promise.all(Sift.Array.map(Range(3), function(index)
+					local slotId = bestSlotIds[index]
+					if not slotId then return end
+
+					return self:SetPetEquipped(player, slotId, true)
+				end))
+			end)
+			:andThenReturn(true)
 	end)
 end
 

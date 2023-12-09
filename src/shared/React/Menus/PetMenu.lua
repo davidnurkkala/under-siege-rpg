@@ -24,6 +24,7 @@ return function(props: {
 	Visible: boolean,
 	Close: () -> (),
 	Select: (string) -> any,
+	EquipBest: () -> any,
 	Pets: {
 		Owned: { [string]: any },
 		Equipped: { [string]: boolean },
@@ -39,6 +40,7 @@ return function(props: {
 			Size = UDim2.new(1, 0, 0.2, -4),
 			Position = UDim2.fromScale(0, 1),
 			AnchorPoint = Vector2.new(0, 1),
+			Padding = UDim.new(0, 8),
 			ImageColor3 = ColorDefs.PaleRed,
 		}, {
 			Layout = React.createElement(ListLayout, {
@@ -60,6 +62,18 @@ return function(props: {
 				AutomaticSize = Enum.AutomaticSize.X,
 				Text = TextStroke(`Bonus\nx{PetHelper.GetTotalPower(props.Pets) // 0.1 / 10}`),
 				TextXAlignment = Enum.TextXAlignment.Right,
+			}),
+
+			Button = React.createElement(Button, {
+				LayoutOrder = 3,
+				Size = UDim2.fromScale(2, 1),
+				SizeConstraint = Enum.SizeConstraint.RelativeYY,
+				ImageColor3 = ColorDefs.PalePurple,
+				[React.Event.Activated] = props.EquipBest,
+			}, {
+				Text = React.createElement(Label, {
+					Text = TextStroke("Equip Best"),
+				}),
 			}),
 		}),
 
