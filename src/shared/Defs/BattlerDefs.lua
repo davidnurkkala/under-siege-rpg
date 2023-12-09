@@ -59,7 +59,7 @@ local Battlers = {
 
 	ElfCommoner = {
 		Name = "Elf Commoner",
-		BattlegroundName = "World1",
+		BattlegroundName = "World2",
 		Reward = 125,
 		WeaponId = "ElvenBow",
 		Power = 200000,
@@ -71,7 +71,7 @@ local Battlers = {
 
 	ElfHunter = {
 		Name = "Elf Hunter",
-		BattlegroundName = "World1",
+		BattlegroundName = "World2",
 		Reward = 200,
 		WeaponId = "ElvenBow",
 		Power = 300000,
@@ -83,7 +83,7 @@ local Battlers = {
 
 	ElfWarrior = {
 		Name = "Elf Warrior",
-		BattlegroundName = "World1",
+		BattlegroundName = "World2",
 		Reward = 300,
 		WeaponId = "ElvenBow",
 		Power = 400000,
@@ -95,7 +95,7 @@ local Battlers = {
 
 	ElfKing = {
 		Name = "Elf King",
-		BattlegroundName = "World1",
+		BattlegroundName = "World2",
 		Reward = 500,
 		WeaponId = "ElvenBow",
 		Power = 500000,
