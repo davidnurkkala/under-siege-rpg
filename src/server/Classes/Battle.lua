@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local AbilityHelper = require(ReplicatedStorage.Shared.Util.AbilityHelper)
 local BattleService = require(ServerScriptService.Server.Services.BattleService)
 local BattleSession = require(ServerScriptService.Server.Classes.BattleSession)
 local Battler = require(ServerScriptService.Server.Classes.Battler)
@@ -220,6 +221,8 @@ function Battle.PlayCard(self: Battle, battler: Battler.Battler, cardId: string,
 	local card = CardDefs[cardId]
 	assert(card, `No card for id {cardId}`)
 
+	local level = CardHelper.CountToLevel(cardCount)
+
 	if card.Type == "Goon" then
 		Goon.fromId({
 			Id = card.GoonId,
@@ -228,8 +231,11 @@ function Battle.PlayCard(self: Battle, battler: Battler.Battler, cardId: string,
 			Direction = battler.Direction,
 			Position = battler.Position,
 			TeamId = battler.TeamId,
-			Level = CardHelper.CountToLevel(cardCount),
+			Level = level,
 		})
+	elseif card.Type == "Ability" then
+		local activate = AbilityHelper.GetImplementation(card.AbilityId)
+		activate(level, battler, self)
 	else
 		error(`Unimplemented card type {card.Type}`)
 	end
@@ -288,6 +294,12 @@ function Battle.DefaultFilter(_self: Battle, teamId: string)
 	end
 end
 
+function Battle.AllyFilter(_self: Battle, teamId: string)
+	return function(object: BattleTarget)
+		return object.TeamId == teamId
+	end
+end
+
 function Battle.ForEachTarget(self: Battle, check: (BattleTarget) -> ())
 	for target in self.Field do
 		check(target)
@@ -315,6 +327,30 @@ function Battle.TargetNearest(
 
 		local distance = math.abs(target.Position - args.Position)
 		if distance < bestDistance then
+			bestTarget = target
+			bestDistance = distance
+		end
+	end)
+
+	return bestTarget
+end
+
+function Battle.TargetFurthest(
+	self: Battle,
+	args: {
+		Position: number,
+		Filter: (BattleTarget) -> boolean,
+	}
+): BattleTarget?
+	local bestTarget = nil
+	local bestDistance = -1
+	local filter = args.Filter
+
+	self:ForEachTarget(function(target)
+		if not filter(target) then return end
+
+		local distance = math.abs(target.Position - args.Position)
+		if distance > bestDistance then
 			bestTarget = target
 			bestDistance = distance
 		end

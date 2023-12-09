@@ -25,6 +25,16 @@ local Gachas = {
 			{ Result = "Mage", Weight = 1 },
 		},
 	},
+	World1Abilities = {
+		Name = "World 1 Abilities",
+		Price = {
+			Secondary = 10,
+		},
+		WeightTable = {
+			{ Result = "Heal", Weight = 4 },
+			{ Result = "RainOfArrows", Weight = 3 },
+		},
+	},
 }
 
 return Sift.Dictionary.map(Gachas, function(gacha, id)

@@ -15,14 +15,14 @@ local Worlds = {
 		Order = 2,
 		ModelName = "World2",
 		Price = 1000,
-		Position = Vector3.new(512, 0, 1024),
+		Position = Vector3.new(512, 0, 1280),
 	},
 	World3 = {
 		Name = "Orcish Highalnds",
 		Order = 3,
-		ModelName = "World2",
+		ModelName = "World3",
 		Price = 10000,
-		Position = Vector3.new(-512, 0, 1024),
+		Position = Vector3.new(-640, 0, 1024),
 	},
 }
 

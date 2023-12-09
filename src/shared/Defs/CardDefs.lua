@@ -1,9 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local AbilityHelper = require(ReplicatedStorage.Shared.Util.AbilityHelper)
 local GoonDefs = require(ReplicatedStorage.Shared.Defs.GoonDefs)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 
 local Cards = {
+	-- GOONS
 	Peasant = {
 		GoonId = "Peasant",
 		Type = "Goon",
@@ -59,10 +61,23 @@ local Cards = {
 		Type = "Goon",
 		Rank = 1,
 	},
+
+	-- ABILITIES
+	Heal = {
+		AbilityId = "Heal",
+		Type = "Ability",
+		Rank = 1,
+	},
+	RainOfArrows = {
+		AbilityId = "RainOfArrows",
+		Type = "Ability",
+		Rank = 1,
+	},
 }
 
 return Sift.Dictionary.map(Cards, function(card, id)
 	if card.Type == "Goon" then card.Name = GoonDefs[card.GoonId].Name end
+	if card.Type == "Ability" then card.Name = AbilityHelper.GetAbility(card.AbilityId).Name end
 
 	return Sift.Dictionary.merge(card, {
 		Id = id,

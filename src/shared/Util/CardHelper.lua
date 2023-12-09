@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local AbilityHelper = require(ReplicatedStorage.Shared.Util.AbilityHelper)
 local CardDefs = require(ReplicatedStorage.Shared.Defs.CardDefs)
 local GoonDefs = require(ReplicatedStorage.Shared.Defs.GoonDefs)
 local CardHelper = {}
@@ -19,6 +20,13 @@ function CardHelper.GetDescription(id: string, count: number)
 		description ..= `\nRange: {get("Range") // 0.01} units`
 		description ..= `\nSpeed: {get("Speed") // 0.01} units/second`
 		description ..= `\nSize: {get("Size") // 0.01} units`
+
+		return description
+	elseif cardDef.Type == "Ability" then
+		local ability = AbilityHelper.GetAbility(cardDef.AbilityId)
+
+		local description = ability.Description
+		if typeof(description) == "function" then description = description(ability, CardHelper.CountToLevel(count)) end
 
 		return description
 	else
