@@ -40,6 +40,7 @@ local Ids = {
 	MasherMash1 = "rbxassetid://15563256407",
 	CartoonPoof1 = "rbxassetid://15563398290",
 	CartoonPop1 = "rbxassetid://15563398410",
+	Heal1 = "rbxassetid://15592283200",
 }
 
 return Sift.Dictionary.map(Ids, function(id, name)

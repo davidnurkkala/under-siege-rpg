@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Comm = require(ReplicatedStorage.Packages.Comm)
 local PlayerLeaving = require(ReplicatedStorage.Shared.Util.PlayerLeaving)
 local Promise = require(ReplicatedStorage.Packages.Promise)
+local Sift = require(ReplicatedStorage.Packages.Sift)
 local BattleService = {
 	Priority = 0,
 }
@@ -26,10 +27,18 @@ function BattleService.PrepareBlocking(self: BattleService)
 			if battler.CharModel == player.Character then battler.Health:Set(-100) end
 		end
 	end)
+
+	self.CardPlayed = self.Comm:CreateSignal("CardPlayed")
 end
 
 function BattleService.Get(_self: BattleService, player: Player)
 	return BattlesByPlayer[player]
+end
+
+function BattleService.GetPlayersFromBattle(_self: BattleService, battle)
+	return Sift.Array.filter(Sift.Dictionary.keys(BattlesByPlayer), function(player)
+		return BattlesByPlayer[player] == battle
+	end)
 end
 
 function BattleService.Promise(_self: BattleService, player, func)

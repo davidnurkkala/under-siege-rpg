@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local AttackButton = require(ReplicatedStorage.Shared.React.Battle.AttackButton)
 local BattleController = require(ReplicatedStorage.Shared.Controllers.BattleController)
 local Button = require(ReplicatedStorage.Shared.React.Common.Button)
+local CardContents = require(ReplicatedStorage.Shared.React.Cards.CardContents)
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local ComponentController = require(ReplicatedStorage.Shared.Controllers.ComponentController)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
@@ -11,9 +12,12 @@ local Frame = require(ReplicatedStorage.Shared.React.Common.Frame)
 local HealthBar = require(ReplicatedStorage.Shared.React.Battle.HealthBar)
 local Image = require(ReplicatedStorage.Shared.React.Common.Image)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
+local Lerp = require(ReplicatedStorage.Shared.Util.Lerp)
 local ListLayout = require(ReplicatedStorage.Shared.React.Common.ListLayout)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local Panel = require(ReplicatedStorage.Shared.React.Common.Panel)
+local Promise = require(ReplicatedStorage.Packages.Promise)
+local PromiseMotor = require(ReplicatedStorage.Shared.Util.PromiseMotor)
 local PromptWindow = require(ReplicatedStorage.Shared.React.Common.PromptWindow)
 local React = require(ReplicatedStorage.Packages.React)
 local Sift = require(ReplicatedStorage.Packages.Sift)
@@ -116,12 +120,78 @@ local function critBar(props: {
 	})
 end
 
+local function playedCard(props: {
+	CardId: string,
+	CardCount: number,
+	AnchorPoint: Vector2,
+	Finish: () -> (),
+})
+	local slide, slideMotor = UseMotor(0)
+	local slidingDown = React.useRef(false)
+
+	local width = 0.1
+	local height = width * (3.5 / 2.5)
+
+	React.useEffect(function()
+		local promise = PromiseMotor(slideMotor, Flipper.Spring.new(1), function(value)
+				return value > 0.99
+			end)
+			:andThenCall(Promise.delay, 3)
+			:andThen(function()
+				slidingDown.current = true
+				return PromiseMotor(slideMotor, Flipper.Spring.new(0), function(value)
+					return value < 0.01
+				end)
+			end)
+			:andThenCall(props.Finish)
+
+		return function()
+			promise:cancel()
+		end
+	end, { props.CardId, props.CardCount, props.Finish })
+
+	return React.createElement(Panel, {
+		ImageColor3 = ColorDefs.PaleGreen,
+		Size = UDim2.fromScale(width, height),
+		SizeConstraint = Enum.SizeConstraint.RelativeXX,
+		AnchorPoint = props.AnchorPoint,
+		Position = slide:map(function(value)
+			local isLeft = props.AnchorPoint.X == 0
+
+			if slidingDown.current then
+				return UDim2.fromScale(if isLeft then 0 else 1, Lerp(2, 1, value))
+			else
+				if isLeft then
+					return UDim2.fromScale(Lerp(-0.5, 0, value), 1)
+				else
+					return UDim2.fromScale(Lerp(1.5, 1, value), 1)
+				end
+			end
+		end),
+	}, {
+		Contents = React.createElement(CardContents, {
+			CardId = props.CardId,
+			CardCount = props.CardCount,
+		}),
+	})
+end
+
 return function(props: {
 	Visible: boolean,
 })
 	local status, setStatus = React.useState(nil)
 	local goonModels, setGoonModels = React.useState({})
 	local surrendering, setSurrendering = React.useState(false)
+
+	local leftCard, setLeftCard = React.useState(nil)
+	local finishLeft = React.useCallback(function()
+		setLeftCard(nil)
+	end, {})
+
+	local rightCard, setRightCard = React.useState(nil)
+	local finishRight = React.useCallback(function()
+		setRightCard(nil)
+	end, {})
 
 	local critEnabled = if status then status.CritEnabled else false
 
@@ -148,6 +218,27 @@ return function(props: {
 		return function()
 			stopObserving()
 			setGoonModels({})
+		end
+	end, { props.Visible })
+
+	React.useEffect(function()
+		if not props.Visible then
+			setLeftCard(nil)
+			setRightCard(nil)
+			return
+		end
+
+		local connection = BattleController.CardPlayed:Connect(function(cardData)
+			local data = Sift.Dictionary.removeKey(cardData, "Position")
+			if cardData.Position < 0.5 then
+				setLeftCard(data)
+			else
+				setRightCard(data)
+			end
+		end)
+
+		return function()
+			connection:Disconnect()
 		end
 	end, { props.Visible })
 
@@ -243,6 +334,26 @@ return function(props: {
 			Image = React.createElement(Image, {
 				Image = "rbxassetid://15484464238",
 			}),
+		}),
+
+		PlayedCards = React.createElement(Container, {
+			Size = UDim2.fromScale(1, 0.85),
+		}, {
+			Left = (leftCard ~= nil) and React.createElement(
+				playedCard,
+				Sift.Dictionary.merge(leftCard, {
+					AnchorPoint = Vector2.new(0, 1),
+					Finish = finishLeft,
+				})
+			),
+
+			Right = (rightCard ~= nil) and React.createElement(
+				playedCard,
+				Sift.Dictionary.merge(rightCard, {
+					AnchorPoint = Vector2.new(1, 1),
+					Finish = finishRight,
+				})
+			),
 		}),
 	})
 end

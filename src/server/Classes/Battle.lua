@@ -239,6 +239,12 @@ function Battle.PlayCard(self: Battle, battler: Battler.Battler, cardId: string,
 	else
 		error(`Unimplemented card type {card.Type}`)
 	end
+
+	BattleService.CardPlayed:FireFor(BattleService:GetPlayersFromBattle(self), {
+		Position = battler.Position,
+		CardId = cardId,
+		CardCount = cardCount,
+	})
 end
 
 function Battle.Update(self: Battle, dt: number)
@@ -255,6 +261,8 @@ function Battle.Update(self: Battle, dt: number)
 			end)),
 			Promise.delay(ChooseDuration),
 		}):andThen(function(results)
+			if self.State ~= "Active" then return end
+
 			for _, cardChoice in results[1] do
 				self:PlayCard(cardChoice.Battler, cardChoice.Card.Id, cardChoice.Card.Level)
 			end

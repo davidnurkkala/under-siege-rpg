@@ -121,7 +121,7 @@ function Battler.fromBattlerId(battlerId: string, position: number, direction: n
 	local def = BattlerDefs[battlerId]
 	assert(def, `No def found for battler id {battlerId}`)
 
-	local base = ReplicatedStorage.Assets.Models.Bases.Basic:Clone()
+	local base = ReplicatedStorage.Assets.Models.Bases[def.BaseName]:Clone()
 
 	local char = def.Model:Clone()
 	char.Parent = workspace
