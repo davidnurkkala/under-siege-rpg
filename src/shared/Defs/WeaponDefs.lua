@@ -128,7 +128,7 @@ local Weapons = {
 
 	CrudeThrownAxe = {
 		Name = "CrudeThrownAxe",
-		Power = 450,
+		Power = 550,
 		AttackCooldownTime = 0.4,
 		HoldPartName = "RightHand",
 		ProjectileName = "ThrownAxe1",
