@@ -127,7 +127,7 @@ function BattleSession.promised(player: Player, position: number, direction: num
 			local power = CurrencyService:GetCurrency(player, "Primary"):expect()
 			if onCancel() then return end
 
-			local base = ReplicatedStorage.Assets.Models.Bases.Basic:Clone()
+			local base = ReplicatedStorage.Assets.Models.Bases.Tower:Clone()
 
 			resolve(BattleSession.new({
 				Player = player,

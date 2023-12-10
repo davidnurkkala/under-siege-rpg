@@ -261,6 +261,8 @@ function Battle.Update(self: Battle, dt: number)
 			end)),
 			Promise.delay(ChooseDuration),
 		}):andThen(function(results)
+			if self.State ~= "Active" then return end
+
 			for _, cardChoice in results[1] do
 				self:PlayCard(cardChoice.Battler, cardChoice.Card.Id, cardChoice.Card.Level)
 			end
