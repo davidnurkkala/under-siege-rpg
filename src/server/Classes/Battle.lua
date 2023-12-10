@@ -239,6 +239,12 @@ function Battle.PlayCard(self: Battle, battler: Battler.Battler, cardId: string,
 	else
 		error(`Unimplemented card type {card.Type}`)
 	end
+
+	BattleService.CardPlayed:FireFor(BattleService:GetPlayersFromBattle(self), {
+		Position = battler.Position,
+		CardId = cardId,
+		CardCount = cardCount,
+	})
 end
 
 function Battle.Update(self: Battle, dt: number)
