@@ -109,6 +109,38 @@ local Weapons = {
 			Hit = { "BowHit1", "BowHit2", "BowHit3", "BowHit4" },
 		},
 	},
+
+	RoughwoodStaff = {
+		Name = "RoughwoodStaff",
+		Power = 450,
+		AttackCooldownTime = 0.4,
+		HoldPartName = "RightHand",
+		ProjectileName = "MagicStar1",
+		Animations = {
+			Idle = "WandIdle",
+			Shoot = "WandShoot",
+		},
+		Sounds = {
+			Shoot = { "WandCast1", "WandCast2", "WandCast3" },
+			Hit = { "MagicImpact1", "MagicImpact2", "MagicImpact3" },
+		},
+	},
+
+	CrudeThrownAxe = {
+		Name = "CrudeThrownAxe",
+		Power = 450,
+		AttackCooldownTime = 0.4,
+		HoldPartName = "RightHand",
+		ProjectileName = "ThrownAxe1",
+		Animations = {
+			Idle = "JavelinIdle",
+			Shoot = "JavelinThrow",
+		},
+		Sounds = {
+			Shoot = { "WhooshMedium1", "WhooshMedium2", "WhooshMedium3", "WhooshMedium4", "WhooshMedium5", "WhooshMedium6" },
+			Hit = { "MediumProjectileImpact1", "MediumProjectileImpact2", "MediumProjectileImpact3", "MediumProjectileImpact4" },
+		},
+	},
 }
 
 return Sift.Dictionary.map(Weapons, function(def, id)
