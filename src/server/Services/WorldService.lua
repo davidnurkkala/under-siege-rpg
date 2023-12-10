@@ -4,7 +4,9 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local Comm = require(ReplicatedStorage.Packages.Comm)
 local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local DataService = require(ServerScriptService.Server.Services.DataService)
+local LightingService = require(ServerScriptService.Server.Services.LightingService)
 local Observers = require(ReplicatedStorage.Packages.Observers)
+local Promise = require(ReplicatedStorage.Packages.Promise)
 local ServerFade = require(ServerScriptService.Server.Util.ServerFade)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local WorldDefs = require(ReplicatedStorage.Shared.Defs.WorldDefs)
@@ -49,6 +51,34 @@ function WorldService.PrepareBlocking(self: WorldService)
 		end)
 	end)
 
+	Observers.observePlayer(function(player)
+		local promise = Promise.new(function(resolve, _, onCancel)
+			repeat
+				local success = (player.Character ~= nil)
+					and (player.Character:IsDescendantOf(workspace))
+					and (player.Character.PrimaryPart ~= nil)
+					and (player.Character.PrimaryPart:IsDescendantOf(workspace))
+
+				if not success then
+					task.wait()
+					if onCancel() then return end
+				end
+			until success
+
+			resolve()
+		end)
+			:andThen(function()
+				return DataService:GetSaveFile(player)
+			end)
+			:andThen(function(saveFile)
+				return self:TeleportToWorld(player, saveFile:Get("WorldCurrent"))
+			end)
+
+		return function()
+			promise:cancel()
+		end
+	end)
+
 	self.Comm:CreateSignal("WorldTeleportRequested"):Connect(function(player: Player, worldId: string)
 		if not t.string(worldId) then return end
 
@@ -71,17 +101,12 @@ function WorldService.PurchaseWorld(self: WorldService, player: Player, worldId:
 	}
 
 	return DataService:GetSaveFile(player):andThen(function(saveFile)
-		print("has wordl?")
 		if Sift.Set.has(saveFile:Get("Worlds"), worldId) then return end
-		print("no!!")
 
 		return CurrencyService:ApplyPrice(player, price):andThen(function(success)
-			print("scucc?")
 			if not success then return end
-			print("haz mun")
 
 			saveFile:Update("Worlds", function(oldWorlds)
-				print("updoot")
 				return Sift.Set.add(oldWorlds, worldId)
 			end)
 		end)
@@ -99,7 +124,10 @@ function WorldService.TeleportToWorld(self: WorldService, player: Player, worldI
 	return DataService:GetSaveFile(player):andThen(function(saveFile)
 		if not saveFile:Get("Worlds")[worldId] then return end
 
+		saveFile:Set("WorldCurrent", worldId)
+
 		return ServerFade(player, nil, function()
+			LightingService.LightingChangeRequested:Fire(player, def.LightingName)
 			char:PivotTo(model:GetPivot() + Vector3.new(0, 4, 0))
 		end)
 	end)
