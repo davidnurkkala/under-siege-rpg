@@ -64,6 +64,7 @@ function DataService.PrepareBlocking(self: DataService)
 			Worlds = {
 				World1 = true,
 			},
+			WorldCurrent = "World1",
 			IsFirstSession = true,
 		},
 
@@ -79,6 +80,9 @@ function DataService.PrepareBlocking(self: DataService)
 			end,
 			function(oldData)
 				return Sift.Dictionary.set(oldData, "Boosts", {})
+			end,
+			function(oldData)
+				return Sift.Dictionary.set(oldData, "WorldCurrent", "World1")
 			end,
 		},
 	})

@@ -15,7 +15,6 @@ local EffectSound = require(ReplicatedStorage.Shared.Effects.EffectSound)
 local GuiEffectService = require(ServerScriptService.Server.Services.GuiEffectService)
 local LobbySessions = require(ServerScriptService.Server.Singletons.LobbySessions)
 local Pet = require(ServerScriptService.Server.Classes.Pet)
-local PetDefs = require(ReplicatedStorage.Shared.Defs.PetDefs)
 local PetHelper = require(ReplicatedStorage.Shared.Util.PetHelper)
 local PetService = require(ServerScriptService.Server.Services.PetService)
 local PickRandom = require(ReplicatedStorage.Shared.Util.PickRandom)
@@ -66,9 +65,6 @@ function LobbySession.new(args: {
 		WeaponDef = args.WeaponDef,
 		AttackCooldown = Cooldown.new(args.WeaponDef.AttackCooldownTime),
 	}, LobbySession)
-
-	-- TODO: link up to a spawn zone?
-	self.Character:MoveTo(Vector3.new(0, 16, 0))
 
 	self.Animator:Play(self.WeaponDef.Animations.Idle)
 
