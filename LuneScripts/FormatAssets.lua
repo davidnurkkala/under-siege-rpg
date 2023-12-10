@@ -48,3 +48,38 @@ forEachModel("Assets/Models/Battlers", function(model)
 	makeModelIntangible(model)
 	model.PrimaryPart.Anchored = true
 end)
+
+for _, name in fs.readDir("LightingExports") do
+	local db = roblox:getReflectionDatabase()
+	local lighting = roblox.deserializeModel(fs.readFile(`LightingExports/{name}`))[1]
+
+	local configuration = roblox.Instance.new("ModuleScript")
+	configuration.Name = string.gsub(name, ".rbxm", "")
+	configuration.Source = "return {"
+
+	local propStrings = {}
+	for _, prop in db:GetClass("Lighting").Properties do
+		if prop.Scriptability ~= "ReadWrite" then continue end
+		if table.find(prop.Tags, "NotReplicated") or table.find(prop.Tags, "Deprecated") then continue end
+
+		local v = lighting[prop.Name]
+		local propString = `{prop.Name} = `
+
+		if prop.Datatype == "Color3" then
+			propString ..= `Color3.new({v.R}, {v.G}, {v.B})`
+		elseif prop.Datatype == "String" then
+			propString ..= `"{v}"`
+		else
+			propString ..= tostring(v)
+		end
+
+		table.insert(propStrings, propString)
+	end
+	configuration.Source ..= table.concat(propStrings, ", ") .. "}"
+
+	for _, child in lighting:GetChildren() do
+		child.Parent = configuration
+	end
+
+	fs.writeFile(`Assets/Lightings/{name}`, roblox.serializeModel({ configuration }))
+end
