@@ -15,7 +15,7 @@ local Worlds = {
 		Name = "Elven Woods",
 		Order = 2,
 		ModelName = "World2",
-		LightingName = "Terrible",
+		LightingName = "World1",
 		Price = 1000,
 		Position = Vector3.new(512, 0, 1280),
 	},
