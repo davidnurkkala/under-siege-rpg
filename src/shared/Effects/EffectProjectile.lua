@@ -36,9 +36,20 @@ return function(args: {
 				return args.Finish.CFrame
 			end
 
+		local startRotation = Vector3.new(0, 0, 0)
+		local finishRotation = (model:GetAttribute("Rotation") or Vector3.new()) * duration
+		local doesRotate = startRotation ~= finishRotation
+
 		return Animate(duration, function(scalar)
 			local position = Lerp(start().Position, finish().Position, scalar)
-			model:PivotTo(CFrame.lookAt(position, finish().Position).Rotation + position)
+			local cframe = CFrame.lookAt(position, finish().Position).Rotation + position
+
+			if doesRotate then
+				local rotation = Lerp(startRotation, finishRotation, scalar)
+				cframe *= CFrame.Angles(math.rad(rotation.X), math.rad(rotation.Y), math.rad(rotation.Z))
+			end
+
+			model:PivotTo(cframe)
 		end):andThenCall(function()
 			EffectController:Effect(EffectFadeModel({
 				Model = model,
