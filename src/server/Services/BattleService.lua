@@ -83,7 +83,7 @@ function BattleService.ReserveSlot(_self: BattleService, callback: (Vector3) -> 
 	end
 	BattleSlots[index] = true
 
-	callback(Vector3.new(256 + 64 * index, 1024, 0))
+	callback(Vector3.new(256 + 512 * index, 1024, 0))
 
 	return function()
 		BattleSlots[index] = false

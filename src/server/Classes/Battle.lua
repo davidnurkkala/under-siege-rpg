@@ -318,6 +318,10 @@ function Battle.ForEachTarget(self: Battle, check: (BattleTarget) -> ())
 	end
 end
 
+function Battle.FilterTargets(self: Battle, filter: (BattleTarget) -> boolean)
+	return Sift.Array.filter(Sift.Array.concat(Sift.Dictionary.keys(self.Field), self.Battlers), filter)
+end
+
 function Battle.TargetNearest(
 	self: Battle,
 	args: {

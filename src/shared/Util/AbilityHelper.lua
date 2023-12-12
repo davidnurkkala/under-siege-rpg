@@ -2,16 +2,12 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
 
-local Sift = require(ReplicatedStorage.Packages.Sift)
+local AbilityDefs = require(ReplicatedStorage.Shared.Defs.AbilityDefs)
 
 local AbilityHelper = {}
 
-local AbilitiesById = Sift.Dictionary.map(ReplicatedStorage.Shared.Abilities:GetChildren(), function(moduleScript)
-	return require(moduleScript), moduleScript.Name
-end)
-
 function AbilityHelper.GetAbility(abilityId: string)
-	return AbilitiesById[abilityId]
+	return AbilityDefs[abilityId]
 end
 
 function AbilityHelper.GetImplementation(abilityId: string)

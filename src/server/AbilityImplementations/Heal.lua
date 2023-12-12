@@ -7,7 +7,7 @@ local EffectService = require(ServerScriptService.Server.Services.EffectService)
 local EffectSound = require(ReplicatedStorage.Shared.Effects.EffectSound)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 
-return function(self, level, battler, battle)
+return function(def, level, battler, battle)
 	local target = battle:TargetFurthest({
 		Position = battler.Position,
 		Filter = battle:AllyFilter(battler.TeamId),
@@ -36,5 +36,5 @@ return function(self, level, battler, battle)
 		)
 	end):catch(function() end)
 
-	target.Health:Adjust(self.Amount(level))
+	target.Health:Adjust(def.Amount(level))
 end
