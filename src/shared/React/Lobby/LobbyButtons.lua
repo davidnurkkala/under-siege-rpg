@@ -130,7 +130,7 @@ return function()
 		Size = UDim2.fromScale(0.1, 1),
 	}, {
 		SizeConstraint = React.createElement("UISizeConstraint", {
-			MinSize = Vector2.new(80, 0),
+			MinSize = Vector2.new(120, 0),
 			MaxSize = Vector2.new(160, math.huge),
 		}),
 
@@ -163,12 +163,14 @@ return function()
 			Text = TextStroke("VIP"),
 			Color = ColorDefs.Purple,
 			Image = "rbxassetid://15307999873",
+			Activate = function() end,
 		}),
 		StreakButton = React.createElement(lobbyButton, {
 			LayoutOrder = 3,
 			Text = TextStroke("Streak"),
 			Color = ColorDefs.LightRed,
 			Image = "rbxassetid://15307999952",
+			Activate = function() end,
 		}),
 		GiftsButton = React.createElement(giftButton),
 		RebirthButton = React.createElement(lobbyButton, {
@@ -176,12 +178,14 @@ return function()
 			Text = TextStroke("Rebirth"),
 			Color = ColorDefs.PalePurple,
 			Image = "rbxassetid://15308000137",
+			Activate = function() end,
 		}),
 		ShopButton = React.createElement(lobbyButton, {
 			LayoutOrder = 6,
 			Text = TextStroke("Shop"),
 			Color = ColorDefs.Yellow,
 			Image = "rbxassetid://15308000036",
+			Activate = function() end,
 		}),
 		PetsButton = React.createElement(lobbyButton, {
 			LayoutOrder = 7,

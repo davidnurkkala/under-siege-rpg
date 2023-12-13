@@ -6,6 +6,7 @@ local Weapons = {
 	WoodenBow = {
 		Name = "Wooden Bow",
 		Power = 1,
+		Price = 0,
 		AttackCooldownTime = 0.4,
 		HoldPartName = "LeftHand",
 		ProjectileName = "Arrow1",
@@ -20,7 +21,8 @@ local Weapons = {
 	},
 	HuntersBow = {
 		Name = "Hunters Bow",
-		Power = 5,
+		Power = 10,
+		Price = 100,
 		AttackCooldownTime = 0.4,
 		HoldPartName = "LeftHand",
 		ProjectileName = "Arrow1",
@@ -35,7 +37,8 @@ local Weapons = {
 	},
 	Crossbow = {
 		Name = "Crossbow",
-		Power = 10,
+		Power = 50,
+		Price = 7500,
 		AttackCooldownTime = 0.4,
 		HoldPartName = "RightHand",
 		ProjectileName = "Arrow1",
@@ -50,7 +53,8 @@ local Weapons = {
 	},
 	SimpleWand = {
 		Name = "Apprentice Wand",
-		Power = 50,
+		Power = 250,
+		Price = 75000,
 		AttackCooldownTime = 0.4,
 		HoldPartName = "RightHand",
 		ProjectileName = "MagicStar1",
@@ -65,7 +69,8 @@ local Weapons = {
 	},
 	RecurveBow = {
 		Name = "Recurve Bow",
-		Power = 200,
+		Power = 1000,
+		Price = 1.5e6,
 		AttackCooldownTime = 0.4,
 		HoldPartName = "LeftHand",
 		ProjectileName = "Arrow1",
@@ -78,25 +83,10 @@ local Weapons = {
 			Hit = { "BowHit1", "BowHit2", "BowHit3", "BowHit4" },
 		},
 	},
-	Javelin = {
-		Name = "Javelin",
-		Power = 250,
-		AttackCooldownTime = 0.4,
-		HoldPartName = "RightHand",
-		ProjectileName = "Javelin1",
-		Animations = {
-			Idle = "JavelinIdle",
-			Shoot = "JavelinThrow",
-		},
-		Sounds = {
-			Shoot = { "WhooshMedium1", "WhooshMedium2", "WhooshMedium3", "WhooshMedium4", "WhooshMedium5", "WhooshMedium6" },
-			Hit = { "MediumProjectileImpact1", "MediumProjectileImpact2", "MediumProjectileImpact3", "MediumProjectileImpact4" },
-		},
-	},
-
 	ElvenBow = {
 		Name = "Elven Bow",
-		Power = 350,
+		Power = 2000,
+		Price = 3e6,
 		AttackCooldownTime = 0.4,
 		HoldPartName = "LeftHand",
 		ProjectileName = "Arrow1",
@@ -109,10 +99,10 @@ local Weapons = {
 			Hit = { "BowHit1", "BowHit2", "BowHit3", "BowHit4" },
 		},
 	},
-
 	RoughwoodStaff = {
-		Name = "RoughwoodStaff",
-		Power = 450,
+		Name = "Roughwood Staff",
+		Power = 3500,
+		Price = 6e6,
 		AttackCooldownTime = 0.4,
 		HoldPartName = "RightHand",
 		ProjectileName = "MagicStar1",
@@ -125,10 +115,26 @@ local Weapons = {
 			Hit = { "MagicImpact1", "MagicImpact2", "MagicImpact3" },
 		},
 	},
-
+	Javelin = {
+		Name = "Javelin",
+		Power = 5000,
+		Price = 10e6,
+		AttackCooldownTime = 0.4,
+		HoldPartName = "RightHand",
+		ProjectileName = "Javelin1",
+		Animations = {
+			Idle = "JavelinIdle",
+			Shoot = "JavelinThrow",
+		},
+		Sounds = {
+			Shoot = { "WhooshMedium1", "WhooshMedium2", "WhooshMedium3", "WhooshMedium4", "WhooshMedium5", "WhooshMedium6" },
+			Hit = { "MediumProjectileImpact1", "MediumProjectileImpact2", "MediumProjectileImpact3", "MediumProjectileImpact4" },
+		},
+	},
 	CrudeThrownAxe = {
-		Name = "CrudeThrownAxe",
-		Power = 550,
+		Name = "Crude Throwing Axe",
+		Power = 7500,
+		Price = 30e6,
 		AttackCooldownTime = 0.4,
 		HoldPartName = "RightHand",
 		ProjectileName = "ThrownAxeCrude",
@@ -146,14 +152,6 @@ local Weapons = {
 return Sift.Dictionary.map(Weapons, function(def, id)
 	local model = ReplicatedStorage.Assets.Weapons:FindFirstChild(id)
 	assert(model, `Missing model for weapon {id}`)
-
-	if not def.Requirements then def = Sift.Dictionary.merge(def, {
-		Requirements = {
-			Currency = {
-				Primary = def.Power * 25,
-			},
-		},
-	}) end
 
 	return Sift.Dictionary.merge(def, {
 		Id = id,

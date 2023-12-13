@@ -53,10 +53,14 @@ local function currencyPanel(props: {
 	return React.createElement(Container, {
 		[React.Tag] = `GuiPanel{props.Id}`,
 
-		Size = UDim2.fromScale(0.1, 0.033),
-		SizeConstraint = Enum.SizeConstraint.RelativeXX,
+		Size = UDim2.fromScale(0.2, 0.075),
+		SizeConstraint = Enum.SizeConstraint.RelativeYY,
 		LayoutOrder = props.LayoutOrder,
 	}, {
+		Constraint = React.createElement("UISizeConstraint", {
+			MinSize = Vector2.new(100, 40),
+		}),
+
 		Layout = React.createElement(ListLayout, {
 			VerticalAlignment = if props.Inverted then Enum.VerticalAlignment.Bottom else Enum.VerticalAlignment.Top,
 			Padding = UDim.new(0, 6),

@@ -53,27 +53,23 @@ function BattlerPrompt.new(model: Model): BattlerPrompt
 
 		local cframe = TryNow(function()
 			return player.Character.PrimaryPart.CFrame
-		end)
-
-		if not cframe then return end
+		end, model:GetPivot() + Vector3.new(0, 4, 0))
 
 		ServerFade(player, nil, function()
-				return Battle.fromPlayerVersusBattler(player, self.Id)
-			end)
-			:andThen(function(battle)
-				return Promise.fromEvent(battle.Finished):andThenReturn(battle)
-			end)
-			:andThen(function(battle)
-				return ServerFade(player, nil, function()
-					battle:Destroy()
-					return LobbySession.promised(player)
+			return Battle.fromPlayerVersusBattler(player, self.Id)
+		end):andThen(function(battle)
+			return Promise.fromEvent(battle.Finished):andThenReturn(battle)
+		end):andThen(function(battle)
+			return ServerFade(player, nil, function()
+				battle:Destroy()
+
+				return LobbySession.promised(player):andThenCall(Promise.delay, 0.5):andThen(function()
+					TryNow(function()
+						player.Character.PrimaryPart.CFrame = cframe
+					end)
 				end)
 			end)
-			:andThen(function()
-				TryNow(function()
-					player.Character.PrimaryPart.CFrame = cframe
-				end)
-			end)
+		end)
 	end)
 	prompt.Parent = self.Model.PrimaryPart
 

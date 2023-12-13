@@ -8,6 +8,7 @@ local EffectGrindPets = require(ReplicatedStorage.Shared.Effects.EffectGrindPets
 local EffectService = require(ServerScriptService.Server.Services.EffectService)
 local Guid = require(ReplicatedStorage.Shared.Util.Guid)
 local Observers = require(ReplicatedStorage.Packages.Observers)
+local OptionsService = require(ServerScriptService.Server.Services.OptionsService)
 local PetGachaDefs = require(ReplicatedStorage.Shared.Defs.PetGachaDefs)
 local PetHelper = require(ReplicatedStorage.Shared.Util.PetHelper)
 local Promise = require(ReplicatedStorage.Packages.Promise)
@@ -85,7 +86,7 @@ function PetService.EquipBest(self: PetService, player: Player)
 	end)
 end
 
-function PetService.AddPet(_self: PetService, player: Player, petId: string, tier: number?)
+function PetService.AddPet(self: PetService, player: Player, petId: string, tier: number?)
 	return DataService:GetSaveFile(player):andThen(function(saveFile)
 		saveFile:Update("Pets", function(pets)
 			local slotId = Guid()
@@ -99,6 +100,12 @@ function PetService.AddPet(_self: PetService, player: Player, petId: string, tie
 					Tier = tier or 1,
 				})
 			)
+		end)
+
+		return OptionsService:GetOption(player, "AutoEquipBestPets"):andThen(function(autoEquip)
+			if not autoEquip then return end
+
+			return self:EquipBest(player)
 		end)
 	end)
 end

@@ -63,21 +63,11 @@ function WeaponService.UnlockWeapon(self: WeaponService, player: Player, weaponI
 		local weapons = saveFile:Get("Weapons")
 		if weapons.Owned[weaponId] then return false end
 
-		if def.Requirements then
-			for reqType, reqInfo in def.Requirements do
-				if reqType == "Currency" then
-					if
-						not Sift.Dictionary.every(reqInfo, function(amount, currencyType)
-							return CurrencyService:GetCurrency(player, currencyType):expect() >= amount
-						end)
-					then
-						return false
-					end
-				end
-			end
-		end
+		return CurrencyService:GetCurrency(player, "Primary"):andThen(function(currency)
+			if currency < def.Price then return end
 
-		return self:OwnWeapon(player, weaponId)
+			return self:OwnWeapon(player, weaponId)
+		end)
 	end)
 end
 

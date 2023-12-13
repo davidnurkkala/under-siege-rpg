@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Animate = require(ReplicatedStorage.Shared.Util.Animate)
 local Button = require(ReplicatedStorage.Shared.React.Common.Button)
 local CardContents = require(ReplicatedStorage.Shared.React.Cards.CardContents)
+local CardHelper = require(ReplicatedStorage.Shared.Util.CardHelper)
 local CelebrationEffect = require(ReplicatedStorage.Shared.React.Effects.CelebrationEffect)
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
@@ -103,6 +104,14 @@ return function(props: {
 				Position = UDim2.fromScale(0.5, 0.5),
 			}, {
 				Effect = React.createElement(CelebrationEffect),
+			}),
+
+			LevelUp = CardHelper.WasLevelUp(props.CardCount or 1) and React.createElement(Label, {
+				Size = UDim2.fromScale(1, 0.25),
+				SizeConstraint = Enum.SizeConstraint.RelativeXX,
+				AnchorPoint = Vector2.new(0.5, 1),
+				Position = UDim2.fromScale(0.5, 0),
+				Text = TextStroke("Level up!"),
 			}),
 		}),
 

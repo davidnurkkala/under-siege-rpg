@@ -5,6 +5,7 @@ local Button = require(ReplicatedStorage.Shared.React.Common.Button)
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
+local FormatBigNumber = require(ReplicatedStorage.Shared.Util.FormatBigNumber)
 local Image = require(ReplicatedStorage.Shared.React.Common.Image)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local LayoutContainer = require(ReplicatedStorage.Shared.React.Common.LayoutContainer)
@@ -17,6 +18,7 @@ local SystemWindow = require(ReplicatedStorage.Shared.React.Common.SystemWindow)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local WeaponDefs = require(ReplicatedStorage.Shared.Defs.WeaponDefs)
+local WeaponShopDefs = require(ReplicatedStorage.Shared.Defs.WeaponShopDefs)
 
 local WeaponRotation = CFrame.Angles(0, math.pi / 2, 0) * CFrame.Angles(0, 0, math.pi / 2) * CFrame.Angles(0, -math.pi / 4, 0)
 
@@ -55,6 +57,7 @@ end
 
 return function(props: {
 	Visible: boolean,
+	ShopId: string,
 	Weapons: any,
 	Select: (string) -> (),
 	Close: () -> (),
@@ -77,7 +80,7 @@ return function(props: {
 				React.Fragment,
 				nil,
 				Sift.Dictionary.map(
-					Sift.Array.sort(Sift.Dictionary.keys(WeaponDefs), function(idA, idB)
+					Sift.Array.sort(WeaponShopDefs[props.ShopId], function(idA, idB)
 						local a, b = WeaponDefs[idA], WeaponDefs[idB]
 						return a.Power < b.Power
 					end),
@@ -145,7 +148,7 @@ return function(props: {
 
 										CurrencyIcon = React.createElement(Image, {
 											LayoutOrder = 1,
-											Size = UDim2.fromScale(0.6, 0.6),
+											Size = UDim2.fromScale(0.4, 0.4),
 											SizeConstraint = Enum.SizeConstraint.RelativeYY,
 											Image = CurrencyDefs.Primary.Image,
 											ZIndex = 4,
@@ -153,11 +156,8 @@ return function(props: {
 
 										Price = React.createElement(Label, {
 											LayoutOrder = 2,
-											AutomaticSize = Enum.AutomaticSize.X,
-											Size = UDim2.fromScale(0, 0.5),
-											Position = UDim2.fromScale(0.25, 0.5),
-											AnchorPoint = Vector2.new(0, 0.5),
-											Text = TextStroke(def.Requirements.Currency.Primary, 2),
+											Size = UDim2.fromScale(0.45, 0.5),
+											Text = TextStroke(FormatBigNumber(def.Price), 2),
 											TextXAlignment = Enum.TextXAlignment.Left,
 											ZIndex = 4,
 										}),

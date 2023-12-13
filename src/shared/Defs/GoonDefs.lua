@@ -374,7 +374,7 @@ local Goons = {
 			return 0.1
 		end,
 		AttackRate = function()
-			return 2
+			return 1.25
 		end,
 		Damage = function(level)
 			return scaling(1, 0.5, level)
@@ -415,7 +415,7 @@ local Goons = {
 			return 0.35
 		end,
 		AttackRate = function()
-			return 1.5
+			return 1.25
 		end,
 		Damage = function(level)
 			return scaling(1, 1, level)

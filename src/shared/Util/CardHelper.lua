@@ -38,6 +38,13 @@ function CardHelper.CountToLevel(count: number)
 	return math.floor(math.log(count, 2)) + 1
 end
 
+function CardHelper.WasLevelUp(count: number)
+	if count < 2 then return false end
+
+	local _, frac = math.modf(math.log(count, 2))
+	return frac == 0
+end
+
 function CardHelper.GetNextUpgrade(count: number)
 	return math.pow(2, CardHelper.CountToLevel(count))
 end

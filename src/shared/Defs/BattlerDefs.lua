@@ -27,6 +27,7 @@ local Battlers = {
 			Berserker = 1,
 			Recruit = 4,
 			VikingWarrior = 4,
+			RainOfArrows = 1,
 		},
 	},
 
@@ -42,6 +43,8 @@ local Battlers = {
 			VikingWarrior = 8,
 			Hunter = 16,
 			Berserker = 4,
+			Heal = 1,
+			RainOfArrows = 4,
 		},
 	},
 
@@ -58,6 +61,8 @@ local Battlers = {
 			VikingWarrior = 16,
 			Hunter = 32,
 			Berserker = 16,
+			Heal = 4,
+			RainOfArrows = 8,
 		},
 	},
 
@@ -71,6 +76,8 @@ local Battlers = {
 		Deck = {
 			ElfBrawler = 12,
 			ElfRanger = 8,
+			Heal = 16,
+			RainOfArrows = 8,
 		},
 	},
 
@@ -84,6 +91,7 @@ local Battlers = {
 		Deck = {
 			ElfBrawler = 16,
 			ElfRanger = 12,
+			RainOfArrows = 32,
 		},
 	},
 
@@ -97,6 +105,7 @@ local Battlers = {
 		Deck = {
 			ElfBrawler = 18,
 			ElfRanger = 16,
+			Heal = 32,
 		},
 	},
 
@@ -110,6 +119,8 @@ local Battlers = {
 		Deck = {
 			ElfBrawler = 32,
 			ElfRanger = 18,
+			Heal = 16,
+			RainOfArrows = 16,
 		},
 	},
 
@@ -121,8 +132,9 @@ local Battlers = {
 		WeaponId = "WoodenBow",
 		Power = 25000000,
 		Deck = {
-			OrcWarrior = 40,
-			OrcChampion = 20,
+			OrcWarrior = 32,
+			OrcChampion = 16,
+			RainOfArrows = 64,
 		},
 	},
 
@@ -134,8 +146,10 @@ local Battlers = {
 		WeaponId = "WoodenBow",
 		Power = 50000000,
 		Deck = {
-			OrcWarrior = 42,
-			OrcChampion = 22,
+			OrcWarrior = 32,
+			OrcChampion = 16,
+			Heal = 32,
+			RainOfArrows = 64,
 		},
 	},
 
@@ -147,8 +161,10 @@ local Battlers = {
 		WeaponId = "Javelin",
 		Power = 75000000,
 		Deck = {
-			OrcWarrior = 46,
-			OrcChampion = 24,
+			OrcWarrior = 32,
+			OrcChampion = 32,
+			Heal = 32,
+			RainOfArrows = 64,
 		},
 	},
 
@@ -160,8 +176,10 @@ local Battlers = {
 		WeaponId = "Javelin",
 		Power = 100000000,
 		Deck = {
-			OrcWarrior = 50,
-			OrcChampion = 30,
+			OrcWarrior = 64,
+			OrcChampion = 32,
+			Heal = 64,
+			RainOfArrows = 128,
 		},
 	},
 }

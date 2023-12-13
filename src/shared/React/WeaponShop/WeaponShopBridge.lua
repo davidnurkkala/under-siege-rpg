@@ -11,14 +11,16 @@ local Zoner = require(ReplicatedStorage.Shared.Classes.Zoner)
 return function()
 	local menu = React.useContext(MenuContext)
 	local weapons, setWeapons = React.useState(nil)
+	local shopId, setShopId = React.useState(nil)
 
 	React.useEffect(function()
 		local trove = Trove.new()
 
 		trove:Add(WeaponController:ObserveWeapons(setWeapons))
 
-		trove:Add(Zoner.new(Players.LocalPlayer, "WeaponShopZone", function(entered)
+		trove:Add(Zoner.new(Players.LocalPlayer, "WeaponShopZone", function(entered, zone)
 			if entered then
+				setShopId(zone:GetAttribute("ShopId"))
 				menu.Set("WeaponShop")
 			else
 				menu.Unset("WeaponShop")
@@ -30,10 +32,13 @@ return function()
 		end
 	end, {})
 
+	local isDataReady = (weapons ~= nil) and (shopId ~= nil)
+
 	return React.createElement(React.Fragment, nil, {
-		WeaponShop = (weapons ~= nil) and React.createElement(WeaponShop, {
+		WeaponShop = isDataReady and React.createElement(WeaponShop, {
 			Visible = menu.Is("WeaponShop"),
 			Weapons = weapons,
+			ShopId = shopId,
 			Select = function(weaponId)
 				if not weapons then return end
 

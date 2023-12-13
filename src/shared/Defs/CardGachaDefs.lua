@@ -13,6 +13,9 @@ export type Gacha = {
 }
 
 local Gachas = {
+	-----------
+	-- GOONS --
+	-----------
 	World1Goons = {
 		Name = "World 1 Soldiers",
 		Price = {
@@ -25,8 +28,55 @@ local Gachas = {
 			{ Result = "Mage", Weight = 1 },
 		},
 	},
+	World2Goons = {
+		Name = "World 2 Soldiers",
+		Price = {
+			Secondary = 50,
+		},
+		WeightTable = {
+			{ Result = "Footman", Weight = 4 },
+			{ Result = "Mage", Weight = 4 },
+			{ Result = "VikingWarrior", Weight = 2 },
+			{ Result = "Berserker", Weight = 1 },
+		},
+	},
+	World3Goons = {
+		Name = "World 3 Soldiers",
+		Price = {
+			Secondary = 100,
+		},
+		WeightTable = {
+			{ Result = "Footman", Weight = 3 },
+			{ Result = "ElfBrawler", Weight = 2 },
+			{ Result = "ElfRanger", Weight = 1 },
+		},
+	},
+
+	---------------
+	-- ABILITIES --
+	---------------
 	World1Abilities = {
 		Name = "World 1 Abilities",
+		Price = {
+			Secondary = 10,
+		},
+		WeightTable = {
+			{ Result = "Heal", Weight = 4 },
+			{ Result = "RainOfArrows", Weight = 3 },
+		},
+	},
+	World2Abilities = {
+		Name = "World 2 Abilities",
+		Price = {
+			Secondary = 10,
+		},
+		WeightTable = {
+			{ Result = "Heal", Weight = 4 },
+			{ Result = "RainOfArrows", Weight = 3 },
+		},
+	},
+	World3Abilities = {
+		Name = "World 3 Abilities",
 		Price = {
 			Secondary = 10,
 		},
