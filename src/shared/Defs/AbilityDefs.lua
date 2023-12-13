@@ -21,8 +21,8 @@ local Abilities = {
 		Count = function(level)
 			return 3 + level
 		end,
-		Damage = function(level)
-			return 5 + level
+		Damage = function(_level)
+			return 2
 		end,
 	},
 }

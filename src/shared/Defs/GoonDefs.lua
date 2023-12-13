@@ -37,7 +37,7 @@ local Goons = {
 			return 0.75
 		end,
 		Damage = function(level)
-			return scaling(1, 0.25, level)
+			return scaling(1, 1, level)
 		end,
 		HealthMax = function(level)
 			return scaling(10, 1, level)
@@ -74,7 +74,7 @@ local Goons = {
 			return 0.75
 		end,
 		Damage = function(level)
-			return scaling(2, 0.25, level)
+			return scaling(2, 1, level)
 		end,
 		HealthMax = function(level)
 			return scaling(15, 1, level)
@@ -111,10 +111,10 @@ local Goons = {
 			return 0.75
 		end,
 		Damage = function(level)
-			return scaling(2.5, 0.5, level)
+			return scaling(2.5, 1, level)
 		end,
 		HealthMax = function(level)
-			return scaling(25, 2.5, level)
+			return scaling(20, 1, level)
 		end,
 	},
 
@@ -152,10 +152,10 @@ local Goons = {
 			return 1.1
 		end,
 		Damage = function(level)
-			return scaling(0.5, 0.1, level)
+			return scaling(1, 1, level)
 		end,
 		HealthMax = function(level)
-			return scaling(5, 1, level)
+			return scaling(10, 1, level)
 		end,
 	},
 
@@ -192,7 +192,7 @@ local Goons = {
 			return 0.5
 		end,
 		Damage = function(level)
-			return scaling(1, 0.5, level)
+			return scaling(2, 2, level)
 		end,
 		HealthMax = function(level)
 			return scaling(5, 1, level)
@@ -229,10 +229,10 @@ local Goons = {
 			return 0.75
 		end,
 		Damage = function(level)
-			return scaling(2.5, 0.5, level)
+			return scaling(3, 1, level)
 		end,
 		HealthMax = function(level)
-			return scaling(25, 2.5, level)
+			return scaling(15, 2, level)
 		end,
 	},
 
@@ -266,7 +266,7 @@ local Goons = {
 			return 0.75
 		end,
 		Damage = function(level)
-			return scaling(5, 0.5, level)
+			return scaling(4, 2, level)
 		end,
 		HealthMax = function(level)
 			return scaling(5, 1, level)
@@ -303,10 +303,10 @@ local Goons = {
 			return 0.75
 		end,
 		Damage = function(level)
-			return scaling(5, 0.5, level)
+			return scaling(5, 1, level)
 		end,
 		HealthMax = function(level)
-			return scaling(5, 1, level)
+			return scaling(15, 2, level)
 		end,
 	},
 
@@ -331,19 +331,19 @@ local Goons = {
 			return 0.43
 		end,
 		Speed = function()
-			return 0.1
+			return 0.05
 		end,
 		Range = function()
 			return 0.1
 		end,
 		AttackRate = function()
-			return 0.75
+			return 0.25
 		end,
 		Damage = function(level)
-			return scaling(6, 0.5, level)
+			return scaling(8, 2, level)
 		end,
 		HealthMax = function(level)
-			return scaling(6, 1, level)
+			return scaling(20, 3, level)
 		end,
 	},
 
@@ -374,13 +374,13 @@ local Goons = {
 			return 0.1
 		end,
 		AttackRate = function()
-			return 0.75
+			return 2
 		end,
 		Damage = function(level)
-			return scaling(5, 0.5, level)
+			return scaling(1, 0.5, level)
 		end,
 		HealthMax = function(level)
-			return scaling(5, 1, level)
+			return scaling(15, 2, level)
 		end,
 	},
 
@@ -415,13 +415,13 @@ local Goons = {
 			return 0.35
 		end,
 		AttackRate = function()
-			return 1.1
+			return 1.5
 		end,
 		Damage = function(level)
-			return scaling(0.5, 0.1, level)
+			return scaling(1, 1, level)
 		end,
 		HealthMax = function(level)
-			return scaling(5, 1, level)
+			return scaling(10, 1, level)
 		end,
 	},
 }

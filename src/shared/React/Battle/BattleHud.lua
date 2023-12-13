@@ -9,6 +9,7 @@ local ComponentController = require(ReplicatedStorage.Shared.Controllers.Compone
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local Flipper = require(ReplicatedStorage.Packages.Flipper)
 local Frame = require(ReplicatedStorage.Shared.React.Common.Frame)
+local Guid = require(ReplicatedStorage.Shared.Util.Guid)
 local HealthBar = require(ReplicatedStorage.Shared.React.Battle.HealthBar)
 local Image = require(ReplicatedStorage.Shared.React.Common.Image)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
@@ -121,6 +122,7 @@ local function critBar(props: {
 end
 
 local function playedCard(props: {
+	Guid: string,
 	CardId: string,
 	CardCount: number,
 	AnchorPoint: Vector2,
@@ -146,9 +148,13 @@ local function playedCard(props: {
 			:andThenCall(props.Finish)
 
 		return function()
+			slideMotor:setGoal(Flipper.Instant.new(0))
+			slideMotor:step()
+			slidingDown.current = false
+
 			promise:cancel()
 		end
-	end, { props.CardId, props.CardCount, props.Finish })
+	end, { props.Guid, props.CardId, props.CardCount, props.Finish })
 
 	return React.createElement(Panel, {
 		ImageColor3 = ColorDefs.PaleGreen,
@@ -229,7 +235,7 @@ return function(props: {
 		end
 
 		local connection = BattleController.CardPlayed:Connect(function(cardData)
-			local data = Sift.Dictionary.removeKey(cardData, "Position")
+			local data = Sift.Dictionary.set(Sift.Dictionary.removeKey(cardData, "Position"), "Guid", Guid())
 			if cardData.Position < 0.5 then
 				setLeftCard(data)
 			else

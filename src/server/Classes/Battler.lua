@@ -141,7 +141,7 @@ function Battler.fromBattlerId(battlerId: string, position: number, direction: n
 		TeamId = `NON_PLAYER_{battlerId}`,
 		DeckPlayer = DeckPlayerRandom.new(Deck.new(def.Deck)),
 		Animator = Animator.new(char.Humanoid),
-		HealthMax = 25,
+		HealthMax = 50,
 		Power = def.Power,
 	})
 

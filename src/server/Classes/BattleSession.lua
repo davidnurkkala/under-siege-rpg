@@ -70,11 +70,15 @@ function BattleSession.new(args: {
 	end):andThen(function(battle)
 		if not battle.CritEnabled then return end
 
-		local cooldown = Cooldown.new(0.1)
+		local critPerSecond = 1 / 3
+		local clicksPerSecond = 5
+		local critPerClick = critPerSecond / clicksPerSecond
+
+		local cooldown = Cooldown.new(1 / clicksPerSecond)
 		self.Trove:Add(ActionService:Subscribe(self.Player, "Primary", function()
 			if cooldown:IsReady() then
 				cooldown:Use()
-				self.Battler:AddCrit(0.2)
+				self.Battler:AddCrit(critPerClick)
 			end
 		end))
 	end))
@@ -143,7 +147,7 @@ function BattleSession.promised(player: Player, position: number, direction: num
 					WeaponHoldPart = holdPart,
 					TeamId = `PLAYER_{player.Name}`,
 					DeckPlayer = DeckPlayerRandom.new(Deck.new(deck)),
-					HealthMax = 25,
+					HealthMax = 50,
 					Power = power,
 				},
 			}))

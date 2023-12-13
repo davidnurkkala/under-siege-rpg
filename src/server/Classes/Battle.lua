@@ -134,6 +134,10 @@ function Battle.new(args: {
 		battler:SetBattle(self)
 	end
 
+	for _, battler in self.Battlers do
+		self:DeployStartingGoons(battler)
+	end
+
 	return self
 end
 
@@ -215,6 +219,28 @@ function Battle.Remove(self: Battle, object: Fieldable)
 	self.Field[object] = nil
 end
 
+function Battle.DeployStartingGoons(self: Battle, battler: Battler.Battler)
+	local cards = battler.DeckPlayer.Deck.Cards
+	local goonCardIds = Sift.Array.shuffle(Sift.Array.filter(Sift.Dictionary.keys(cards), function(cardId)
+		return CardDefs[cardId].Type == "Goon"
+	end))
+	if #goonCardIds == 0 then return end
+
+	local index = 1
+	for number = 1, 3 do
+		local cardId = goonCardIds[index]
+
+		index += 1
+		if index > #goonCardIds then index = 1 end
+
+		Promise.delay(number * 0.75):andThen(function()
+			if self.State ~= "Active" then return end
+
+			self:PlayCard(battler, cardId, cards[cardId])
+		end)
+	end
+end
+
 function Battle.PlayCard(self: Battle, battler: Battler.Battler, cardId: string, cardCount: number)
 	if not cardId then return end
 
@@ -223,8 +249,14 @@ function Battle.PlayCard(self: Battle, battler: Battler.Battler, cardId: string,
 
 	local level = CardHelper.CountToLevel(cardCount)
 
+	BattleService.CardPlayed:FireFor(BattleService:GetPlayersFromBattle(self), {
+		Position = battler.Position,
+		CardId = cardId,
+		CardCount = cardCount,
+	})
+
 	if card.Type == "Goon" then
-		Goon.fromId({
+		return Promise.resolve(Goon.fromId({
 			Id = card.GoonId,
 			Battle = self,
 			Battler = battler,
@@ -232,19 +264,13 @@ function Battle.PlayCard(self: Battle, battler: Battler.Battler, cardId: string,
 			Position = battler.Position,
 			TeamId = battler.TeamId,
 			Level = level,
-		})
+		}))
 	elseif card.Type == "Ability" then
 		local activate = AbilityHelper.GetImplementation(card.AbilityId)
-		activate(level, battler, self)
+		return activate(level, battler, self)
 	else
 		error(`Unimplemented card type {card.Type}`)
 	end
-
-	BattleService.CardPlayed:FireFor(BattleService:GetPlayersFromBattle(self), {
-		Position = battler.Position,
-		CardId = cardId,
-		CardCount = cardCount,
-	})
 end
 
 function Battle.Update(self: Battle, dt: number)

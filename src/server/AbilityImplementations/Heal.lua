@@ -37,4 +37,6 @@ return function(def, level, battler, battle)
 	end):catch(function() end)
 
 	target.Health:Adjust(def.Amount(level))
+
+	return Promise.resolve()
 end
