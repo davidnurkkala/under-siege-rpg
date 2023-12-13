@@ -15,8 +15,25 @@ return function()
 	local currency, setCurrency = React.useState(nil)
 	local gachaId, setGachaId = React.useState(nil)
 	local state, setState = React.useState("Shop")
-	local resultCardId = React.useRef(nil)
-	local resultCardCount = React.useRef(nil)
+	local resultCardId, setResultCardId = React.useState(nil)
+	local resultCardCount, setResultCardCount = React.useState(nil)
+	local buys = React.useRef(0)
+
+	local buy = React.useCallback(function()
+		buys.current -= 1
+
+		setState("Waiting")
+		DeckController:DrawCardFromGacha(gachaId):andThen(function(success, cardId, cardCount)
+			if not success then
+				setState("Shop")
+				return
+			end
+
+			setResultCardId(cardId)
+			setResultCardCount(cardCount)
+			setState("Result")
+		end)
+	end, { gachaId, buys })
 
 	React.useEffect(function()
 		local trove = Trove.new()
@@ -44,18 +61,9 @@ return function()
 			Visible = menu.Is("CardGacha") and (state == "Shop"),
 			GachaId = gachaId,
 			Wallet = currency,
-			Buy = function()
-				setState("Waiting")
-				DeckController:DrawCardFromGacha(gachaId):andThen(function(success, cardId, cardCount)
-					if not success then
-						setState("Shop")
-						return
-					end
-
-					resultCardId.current = cardId
-					resultCardCount.current = cardCount
-					setState("Result")
-				end)
+			Buy = function(count)
+				buys.current = count
+				buy()
 			end,
 			Close = function()
 				menu.Unset("CardGacha")
@@ -63,10 +71,14 @@ return function()
 		}),
 
 		Result = (state == "Result") and React.createElement(CardGachaResult, {
-			CardId = resultCardId.current,
-			CardCount = resultCardCount.current,
+			CardId = resultCardId,
+			CardCount = resultCardCount,
 			Close = function()
-				setState("Shop")
+				if buys.current > 0 then
+					buy()
+				else
+					setState("Shop")
+				end
 			end,
 		}),
 	})

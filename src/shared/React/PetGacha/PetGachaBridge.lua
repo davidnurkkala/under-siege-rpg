@@ -17,7 +17,23 @@ return function()
 	local currency, setCurrency = React.useState(nil)
 	local gachaId, setGachaId = React.useState(nil)
 	local state, setState = React.useState("Shop")
-	local resultPetId = React.useRef(nil)
+	local resultPetId, setResultPetId = React.useState(nil)
+	local buys = React.useRef(0)
+
+	local buy = React.useCallback(function()
+		buys.current -= 1
+
+		setState("Waiting")
+		PetController:HatchPetFromGacha(gachaId):andThen(function(success, petId)
+			if not success then
+				setState("Shop")
+				return
+			end
+
+			setResultPetId(petId)
+			setState("Result")
+		end)
+	end, { gachaId, buys })
 
 	React.useEffect(function()
 		local trove = Trove.new()
@@ -45,17 +61,9 @@ return function()
 			Visible = menu.Is("PetGacha") and (state == "Shop"),
 			GachaId = gachaId,
 			Wallet = currency,
-			Buy = function()
-				setState("Waiting")
-				PetController:HatchPetFromGacha(gachaId):andThen(function(success, petId)
-					if not success then
-						setState("Shop")
-						return
-					end
-
-					resultPetId.current = petId
-					setState("Result")
-				end)
+			Buy = function(count)
+				buys.current = count
+				buy()
 			end,
 			Close = function()
 				menu.Unset("PetGacha")
@@ -63,12 +71,16 @@ return function()
 		}),
 
 		Result = (state == "Result") and React.createElement(PetGachaResult, {
-			PetId = resultPetId.current,
+			PetId = resultPetId,
 			EggId = TryNow(function()
 				return PetGachaDefs[gachaId].EggId
 			end, "World1"),
 			Close = function()
-				setState("Shop")
+				if buys.current > 0 then
+					buy()
+				else
+					setState("Shop")
+				end
 			end,
 		}),
 	})

@@ -64,6 +64,8 @@ function BattleService.Add(self: BattleService, player: Player, battle: any)
 	BattlesByPlayer[player] = battle
 
 	battle:Observe(function(status)
+		if BattlesByPlayer[player] ~= battle then return end
+
 		self.StatusRemote:SetFor(player, status)
 	end)
 end

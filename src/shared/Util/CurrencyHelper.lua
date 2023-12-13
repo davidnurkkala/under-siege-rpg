@@ -12,9 +12,11 @@ export type Wallet = {
 
 local CurrencyHelper = {}
 
-function CurrencyHelper.CheckPrice(wallet: Wallet, price: Price)
+function CurrencyHelper.CheckPrice(wallet: Wallet, price: Price, multiplier: number?)
+	if multiplier == nil then multiplier = 1 end
+
 	return Sift.Dictionary.every(price, function(amount, currencyType)
-		return wallet[currencyType] >= amount
+		return wallet[currencyType] >= amount * multiplier
 	end)
 end
 

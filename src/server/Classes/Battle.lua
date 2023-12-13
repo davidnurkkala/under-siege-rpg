@@ -204,7 +204,9 @@ end
 function Battle.Observe(self: Battle, callback)
 	local connection = self.Changed:Connect(callback)
 	callback(self:GetStatus())
-	return connection
+	return function()
+		connection:Disconnect()
+	end
 end
 
 function Battle.Add(self: Battle, object: Fieldable)
@@ -426,7 +428,8 @@ function Battle.MoveFieldable(self: Battle, mover: Fieldable, movement: number)
 		if movement == 0 then return false end
 	end
 
-	local position = math.clamp(mover.Position + movement, 0, 1)
+	local halfSize = mover.Size / 2
+	local position = math.clamp(mover.Position + movement, halfSize, 1 - halfSize)
 	if mover.Position == position then return false end
 
 	mover.Position = position

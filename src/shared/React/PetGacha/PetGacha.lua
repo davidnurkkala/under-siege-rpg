@@ -50,15 +50,54 @@ local function petPanel(props: {
 	})
 end
 
+local function buyButton(props: {
+	CanAfford: boolean,
+	Count: number,
+	Price: number,
+	LayoutOrder: number,
+	Activate: () -> (),
+})
+	return React.createElement(Button, {
+		LayoutOrder = props.LayoutOrder,
+		Size = UDim2.fromScale(5.5, 1),
+		SizeConstraint = Enum.SizeConstraint.RelativeYY,
+		ImageColor3 = if props.CanAfford then ColorDefs.Yellow else ColorDefs.PaleBlue,
+		BorderColor3 = if props.CanAfford then nil else ColorDefs.PaleBlue,
+		Active = props.CanAfford,
+		[React.Event.Activated] = props.Activate,
+	}, {
+		Layout = React.createElement(ListLayout, {
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			FillDirection = Enum.FillDirection.Horizontal,
+			Padding = UDim.new(0, 4),
+		}),
+
+		Text = React.createElement(Label, {
+			Text = TextStroke(
+				`<b>{if props.CanAfford then `Hatch {props.Count}` else "Need"}</b>   <font color="#{CurrencyDefs.Secondary.Colors.Primary:ToHex()}">{props.Price}</font>`
+			),
+			AutomaticSize = Enum.AutomaticSize.X,
+			Size = UDim2.fromScale(0, 1),
+			LayoutOrder = 1,
+			TextColor3 = if props.CanAfford then nil else ColorDefs.PaleRed,
+		}),
+
+		Icon = React.createElement(Image, {
+			SizeConstraint = Enum.SizeConstraint.RelativeYY,
+			Image = CurrencyDefs.Secondary.Image,
+			LayoutOrder = 2,
+		}),
+	})
+end
+
 return function(props: {
 	GachaId: string,
 	Visible: boolean,
 	Close: () -> (),
-	Buy: () -> (),
+	Buy: (number) -> (),
 	Wallet: CurrencyHelper.Wallet,
 })
 	local gacha = PetGachaDefs[props.GachaId]
-	local canAfford = CurrencyHelper.CheckPrice(props.Wallet, gacha.Price)
 
 	return React.createElement(SystemWindow, {
 		Visible = props.Visible,
@@ -66,35 +105,35 @@ return function(props: {
 		[React.Event.Activated] = props.Close,
 		Ratio = 1.15,
 	}, {
-		BuyButton = React.createElement(Button, {
-			Size = UDim2.new(0.4, 0, 0.125, -8),
+		Buttons = React.createElement(Container, {
+			Size = UDim2.new(1, 0, 0.125, -8),
 			Position = UDim2.fromScale(0.5, 1),
 			AnchorPoint = Vector2.new(0.5, 1),
-			ImageColor3 = if canAfford then ColorDefs.Yellow else ColorDefs.PaleBlue,
-			BorderColor3 = if canAfford then nil else ColorDefs.PaleBlue,
-			Active = canAfford,
-			[React.Event.Activated] = props.Buy,
 		}, {
 			Layout = React.createElement(ListLayout, {
 				HorizontalAlignment = Enum.HorizontalAlignment.Center,
 				FillDirection = Enum.FillDirection.Horizontal,
-				Padding = UDim.new(0, 4),
+				Padding = UDim.new(0, 12),
 			}),
 
-			Text = React.createElement(Label, {
-				Text = TextStroke(
-					`<b>{if canAfford then "Hatch!" else "Need"}</b>   <font color="#{CurrencyDefs.Secondary.Colors.Primary:ToHex()}">{gacha.Price.Secondary}</font>`
-				),
-				AutomaticSize = Enum.AutomaticSize.X,
-				Size = UDim2.fromScale(0, 1),
+			Button1 = React.createElement(buyButton, {
 				LayoutOrder = 1,
-				TextColor3 = if canAfford then nil else ColorDefs.PaleRed,
+				CanAfford = CurrencyHelper.CheckPrice(props.Wallet, gacha.Price),
+				Count = 1,
+				Price = gacha.Price.Secondary,
+				Activate = function()
+					props.Buy(1)
+				end,
 			}),
 
-			Icon = React.createElement(Image, {
-				SizeConstraint = Enum.SizeConstraint.RelativeYY,
-				Image = CurrencyDefs.Secondary.Image,
+			Button5 = React.createElement(buyButton, {
 				LayoutOrder = 2,
+				CanAfford = CurrencyHelper.CheckPrice(props.Wallet, gacha.Price, 5),
+				Count = 5,
+				Price = gacha.Price.Secondary * 5,
+				Activate = function()
+					props.Buy(5)
+				end,
 			}),
 		}),
 
