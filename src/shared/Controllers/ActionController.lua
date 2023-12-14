@@ -1,5 +1,6 @@
 local ContextActionService = game:GetService("ContextActionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 
 local Comm = require(ReplicatedStorage.Packages.Comm)
 local ActionController = {
@@ -22,6 +23,10 @@ function ActionController.PrepareBlocking(self: ActionController)
 			self:SetActionActive("Primary", false)
 		end
 	end, false, Enum.UserInputType.MouseButton1)
+
+	UserInputService.InputEnded:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 then self:SetActionActive("Primary", false) end
+	end)
 end
 
 function ActionController.SetActionActive(self: ActionController, actionName: string, active: boolean)
