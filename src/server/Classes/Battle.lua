@@ -12,6 +12,7 @@ local Cooldown = require(ReplicatedStorage.Shared.Classes.Cooldown)
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
 local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local Default = require(ReplicatedStorage.Shared.Util.Default)
+local EventStream = require(ReplicatedStorage.Shared.Util.EventStream)
 local Goon = require(ServerScriptService.Server.Classes.Goon)
 local GuiEffectService = require(ServerScriptService.Server.Services.GuiEffectService)
 local PartPath = require(ReplicatedStorage.Shared.Classes.PartPath)
@@ -164,23 +165,30 @@ function Battle.fromPlayerVersusBattler(player: Player, battlerId: string)
 
 			BattleService:Add(player, battle)
 			battle.Ended:Connect(function(victor)
-				if victor ~= battleSession.Battler then return end
+				if victor ~= battleSession.Battler then
+					EventStream.Event({ Kind = "BattleLost", Player = player, BattlerId = battlerId })
+					return
+				end
 
 				local def = BattlerDefs[battlerId]
 				local reward = def.Reward
 
-				CurrencyService:GetBoosted(player, "Secondary", reward):andThen(function(amountAdded)
-					GuiEffectService.IndicatorRequestedRemote:Fire(player, {
-						Text = `+{amountAdded // 0.1 / 10}`,
-						Image = CurrencyDefs.Secondary.Image,
-						Start = opponent:GetRoot().Position,
-						Finish = victor:GetRoot().Position,
-					})
+				CurrencyService:GetBoosted(player, "Secondary", reward)
+					:andThen(function(amountAdded)
+						GuiEffectService.IndicatorRequestedRemote:Fire(player, {
+							Text = `+{amountAdded // 0.1 / 10}`,
+							Image = CurrencyDefs.Secondary.Image,
+							Start = opponent:GetRoot().Position,
+							Finish = victor:GetRoot().Position,
+						})
 
-					Promise.delay(0.5):andThen(function()
-						CurrencyService:AddCurrency(player, "Secondary", amountAdded)
+						Promise.delay(0.5):andThen(function()
+							CurrencyService:AddCurrency(player, "Secondary", amountAdded)
+						end)
 					end)
-				end)
+					:andThen(function()
+						EventStream.Event({ Kind = "BattleWon", Player = player, BattlerId = battlerId })
+					end)
 			end)
 			battle.Destroyed:Connect(function()
 				BattleService:Remove(player)

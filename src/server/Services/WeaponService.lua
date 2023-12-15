@@ -4,6 +4,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local Comm = require(ReplicatedStorage.Packages.Comm)
 local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local DataService = require(ServerScriptService.Server.Services.DataService)
+local EventStream = require(ReplicatedStorage.Shared.Util.EventStream)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Sift = require(ReplicatedStorage.Packages.Sift)
@@ -55,6 +56,12 @@ function WeaponService.EquipWeapon(_self: WeaponService, player: Player, weaponI
 	end)
 end
 
+function WeaponService.IsWeaponOwned(_self: WeaponService, player: Player, weaponId: string)
+	return DataService:GetSaveFile(player):andThen(function(saveFile)
+		return saveFile:Get("Weapons").Owned[weaponId] ~= nil
+	end)
+end
+
 function WeaponService.UnlockWeapon(self: WeaponService, player: Player, weaponId: string)
 	local def = WeaponDefs[weaponId]
 	if not def then return Promise.resolve(false) end
@@ -71,7 +78,7 @@ function WeaponService.UnlockWeapon(self: WeaponService, player: Player, weaponI
 	end)
 end
 
-function WeaponService.OwnWeapon(_self: WeaponService, player: Player, weaponId: string)
+function WeaponService.OwnWeapon(self: WeaponService, player: Player, weaponId: string)
 	if not WeaponDefs[weaponId] then return Promise.resolve(false) end
 
 	return DataService:GetSaveFile(player):andThen(function(saveFile)
@@ -82,7 +89,9 @@ function WeaponService.OwnWeapon(_self: WeaponService, player: Player, weaponId:
 		local newWeapons = Sift.Dictionary.set(weapons, "Owned", newOwned)
 		saveFile:Set("Weapons", newWeapons)
 
-		return true
+		EventStream.Event({ Kind = "WeaponOwned", Player = player, WeaponId = weaponId })
+
+		return self:EquipWeapon(player, weaponId):andThenReturn(true)
 	end)
 end
 

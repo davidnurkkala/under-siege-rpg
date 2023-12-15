@@ -6,6 +6,7 @@ local Comm = require(ReplicatedStorage.Packages.Comm)
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
 local CurrencyHelper = require(ReplicatedStorage.Shared.Util.CurrencyHelper)
 local DataService = require(ServerScriptService.Server.Services.DataService)
+local EventStream = require(ReplicatedStorage.Shared.Util.EventStream)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 
@@ -61,6 +62,13 @@ function CurrencyService.AddCurrency(_self: CurrencyService, player: Player, cur
 		saveFile:Update("Currency", function(oldCurrency)
 			return Sift.Dictionary.set(oldCurrency, currencyType, oldCurrency[currencyType] + amount)
 		end)
+
+		EventStream.Event({
+			Kind = "CurrencyAdded",
+			Player = player,
+			CurrencyType = currencyType,
+			Amount = amount,
+		})
 
 		return amount
 	end)

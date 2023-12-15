@@ -6,6 +6,7 @@ local CurrencyService = require(ServerScriptService.Server.Services.CurrencyServ
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local EffectGrindPets = require(ReplicatedStorage.Shared.Effects.EffectGrindPets)
 local EffectService = require(ServerScriptService.Server.Services.EffectService)
+local EventStream = require(ReplicatedStorage.Shared.Util.EventStream)
 local Guid = require(ReplicatedStorage.Shared.Util.Guid)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local OptionsService = require(ServerScriptService.Server.Services.OptionsService)
@@ -206,6 +207,8 @@ function PetService.HatchPetFromGacha(self: PetService, player: Player, gachaId:
 	return CurrencyService:ApplyPrice(player, gacha.Price)
 		:andThen(function(success)
 			if not success then return false, "notEnoughCurrency" end
+
+			EventStream.Event({ Kind = "PetGachaRolled", Player = player, GachaId = gachaId })
 
 			local petId = gacha.WeightTable:Roll()
 			return self:AddPet(player, petId):andThenReturn(true, petId)

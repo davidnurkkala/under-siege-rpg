@@ -49,8 +49,8 @@ function DataService.PrepareBlocking(self: DataService)
 			},
 			Boosts = {},
 			Deck = {
-				Equipped = {},
-				Owned = {},
+				Equipped = { Peasant = true },
+				Owned = { Peasant = 1 },
 			},
 			Pets = {
 				Equipped = {},
@@ -68,23 +68,7 @@ function DataService.PrepareBlocking(self: DataService)
 			IsFirstSession = true,
 		},
 
-		migrations = {
-			function(oldData)
-				return Sift.Dictionary.set(oldData, "Worlds", { "World1" })
-			end,
-			function(oldData)
-				return Sift.Dictionary.set(oldData, "Worlds", { World1 = true })
-			end,
-			function(oldData)
-				return Sift.Dictionary.set(oldData, "Worlds", { World1 = true })
-			end,
-			function(oldData)
-				return Sift.Dictionary.set(oldData, "Boosts", {})
-			end,
-			function(oldData)
-				return Sift.Dictionary.set(oldData, "WorldCurrent", "World1")
-			end,
-		},
+		migrations = {},
 	})
 
 	Observers.observePlayer(function(player: Player)

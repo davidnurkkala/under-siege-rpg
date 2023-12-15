@@ -20,7 +20,7 @@ local Weapons = {
 		},
 	},
 	HuntersBow = {
-		Name = "Hunters Bow",
+		Name = "Hunter's Bow",
 		Power = 10,
 		Price = 100,
 		AttackCooldownTime = 0.4,

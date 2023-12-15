@@ -6,6 +6,7 @@ local CardGachaDefs = require(ReplicatedStorage.Shared.Defs.CardGachaDefs)
 local Comm = require(ReplicatedStorage.Packages.Comm)
 local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local DataService = require(ServerScriptService.Server.Services.DataService)
+local EventStream = require(ReplicatedStorage.Shared.Util.EventStream)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local OptionsService = require(ServerScriptService.Server.Services.OptionsService)
 local Promise = require(ReplicatedStorage.Packages.Promise)
@@ -113,6 +114,8 @@ function DeckService.DrawCardFromGacha(self: DeckService, player: Player, gachaI
 	return CurrencyService:ApplyPrice(player, gacha.Price)
 		:andThen(function(success)
 			if not success then return false, "notEnoughCurrency" end
+
+			EventStream.Event({ Kind = "CardGachaRolled", Player = player, GachaId = gachaId })
 
 			local cardId = gacha.WeightTable:Roll()
 			return self:AddCard(player, cardId):andThen(function(cardCount)
