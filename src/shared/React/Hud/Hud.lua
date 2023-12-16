@@ -4,15 +4,10 @@ local BattleController = require(ReplicatedStorage.Shared.Controllers.BattleCont
 local BattleHud = require(ReplicatedStorage.Shared.React.Battle.BattleHud)
 local LobbyHud = require(ReplicatedStorage.Shared.React.Lobby.LobbyHud)
 local React = require(ReplicatedStorage.Packages.React)
+local UseProperty = require(ReplicatedStorage.Shared.React.Hooks.UseProperty)
 
 return function()
-	local inBattle, setInBattle = React.useState(false)
-
-	React.useEffect(function()
-		return BattleController:ObserveStatus(function(status)
-			setInBattle(status ~= nil)
-		end)
-	end, {})
+	local inBattle = UseProperty(BattleController.InBattle)
 
 	return React.createElement(React.Fragment, nil, {
 		LobbyHud = React.createElement(LobbyHud, {

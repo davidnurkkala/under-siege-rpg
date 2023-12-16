@@ -3,13 +3,13 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Animate = require(ReplicatedStorage.Shared.Util.Animate)
 local Comm = require(ReplicatedStorage.Packages.Comm)
 local Compare = require(ReplicatedStorage.Shared.Util.Compare)
+local Property = require(ReplicatedStorage.Shared.Classes.Property)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local SmoothStep = require(ReplicatedStorage.Shared.Util.SmoothStep)
 
 local BattleController = {
 	Priority = 0,
-	InBattle = false,
 	StatusChanged = Signal.new(),
 }
 
@@ -17,6 +17,7 @@ type BattleController = typeof(BattleController)
 
 function BattleController.PrepareBlocking(self: BattleController)
 	self.Status = nil
+	self.InBattle = Property.new(false)
 
 	self.Comm = Comm.ClientComm.new(ReplicatedStorage, true, "BattleService")
 
@@ -43,8 +44,8 @@ function BattleController.SetStatus(self: BattleController, status: any?)
 end
 
 function BattleController:SetInBattle(inBattle: boolean, status: any)
-	if inBattle == self.InBattle then return end
-	self.InBattle = inBattle
+	if inBattle == self.InBattle:Get() then return end
+	self.InBattle:Set(inBattle)
 
 	local camera = workspace.CurrentCamera
 

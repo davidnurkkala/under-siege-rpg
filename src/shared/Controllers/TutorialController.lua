@@ -2,6 +2,7 @@ local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local BattleController = require(ReplicatedStorage.Shared.Controllers.BattleController)
 local BattlerDefs = require(ReplicatedStorage.Shared.Defs.BattlerDefs)
 local Comm = require(ReplicatedStorage.Packages.Comm)
 local Promise = require(ReplicatedStorage.Packages.Promise)
@@ -19,8 +20,10 @@ type TutorialController = typeof(TutorialController)
 function TutorialController.PrepareBlocking(self: TutorialController)
 	self.Comm = Comm.ClientComm.new(ReplicatedStorage, true, "TutorialService")
 	self.StatusRemote = self.Comm:GetProperty("Status")
+
 	self.Message = Property.new(nil, Sift.Dictionary.equalsDeep)
 	self.Target = Property.new(nil)
+	self.BeamEnabled = Property.new(true)
 
 	self.StatusRemote:Observe(function(state)
 		self:Update(state and state.state)
@@ -64,10 +67,21 @@ function TutorialController.PrepareBlocking(self: TutorialController)
 		beam.Attachment1 = a1
 		beam.Parent = workspace.Effects
 
+		local function updateEnabled()
+			beam.Enabled = self.BeamEnabled:Get() and (not BattleController.InBattle:Get())
+		end
+
+		trove:Add(self.BeamEnabled:Observe(updateEnabled))
+		trove:Add(BattleController.InBattle:Observe(updateEnabled))
+
 		return function()
 			trove:Clean()
 		end
 	end)
+end
+
+function TutorialController.ToggleBeam(self: TutorialController)
+	self.BeamEnabled:Set(not self.BeamEnabled:Get())
 end
 
 function TutorialController.GetNearestTag(_self: TutorialController, tag: string, predicate: ((any) -> boolean)?)
@@ -110,21 +124,21 @@ function TutorialController.Update(self: TutorialController, status)
 			`Battle the {BattlerDefs[status.State.battlerId].Name}.\n{status.State.victories} / {status.State.requirement} wins`,
 		})
 
-		self.Target:Set(self:GetNearestTag("BattlerPrompt"), function(model)
+		self.Target:Set(self:GetNearestTag("BattlerPrompt", function(model)
 			return model:GetAttribute("BattlerId") == status.State.battlerId
-		end)
+		end))
 	elseif status.Instruction == "CardGacha" then
 		self.Message:Set({ `Hire a soldier.` })
 
-		self.Target:Set(self:GetNearestTag("CardGachaZone"), function(model)
-			return model:GetAttribute("GachaId") == "World1Soldiers"
-		end)
+		self.Target:Set(self:GetNearestTag("CardGachaZone", function(model)
+			return model:GetAttribute("GachaId") == "World1Goons"
+		end))
 	elseif status.Instruction == "PetGacha" then
 		self.Message:Set({ `Hatch a pet.` })
 
-		self.Target:Set(self:GetNearestTag("PetGachaZone"), function(model)
-			return model:GetAttribute("GachaId") == "World1Soldiers"
-		end)
+		self.Target:Set(self:GetNearestTag("PetGachaZone", function(model)
+			return model:GetAttribute("GachaId") == "World1Pets"
+		end))
 	end
 end
 

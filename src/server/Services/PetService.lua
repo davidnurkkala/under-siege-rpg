@@ -137,7 +137,13 @@ function PetService.MergePets(self: PetService, player: Player, petId: string, t
 			if success then
 				return self:AddPet(player, petId, tier + 1):andThenReturn(true)
 			else
-				return false
+				return OptionsService:GetOption(player, "AutoEquipBestPets")
+					:andThen(function(autoEquip)
+						if not autoEquip then return end
+
+						return self:EquipBest(player)
+					end)
+					:andThenReturn(false)
 			end
 		end)
 	end)
