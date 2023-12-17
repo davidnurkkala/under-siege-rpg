@@ -63,6 +63,7 @@ return function(props: {
 
 				return React.createElement(LayoutContainer, {
 					Padding = 8,
+					LayoutOrder = index,
 				}, {
 					Button = React.createElement(Button, {
 						Size = UDim2.fromScale(1, 1),

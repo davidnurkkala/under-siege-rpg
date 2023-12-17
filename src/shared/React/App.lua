@@ -6,6 +6,7 @@ local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local DeckMenuBridge = require(ReplicatedStorage.Shared.React.Menus.DeckMenuBridge)
 local Hud = require(ReplicatedStorage.Shared.React.Hud.Hud)
 local IndicatorBridge = require(ReplicatedStorage.Shared.React.NumberPopups.IndicatorBridge)
+local LoginStreakRewardsMenuBridge = require(ReplicatedStorage.Shared.React.Menus.LoginStreakRewardsMenuBridge)
 local MenuProvider = require(ReplicatedStorage.Shared.React.MenuContext.MenuProvider)
 local PaddingAll = require(ReplicatedStorage.Shared.React.Common.PaddingAll)
 local PetGachaBridge = require(ReplicatedStorage.Shared.React.PetGacha.PetGachaBridge)
@@ -37,6 +38,7 @@ return function()
 				DeckMenu = React.createElement(DeckMenuBridge),
 				PetMenu = React.createElement(PetMenuBridge),
 				SessionRewardsMenu = React.createElement(SessionRewardsMenuBridge),
+				LoginStreakRewardsMenu = React.createElement(LoginStreakRewardsMenuBridge),
 			}),
 
 			Indicators = React.createElement(IndicatorBridge),
