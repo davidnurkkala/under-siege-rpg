@@ -1,5 +1,6 @@
 local MarketplaceService = game:GetService("MarketplaceService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 
 local Comm = require(ReplicatedStorage.Packages.Comm)
 local Observers = require(ReplicatedStorage.Packages.Observers)
@@ -67,6 +68,8 @@ function ProductService.GetVipBoostedSecondary(self: ProductService, player: Pla
 end
 
 function ProductService.IsVip(_self: ProductService, player: Player)
+	if RunService:IsStudio() then return false end
+
 	return player:GetAttribute("IsVip")
 end
 
