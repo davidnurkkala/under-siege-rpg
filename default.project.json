@@ -49,6 +49,12 @@
         "CharacterAutoLoads": false,
         "MaxPlayers": 10
       }
+    },
+
+    "TextChatService": {
+      "$properties": {
+        "ChatVersion": "TextChatService"
+      }
     }
   }
 }

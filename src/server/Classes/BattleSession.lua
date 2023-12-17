@@ -10,6 +10,7 @@ local Deck = require(ServerScriptService.Server.Classes.Deck)
 local DeckPlayerRandom = require(ServerScriptService.Server.Classes.DeckPlayerRandom)
 local DeckService = require(ServerScriptService.Server.Services.DeckService)
 local PlayerLeaving = require(ReplicatedStorage.Shared.Util.PlayerLeaving)
+local ProductService = require(ServerScriptService.Server.Services.ProductService)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local Trove = require(ReplicatedStorage.Packages.Trove)
@@ -78,7 +79,13 @@ function BattleSession.new(args: {
 		self.Trove:Add(ActionService:Subscribe(self.Player, "Primary", function()
 			if cooldown:IsReady() then
 				cooldown:Use()
-				self.Battler:AddCrit(critPerClick)
+
+				local multiplier = 1
+				if ProductService:IsVip(self.Player) then
+					multiplier += 1
+				end
+
+				self.Battler:AddCrit(critPerClick * multiplier)
 			end
 		end))
 	end))

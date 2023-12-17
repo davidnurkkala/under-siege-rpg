@@ -200,7 +200,10 @@ return function()
 			Text = TextStroke("VIP"),
 			Color = ColorDefs.Purple,
 			Image = "rbxassetid://15307999873",
-			Activate = function() end,
+			Activate = function()
+				menu.Set("VIP")
+				return Promise.resolve()
+			end,
 		}),
 		StreakButton = React.createElement(streakButton),
 		GiftsButton = React.createElement(giftButton),

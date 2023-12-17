@@ -17,6 +17,7 @@ local React = require(ReplicatedStorage.Packages.React)
 local SessionRewardsMenuBridge = require(ReplicatedStorage.Shared.React.Menus.SessionRewardsMenuBridge)
 local TeleportMenuBridge = require(ReplicatedStorage.Shared.React.Teleport.TeleportMenuBridge)
 local TutorialHud = require(ReplicatedStorage.Shared.React.Tutorial.TutorialHud)
+local VipMenuBridge = require(ReplicatedStorage.Shared.React.Menus.VipMenuBridge)
 local WeaponShopBridge = require(ReplicatedStorage.Shared.React.WeaponShop.WeaponShopBridge)
 
 return function()
@@ -39,6 +40,7 @@ return function()
 				PetMenu = React.createElement(PetMenuBridge),
 				SessionRewardsMenu = React.createElement(SessionRewardsMenuBridge),
 				LoginStreakRewardsMenu = React.createElement(LoginStreakRewardsMenuBridge),
+				VipMenu = React.createElement(VipMenuBridge),
 			}),
 
 			Indicators = React.createElement(IndicatorBridge),
