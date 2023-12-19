@@ -119,33 +119,35 @@ function PetService.MergePets(self: PetService, player: Player, petId: string, t
 
 		if #pets < count then return false end
 
-		return Promise.all(Sift.Array.map(Range(count), function(index)
-			return self:RemovePet(player, pets[index].Id)
-		end)):andThen(function()
-			local roll = Rand:NextInteger(1, 4) - count
-			local success = roll < 1
+		local roll = Rand:NextInteger(1, 4) - count
+		local success = roll < 1
 
-			EffectService:Effect(
-				player,
-				EffectGrindPets({
-					PetId = petId,
-					Success = success,
-					Count = count,
-				})
-			)
+		return EffectService:Effect(
+			player,
+			EffectGrindPets({
+				PetId = petId,
+				Success = success,
+				Count = count,
+			})
+		)
+			:andThen(function()
+				return Promise.all(Sift.Array.map(Range(count), function(index)
+					return self:RemovePet(player, pets[index].Id)
+				end))
+			end)
+			:andThen(function()
+				if success then
+					return self:AddPet(player, petId, tier + 1):andThenReturn(true)
+				else
+					return OptionsService:GetOption(player, "AutoEquipBestPets")
+						:andThen(function(autoEquip)
+							if not autoEquip then return end
 
-			if success then
-				return self:AddPet(player, petId, tier + 1):andThenReturn(true)
-			else
-				return OptionsService:GetOption(player, "AutoEquipBestPets")
-					:andThen(function(autoEquip)
-						if not autoEquip then return end
-
-						return self:EquipBest(player)
-					end)
-					:andThenReturn(false)
-			end
-		end)
+							return self:EquipBest(player)
+						end)
+						:andThenReturn(false)
+				end
+			end)
 	end)
 end
 

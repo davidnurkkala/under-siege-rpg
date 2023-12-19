@@ -134,8 +134,8 @@ return function(props: {
 								end,
 							}, {
 								Name = React.createElement(Label, {
-									Size = UDim2.fromScale(1, 0.25),
-									Text = TextStroke(`{petDef.Name}{if petSlot.Tier > 1 then ` Lv. {petSlot.Tier}` else ``}`),
+									Size = UDim2.fromScale(1, 0.4),
+									Text = TextStroke(`{petDef.Name}{if petSlot.Tier > 1 then `\nLv. {petSlot.Tier}` else `\n `}`),
 									TextXAlignment = Enum.TextXAlignment.Left,
 									ZIndex = 4,
 								}),

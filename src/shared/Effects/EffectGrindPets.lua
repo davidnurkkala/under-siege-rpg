@@ -44,7 +44,7 @@ return function(args: {
 	Count: number,
 })
 	return function()
-		return script.Name, args, Promise.delay(3)
+		return script.Name, args, Promise.delay(0.75 * args.Count + 1.5)
 	end, function()
 		local grinders = ComponentController:GetComponentsByName("PetGrinder")
 		local playerRoot = Players.LocalPlayer.Character.PrimaryPart
