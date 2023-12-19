@@ -72,13 +72,14 @@ function PrestigeService.Prestige(self: PrestigeService, player: Player, prestig
 
 			return EffectService:All(EffectPrestige({ Player = player }))
 				:andThen(function()
-					return Promise.all({
-						self.CurrencyService:SetCurrency(player, "Primary", 0),
-						self.CurrencyService:SetCurrency(player, "Secondary", 0),
-						WorldService:ResetWorlds(player),
-						WeaponService:ResetWeapons(player),
-						self.CurrencyService:AddCurrency(player, "Prestige", 1),
-					})
+					return WorldService:ResetWorlds(player, function()
+						Promise.all({
+							self.CurrencyService:SetCurrency(player, "Primary", 0),
+							self.CurrencyService:SetCurrency(player, "Secondary", 0),
+							WeaponService:ResetWeapons(player),
+							self.CurrencyService:AddCurrency(player, "Prestige", 1),
+						}):expect()
+					end)
 				end)
 				:andThen(function()
 					return DataService:GetSaveFile(player):andThen(function(saveFile)

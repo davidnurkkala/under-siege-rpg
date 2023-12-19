@@ -12,6 +12,7 @@ function ProductController.PrepareBlocking(self: ProductController)
 	self.Comm = Comm.ClientComm.new(ReplicatedStorage, true, "ProductService")
 	self.GetOwnsProduct = self.Comm:GetFunction("GetOwnsProduct")
 	self.PurchaseProduct = self.Comm:GetFunction("PurchaseProduct")
+	self.PurchasePremium = self.Comm:GetFunction("PurchasePremium")
 end
 
 return ProductController

@@ -92,8 +92,8 @@ function WorldService.PrepareBlocking(self: WorldService)
 	end)
 end
 
-function WorldService.ResetWorlds(self: WorldService, player: Player)
-	return self:TeleportToWorld(player, DataService.Defaults.WorldCurrent)
+function WorldService.ResetWorlds(self: WorldService, player: Player, callback)
+	return self:TeleportToWorld(player, DataService.Defaults.WorldCurrent, callback)
 		:andThen(function()
 			return DataService:GetSaveFile(player)
 		end)
@@ -123,7 +123,7 @@ function WorldService.PurchaseWorld(self: WorldService, player: Player, worldId:
 	end)
 end
 
-function WorldService.TeleportToWorld(self: WorldService, player: Player, worldId: string)
+function WorldService.TeleportToWorld(self: WorldService, player: Player, worldId: string, callback)
 	local def = WorldDefs[worldId]
 	assert(def, `No def for id {worldId}`)
 
@@ -137,6 +137,7 @@ function WorldService.TeleportToWorld(self: WorldService, player: Player, worldI
 		saveFile:Set("WorldCurrent", worldId)
 
 		return ServerFade(player, nil, function()
+			if callback then callback() end
 			LightingService.LightingChangeRequested:Fire(player, def.LightingName)
 			char:PivotTo(model:GetPivot() + Vector3.new(0, 4, 0))
 		end)

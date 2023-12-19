@@ -7,6 +7,11 @@ local Products = {
 		AssetId = 673504609,
 		Type = "GamePass",
 	},
+	MultiRoll = {
+		FreeForPremium = true,
+		AssetId = 674957315,
+		Type = "GamePass",
+	},
 }
 
 return Sift.Dictionary.map(Products, function(product, id)

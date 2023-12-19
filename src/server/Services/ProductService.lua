@@ -25,9 +25,17 @@ function ProductService.PrepareBlocking(self: ProductService)
 
 		if def.Type == "GamePass" then
 			MarketplaceService:PromptGamePassPurchase(player, def.AssetId)
+
+			return Promise.fromEvent(MarketplaceService.PromptGamePassPurchaseFinished):expect()
 		else
 			error(`Unimplemented product type {def.Type}`)
 		end
+	end)
+
+	self.Comm:BindFunction("PurchasePremium", function(player: Player)
+		MarketplaceService:PromptPremiumPurchase(player)
+
+		return Promise.fromEvent(MarketplaceService.PromptPremiumPurchaseFinished):expect()
 	end)
 
 	self.Comm:BindFunction("GetOwnsProduct", function(player: Player, id)
@@ -35,6 +43,8 @@ function ProductService.PrepareBlocking(self: ProductService)
 
 		local def = ProductDefs[id]
 		if not def then return end
+
+		if def.FreeForPremium and player.MembershipType == Enum.MembershipType.Premium then return true end
 
 		if def.Type == "GamePass" then
 			return MarketplaceService:UserOwnsGamePassAsync(player.UserId, def.AssetId)
