@@ -13,6 +13,19 @@ local COLLECTION_NAME = "DataService" .. Configuration.DataStoreVersion
 
 local DataService = {
 	Priority = -1024,
+
+	Defaults = {
+		Weapons = {
+			Equipped = "WoodenBow",
+			Owned = {
+				WoodenBow = true,
+			},
+		},
+		Worlds = {
+			World1 = true,
+		},
+		WorldCurrent = "World1",
+	},
 }
 
 type DataService = typeof(DataService)
@@ -35,17 +48,16 @@ function DataService.PrepareBlocking(self: DataService)
 		end,
 
 		defaultData = {
-			Weapons = {
-				Equipped = "WoodenBow",
-				Owned = {
-					WoodenBow = true,
-				},
-			},
+			Weapons = self.Defaults.Weapons,
 			Currency = {
 				Primary = 0,
 				Secondary = 0,
 				Premium = 0,
 				Prestige = 0,
+			},
+			PrestigePoints = {
+				Primary = 0,
+				Secondary = 0,
 			},
 			Boosts = {},
 			Deck = {
@@ -61,14 +73,19 @@ function DataService.PrepareBlocking(self: DataService)
 				Streak = 0,
 				AvailableRewardIndices = {},
 			},
-			Worlds = {
-				World1 = true,
-			},
-			WorldCurrent = "World1",
+			Worlds = self.Defaults.Worlds,
+			WorldCurrent = self.Defaults.WorldCurrent,
 			IsFirstSession = true,
 		},
 
-		migrations = {},
+		migrations = {
+			function(oldData)
+				return Sift.Dictionary.set(oldData, "PrestigePoints", {
+					Primary = 0,
+					Secondary = 0,
+				})
+			end,
+		},
 	})
 
 	Observers.observePlayer(function(player: Player)

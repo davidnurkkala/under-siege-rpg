@@ -212,7 +212,10 @@ return function()
 			Text = TextStroke("Rebirth"),
 			Color = ColorDefs.PalePurple,
 			Image = "rbxassetid://15308000137",
-			Activate = function() end,
+			Activate = function()
+				menu.Set("Prestige")
+				return Promise.resolve()
+			end,
 		}),
 		ShopButton = React.createElement(lobbyButton, {
 			LayoutOrder = 6,

@@ -33,9 +33,11 @@ function Animator.Play(self: Animator, name: string, ...)
 		self.Tracks[name] = self.Controller:LoadAnimation(animation)
 	end
 
-	if self.Tracks[name].IsPlaying then return end
+	if self.Tracks[name].IsPlaying then return self.Tracks[name] end
 
 	self.Tracks[name]:Play(...)
+
+	return self.Tracks[name]
 end
 
 function Animator.Stop(self: Animator, name: string, ...)

@@ -64,6 +64,8 @@ local Ids = {
 
 	GrinderIdle = 15556640531,
 	GrinderShake = 15556639103,
+
+	Prestige = 15683543486,
 }
 
 return Sift.Dictionary.map(Ids, function(id, name)

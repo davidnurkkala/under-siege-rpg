@@ -92,6 +92,16 @@ function WorldService.PrepareBlocking(self: WorldService)
 	end)
 end
 
+function WorldService.ResetWorlds(self: WorldService, player: Player)
+	return self:TeleportToWorld(player, DataService.Defaults.WorldCurrent)
+		:andThen(function()
+			return DataService:GetSaveFile(player)
+		end)
+		:andThen(function(saveFile)
+			saveFile:Set("Worlds", DataService.Defaults.Worlds)
+		end)
+end
+
 function WorldService.PurchaseWorld(self: WorldService, player: Player, worldId: string)
 	local def = WorldDefs[worldId]
 	assert(def, `No def for id {worldId}`)

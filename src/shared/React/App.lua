@@ -13,6 +13,7 @@ local PetGachaBridge = require(ReplicatedStorage.Shared.React.PetGacha.PetGachaB
 local PetMenuBridge = require(ReplicatedStorage.Shared.React.Menus.PetMenuBridge)
 local PetMergeMenuBridge = require(ReplicatedStorage.Shared.React.Menus.PetMergeMenuBridge)
 local PlatformProvider = require(ReplicatedStorage.Shared.React.PlatformContext.PlatformProvider)
+local PrestigeMenuBridge = require(ReplicatedStorage.Shared.React.Menus.PrestigeMenuBridge)
 local React = require(ReplicatedStorage.Packages.React)
 local SessionRewardsMenuBridge = require(ReplicatedStorage.Shared.React.Menus.SessionRewardsMenuBridge)
 local TeleportMenuBridge = require(ReplicatedStorage.Shared.React.Teleport.TeleportMenuBridge)
@@ -41,6 +42,7 @@ return function()
 				SessionRewardsMenu = React.createElement(SessionRewardsMenuBridge),
 				LoginStreakRewardsMenu = React.createElement(LoginStreakRewardsMenuBridge),
 				VipMenu = React.createElement(VipMenuBridge),
+				PrestigeMenu = React.createElement(PrestigeMenuBridge),
 			}),
 
 			Indicators = React.createElement(IndicatorBridge),

@@ -33,11 +33,25 @@ function CurrencyService.PrepareBlocking(self: CurrencyService)
 	end)
 end
 
+function CurrencyService.Start(self: CurrencyService)
+	self.PrestigeService = require(ServerScriptService.Server.Services.PrestigeService) :: any
+end
+
 function CurrencyService.GetCurrency(_self: CurrencyService, player: Player, currencyType: string)
 	assert(Sift.Dictionary.has(CurrencyDefs, currencyType), `Invalid currency type {currencyType}`)
 
 	return DataService:GetSaveFile(player):andThen(function(saveFile)
 		return saveFile:Get("Currency")[currencyType]
+	end)
+end
+
+function CurrencyService.SetCurrency(_self: CurrencyService, player: Player, currencyType: string, amount: number)
+	assert(Sift.Dictionary.has(CurrencyDefs, currencyType), `Invalid currency type {currencyType}`)
+
+	return DataService:GetSaveFile(player):andThen(function(saveFile)
+		saveFile:Update("Currency", function(oldCurrency)
+			return Sift.Dictionary.set(oldCurrency, currencyType, amount)
+		end)
 	end)
 end
 
@@ -47,12 +61,18 @@ function CurrencyService.GetWallet(_self: CurrencyService, player: Player)
 	end)
 end
 
-function CurrencyService.GetBoosted(_self: CurrencyService, player: Player, currencyType: string, amount: number)
+function CurrencyService.GetBoosted(self: CurrencyService, player: Player, currencyType: string, amount: number)
 	return BoostService:GetMultiplier(player, function(boost)
 		return (boost.Type == "Currency") and (boost.CurrencyType == currencyType)
-	end):andThen(function(multiplier)
-		return amount * multiplier
 	end)
+		:andThen(function(multiplier)
+			return self.PrestigeService:GetBoost(player, currencyType):andThen(function(prestigeMultiplier)
+				return multiplier * prestigeMultiplier
+			end)
+		end)
+		:andThen(function(multiplier)
+			return amount * multiplier
+		end)
 end
 
 function CurrencyService.AddCurrency(_self: CurrencyService, player: Player, currencyType: string, amount: number)

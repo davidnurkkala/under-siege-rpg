@@ -95,4 +95,10 @@ function WeaponService.OwnWeapon(self: WeaponService, player: Player, weaponId: 
 	end)
 end
 
+function WeaponService.ResetWeapons(_self: WeaponService, player: Player)
+	return DataService:GetSaveFile(player):andThen(function(saveFile)
+		saveFile:Set("Weapons", DataService.Defaults.Weapons)
+	end)
+end
+
 return WeaponService
