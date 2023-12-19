@@ -154,7 +154,7 @@ return function(props: {
 									}),
 
 									Name = React.createElement(Label, {
-										Text = TextStroke(`{def.Name} T{entry.Tier}`),
+										Text = TextStroke(`{def.Name} Lv. {entry.Tier}`),
 										TextXAlignment = Enum.TextXAlignment.Left,
 										Size = UDim2.fromScale(1, 0.25),
 										ZIndex = 4,
