@@ -14,6 +14,7 @@ export type TrainingDummy = typeof(setmetatable({} :: {}, TrainingDummy))
 function TrainingDummy.new(model: Model): TrainingDummy
 	local self: TrainingDummy = setmetatable({
 		Model = model,
+		IsPremium = model:GetAttribute("IsPremium") == true,
 		Root = model.PrimaryPart,
 	}, TrainingDummy)
 

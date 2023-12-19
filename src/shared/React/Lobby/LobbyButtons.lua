@@ -11,6 +11,7 @@ local GridLayout = require(ReplicatedStorage.Shared.React.Common.GridLayout)
 local Image = require(ReplicatedStorage.Shared.React.Common.Image)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local LayoutContainer = require(ReplicatedStorage.Shared.React.Common.LayoutContainer)
+local LoginStreakController = require(ReplicatedStorage.Shared.Controllers.LoginStreakController)
 local MenuContext = require(ReplicatedStorage.Shared.React.MenuContext.MenuContext)
 local ObserveSignal = require(ReplicatedStorage.Shared.Util.ObserveSignal)
 local Promise = require(ReplicatedStorage.Packages.Promise)
@@ -122,6 +123,42 @@ local function giftButton()
 	})
 end
 
+local function streakButton()
+	local menu = React.useContext(MenuContext)
+
+	local count, setCount = React.useState(0)
+
+	React.useEffect(function()
+		return LoginStreakController:ObserveStatus(function(status)
+			if not (status and status.AvailableRewardIndices) then return end
+
+			setCount(#status.AvailableRewardIndices)
+		end)
+	end, {})
+
+	return React.createElement(lobbyButton, {
+		LayoutOrder = 3,
+		Text = TextStroke("Streak"),
+		Color = ColorDefs.LightRed,
+		Image = "rbxassetid://15307999952",
+		Activate = function()
+			menu.Set("LoginStreak")
+			return Promise.resolve()
+		end,
+	}, {
+		Notification = (count > 0) and React.createElement(Container, {
+			ZIndex = 8,
+			Size = UDim2.fromScale(0.5, 0.5),
+			Position = UDim2.fromScale(1, 1),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+		}, {
+			Notification = React.createElement(numberNotification, {
+				Number = count,
+			}),
+		}),
+	})
+end
+
 return function()
 	local menu = React.useContext(MenuContext)
 
@@ -163,15 +200,12 @@ return function()
 			Text = TextStroke("VIP"),
 			Color = ColorDefs.Purple,
 			Image = "rbxassetid://15307999873",
-			Activate = function() end,
+			Activate = function()
+				menu.Set("VIP")
+				return Promise.resolve()
+			end,
 		}),
-		StreakButton = React.createElement(lobbyButton, {
-			LayoutOrder = 3,
-			Text = TextStroke("Streak"),
-			Color = ColorDefs.LightRed,
-			Image = "rbxassetid://15307999952",
-			Activate = function() end,
-		}),
+		StreakButton = React.createElement(streakButton),
 		GiftsButton = React.createElement(giftButton),
 		RebirthButton = React.createElement(lobbyButton, {
 			LayoutOrder = 5,

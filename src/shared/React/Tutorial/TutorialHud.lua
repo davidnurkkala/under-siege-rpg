@@ -96,7 +96,7 @@ return function()
 				Size = UDim2.new(1, 0, 0.9, -12),
 				TextXAlignment = Enum.TextXAlignment.Right,
 				TextYAlignment = Enum.TextYAlignment.Bottom,
-				Text = TextStroke(`<b>{TextColor("Tutorial", ColorDefs.LightPurple)}</b>\n{text}`),
+				Text = TextStroke(`<b>{TextColor("Quest", ColorDefs.LightPurple)}</b>\n{text}`),
 			}),
 		})
 end

@@ -16,6 +16,7 @@ local EventStream = require(ReplicatedStorage.Shared.Util.EventStream)
 local Goon = require(ServerScriptService.Server.Classes.Goon)
 local GuiEffectService = require(ServerScriptService.Server.Services.GuiEffectService)
 local PartPath = require(ReplicatedStorage.Shared.Classes.PartPath)
+local ProductService = require(ServerScriptService.Server.Services.ProductService)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local Signal = require(ReplicatedStorage.Packages.Signal)
@@ -175,6 +176,8 @@ function Battle.fromPlayerVersusBattler(player: Player, battlerId: string)
 
 				CurrencyService:GetBoosted(player, "Secondary", reward)
 					:andThen(function(amountAdded)
+						amountAdded = ProductService:GetVipBoostedSecondary(player, amountAdded)
+
 						GuiEffectService.IndicatorRequestedRemote:Fire(player, {
 							Text = `+{amountAdded // 0.1 / 10}`,
 							Image = CurrencyDefs.Secondary.Image,
