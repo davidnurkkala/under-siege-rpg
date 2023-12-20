@@ -3,16 +3,76 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Sift = require(ReplicatedStorage.Packages.Sift)
 
 local Battlers = {
-	Noob = {
-		Name = "Noob",
+
+	Peasant = {
+		Name = "Peasant",
 		BattlegroundName = "World1",
 		BaseName = "Tower",
 		Reward = 5,
 		WeaponId = "WoodenBow",
 		Power = 100,
 		Deck = {
-			Peasant = 1,
+			Hunter = 1,
 			Recruit = 1,
+		},
+	},
+
+	Noble = {
+		Name = "Noble",
+		BattlegroundName = "World1",
+		BaseName = "Tower",
+		Reward = 25,
+		WeaponId = "WoodenBow",
+		Power = 1000,
+		Deck = {
+			Recruit = 8,
+			Hunter = 8,
+			RainOfArrows = 1,
+		},
+	},
+
+	Knight = {
+		Name = "Knight",
+		BattlegroundName = "World1",
+		BaseName = "Tower",
+		Reward = 50,
+		WeaponId = "WoodenBow",
+		Power = 10000,
+		Deck = {
+			Recruit = 8,
+			Hunter = 16,
+			Heal = 1,
+			RainOfArrows = 4,
+		},
+	},
+
+	King = {
+		Name = "King",
+		BattlegroundName = "World1",
+		BaseName = "Tower",
+		Reward = 100,
+		WeaponId = "WoodenBow",
+		Power = 100000,
+		Deck = {
+			Recruit = 32,
+			Footman = 4,
+			Hunter = 32,
+			Heal = 4,
+			RainOfArrows = 8,
+		},
+	},
+
+	VikingRunt = {
+		Name = "VikingRunt",
+		BattlegroundName = "World1",
+		BaseName = "VikingBase",
+		Reward = 5,
+		WeaponId = "WoodenBow",
+		Power = 100,
+		Deck = {
+			Berserker = 1,
+			Recruit = 1,
+			VikingWarrior = 1,
 		},
 	},
 
