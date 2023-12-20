@@ -22,10 +22,11 @@ function ActionController.PrepareBlocking(self: ActionController)
 		elseif state == Enum.UserInputState.End then
 			self:SetActionActive("Primary", false)
 		end
-	end, false, Enum.UserInputType.MouseButton1)
+	end, false, Enum.UserInputType.MouseButton1, Enum.KeyCode.ButtonR2)
 
 	UserInputService.InputEnded:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 then self:SetActionActive("Primary", false) end
+		if input.KeyCode == Enum.KeyCode.ButtonR2 then self:SetActionActive("Primary", false) end
 	end)
 end
 

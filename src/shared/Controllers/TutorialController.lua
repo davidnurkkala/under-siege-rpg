@@ -10,6 +10,7 @@ local Property = require(ReplicatedStorage.Shared.Classes.Property)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local WeaponDefs = require(ReplicatedStorage.Shared.Defs.WeaponDefs)
+local WorldDefs = require(ReplicatedStorage.Shared.Defs.WorldDefs)
 
 local TutorialController = {
 	Priority = 0,
@@ -111,8 +112,22 @@ function TutorialController.Update(self: TutorialController, status)
 			{ Desktop = "Click", Mobile = "Tap the attack button", Console = "RT" },
 			`to attack the dummy.\n{status.State.current // 1} / {status.State.required} Power`,
 		})
-
 		self.Target:Set(self:GetNearestTag("TrainingDummy"))
+	elseif status.Instruction == "Gold" then
+		self.Message:Set({
+			`Defeat battlers and gain gold.\n{status.State.current // 1} / {status.State.required} Gold`,
+		})
+		self.Target:Set(nil)
+	elseif status.Instruction == "Portal" then
+		self.Message:Set({
+			`Teleport to the {WorldDefs[status.State.worldId].Name}`,
+		})
+		self.Target:Set(self:GetNearestTag("WorldPortal"))
+	elseif status.Instruction == "TrainLongTerm" then
+		self.Message:Set({
+			`Train, battle, hire soldiers, hatch pets, and become stronger.\n{status.State.current // 1} / {status.State.required} Power`,
+		})
+		self.Target:Set(nil)
 	elseif status.Instruction == "WeaponShop" then
 		self.Message:Set({
 			`Unlock the {WeaponDefs[status.State.weaponId].Name} at the weapon shop.`,

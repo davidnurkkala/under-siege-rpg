@@ -32,7 +32,7 @@ local Worlds = {
 		Order = 4,
 		ModelName = "World4",
 		LightingName = "World1",
-		Price = 10000,
+		Price = 50000,
 		Position = Vector3.new(-640, 0, -1024),
 	},
 }

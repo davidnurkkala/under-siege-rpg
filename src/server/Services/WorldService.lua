@@ -36,6 +36,11 @@ function WorldService.PrepareBlocking(self: WorldService)
 	self.WorldModels = Sift.Dictionary.map(WorldDefs, function(def, id)
 		local model = def.Model:Clone()
 		model:PivotTo(CFrame.new(def.Position))
+
+		for _, object in model:GetDescendants() do
+			if object:IsA("Humanoid") then object.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None end
+		end
+
 		model.Parent = workspace
 
 		return model, id
@@ -141,6 +146,12 @@ function WorldService.TeleportToWorld(self: WorldService, player: Player, worldI
 			LightingService.LightingChangeRequested:Fire(player, def.LightingName)
 			char:PivotTo(model:GetPivot() + Vector3.new(0, 4, 0))
 		end)
+	end)
+end
+
+function WorldService.GetCurrentWorld(self: WorldService, player: Player)
+	return DataService:GetSaveFile(player):andThen(function(saveFile)
+		return saveFile:Get("WorldCurrent")
 	end)
 end
 

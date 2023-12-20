@@ -78,14 +78,7 @@ function DataService.PrepareBlocking(self: DataService)
 			IsFirstSession = true,
 		},
 
-		migrations = {
-			function(oldData)
-				return Sift.Dictionary.set(oldData, "PrestigePoints", {
-					Primary = 0,
-					Secondary = 0,
-				})
-			end,
-		},
+		migrations = {},
 	})
 
 	Observers.observePlayer(function(player: Player)

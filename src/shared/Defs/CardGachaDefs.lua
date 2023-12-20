@@ -24,8 +24,7 @@ local Gachas = {
 		WeightTable = {
 			{ Result = "Peasant", Weight = 6 },
 			{ Result = "Recruit", Weight = 2 },
-			{ Result = "Hunter", Weight = 2 },
-			{ Result = "Mage", Weight = 1 },
+			{ Result = "Hunter", Weight = 1 },
 		},
 	},
 	World2Goons = {
@@ -34,10 +33,9 @@ local Gachas = {
 			Secondary = 50,
 		},
 		WeightTable = {
-			{ Result = "Footman", Weight = 4 },
-			{ Result = "Mage", Weight = 4 },
 			{ Result = "VikingWarrior", Weight = 2 },
 			{ Result = "Berserker", Weight = 1 },
+			{ Result = "Footman", Weight = 4 },
 		},
 	},
 	World3Goons = {
@@ -46,9 +44,19 @@ local Gachas = {
 			Secondary = 100,
 		},
 		WeightTable = {
-			{ Result = "Footman", Weight = 3 },
-			{ Result = "ElfBrawler", Weight = 2 },
+			{ Result = "ElfBrawler", Weight = 4 },
 			{ Result = "ElfRanger", Weight = 1 },
+			{ Result = "Mage", Weight = 2 },
+		},
+	},
+	World4Goons = {
+		Name = "World 4 Soldiers",
+		Price = {
+			Secondary = 250,
+		},
+		WeightTable = {
+			{ Result = "OrcWarrior", Weight = 8 },
+			{ Result = "OrcChampion", Weight = 1 },
 		},
 	},
 
@@ -77,6 +85,16 @@ local Gachas = {
 	},
 	World3Abilities = {
 		Name = "World 3 Abilities",
+		Price = {
+			Secondary = 10,
+		},
+		WeightTable = {
+			{ Result = "Heal", Weight = 4 },
+			{ Result = "RainOfArrows", Weight = 3 },
+		},
+	},
+	World4Abilities = {
+		Name = "World 4 Abilities",
 		Price = {
 			Secondary = 10,
 		},
