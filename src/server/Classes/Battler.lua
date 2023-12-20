@@ -157,14 +157,16 @@ function Battler.Is(object)
 end
 
 function Battler.DefeatAnimation(self: Battler)
-	self.Animator:Play("GenericBattlerDie", 0)
+	return Promise.try(function()
+		self.Animator:Play("GenericBattlerDie", 0)
 
-	EffectService:All(EffectBattlerCollapse({
-		CharModel = self.CharModel,
-		BaseModel = self.BaseModel,
-	}))
+		EffectService:All(EffectBattlerCollapse({
+			CharModel = self.CharModel,
+			BaseModel = self.BaseModel,
+		}))
 
-	return Promise.delay(2.5)
+		return Promise.delay(2.5)
+	end):catch(function() end)
 end
 
 function Battler.InjuryAnimation(self: Battler)
@@ -245,74 +247,76 @@ function Battler.Attack(self: Battler)
 
 	self.Animator:Play(self.WeaponDef.Animations.Shoot, 0)
 
-	local attackPromise = Promise.delay(0.05):andThen(function()
-		local part = self.WeaponModel:FindFirstChild("Weapon")
-		local here = part.Position
-		local there = root.Position
-		local start = CFrame.lookAt(here, there)
-		local speed = 128
+	local attackPromise = Promise.delay(0.05)
+		:andThen(function()
+			local part = self.WeaponModel:FindFirstChild("Weapon")
+			local here = part.Position
+			local there = root.Position
+			local start = CFrame.lookAt(here, there)
+			local speed = 128
 
-		local isCrit = self.Crit >= 1
-		if isCrit then
-			self:SetCrit(0)
+			local isCrit = self.Crit >= 1
+			if isCrit then
+				self:SetCrit(0)
+
+				EffectService:All(
+					EffectProjectile({
+						Model = ReplicatedStorage.Assets.Models.Effects.CritProjectile,
+						Start = start,
+						Finish = root,
+						Speed = speed,
+					}),
+					EffectSound({
+						SoundId = "CritStart1",
+						Target = part,
+					})
+				)
+			end
 
 			EffectService:All(
 				EffectProjectile({
-					Model = ReplicatedStorage.Assets.Models.Effects.CritProjectile,
+					Model = ReplicatedStorage.Assets.Models.Projectiles[self.WeaponDef.ProjectileName],
 					Start = start,
 					Finish = root,
 					Speed = speed,
 				}),
 				EffectSound({
-					SoundId = "CritStart1",
+					SoundId = PickRandom(self.WeaponDef.Sounds.Shoot),
 					Target = part,
 				})
-			)
-		end
+			):andThen(function()
+				battle:Damage(self, target, self.AttackDamage * if isCrit then 5 else 1)
 
-		EffectService:All(
-			EffectProjectile({
-				Model = ReplicatedStorage.Assets.Models.Projectiles[self.WeaponDef.ProjectileName],
-				Start = start,
-				Finish = root,
-				Speed = speed,
-			}),
-			EffectSound({
-				SoundId = PickRandom(self.WeaponDef.Sounds.Shoot),
-				Target = part,
-			})
-		):andThen(function()
-			battle:Damage(self, target, self.AttackDamage * if isCrit then 5 else 1)
-
-			EffectService:All(
-				EffectSound({
-					SoundId = PickRandom(self.WeaponDef.Sounds.Hit),
-					Target = target:GetWorldCFrame().Position,
-				}),
-				EffectEmission({
-					Emitter = ReplicatedStorage.Assets.Emitters.Impact1,
-					ParticleCount = 2,
-					Target = root,
-				})
-			)
-
-			if isCrit then
 				EffectService:All(
-					EffectGrowFade({
-						Part = ReplicatedStorage.Assets.Models.Effects.CritHitEffect,
-						Target = root,
-						Duration = 0.25,
-						StartSize = Vector3.zero,
-						EndSize = Vector3.one * 20,
-					}),
 					EffectSound({
-						SoundId = "CritImpact1",
+						SoundId = PickRandom(self.WeaponDef.Sounds.Hit),
+						Target = target:GetWorldCFrame().Position,
+					}),
+					EffectEmission({
+						Emitter = ReplicatedStorage.Assets.Emitters.Impact1,
+						ParticleCount = 2,
 						Target = root,
 					})
 				)
-			end
+
+				if isCrit then
+					EffectService:All(
+						EffectGrowFade({
+							Part = ReplicatedStorage.Assets.Models.Effects.CritHitEffect,
+							Target = root,
+							Duration = 0.25,
+							StartSize = Vector3.zero,
+							EndSize = Vector3.one * 20,
+						}),
+						EffectSound({
+							SoundId = "CritImpact1",
+							Target = root,
+						})
+					)
+				end
+			end)
 		end)
-	end)
+		:catch(function() end)
 
 	local cancelPromise = Promise.fromEvent(target.Destroyed):andThen(function()
 		self.Animator:StopHard(self.WeaponDef.Animations.Shoot)

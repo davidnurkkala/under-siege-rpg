@@ -6,7 +6,6 @@ local Lapis = require(ServerScriptService.ServerPackages.Lapis)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local SaveFile = require(ServerScriptService.Server.Classes.SaveFile)
-local Sift = require(ReplicatedStorage.Packages.Sift)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
 local COLLECTION_NAME = "DataService" .. Configuration.DataStoreVersion
@@ -105,19 +104,24 @@ function DataService.GetSaveFile(self: DataService, player: Player)
 		return Promise.resolve(SaveFilesByPlayer[player])
 	else
 		if not LoadPromisesByPlayer[player] then
-			LoadPromisesByPlayer[player] = self.Collection:load(getDocumentKey(player)):andThen(function(document)
-				local saveFile = SaveFile.new(document)
+			LoadPromisesByPlayer[player] = self.Collection
+				:load(getDocumentKey(player))
+				:andThen(function(document)
+					local saveFile = SaveFile.new(document)
 
-				if saveFile:Get("IsFirstSession") then
-					saveFile:Set("IsFirstSession", nil)
-					FirstSessionsByPlayer[player] = true
-				end
+					if saveFile:Get("IsFirstSession") then
+						saveFile:Set("IsFirstSession", nil)
+						FirstSessionsByPlayer[player] = true
+					end
 
-				SaveFilesByPlayer[player] = saveFile
-				LoadPromisesByPlayer[player] = nil
+					SaveFilesByPlayer[player] = saveFile
+					LoadPromisesByPlayer[player] = nil
 
-				return saveFile
-			end)
+					return saveFile
+				end)
+				:catch(function()
+					player:Kick("There was a problem retrieving your data. Your data is safe. Please try again in 10 minutes.")
+				end)
 		end
 
 		return LoadPromisesByPlayer[player]

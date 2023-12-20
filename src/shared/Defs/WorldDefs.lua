@@ -17,7 +17,7 @@ local Worlds = {
 		ModelName = "World2",
 		LightingName = "World1",
 		Price = 1000,
-		Position = Vector3.new(512, 16, 1280),
+		Position = Vector3.new(1000, 20, 1500),
 	},
 	World3 = {
 		Name = "Elven Woods",
@@ -25,7 +25,7 @@ local Worlds = {
 		ModelName = "World3",
 		LightingName = "World1",
 		Price = 10000,
-		Position = Vector3.new(-640, 0, 1024),
+		Position = Vector3.new(-1000, 0, 1500),
 	},
 	World4 = {
 		Name = "Orcish Highalnds",
@@ -33,7 +33,7 @@ local Worlds = {
 		ModelName = "World4",
 		LightingName = "World1",
 		Price = 50000,
-		Position = Vector3.new(-640, 0, -1024),
+		Position = Vector3.new(-1000, 0, -1500),
 	},
 }
 

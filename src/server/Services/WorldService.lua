@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
@@ -19,19 +20,7 @@ local WorldService = {
 type WorldService = typeof(WorldService)
 
 function WorldService.PrepareBlocking(self: WorldService)
-	local ocean = Instance.new("Folder")
-	ocean.Name = "Ocean"
-	ocean.Parent = workspace
-
-	local oceanRadius = 2
-	local oceanCellSize = 2048
-	for x = -oceanRadius, oceanRadius do
-		for z = -oceanRadius, oceanRadius do
-			local oceanCell = ReplicatedStorage.Assets.Models.Ocean:Clone()
-			oceanCell:PivotTo(CFrame.new(x * oceanCellSize, -20, z * oceanCellSize))
-			oceanCell.Parent = ocean
-		end
-	end
+	self:BuildOcean()
 
 	self.WorldModels = Sift.Dictionary.map(WorldDefs, function(def, id)
 		local model = def.Model:Clone()
@@ -126,6 +115,40 @@ function WorldService.PurchaseWorld(self: WorldService, player: Player, worldId:
 			end)
 		end)
 	end)
+end
+
+function WorldService.BuildOcean(self: WorldService)
+	local ocean = Instance.new("Folder")
+	ocean.Name = "Ocean"
+	ocean.Parent = workspace
+
+	local cooldowns = {}
+	local function onTouched(part)
+		local char = part.Parent
+		if not char then return end
+		local player = Players:GetPlayerFromCharacter(char)
+		if not player then return end
+		if cooldowns[player] then return end
+
+		cooldowns[player] = true
+		self:TeleportToWorld(player, "World1"):andThenCall(Promise.delay, 1):finally(function()
+			cooldowns[player] = nil
+		end)
+	end
+
+	local oceanRadius = 2
+	local oceanCellSize = 2048
+	for x = -oceanRadius, oceanRadius do
+		for z = -oceanRadius, oceanRadius do
+			local oceanCell = ReplicatedStorage.Assets.Models.Ocean:Clone()
+			oceanCell:PivotTo(CFrame.new(x * oceanCellSize, -20, z * oceanCellSize))
+			oceanCell.Parent = ocean
+
+			for _, object in oceanCell:GetDescendants() do
+				if object:IsA("BasePart") and object.CanTouch then object.Touched:Connect(onTouched) end
+			end
+		end
+	end
 end
 
 function WorldService.TeleportToWorld(self: WorldService, player: Player, worldId: string, callback)

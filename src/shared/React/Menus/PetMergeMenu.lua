@@ -28,7 +28,7 @@ return function(props: {
 		Prompt = promptedEntry and React.createElement(PromptWindow, {
 			TextSize = 0.4,
 			HeaderText = TextStroke("Confirm Merge"),
-			Text = TextStroke(`Merge how many tier {promptedEntry.Tier} {PetDefs[promptedEntry.PetId].Name} pets?`),
+			Text = TextStroke(`Merge how many level {promptedEntry.Tier} {PetDefs[promptedEntry.PetId].Name} pets?`),
 			[React.Event.Activated] = function()
 				setPromptedEntry(nil)
 			end,

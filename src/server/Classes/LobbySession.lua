@@ -282,6 +282,7 @@ function LobbySession.Attack(self: LobbySession)
 		:andThen(function(amountAdded)
 			CurrencyService:AddCurrency(self.Player, "Primary", amountAdded)
 		end)
+		:catch(function() end)
 end
 
 function LobbySession.Destroy(self: LobbySession)

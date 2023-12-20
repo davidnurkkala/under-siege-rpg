@@ -30,7 +30,7 @@ return function(args: {
 			part.CFrame = getCFrame()
 			part.Size = Lerp(args.StartSize, args.EndSize, math.pow(scalar, 0.5))
 			part.Transparency = Lerp(transparency, 1, scalar)
-		end):andThen(function()
+		end):finally(function()
 			part:Destroy()
 		end)
 	end
