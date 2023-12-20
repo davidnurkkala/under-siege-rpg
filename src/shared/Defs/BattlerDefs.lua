@@ -61,7 +61,7 @@ local Battlers = {
 	},
 	VikingRunt = {
 		Name = "VikingRunt",
-		BattlegroundName = "World1",
+		BattlegroundName = "World2",
 		BaseName = "VikingBase",
 		Reward = 35,
 		WeaponId = "WoodenBow",
@@ -74,7 +74,7 @@ local Battlers = {
 	},
 	VikingWarrior = {
 		Name = "Viking Warrior",
-		BattlegroundName = "World1",
+		BattlegroundName = "World2",
 		BaseName = "VikingBase",
 		Reward = 50,
 		WeaponId = "WoodenBow",
@@ -88,7 +88,7 @@ local Battlers = {
 	},
 	VikingChief = {
 		Name = "Viking Chief",
-		BattlegroundName = "World1",
+		BattlegroundName = "World2",
 		BaseName = "VikingBase",
 		Reward = 75,
 		WeaponId = "WoodenBow",
@@ -104,7 +104,7 @@ local Battlers = {
 	},
 	VikingKing = {
 		Name = "Viking King",
-		BattlegroundName = "World1",
+		BattlegroundName = "World2",
 		BaseName = "VikingBase",
 		Reward = 100,
 		WeaponId = "WoodenBow",
