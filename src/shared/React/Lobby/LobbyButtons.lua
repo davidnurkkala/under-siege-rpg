@@ -217,13 +217,13 @@ return function()
 				return Promise.resolve()
 			end,
 		}),
-		ShopButton = React.createElement(lobbyButton, {
+		--[[ShopButton = React.createElement(lobbyButton, {
 			LayoutOrder = 6,
 			Text = TextStroke("Shop"),
 			Color = ColorDefs.Yellow,
 			Image = "rbxassetid://15308000036",
 			Activate = function() end,
-		}),
+		}),]]
 		PetsButton = React.createElement(lobbyButton, {
 			LayoutOrder = 7,
 			Text = TextStroke("Pets"),
