@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local Badger = require(ReplicatedStorage.Shared.Util.Badger)
+local BeInWorld = require(ServerScriptService.Server.Badger.Conditions.BeInWorld)
 local Comm = require(ReplicatedStorage.Packages.Comm)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local DefeatBattler = require(ServerScriptService.Server.Badger.Conditions.DefeatBattler)
@@ -38,7 +39,7 @@ local function tutorialCondition(player)
 				State = condition:getState(),
 			}
 		end),
-		DefeatBattler(player, "Noob", 1):withState(function(condition)
+		DefeatBattler(player, "Peasant", 1):withState(function(condition)
 			return {
 				Instruction = "Battler",
 				State = condition:getState(),
@@ -50,7 +51,7 @@ local function tutorialCondition(player)
 				State = condition:getState(),
 			}
 		end),
-		DefeatBattler(player, "Noob", 2):withState(function(condition)
+		DefeatBattler(player, "Peasant", 2):withState(function(condition)
 			return {
 				Instruction = "Battler",
 				State = condition:getState(),
@@ -59,6 +60,96 @@ local function tutorialCondition(player)
 		RollPetGacha(player, "World1Pets", 1):withState(function(condition)
 			return {
 				Instruction = "PetGacha",
+				State = condition:getState(),
+			}
+		end),
+		HaveCurrency(player, "Primary", 100000):withState(function(condition)
+			return {
+				Instruction = "TrainLongTerm",
+				State = condition:getState(),
+			}
+		end),
+		DefeatBattler(player, "King", 1):withState(function(condition)
+			return {
+				Instruction = "Battler",
+				State = condition:getState(),
+			}
+		end),
+		HaveCurrency(player, "Secondary", 1000):withState(function(condition)
+			return {
+				Instruction = "Gold",
+				State = condition:getState(),
+			}
+		end),
+		BeInWorld(player, "World2"):withState(function(condition)
+			return {
+				Instruction = "Portal",
+				State = condition:getState(),
+			}
+		end),
+
+		-- beat viking world
+		HaveCurrency(player, "Primary", 750000):withState(function(condition)
+			return {
+				Instruction = "TrainLongTerm",
+				State = condition:getState(),
+			}
+		end),
+		DefeatBattler(player, "VikingKing", 1):withState(function(condition)
+			return {
+				Instruction = "Battler",
+				State = condition:getState(),
+			}
+		end),
+		HaveCurrency(player, "Secondary", 10000):withState(function(condition)
+			return {
+				Instruction = "Gold",
+				State = condition:getState(),
+			}
+		end),
+		BeInWorld(player, "World3"):withState(function(condition)
+			return {
+				Instruction = "Portal",
+				State = condition:getState(),
+			}
+		end),
+
+		-- beat elf world
+		HaveCurrency(player, "Primary", 10000000):withState(function(condition)
+			return {
+				Instruction = "TrainLongTerm",
+				State = condition:getState(),
+			}
+		end),
+		DefeatBattler(player, "ElfKing", 1):withState(function(condition)
+			return {
+				Instruction = "Battler",
+				State = condition:getState(),
+			}
+		end),
+		HaveCurrency(player, "Secondary", 50000):withState(function(condition)
+			return {
+				Instruction = "Gold",
+				State = condition:getState(),
+			}
+		end),
+		BeInWorld(player, "World4"):withState(function(condition)
+			return {
+				Instruction = "Portal",
+				State = condition:getState(),
+			}
+		end),
+
+		-- beat orc world
+		HaveCurrency(player, "Primary", 100000000):withState(function(condition)
+			return {
+				Instruction = "TrainLongTerm",
+				State = condition:getState(),
+			}
+		end),
+		DefeatBattler(player, "OrcGeneral", 1):withState(function(condition)
+			return {
+				Instruction = "Battler",
 				State = condition:getState(),
 			}
 		end),
@@ -85,18 +176,21 @@ function TutorialService.PrepareBlocking(self: TutorialService)
 				local changed = not Sift.Dictionary.equalsDeep(state, self.StatusRemote:GetFor(player))
 				if changed then self.StatusRemote:SetFor(player, processed:getState()) end
 
-				--saveFile:Set("TutorialData", processed:save())
+				saveFile:Set("TutorialData", processed:save())
 			end)
 
 			-- save on complete
 			condition = Badger.start(Badger.onCompleted(condition, function(completed)
 				Badger.stop(completed)
-				--saveFile:Set("TutorialData", "Complete")
+				saveFile:Set("TutorialData", "Complete")
 				condition = nil
 			end))
 
 			-- load data if it exists
-			if tutorialData ~= nil then condition:load(tutorialData) end
+			if tutorialData ~= nil then
+				condition:load(tutorialData)
+				self.StatusRemote:SetFor(player, condition:getState())
+			end
 		end)
 
 		-- stop the condition if the player leaves

@@ -1,7 +1,8 @@
 local Shops = {
-	World1 = { "WoodenBow", "HuntersBow", "Crossbow", "SimpleWand" },
-	World2 = { "RecurveBow", "ElvenBow", "RoughwoodStaff" },
-	World3 = { "Javelin", "CrudeThrownAxe" },
+	World1 = { "WoodenBow", "HuntersBow", "Crossbow" },
+	World2 = { "SimpleWand", "RecurveBow" },
+	World3 = { "ElvenBow", "RoughwoodStaff" },
+	World4 = { "Javelin", "CrudeThrownAxe" },
 }
 
 return Shops

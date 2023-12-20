@@ -3,7 +3,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Sift = require(ReplicatedStorage.Packages.Sift)
 
 local Battlers = {
-
 	Peasant = {
 		Name = "Peasant",
 		BattlegroundName = "World1",
@@ -12,77 +11,74 @@ local Battlers = {
 		WeaponId = "WoodenBow",
 		Power = 100,
 		Deck = {
-			Hunter = 1,
+			Peasant = 1,
 			Recruit = 1,
 		},
 	},
-
 	Noble = {
 		Name = "Noble",
 		BattlegroundName = "World1",
 		BaseName = "Tower",
-		Reward = 25,
+		Reward = 10,
 		WeaponId = "WoodenBow",
 		Power = 1000,
 		Deck = {
-			Recruit = 8,
-			Hunter = 8,
+			Peasant = 4,
+			Recruit = 1,
+			Hunter = 1,
 			RainOfArrows = 1,
 		},
 	},
-
 	Knight = {
 		Name = "Knight",
 		BattlegroundName = "World1",
 		BaseName = "Tower",
-		Reward = 50,
+		Reward = 15,
 		WeaponId = "WoodenBow",
 		Power = 10000,
 		Deck = {
-			Recruit = 8,
-			Hunter = 16,
+			Footman = 1,
+			Recruit = 4,
+			Hunter = 4,
 			Heal = 1,
-			RainOfArrows = 4,
+			RainOfArrows = 2,
 		},
 	},
-
 	King = {
 		Name = "King",
 		BattlegroundName = "World1",
 		BaseName = "Tower",
-		Reward = 100,
+		Reward = 25,
 		WeaponId = "WoodenBow",
 		Power = 100000,
 		Deck = {
-			Recruit = 32,
-			Footman = 4,
-			Hunter = 32,
-			Heal = 4,
-			RainOfArrows = 8,
+			Recruit = 8,
+			Footman = 2,
+			Hunter = 8,
+			Heal = 2,
+			RainOfArrows = 2,
 		},
 	},
-
 	VikingRunt = {
 		Name = "VikingRunt",
 		BattlegroundName = "World1",
 		BaseName = "VikingBase",
-		Reward = 5,
+		Reward = 35,
 		WeaponId = "WoodenBow",
-		Power = 100,
+		Power = 200000,
 		Deck = {
 			Berserker = 1,
 			Recruit = 1,
 			VikingWarrior = 1,
 		},
 	},
-
 	VikingWarrior = {
 		Name = "Viking Warrior",
 		BattlegroundName = "World1",
 		BaseName = "VikingBase",
-		Reward = 25,
+		Reward = 50,
 		WeaponId = "WoodenBow",
-		Power = 1000,
+		Power = 300000,
 		Deck = {
 			Berserker = 1,
 			Recruit = 4,
@@ -90,14 +86,13 @@ local Battlers = {
 			RainOfArrows = 1,
 		},
 	},
-
 	VikingChief = {
 		Name = "Viking Chief",
 		BattlegroundName = "World1",
 		BaseName = "VikingBase",
-		Reward = 50,
+		Reward = 75,
 		WeaponId = "WoodenBow",
-		Power = 10000,
+		Power = 450000,
 		Deck = {
 			Recruit = 8,
 			VikingWarrior = 8,
@@ -107,14 +102,13 @@ local Battlers = {
 			RainOfArrows = 4,
 		},
 	},
-
 	VikingKing = {
 		Name = "Viking King",
 		BattlegroundName = "World1",
 		BaseName = "VikingBase",
 		Reward = 100,
 		WeaponId = "WoodenBow",
-		Power = 100000,
+		Power = 750000,
 		Deck = {
 			Recruit = 32,
 			Footman = 4,
@@ -125,7 +119,6 @@ local Battlers = {
 			RainOfArrows = 8,
 		},
 	},
-
 	ElfCommoner = {
 		Name = "Elf Commoner",
 		BattlegroundName = "World2",
@@ -140,12 +133,11 @@ local Battlers = {
 			RainOfArrows = 8,
 		},
 	},
-
 	ElfHunter = {
 		Name = "Elf Hunter",
 		BattlegroundName = "World2",
 		BaseName = "Tower",
-		Reward = 200,
+		Reward = 150,
 		WeaponId = "ElvenBow",
 		Power = 2000000,
 		Deck = {
@@ -154,12 +146,11 @@ local Battlers = {
 			RainOfArrows = 32,
 		},
 	},
-
 	ElfWarrior = {
 		Name = "Elf Warrior",
 		BattlegroundName = "World2",
 		BaseName = "Tower",
-		Reward = 300,
+		Reward = 200,
 		WeaponId = "ElvenBow",
 		Power = 4000000,
 		Deck = {
@@ -168,12 +159,11 @@ local Battlers = {
 			Heal = 32,
 		},
 	},
-
 	ElfKing = {
 		Name = "Elf King",
 		BattlegroundName = "World2",
 		BaseName = "Tower",
-		Reward = 500,
+		Reward = 300,
 		WeaponId = "ElvenBow",
 		Power = 10000000,
 		Deck = {
@@ -183,12 +173,11 @@ local Battlers = {
 			RainOfArrows = 16,
 		},
 	},
-
 	OrcGrunt = {
 		Name = "Orc Grunt",
 		BattlegroundName = "World3",
 		BaseName = "VikingBase",
-		Reward = 550,
+		Reward = 350,
 		WeaponId = "WoodenBow",
 		Power = 25000000,
 		Deck = {
@@ -197,12 +186,11 @@ local Battlers = {
 			RainOfArrows = 64,
 		},
 	},
-
 	OrcBrute = {
 		Name = "Orc Brute",
 		BattlegroundName = "World3",
 		BaseName = "VikingBase",
-		Reward = 1000,
+		Reward = 450,
 		WeaponId = "WoodenBow",
 		Power = 50000000,
 		Deck = {
@@ -212,12 +200,11 @@ local Battlers = {
 			RainOfArrows = 64,
 		},
 	},
-
 	OrcFighter = {
 		Name = "Orc Fighter",
 		BattlegroundName = "World3",
 		BaseName = "VikingBase",
-		Reward = 1500,
+		Reward = 550,
 		WeaponId = "Javelin",
 		Power = 75000000,
 		Deck = {
@@ -227,12 +214,11 @@ local Battlers = {
 			RainOfArrows = 64,
 		},
 	},
-
 	OrcGeneral = {
 		Name = "Orc General",
 		BattlegroundName = "World3",
 		BaseName = "VikingBase",
-		Reward = 3000,
+		Reward = 750,
 		WeaponId = "Javelin",
 		Power = 100000000,
 		Deck = {
