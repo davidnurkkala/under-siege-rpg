@@ -1,10 +1,12 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local BattleService = require(ServerScriptService.Server.Services.BattleService)
 local Comm = require(ReplicatedStorage.Packages.Comm)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local EffectPrestige = require(ReplicatedStorage.Shared.Effects.EffectPrestige)
 local EffectService = require(ServerScriptService.Server.Services.EffectService)
+local LobbySessions = require(ServerScriptService.Server.Singletons.LobbySessions)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local PrestigeHelper = require(ReplicatedStorage.Shared.Util.PrestigeHelper)
 local Promise = require(ReplicatedStorage.Packages.Promise)
@@ -63,6 +65,8 @@ function PrestigeService.GetBoost(self: PrestigeService, player: Player, currenc
 end
 
 function PrestigeService.Prestige(self: PrestigeService, player: Player, prestigeType: string)
+	if BattleService:Get(player) then return Promise.resolve(false) end
+
 	return self:GetPrestigeCost(player)
 		:andThen(function(cost)
 			return self.CurrencyService:ApplyPrice(player, { Primary = cost })
@@ -70,15 +74,25 @@ function PrestigeService.Prestige(self: PrestigeService, player: Player, prestig
 		:andThen(function(success)
 			if not success then return false end
 
+			player:SetAttribute("IsPrestiging", true)
 			return EffectService:All(EffectPrestige({ Player = player }))
 				:andThen(function()
 					return WorldService:ResetWorlds(player, function()
-						Promise.all({
-							self.CurrencyService:SetCurrency(player, "Primary", 0),
-							self.CurrencyService:SetCurrency(player, "Secondary", 0),
-							WeaponService:ResetWeapons(player),
-							self.CurrencyService:AddCurrency(player, "Prestige", 1),
-						}):expect()
+						self.CurrencyService
+							:SetCurrency(player, "Primary", 0)
+							:andThen(function()
+								local session = LobbySessions.Get(player)
+								if session then session:CancelAttacks() end
+
+								return self.CurrencyService:SetCurrency(player, "Secondary", 0)
+							end)
+							:andThen(function()
+								return WeaponService:ResetWeapons(player)
+							end)
+							:andThen(function()
+								self.CurrencyService:AddCurrency(player, "Prestige", 1)
+							end)
+							:expect()
 					end)
 				end)
 				:andThen(function()
@@ -91,6 +105,9 @@ function PrestigeService.Prestige(self: PrestigeService, player: Player, prestig
 					end)
 				end)
 				:andThenReturn(true)
+				:finally(function()
+					player:SetAttribute("IsPrestiging", false)
+				end)
 		end)
 end
 

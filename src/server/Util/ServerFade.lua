@@ -18,7 +18,7 @@ return function(players: Player | { Player }, args: { [string]: any }?, promiseF
 
 	local guid = Guid()
 
-	return func(players, EffectWipeTransition(Sift.Dictionary.merge(args or {}, { Guid = guid }))):andThenCall(promiseFunc):tap(function()
+	return func(players, EffectWipeTransition(Sift.Dictionary.merge(args or {}, { Guid = guid }))):andThenCall(promiseFunc):finally(function()
 		func(players, EffectUpdate({ Guid = guid }))
 	end)
 end

@@ -40,6 +40,7 @@ type LobbySession = typeof(setmetatable(
 		Animator: Animator.Animator,
 		WeaponDef: any,
 		AttackCooldown: Cooldown.Cooldown,
+		Attacks: any,
 	},
 	LobbySession
 ))
@@ -66,6 +67,7 @@ function LobbySession.new(args: {
 		Animator = animator,
 		WeaponDef = args.WeaponDef,
 		AttackCooldown = Cooldown.new(args.WeaponDef.AttackCooldownTime),
+		Attacks = {},
 	}, LobbySession)
 
 	self.Animator:Play(self.WeaponDef.Animations.Idle)
@@ -238,7 +240,7 @@ function LobbySession.Attack(self: LobbySession)
 		})
 	)
 
-	return Promise.delay(0.05)
+	local attack = Promise.delay(0.05)
 		:andThen(function()
 			local part = self.Model:FindFirstChild("Weapon")
 			if not part then return Promise.reject("No weapon") end
@@ -288,6 +290,20 @@ function LobbySession.Attack(self: LobbySession)
 			CurrencyService:AddCurrency(self.Player, "Primary", amountAdded)
 		end)
 		:catch(function() end)
+
+	self.Attacks[attack] = true
+	attack:finally(function()
+		self.Attacks[attack] = nil
+	end)
+
+	return attack
+end
+
+function LobbySession.CancelAttacks(self: LobbySession)
+	for attack in self.Attacks do
+		attack:cancel()
+	end
+	self.Attacks = {}
 end
 
 function LobbySession.Destroy(self: LobbySession)

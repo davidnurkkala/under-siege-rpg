@@ -42,6 +42,8 @@ function BattleService.GetPlayersFromBattle(_self: BattleService, battle)
 end
 
 function BattleService.Promise(_self: BattleService, player, func)
+	if player:GetAttribute("IsPrestiging") then return Promise.reject(`Player {player} is currently in the prestige animation`) end
+
 	if PromisesByPlayer[player] then
 		return Promise.reject(`Player {player} is already expecting a battle`)
 	else
