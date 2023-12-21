@@ -38,7 +38,28 @@ function TutorialController.PrepareBlocking(self: TutorialController)
 		local beam = trove:Clone(ReplicatedStorage.Assets.Beams.DirectorBeam)
 
 		local a0 = trove:Construct(Instance, "Attachment")
-		a0.Parent = Players.LocalPlayer.Character.PrimaryPart
+		trove:AddPromise(Promise.new(function(resolve, _, onCancel)
+			local player = Players.LocalPlayer
+			while not player.Character do
+				task.wait()
+				if onCancel() then return end
+			end
+
+			local char = player.Character
+			if not char:IsDescendantOf(workspace) then
+				task.wait()
+				if onCancel() then return end
+			end
+
+			while not (char.PrimaryPart and char.PrimaryPart:IsDescendantOf(workspace)) do
+				task.wait()
+				if onCancel() then return end
+			end
+
+			resolve(char.PrimaryPart)
+		end):andThen(function(root)
+			a0.Parent = root
+		end))
 
 		local a1 = trove:Construct(Instance, "Attachment")
 		if typeof(target) == "CFrame" then

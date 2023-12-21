@@ -23,6 +23,7 @@ local ProductService = require(ServerScriptService.Server.Services.ProductServic
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local Trove = require(ReplicatedStorage.Packages.Trove)
+local TryNow = require(ReplicatedStorage.Shared.Util.TryNow)
 local WeaponDefs = require(ReplicatedStorage.Shared.Defs.WeaponDefs)
 local WeaponHelper = require(ReplicatedStorage.Shared.Util.WeaponHelper)
 local WeaponService = require(ServerScriptService.Server.Services.WeaponService)
@@ -197,7 +198,9 @@ function LobbySession.GetClosestDummy(self: LobbySession)
 	local bestDistance = math.huge
 
 	local root = self.Character.PrimaryPart
-	local here = root.Position
+	local here = TryNow(function()
+		return root.Position
+	end, Vector3.zero)
 
 	for _, dummy in ComponentService:GetComponentsByName("TrainingDummy") do
 		if ProductService:IsVip(self.Player) then
@@ -238,6 +241,8 @@ function LobbySession.Attack(self: LobbySession)
 	return Promise.delay(0.05)
 		:andThen(function()
 			local part = self.Model:FindFirstChild("Weapon")
+			if not part then return Promise.reject("No weapon") end
+
 			local here = part.Position
 			local start = CFrame.lookAt(here, there)
 			local finish = start - here + there

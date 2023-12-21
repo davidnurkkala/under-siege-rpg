@@ -5,6 +5,7 @@ local EffectController = require(ReplicatedStorage.Shared.Controllers.EffectCont
 local EffectFadeModel = require(ReplicatedStorage.Shared.Effects.EffectFadeModel)
 local Lerp = require(ReplicatedStorage.Shared.Util.Lerp)
 local Promise = require(ReplicatedStorage.Packages.Promise)
+local TryNow = require(ReplicatedStorage.Shared.Util.TryNow)
 
 return function(args: {
 	Model: Model,
@@ -12,7 +13,9 @@ return function(args: {
 	Finish: BasePart | CFrame,
 	Speed: number,
 })
-	local duration = (args.Finish.Position - args.Start.Position).Magnitude / args.Speed
+	local duration = TryNow(function()
+		return (args.Finish.Position - args.Start.Position).Magnitude / args.Speed
+	end, 0)
 
 	return function()
 		return script.Name, args, Promise.delay(duration)
