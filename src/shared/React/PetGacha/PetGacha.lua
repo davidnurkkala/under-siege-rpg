@@ -56,6 +56,8 @@ local function buyButton(props: {
 	Price: number,
 	LayoutOrder: number,
 	Activate: () -> (),
+	SelectionOrder: number?,
+	OnSelectionGained: any,
 })
 	return React.createElement(Button, {
 		LayoutOrder = props.LayoutOrder,
@@ -64,7 +66,9 @@ local function buyButton(props: {
 		ImageColor3 = if props.CanAfford then ColorDefs.Yellow else ColorDefs.PaleBlue,
 		BorderColor3 = if props.CanAfford then nil else ColorDefs.PaleBlue,
 		Active = props.CanAfford,
+		SelectionOrder = props.SelectionOrder,
 		[React.Event.Activated] = props.Activate,
+		[React.Event.SelectionGained] = props.OnSelectionGained,
 	}, {
 		Layout = React.createElement(ListLayout, {
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
@@ -98,6 +102,10 @@ return function(props: {
 	Wallet: CurrencyHelper.Wallet,
 })
 	local gacha = PetGachaDefs[props.GachaId]
+	local lastActiveBuyButton, setLastActiveBuyButton = React.useState(nil)
+
+	local canAfford1 = CurrencyHelper.CheckPrice(props.Wallet, gacha.Price)
+	local canAfford5 = CurrencyHelper.CheckPrice(props.Wallet, gacha.Price, 5)
 
 	return React.createElement(SystemWindow, {
 		Visible = props.Visible,
@@ -118,22 +126,30 @@ return function(props: {
 
 			Button1 = React.createElement(buyButton, {
 				LayoutOrder = 1,
-				CanAfford = CurrencyHelper.CheckPrice(props.Wallet, gacha.Price),
+				CanAfford = canAfford1,
 				Count = 1,
 				Price = gacha.Price.Secondary,
 				Activate = function()
 					props.Buy(1)
 				end,
+				OnSelectionGained = function()
+					setLastActiveBuyButton(1)
+				end,
+				SelectionOrder = canAfford1 and (lastActiveBuyButton == nil or lastActiveBuyButton == 1) and -1 or 1,
 			}),
 
 			Button5 = React.createElement(buyButton, {
 				LayoutOrder = 2,
-				CanAfford = CurrencyHelper.CheckPrice(props.Wallet, gacha.Price, 5),
+				CanAfford = canAfford5,
 				Count = 5,
 				Price = gacha.Price.Secondary * 5,
 				Activate = function()
 					props.Buy(5)
 				end,
+				OnSelectionGained = function()
+					setLastActiveBuyButton(5)
+				end,
+				SelectionOrder = canAfford5 and (lastActiveBuyButton == nil or lastActiveBuyButton == 5) and -1 or 1,
 			}),
 		}),
 

@@ -1,3 +1,4 @@
+local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -16,6 +17,7 @@ type GuiController = typeof(GuiController)
 
 function GuiController.Start(_self: GuiController)
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false)
+	GuiService.AutoSelectGuiEnabled = false
 
 	Promise.retryWithDelay(function()
 		return Promise.try(function()

@@ -8,6 +8,10 @@ local DefaultProps = {
 	Size = UDim2.fromScale(1, 1),
 }
 
-return function(props)
-	return React.createElement("Frame", Sift.Dictionary.merge(DefaultProps, props))
-end
+return React.memo(function(props)
+	local containerRef = props.containerRef
+
+	props = Sift.Dictionary.removeKeys(props, "containerRef")
+
+	return React.createElement("Frame", Sift.Dictionary.merge(DefaultProps, props, { ref = containerRef }))
+end)

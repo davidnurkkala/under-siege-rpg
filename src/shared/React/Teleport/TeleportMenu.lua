@@ -63,6 +63,7 @@ return function(props: {
 									[React.Event.Activated] = function()
 										props.Select(def.Id)
 									end,
+									SelectionOrder = if owned then -def.Order else 1,
 								}, {
 									Text = React.createElement(Label, {
 										Text = TextStroke(if owned then "Go" else "Buy"),

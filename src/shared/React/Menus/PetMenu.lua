@@ -70,6 +70,7 @@ return function(props: {
 				SizeConstraint = Enum.SizeConstraint.RelativeYY,
 				ImageColor3 = ColorDefs.PalePurple,
 				[React.Event.Activated] = props.EquipBest,
+				SelectionOrder = -1,
 			}, {
 				Text = React.createElement(Label, {
 					Text = TextStroke("Equip Best"),

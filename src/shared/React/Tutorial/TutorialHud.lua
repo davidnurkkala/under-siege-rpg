@@ -84,6 +84,7 @@ return function()
 					[React.Event.Activated] = function()
 						TutorialController:ToggleBeam()
 					end,
+					Selectable = false,
 				}, {
 					Text = React.createElement(Label, {
 						Text = TextStroke("<i>Show arrows</i>"),

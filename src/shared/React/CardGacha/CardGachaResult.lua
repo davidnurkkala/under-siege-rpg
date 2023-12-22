@@ -1,4 +1,6 @@
+local ContextActionService = game:GetService("ContextActionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 
 local Animate = require(ReplicatedStorage.Shared.Util.Animate)
 local Button = require(ReplicatedStorage.Shared.React.Common.Button)
@@ -11,9 +13,11 @@ local Flipper = require(ReplicatedStorage.Packages.Flipper)
 local GuiSound = require(ReplicatedStorage.Shared.Util.GuiSound)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local Panel = require(ReplicatedStorage.Shared.React.Common.Panel)
+local PlatformContext = require(ReplicatedStorage.Shared.React.PlatformContext.PlatformContext)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local PromiseMotor = require(ReplicatedStorage.Shared.Util.PromiseMotor)
 local React = require(ReplicatedStorage.Packages.React)
+local RoundButtonWithImage = require(ReplicatedStorage.Shared.React.Common.RoundButtonWithImage)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 local UseMotor = require(ReplicatedStorage.Shared.React.Hooks.UseMotor)
@@ -32,7 +36,37 @@ return function(props: {
 	local width, widthMotor = UseMotor(1)
 	local contentsVisible, setContentsVisible = React.useState(false)
 	local buttonSize, buttonMotor = UseMotor(0)
-	local active = React.useRef(true)
+	local isActive, setIsActive = React.useState(true)
+	local platform = React.useContext(PlatformContext)
+
+	local dismissCallback = React.useCallback(function()
+		if not isActive then return end
+		setIsActive(false)
+
+		Promise.all({
+			PromiseMotor(buttonMotor, Flipper.Spring.new(0, FastSpring), function(value)
+				return value <= 0.05
+			end),
+			PromiseMotor(widthMotor, Flipper.Spring.new(0, FastSpring), function(value)
+				return value <= 0.05
+			end),
+		}):andThenCall(props.Close)
+	end, { isActive })
+
+	React.useEffect(function()
+		if not isActive then return end
+
+		ContextActionService:BindActionAtPriority("DismissCardGachaResult", function(actionName, inputState, inputObject)
+			if inputState ~= Enum.UserInputState.Begin then return Enum.ContextActionResult.Pass end
+
+			dismissCallback()
+			return Enum.ContextActionResult.Sink
+		end, false, Enum.ContextActionPriority.High.Value, Enum.KeyCode.ButtonB)
+
+		return function()
+			ContextActionService:UnbindAction("DismissCardGachaResult")
+		end
+	end, { isActive })
 
 	local setDelta = React.useCallback(function(position)
 		dxMotor:setGoal(Flipper.Spring.new(position.X))
@@ -117,7 +151,7 @@ return function(props: {
 
 		OkButton = React.createElement(Button, {
 			ZIndex = 8,
-			Visible = buttonSize:map(function(value)
+			Visible = platform ~= "Console" and buttonSize:map(function(value)
 				return value > 0
 			end),
 			Size = buttonSize:map(function(value)
@@ -127,22 +161,34 @@ return function(props: {
 			AnchorPoint = Vector2.new(0.5, 0),
 			Position = UDim2.fromScale(0.5, 0.7),
 			ImageColor3 = ColorDefs.PalePurple,
-			[React.Event.Activated] = function()
-				if not active.current then return end
-				active.current = false
-
-				Promise.all({
-					PromiseMotor(buttonMotor, Flipper.Spring.new(0, FastSpring), function(value)
-						return value <= 0.05
-					end),
-					PromiseMotor(widthMotor, Flipper.Spring.new(0, FastSpring), function(value)
-						return value <= 0.05
-					end),
-				}):andThenCall(props.Close)
-			end,
+			[React.Event.Activated] = dismissCallback,
 		}, {
 			Label = React.createElement(Label, {
 				Text = TextStroke("Okay"),
+			}),
+		}),
+
+		OkayButtonGamepad = React.createElement("Frame", {
+			Visible = platform == "Console" and width:map(function(value)
+				return value > 0
+			end),
+			Size = width:map(function(value)
+				return UDim2.fromScale(0.2 * value, 0.05)
+			end),
+			SizeConstraint = Enum.SizeConstraint.RelativeXX,
+			AnchorPoint = Vector2.new(0.5, 0),
+			Position = UDim2.fromScale(0.5, 0.7),
+			BackgroundTransparency = 1,
+		}, {
+			React.createElement(RoundButtonWithImage, {
+				Visible = platform == "Console",
+				[React.Event.Activated] = dismissCallback,
+				Image = UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonB),
+				Text = "Back",
+				height = UDim.new(1, 0),
+				AnchorPoint = Vector2.new(0.5, 0),
+				Position = UDim2.fromScale(0.5, 0),
+				Selectable = false,
 			}),
 		}),
 	})

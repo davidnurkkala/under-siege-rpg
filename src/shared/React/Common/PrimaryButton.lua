@@ -8,6 +8,7 @@ local React = require(ReplicatedStorage.Packages.React)
 return function(props: {
 	LayoutOrder: number,
 	children: any,
+	Selectable: boolean?,
 })
 	return React.createElement(Button, {
 		Size = UDim2.fromScale(0.075, 0.075),
@@ -17,6 +18,7 @@ return function(props: {
 		ImageColor3 = CurrencyDefs.Primary.Colors.Primary,
 		BorderColor3 = CurrencyDefs.Primary.Colors.Secondary,
 		LayoutOrder = props.LayoutOrder,
+		Selectable = props.Selectable,
 		ZIndex = 16,
 
 		[React.Event.Activated] = function()
