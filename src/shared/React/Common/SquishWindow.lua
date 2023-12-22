@@ -34,12 +34,7 @@ return function(props)
 			addedGuid = HttpService:GenerateGUID(false)
 			GuiService:AddSelectionParent(addedGuid, window)
 
-			if platform == "Console" then
-				-- Roblox won't let you select anything hidden, so this short wait gets around that.
-				task.delay(0.1, function()
-					GuiService:Select(windowRef.current)
-				end)
-			end
+			if platform == "Console" then GuiService:Select(windowRef.current) end
 		end
 
 		return function()
@@ -48,7 +43,6 @@ return function(props)
 	end, { visible })
 
 	-- This is here so that someone plugging in a gamepad in the middle of a game doesn't get locked out.
-	-- This will output warnings in the console every time a window is opened, but that's fine.
 	React.useEffect(function()
 		if visible and platform == "Console" and GuiService.SelectedObject == nil then GuiService:Select(windowRef.current) end
 	end, { platform, visible })
@@ -63,9 +57,7 @@ return function(props)
 
 	local containerProps =
 		Sift.Dictionary.merge(Sift.Dictionary.withKeys(props, "ZIndex", "Size", "SizeConstraint", "Position", "AnchorPoint", "LayoutOrder"), {
-			Visible = binding:map(function(value)
-				return value > 0.1
-			end),
+			Visible = visible,
 		})
 
 	local windowProps = Sift.Dictionary.merge(props, {
