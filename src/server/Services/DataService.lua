@@ -121,6 +121,8 @@ function DataService.GetSaveFile(self: DataService, player: Player)
 				end)
 				:catch(function()
 					player:Kick("There was a problem retrieving your data. Your data is safe. Please try again in 10 minutes.")
+
+					return Promise.reject("Save file could not be retrieved.")
 				end)
 		end
 
@@ -139,9 +141,11 @@ end
 function DataService.ObserveKey(self: DataService, player: Player, key: string, callback)
 	local trove = Trove.new()
 
-	trove:AddPromise(self:GetSaveFile(player):andThen(function(saveFile)
-		trove:Add(saveFile:Observe(key, callback))
-	end))
+	trove:AddPromise(self:GetSaveFile(player)
+		:andThen(function(saveFile)
+			trove:Add(saveFile:Observe(key, callback))
+		end)
+		:catch(function() end))
 
 	return function()
 		trove:Clean()
