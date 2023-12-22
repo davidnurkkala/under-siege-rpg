@@ -128,7 +128,7 @@ return function(props)
 				Text = "Back",
 				AnchorPoint = Vector2.new(1, 0),
 				Position = UDim2.new(1, 0, 1, 8),
-				height = UDim.new(0.15, 0),
+				height = UDim.new(headerSize, 0),
 				Selectable = false,
 			}),
 
