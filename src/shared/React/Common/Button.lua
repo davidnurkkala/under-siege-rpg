@@ -21,14 +21,16 @@ local Dark = Color3.new(0, 0, 0)
 local SizeDefault = UDim2.fromScale(1, 1)
 local SizeHovered = UDim2.new(1, 2, 1, 2)
 
-return function(props)
+return React.memo(function(props)
 	local hoverBinding, hoverMotor = UseMotor(0)
 	local borderThickness = props.BorderSizePixel or 4
 	local corner = props.Corner or UDim.new(0, 4)
 	local padding = props.Padding or corner
 	local active = if props.Active ~= nil then props.Active else true
+	local buttonRef = props.buttonRef
+	local onSelected = props[React.Event.SelectionGained]
 
-	props = Sift.Dictionary.removeKeys(props, "Corner", "Padding")
+	props = Sift.Dictionary.removeKeys(props, "Corner", "Padding", "buttonRef", React.Event.SelectionGained)
 
 	return React.createElement(Container, Sift.Dictionary.withKeys(props, "ZIndex", "SizeConstraint", "Size", "Position", "AnchorPoint", "LayoutOrder"), {
 		Button = React.createElement(
@@ -60,6 +62,8 @@ return function(props)
 				Position = UDim2.fromScale(0.5, 0.5),
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				SizeConstraint = Enum.SizeConstraint.RelativeXY,
+				ref = buttonRef,
+				[React.Event.SelectionGained] = onSelected,
 			}),
 			{
 				Children = React.createElement(React.Fragment, nil, props.children),
@@ -79,4 +83,4 @@ return function(props)
 			}
 		),
 	})
-end
+end)

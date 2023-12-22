@@ -19,6 +19,8 @@ return function(props: {
 			TrainButton = React.createElement(TrainButton),
 		}),
 		Top = React.createElement(LobbyTop),
-		Buttons = React.createElement(LobbyButtons),
+		Buttons = React.createElement(LobbyButtons, {
+			Visible = props.Visible and menu.Is(nil),
+		}),
 	})
 end

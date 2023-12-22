@@ -33,6 +33,7 @@ return function(props: {
 			AnchorPoint = Vector2.new(0.5, 1),
 			ImageColor3 = ColorDefs.Yellow,
 			[React.Event.Activated] = props.Buy,
+			SelectionOrder = -1,
 		}, {
 			Text = React.createElement(Label, {
 				Text = "BUY!",

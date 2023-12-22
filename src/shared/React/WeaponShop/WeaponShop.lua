@@ -133,6 +133,7 @@ return function(props: {
 									Position = UDim2.fromScale(1, 0),
 									ImageColor3 = ColorDefs.DarkRed,
 									BorderColor3 = if isEquipped then ColorDefs.Red else nil,
+									SelectionOrder = isEquipped and -1 or 1,
 									BorderSizePixel = 2,
 									[React.Event.Activated] = function()
 										props.Select(id)

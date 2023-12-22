@@ -1,4 +1,6 @@
+local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Selection = game:GetService("Selection")
 
 local Aspect = require(ReplicatedStorage.Shared.React.Common.Aspect)
 local Button = require(ReplicatedStorage.Shared.React.Common.Button)
@@ -30,6 +32,7 @@ return function(props: {
 			HeaderText = TextStroke("Confirm Merge"),
 			Text = TextStroke(`Merge how many level {promptedEntry.Tier} {PetDefs[promptedEntry.PetId].Name} pets?`),
 			[React.Event.Activated] = function()
+				GuiService.SelectedObject = nil
 				setPromptedEntry(nil)
 			end,
 			Options = {
@@ -44,6 +47,7 @@ return function(props: {
 					end,
 					Props = {
 						ImageColor3 = ColorDefs.PaleGreen,
+						SelectionOrder = -1,
 					},
 				},
 				{
@@ -58,6 +62,7 @@ return function(props: {
 					Props = {
 						ImageColor3 = if promptedEntry.Count >= 3 then ColorDefs.PaleGreen else nil,
 						Active = promptedEntry.Count >= 3,
+						SelectionOrder = -1,
 					},
 				},
 				{
@@ -72,6 +77,7 @@ return function(props: {
 					Props = {
 						ImageColor3 = if promptedEntry.Count >= 4 then ColorDefs.PaleGreen else nil,
 						Active = promptedEntry.Count >= 4,
+						SelectionOrder = -1,
 					},
 				},
 			},
@@ -138,6 +144,7 @@ return function(props: {
 									[React.Event.Activated] = function()
 										setPromptedEntry(entry)
 									end,
+									SelectionOrder = canMerge and -1 or 1,
 								}, {
 									Preview = React.createElement(PetPreview, {
 										PetId = entry.PetId,

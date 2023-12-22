@@ -72,6 +72,7 @@ return function(props: {
 								props.Claim(index)
 							end,
 							[React.Tag] = `LoginStreakRewardButton{index}`,
+							SelectionOrder = if isAvailable then -1 else 1,
 						}, {
 							Text = React.createElement(Label, {
 								Text = TextStroke(RewardDisplayHelper.GetRewardText(reward)),

@@ -1,3 +1,4 @@
+local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -96,6 +97,7 @@ return function()
 			Text = TextStroke("Multi-buy can be bought by itself, but it's free for Premium users!"),
 			TextSize = 0.5,
 			[React.Event.Activated] = function()
+				GuiService.SelectedObject = nil
 				setState("Shop")
 			end,
 			Options = {

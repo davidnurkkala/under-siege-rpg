@@ -82,6 +82,7 @@ return function(props: {
 				Size = UDim2.fromScale(2, 1),
 				SizeConstraint = Enum.SizeConstraint.RelativeYY,
 				ImageColor3 = if props.CanAfford then CurrencyDefs.Primary.Colors.Secondary else nil,
+				SelectionOrder = if props.CanAfford then -1 else 1,
 				[React.Event.Activated] = function()
 					props.Prestige("Primary")
 				end,
@@ -107,6 +108,7 @@ return function(props: {
 				Size = UDim2.fromScale(2, 1),
 				SizeConstraint = Enum.SizeConstraint.RelativeYY,
 				ImageColor3 = if props.CanAfford then CurrencyDefs.Secondary.Colors.Secondary else nil,
+				SelectionOrder = if props.CanAfford then -1 else 1,
 				[React.Event.Activated] = function()
 					props.Prestige("Secondary")
 				end,

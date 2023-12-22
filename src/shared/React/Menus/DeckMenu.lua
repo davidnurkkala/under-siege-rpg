@@ -1,3 +1,4 @@
+local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Aspect = require(ReplicatedStorage.Shared.React.Common.Aspect)
@@ -152,6 +153,7 @@ return function(props: {
 							[React.Event.Activated] = function()
 								setSelectedId(cardId)
 							end,
+							SelectionOrder = -1,
 						}, {
 							Contents = React.createElement(CardContents, {
 								CardId = cardId,

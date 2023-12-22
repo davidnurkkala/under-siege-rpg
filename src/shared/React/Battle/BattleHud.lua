@@ -1,4 +1,7 @@
+local ContextActionService = game:GetService("ContextActionService")
+local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 
 local AttackButton = require(ReplicatedStorage.Shared.React.Battle.AttackButton)
 local BattleController = require(ReplicatedStorage.Shared.Controllers.BattleController)
@@ -17,10 +20,12 @@ local Lerp = require(ReplicatedStorage.Shared.Util.Lerp)
 local ListLayout = require(ReplicatedStorage.Shared.React.Common.ListLayout)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local Panel = require(ReplicatedStorage.Shared.React.Common.Panel)
+local PlatformContext = require(ReplicatedStorage.Shared.React.PlatformContext.PlatformContext)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local PromiseMotor = require(ReplicatedStorage.Shared.Util.PromiseMotor)
 local PromptWindow = require(ReplicatedStorage.Shared.React.Common.PromptWindow)
 local React = require(ReplicatedStorage.Packages.React)
+local RoundButtonWithImage = require(ReplicatedStorage.Shared.React.Common.RoundButtonWithImage)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 local Trove = require(ReplicatedStorage.Packages.Trove)
@@ -188,6 +193,24 @@ return function(props: {
 	local status, setStatus = React.useState(nil)
 	local goonModels, setGoonModels = React.useState({})
 	local surrendering, setSurrendering = React.useState(false)
+	local surrenderButtonRef = React.useRef(nil)
+	local platform = React.useContext(PlatformContext)
+
+	React.useEffect(function()
+		if not props.Visible then return end
+		if surrendering then return end
+
+		ContextActionService:BindActionAtPriority("SelectSurrender", function(actionName, inputState, inputObject)
+			if inputState ~= Enum.UserInputState.Begin then return Enum.ContextActionResult.Pass end
+
+			setSurrendering(true)
+			return Enum.ContextActionResult.Sink
+		end, false, Enum.ContextActionPriority.High.Value, Enum.KeyCode.ButtonSelect)
+
+		return function()
+			ContextActionService:UnbindAction("SelectSurrender")
+		end
+	end, { props.Visible, surrendering })
 
 	local leftCard, setLeftCard = React.useState(nil)
 	local finishLeft = React.useCallback(function()
@@ -312,6 +335,7 @@ return function(props: {
 				{
 					Text = TextStroke("Yes"),
 					Select = function()
+						GuiService.SelectedObject = nil
 						setSurrendering(false)
 						BattleController.SurrenderRequested:Fire()
 					end,
@@ -319,10 +343,16 @@ return function(props: {
 				{
 					Text = TextStroke("No"),
 					Select = function()
+						GuiService.SelectedObject = nil
 						setSurrendering(false)
 					end,
 				},
 			},
+			[React.Event.Activated] = function()
+				GuiService.SelectedObject = nil
+				setSurrendering(false)
+			end,
+			buttonRef = surrenderButtonRef,
 		}),
 
 		Surrender = React.createElement(Button, {
@@ -336,9 +366,20 @@ return function(props: {
 			[React.Event.Activated] = function()
 				setSurrendering(true)
 			end,
+			buttonRef = surrenderButtonRef,
+			Selectable = false,
 		}, {
 			Image = React.createElement(Image, {
 				Image = "rbxassetid://15484464238",
+			}),
+			GamepadHint = React.createElement(RoundButtonWithImage, {
+				Visible = platform == "Console",
+				Image = UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonSelect),
+				Text = "Surrender",
+				Selectable = false,
+				Position = UDim2.new(0.5, 0, 0, -4),
+				AnchorPoint = Vector2.new(0.5, 1),
+				height = UDim.new(0.4, 0),
 			}),
 		}),
 

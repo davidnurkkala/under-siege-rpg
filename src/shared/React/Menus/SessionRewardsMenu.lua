@@ -71,6 +71,7 @@ return function(props: {
 						AnchorPoint = Vector2.new(0.5, 0.5),
 						Position = UDim2.fromScale(0.5, 0.5),
 						Active = status == "Available",
+						SelectionOrder = status == "Available" and -1 or 1,
 						ImageColor3 = if status == "Available"
 							then ColorDefs.LightGreen
 							else if status == "Claimed" then ColorDefs.PaleBlue else ColorDefs.PaleRed,

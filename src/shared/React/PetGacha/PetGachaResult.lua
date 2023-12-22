@@ -1,4 +1,7 @@
+local ContextActionService = game:GetService("ContextActionService")
+local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 
 local Animate = require(ReplicatedStorage.Shared.Util.Animate)
 local Button = require(ReplicatedStorage.Shared.React.Common.Button)
@@ -11,9 +14,11 @@ local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local Lerp = require(ReplicatedStorage.Shared.Util.Lerp)
 local PetDefs = require(ReplicatedStorage.Shared.Defs.PetDefs)
 local PetPreview = require(ReplicatedStorage.Shared.React.PetGacha.PetPreview)
+local PlatformContext = require(ReplicatedStorage.Shared.React.PlatformContext.PlatformContext)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local PromiseMotor = require(ReplicatedStorage.Shared.Util.PromiseMotor)
 local React = require(ReplicatedStorage.Packages.React)
+local RoundButtonWithImage = require(ReplicatedStorage.Shared.React.Common.RoundButtonWithImage)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local UseMotor = require(ReplicatedStorage.Shared.React.Hooks.UseMotor)
@@ -81,9 +86,33 @@ return function(props: {
 	local slide, slideMotor = UseMotor(-1)
 	local size, sizeMotor = UseMotor(0)
 	local width, widthMotor = UseMotor(0)
-	local active = React.useRef(true)
-
+	local isActive, setIsActive = React.useState(true)
 	local state, setState = React.useState("Egg")
+	local platform = React.useContext(PlatformContext)
+
+	local dismissCallback = React.useCallback(function()
+		if not isActive then return end
+		setIsActive(false)
+
+		PromiseMotor(slideMotor, Flipper.Spring.new(-1), function(value)
+			return value < -0.95
+		end):andThenCall(props.Close)
+	end, { isActive, props.Close })
+
+	React.useEffect(function()
+		if not isActive then return end
+
+		ContextActionService:BindActionAtPriority("DismissPetGachaResult", function(actionName, inputState, inputObject)
+			if inputState ~= Enum.UserInputState.Begin then return Enum.ContextActionResult.Pass end
+
+			dismissCallback()
+			return Enum.ContextActionResult.Sink
+		end, false, Enum.ContextActionPriority.High.Value, Enum.KeyCode.ButtonB)
+
+		return function()
+			ContextActionService:UnbindAction("DismissPetGachaResult")
+		end
+	end, { isActive })
 
 	React.useEffect(function()
 		slideMotor:setGoal(Flipper.Instant.new(-1))
@@ -148,7 +177,7 @@ return function(props: {
 		}),
 
 		OkButton = React.createElement(Button, {
-			Visible = width:map(function(value)
+			Visible = platform ~= "Console" and width:map(function(value)
 				return value > 0
 			end),
 			Size = width:map(function(value)
@@ -158,17 +187,34 @@ return function(props: {
 			AnchorPoint = Vector2.new(0.5, 0),
 			Position = UDim2.fromScale(0.5, 0.6),
 			ImageColor3 = ColorDefs.PalePurple,
-			[React.Event.Activated] = function()
-				if not active.current then return end
-				active.current = false
-
-				PromiseMotor(slideMotor, Flipper.Spring.new(-1), function(value)
-					return value < -0.95
-				end):andThenCall(props.Close)
-			end,
+			[React.Event.Activated] = dismissCallback,
 		}, {
 			Label = React.createElement(Label, {
 				Text = TextStroke("Okay"),
+			}),
+		}),
+
+		OkayButtonGamepad = React.createElement("Frame", {
+			Visible = platform == "Console" and width:map(function(value)
+				return value > 0
+			end),
+			Size = width:map(function(value)
+				return UDim2.fromScale(0.2 * value, 0.05)
+			end),
+			SizeConstraint = Enum.SizeConstraint.RelativeXX,
+			AnchorPoint = Vector2.new(0.5, 0),
+			Position = UDim2.fromScale(0.5, 0.6),
+			BackgroundTransparency = 1,
+		}, {
+			React.createElement(RoundButtonWithImage, {
+				Visible = platform == "Console",
+				[React.Event.Activated] = dismissCallback,
+				Image = UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonB),
+				Text = "Back",
+				height = UDim.new(1, 0),
+				AnchorPoint = Vector2.new(0.5, 0),
+				Position = UDim2.fromScale(0.5, 0),
+				Selectable = false,
 			}),
 		}),
 	})

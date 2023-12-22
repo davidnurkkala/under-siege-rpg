@@ -19,6 +19,7 @@ return function(props: {
 
 	props = Sift.Dictionary.merge(DefaultProps, Sift.Dictionary.removeKeys(props, "RenderLayout"), {
 		CanvasSize = canvasSize,
+		Selectable = false,
 	})
 
 	return React.createElement("ScrollingFrame", props, {
