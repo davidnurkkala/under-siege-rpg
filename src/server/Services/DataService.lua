@@ -85,10 +85,9 @@ function DataService.PrepareBlocking(self: DataService)
 				LoadPromisesByPlayer[player] = nil
 			end
 
-			if SaveFilesByPlayer[player] then
-				SaveFilesByPlayer[player]:Destroy()
+			if SaveFilesByPlayer[player] then SaveFilesByPlayer[player]:Destroy():andThen(function()
 				SaveFilesByPlayer[player] = nil
-			end
+			end) end
 
 			FirstSessionsByPlayer[player] = nil
 		end

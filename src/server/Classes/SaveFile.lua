@@ -17,12 +17,14 @@ export type SaveFile = typeof(setmetatable(
 	{} :: {
 		Document: any,
 		Observers: { [string]: { [Observer]: boolean } },
+		Destroyed: boolean,
 	},
 	SaveFile
 ))
 
 function SaveFile.new(document): SaveFile
 	local self: SaveFile = setmetatable({
+		Destroyed = false,
 		Document = document,
 		Observers = {},
 	}, SaveFile)
@@ -31,6 +33,8 @@ function SaveFile.new(document): SaveFile
 end
 
 function SaveFile.Observe(self: SaveFile, key: string, callback: (any) -> ()): () -> ()
+	if self.Destroyed then return function() end end
+
 	if not self.Observers[key] then self.Observers[key] = {} end
 
 	local observer: Observer = {
@@ -62,12 +66,16 @@ function SaveFile.Observe(self: SaveFile, key: string, callback: (any) -> ()): (
 end
 
 function SaveFile.Update(self: SaveFile, key: string, callback: (any) -> any)
+	if self.Destroyed then return end
+
 	local oldValue = self.Document:read()[key]
 	local newValue = callback(oldValue)
 	self:Set(key, newValue)
 end
 
 function SaveFile.Set(self: SaveFile, key: string, value: any)
+	if self.Destroyed then return end
+
 	local data = self.Document:read()
 	if Compare(data[key], value) then return end
 
@@ -82,12 +90,15 @@ function SaveFile.Set(self: SaveFile, key: string, value: any)
 end
 
 function SaveFile.Get(self: SaveFile, key: string): any
+	if self.Destroyed then return end
+
 	return self.Document:read()[key]
 end
 
 function SaveFile.Destroy(self: SaveFile)
+	self.Destroyed = true
 	self.Observers = {}
-	self.Document:close()
+	return self.Document:close()
 end
 
 return SaveFile
