@@ -2,6 +2,7 @@ local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local BattleService = require(ServerScriptService.Server.Services.BattleService)
 local GoonDefs = require(ReplicatedStorage.Shared.Defs.GoonDefs)
 local Health = require(ReplicatedStorage.Shared.Classes.Health)
 local Promise = require(ReplicatedStorage.Packages.Promise)
@@ -52,12 +53,16 @@ local function createRoot(goonId)
 	return root, remote
 end
 
-local function createAnimator(root)
-	local remote: RemoteEvent = root.Remote
+local function fireRemote(remote, battle, ...)
+	for _, player in BattleService:GetPlayersFromBattle(battle) do
+		remote:FireClient(player, ...)
+	end
+end
 
+local function createAnimator(remote, battle)
 	return Sift.Dictionary.map({ "Play", "Stop", "StopHard", "StopHardAll" }, function(funcName)
 		return function(_, ...)
-			remote:FireAllClients("Animator", funcName, ...)
+			fireRemote(remote, battle, "Animator", funcName, ...)
 		end, funcName
 	end)
 end
@@ -73,7 +78,7 @@ function Goon.new(args: {
 	Brain: any,
 }): Goon
 	local root, remote = createRoot(args.Def.Id)
-	local animator = createAnimator(root)
+	local animator = createAnimator(remote, args.Battle)
 
 	local self: Goon = setmetatable({
 		Level = args.Level,
@@ -99,7 +104,7 @@ function Goon.new(args: {
 		local change = new - old
 		if change <= -0.25 then self.Brain:OnInjured() end
 
-		remote:FireAllClients("Health", "Update", self.Health:GetMax(), self.Health:Get())
+		fireRemote(self.Remote, self.Battle, "Health", "Update", self.Health:GetMax(), self.Health:Get())
 	end)
 
 	self.Battle:Add(self)

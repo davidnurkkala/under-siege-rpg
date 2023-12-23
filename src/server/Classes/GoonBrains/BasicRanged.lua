@@ -88,7 +88,8 @@ function BasicRanged.SetUpStateMachine(self: BasicRanged)
 						data.Promise = self.Goon:WhileAlive(Promise.delay(self.Goon:FromDef("AttackWindupTime") or 1):andThen(function()
 							data.AttackIsFinished = true
 
-							EffectService:All(
+							EffectService:ForBattle(
+								self.Battle,
 								EffectProjectile({
 									Model = ReplicatedStorage.Assets.Models.Projectiles[self.ProjectileName],
 									Start = self.Goon.Root.CFrame * self.ProjectileOffset,
@@ -102,7 +103,8 @@ function BasicRanged.SetUpStateMachine(self: BasicRanged)
 							):andThen(function()
 								self.Battle:Damage(self.Goon, target, self.Goon:FromDef("Damage"))
 
-								EffectService:All(
+								EffectService:ForBattle(
+									self.Battle,
 									EffectSound({
 										SoundId = PickRandom(self.Goon.Def.Sounds.Hit),
 										Target = target:GetRoot(),
@@ -148,7 +150,8 @@ function BasicRanged.OnDied(self: BasicRanged)
 	self.Goon.Animator:StopHardAll()
 	self.Goon.Animator:Play(self.Goon.Def.Animations.Die)
 	return Promise.all({
-		EffectService:All(
+		EffectService:ForBattle(
+			self.Battle,
 			EffectSound({
 				SoundId = PickRandom(self.Goon.Def.Sounds.Death),
 				Target = self.Goon:GetRoot(),
@@ -164,7 +167,8 @@ function BasicRanged.OnDied(self: BasicRanged)
 end
 
 function BasicRanged.OnInjured(self: BasicRanged)
-	EffectService:All(
+	EffectService:ForBattle(
+		self.Battle,
 		EffectGoonModel({
 			Root = self.Goon.Root,
 			Name = "EffectColorFadeModel",

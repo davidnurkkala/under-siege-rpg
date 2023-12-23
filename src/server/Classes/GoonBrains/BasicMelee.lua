@@ -69,7 +69,8 @@ function BasicMelee.SetUpStateMachine(self: BasicMelee)
 						data.Promise = self.Goon:WhileAlive(Promise.delay(self.Goon:FromDef("AttackWindupTime") or 1):andThen(function()
 							self.Battle:Damage(self.Goon, target, self.Goon:FromDef("Damage"))
 
-							EffectService:All(
+							EffectService:ForBattle(
+								self.Battle,
 								EffectSound({
 									SoundId = PickRandom(self.Goon.Def.Sounds.Hit),
 									Target = target:GetRoot(),
@@ -114,7 +115,8 @@ function BasicMelee.OnDied(self: BasicMelee)
 	self.Goon.Animator:StopHardAll()
 	self.Goon.Animator:Play(self.Goon.Def.Animations.Die)
 	return Promise.all({
-		EffectService:All(
+		EffectService:ForBattle(
+			self.Battle,
 			EffectSound({
 				SoundId = PickRandom(self.Goon.Def.Sounds.Death),
 				Target = self.Goon:GetRoot(),
@@ -130,7 +132,8 @@ function BasicMelee.OnDied(self: BasicMelee)
 end
 
 function BasicMelee.OnInjured(self: BasicMelee)
-	EffectService:All(
+	EffectService:ForBattle(
+		self.Battle,
 		EffectGoonModel({
 			Root = self.Goon.Root,
 			Name = "EffectColorFadeModel",

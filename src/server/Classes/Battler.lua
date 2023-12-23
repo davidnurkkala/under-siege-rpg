@@ -160,10 +160,13 @@ function Battler.DefeatAnimation(self: Battler)
 	return Promise.try(function()
 		self.Animator:Play("GenericBattlerDie", 0)
 
-		EffectService:All(EffectBattlerCollapse({
-			CharModel = self.CharModel,
-			BaseModel = self.BaseModel,
-		}))
+		EffectService:ForBattle(
+			self.Battle,
+			EffectBattlerCollapse({
+				CharModel = self.CharModel,
+				BaseModel = self.BaseModel,
+			})
+		)
 
 		return Promise.delay(2.5)
 	end):catch(function() end)
@@ -259,7 +262,8 @@ function Battler.Attack(self: Battler)
 			if isCrit then
 				self:SetCrit(0)
 
-				EffectService:All(
+				EffectService:ForBattle(
+					self.Battle,
 					EffectProjectile({
 						Model = ReplicatedStorage.Assets.Models.Effects.CritProjectile,
 						Start = start,
@@ -273,7 +277,8 @@ function Battler.Attack(self: Battler)
 				)
 			end
 
-			EffectService:All(
+			EffectService:ForBattle(
+				self.Battle,
 				EffectProjectile({
 					Model = ReplicatedStorage.Assets.Models.Projectiles[self.WeaponDef.ProjectileName],
 					Start = start,
@@ -287,7 +292,8 @@ function Battler.Attack(self: Battler)
 			):andThen(function()
 				battle:Damage(self, target, self.AttackDamage * if isCrit then 5 else 1)
 
-				EffectService:All(
+				EffectService:ForBattle(
+					self.Battle,
 					EffectSound({
 						SoundId = PickRandom(self.WeaponDef.Sounds.Hit),
 						Target = target:GetWorldCFrame().Position,
@@ -300,7 +306,8 @@ function Battler.Attack(self: Battler)
 				)
 
 				if isCrit then
-					EffectService:All(
+					EffectService:ForBattle(
+						self.Battle,
 						EffectGrowFade({
 							Part = ReplicatedStorage.Assets.Models.Effects.CritHitEffect,
 							Target = root,
