@@ -130,7 +130,7 @@ function TutorialController.Update(self: TutorialController, status)
 		self.Target:Set(nil)
 	elseif status.Instruction == "TrainingDummy" then
 		self.Message:Set({
-			{ Desktop = "Click", Mobile = "Tap the attack button", Console = "RT" },
+			{ Desktop = "Hold left click", Mobile = "Tap and hold the attack button", Console = "Hold RT" },
 			`to attack the dummy.\n{status.State.current // 1} / {status.State.required} Power`,
 		})
 		self.Target:Set(self:GetNearestTag("TrainingDummy"))

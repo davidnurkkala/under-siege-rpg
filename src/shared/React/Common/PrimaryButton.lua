@@ -21,8 +21,11 @@ return function(props: {
 		Selectable = props.Selectable,
 		ZIndex = 16,
 
-		[React.Event.Activated] = function()
-			ActionController:Once("Primary")
+		[React.Event.InputBegan] = function(_, input)
+			local isTouch = input.UserInputType == Enum.UserInputType.Touch
+			local isMouse = input.UserInputType == Enum.UserInputType.MouseButton1
+
+			if isTouch or isMouse then ActionController:SetActionActive("Primary", true) end
 		end,
 	}, props.children)
 end

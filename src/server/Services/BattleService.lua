@@ -29,6 +29,7 @@ function BattleService.PrepareBlocking(self: BattleService)
 	end)
 
 	self.CardPlayed = self.Comm:CreateSignal("CardPlayed")
+	self.MessageSent = self.Comm:CreateSignal("MessageSent")
 end
 
 function BattleService.Get(_self: BattleService, player: Player)

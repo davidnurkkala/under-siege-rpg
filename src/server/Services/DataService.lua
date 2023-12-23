@@ -13,7 +13,7 @@ local COLLECTION_NAME = "DataService" .. Configuration.DataStoreVersion
 local DataService = {
 	Priority = -1024,
 
-	Defaults = {
+	DefaultData = {
 		Weapons = {
 			Equipped = "WoodenBow",
 			Owned = {
@@ -24,6 +24,31 @@ local DataService = {
 			World1 = true,
 		},
 		WorldCurrent = "World1",
+		Currency = {
+			Primary = 0,
+			Secondary = 0,
+			Premium = 0,
+			Prestige = 0,
+		},
+		PrestigePoints = {
+			Primary = 0,
+			Secondary = 0,
+		},
+		Boosts = {},
+		Deck = {
+			Equipped = { Peasant = true },
+			Owned = { Peasant = 1 },
+		},
+		Pets = {
+			Equipped = {},
+			Owned = {},
+		},
+		LoginStreakData = {
+			Timestamp = 0,
+			Streak = 0,
+			AvailableRewardIndices = {},
+		},
+		IsFirstSession = true,
 	},
 }
 
@@ -46,36 +71,7 @@ function DataService.PrepareBlocking(self: DataService)
 			return true
 		end,
 
-		defaultData = {
-			Weapons = self.Defaults.Weapons,
-			Currency = {
-				Primary = 0,
-				Secondary = 0,
-				Premium = 0,
-				Prestige = 0,
-			},
-			PrestigePoints = {
-				Primary = 0,
-				Secondary = 0,
-			},
-			Boosts = {},
-			Deck = {
-				Equipped = { Peasant = true },
-				Owned = { Peasant = 1 },
-			},
-			Pets = {
-				Equipped = {},
-				Owned = {},
-			},
-			LoginStreakData = {
-				Timestamp = 0,
-				Streak = 0,
-				AvailableRewardIndices = {},
-			},
-			Worlds = self.Defaults.Worlds,
-			WorldCurrent = self.Defaults.WorldCurrent,
-			IsFirstSession = true,
-		},
+		defaultData = self.DefaultData,
 
 		migrations = {},
 	})

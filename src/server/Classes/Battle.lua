@@ -168,6 +168,7 @@ function Battle.fromPlayerVersusBattler(player: Player, battlerId: string)
 			battle.Ended:Connect(function(victor)
 				if victor ~= battleSession.Battler then
 					EventStream.Event({ Kind = "BattleLost", Player = player, BattlerId = battlerId })
+					BattleService.MessageSent:Fire(player, "Defeat...")
 					return
 				end
 
@@ -178,11 +179,14 @@ function Battle.fromPlayerVersusBattler(player: Player, battlerId: string)
 					:andThen(function(amountAdded)
 						amountAdded = ProductService:GetVipBoostedSecondary(player, amountAdded)
 
+						BattleService.MessageSent:Fire(player, "Victory!")
+
 						GuiEffectService.IndicatorRequestedRemote:Fire(player, {
 							Text = `+{amountAdded // 0.1 / 10}`,
 							Image = CurrencyDefs.Secondary.Image,
 							Start = opponent:GetRoot().Position,
 							Finish = victor:GetRoot().Position,
+							Mode = "Slow",
 						})
 
 						Promise.delay(0.5):andThen(function()

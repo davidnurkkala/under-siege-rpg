@@ -46,7 +46,7 @@ local function healthBar(props: {
 })
 	return React.createElement(Container, {
 		LayoutOrder = props.LayoutOrder,
-		Size = UDim2.fromScale(0.3, 0.3),
+		Size = UDim2.fromScale(0.3, 1),
 	}, {
 		Bar = React.createElement(HealthBar, {
 			Alignment = props.Alignment,
@@ -187,20 +187,63 @@ local function playedCard(props: {
 	})
 end
 
+local function broadcast(props: {
+	Message: string?,
+	Finish: () -> (),
+})
+	local chars, charsMotor = UseMotor(0)
+
+	React.useEffect(function()
+		charsMotor:setGoal(Flipper.Instant.new(0))
+		charsMotor:step()
+
+		if not props.Message then return end
+
+		local count = 0
+		for _ in utf8.graphemes(props.Message) do
+			count += 1
+		end
+
+		local promise = PromiseMotor(charsMotor, Flipper.Spring.new(count, { frequency = 2 }), function(value)
+			return math.abs(value - count) < 0.1
+		end):andThenCall(Promise.delay, 3):andThenCall(props.Finish)
+
+		return function()
+			promise:cancel()
+		end
+	end, { props.Message, props.Finish })
+
+	return props.Message
+		and React.createElement(Label, {
+			Text = TextStroke(props.Message),
+			MaxVisibleGraphemes = chars:map(function(value)
+				return math.round(value)
+			end),
+			Size = UDim2.fromScale(1, 0.1),
+			Position = UDim2.fromScale(0.5, 0),
+			AnchorPoint = Vector2.new(0.5, 0),
+		})
+end
+
 return function(props: {
 	Visible: boolean,
 })
 	local status, setStatus = React.useState(nil)
 	local goonModels, setGoonModels = React.useState({})
 	local surrendering, setSurrendering = React.useState(false)
+	local message, setMessage = React.useState(nil)
 	local surrenderButtonRef = React.useRef(nil)
 	local platform = React.useContext(PlatformContext)
+
+	local clearMessage = React.useCallback(function()
+		setMessage(nil)
+	end, { setMessage })
 
 	React.useEffect(function()
 		if not props.Visible then return end
 		if surrendering then return end
 
-		ContextActionService:BindActionAtPriority("SelectSurrender", function(actionName, inputState, inputObject)
+		ContextActionService:BindActionAtPriority("SelectSurrender", function(_, inputState)
 			if inputState ~= Enum.UserInputState.Begin then return Enum.ContextActionResult.Pass end
 
 			setSurrendering(true)
@@ -257,7 +300,9 @@ return function(props: {
 			return
 		end
 
-		local connection = BattleController.CardPlayed:Connect(function(cardData)
+		local trove = Trove.new()
+
+		trove:Connect(BattleController.CardPlayed, function(cardData)
 			local data = Sift.Dictionary.set(Sift.Dictionary.removeKey(cardData, "Position"), "Guid", Guid())
 			if cardData.Position < 0.5 then
 				setLeftCard(data)
@@ -266,8 +311,12 @@ return function(props: {
 			end
 		end)
 
+		trove:Connect(BattleController.MessageSent, function(messageIn)
+			setMessage(messageIn)
+		end)
+
 		return function()
-			connection:Disconnect()
+			trove:Clean()
 		end
 	end, { props.Visible })
 
@@ -284,45 +333,71 @@ return function(props: {
 			end)
 		),
 
-		CritBar = critEnabled and React.createElement(Container, {
-			Size = UDim2.fromScale(0.2, 0.025),
-			SizeConstraint = Enum.SizeConstraint.RelativeXX,
-			Position = UDim2.fromScale(0.5, 0.8),
-			AnchorPoint = Vector2.new(0.5, 1),
-		}, {
-			Bar = React.createElement(critBar, {
-				Percent = TryNow(function()
-					return status.Battlers[1].Crit
-				end, 0),
-			}),
+		Message = React.createElement(broadcast, {
+			Message = message,
+			Finish = clearMessage,
 		}),
 
-		Bottom = React.createElement(Container, {
-			Size = UDim2.fromScale(1, 0.2),
-			AnchorPoint = Vector2.new(0.5, 1),
-			Position = UDim2.fromScale(0.5, 1),
-		}, {
+		Bottom = React.createElement(Container, {}, {
+			Padding = React.createElement("UIPadding", {
+				PaddingBottom = UDim.new(0.075, 0),
+			}),
+
 			Layout = React.createElement(ListLayout, {
-				FillDirection = Enum.FillDirection.Horizontal,
 				HorizontalAlignment = Enum.HorizontalAlignment.Center,
-				VerticalAlignment = Enum.VerticalAlignment.Center,
-				Padding = if critEnabled then UDim.new(0.01, 0) else UDim.new(0.05, 0),
+				VerticalAlignment = Enum.VerticalAlignment.Bottom,
+				Padding = UDim.new(0, 8),
 			}),
 
-			AttackButton = critEnabled and React.createElement(AttackButton, {
-				LayoutOrder = 2,
-			}),
+			Hint = critEnabled
+				and React.createElement(Label, {
+					Text = TextStroke(
+						`{if platform == "Desktop" then "Hold left click" else if platform == "Console" then "Hold RT" else "Tap and hold the attack button"} to charge a crit!`
+					),
+					Size = UDim2.fromScale(0.5, 0.025),
+					SizeConstraint = Enum.SizeConstraint.RelativeXX,
+				}),
 
-			HealthLeft = React.createElement(healthBar, {
+			CritBar = critEnabled and React.createElement(Container, {
 				LayoutOrder = 1,
-				Alignment = Enum.HorizontalAlignment.Right,
-				Percent = getHealthPercent(status, 1),
+				Size = UDim2.fromScale(0.25, 0.025),
+				SizeConstraint = Enum.SizeConstraint.RelativeXX,
+			}, {
+				Bar = React.createElement(critBar, {
+					Percent = TryNow(function()
+						return status.Battlers[1].Crit
+					end, 0),
+				}),
 			}),
 
-			HealthRight = React.createElement(healthBar, {
-				LayoutOrder = 3,
-				Alignment = Enum.HorizontalAlignment.Left,
-				Percent = getHealthPercent(status, 2),
+			Bars = React.createElement(Container, {
+				LayoutOrder = 2,
+				Size = UDim2.fromScale(1, 0.05),
+				AnchorPoint = Vector2.new(0.5, 1),
+				Position = UDim2.fromScale(0.5, 0.9),
+			}, {
+				Layout = React.createElement(ListLayout, {
+					FillDirection = Enum.FillDirection.Horizontal,
+					HorizontalAlignment = Enum.HorizontalAlignment.Center,
+					VerticalAlignment = Enum.VerticalAlignment.Top,
+					Padding = if critEnabled then UDim.new(0, 8) else UDim.new(0, 24),
+				}),
+
+				AttackButton = critEnabled and React.createElement(AttackButton, {
+					LayoutOrder = 2,
+				}),
+
+				HealthLeft = React.createElement(healthBar, {
+					LayoutOrder = 1,
+					Alignment = Enum.HorizontalAlignment.Right,
+					Percent = getHealthPercent(status, 1),
+				}),
+
+				HealthRight = React.createElement(healthBar, {
+					LayoutOrder = 3,
+					Alignment = Enum.HorizontalAlignment.Left,
+					Percent = getHealthPercent(status, 2),
+				}),
 			}),
 		}),
 

@@ -21,6 +21,12 @@ type TutorialService = typeof(TutorialService)
 
 local function tutorialCondition(player)
 	return Badger.sequence({
+		DefeatBattler(player, "Peasant", 1):withState(function(condition)
+			return {
+				Instruction = "Battler",
+				State = condition:getState(),
+			}
+		end),
 		HaveCurrency(player, "Primary", 100):withState(function(condition)
 			return {
 				Instruction = "TrainingDummy",
@@ -36,12 +42,6 @@ local function tutorialCondition(player)
 		HaveCurrency(player, "Primary", 200):withState(function(condition)
 			return {
 				Instruction = "TrainingDummy",
-				State = condition:getState(),
-			}
-		end),
-		DefeatBattler(player, "Peasant", 1):withState(function(condition)
-			return {
-				Instruction = "Battler",
 				State = condition:getState(),
 			}
 		end),

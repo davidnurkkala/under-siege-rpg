@@ -87,12 +87,12 @@ function WorldService.PrepareBlocking(self: WorldService)
 end
 
 function WorldService.ResetWorlds(self: WorldService, player: Player, callback)
-	return self:TeleportToWorld(player, DataService.Defaults.WorldCurrent, callback)
+	return self:TeleportToWorld(player, DataService.DefaultData.WorldCurrent, callback)
 		:andThen(function()
 			return DataService:GetSaveFile(player)
 		end)
 		:andThen(function(saveFile)
-			saveFile:Set("Worlds", DataService.Defaults.Worlds)
+			saveFile:Set("Worlds", DataService.DefaultData.Worlds)
 		end)
 end
 

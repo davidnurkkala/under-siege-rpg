@@ -28,6 +28,10 @@ function ActionController.PrepareBlocking(self: ActionController)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 then self:SetActionActive("Primary", false) end
 		if input.KeyCode == Enum.KeyCode.ButtonR2 then self:SetActionActive("Primary", false) end
 	end)
+
+	UserInputService.TouchEnded:Connect(function()
+		self:SetActionActive("Primary", false)
+	end)
 end
 
 function ActionController.SetActionActive(self: ActionController, actionName: string, active: boolean)

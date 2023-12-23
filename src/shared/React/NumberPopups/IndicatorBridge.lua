@@ -57,6 +57,7 @@ return function()
 				ImageProps = { Image = data.Image },
 				StartPosition = data.StartPosition,
 				EndPosition = data.EndPosition,
+				Mode = data.Mode,
 				OnFinished = function()
 					setIndicators(function(oldIndicators)
 						return Sift.Dictionary.removeKey(oldIndicators, guid)

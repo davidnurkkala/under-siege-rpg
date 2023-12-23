@@ -155,7 +155,7 @@ function BattleSession.promised(player: Player, position: number, direction: num
 					TeamId = `PLAYER_{player.Name}`,
 					DeckPlayer = DeckPlayerRandom.new(Deck.new(deck)),
 					HealthMax = 50,
-					Power = power,
+					Power = math.max(50, power),
 				},
 			}))
 		end)

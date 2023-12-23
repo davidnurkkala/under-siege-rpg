@@ -27,6 +27,7 @@ function BattleController.PrepareBlocking(self: BattleController)
 
 	self.SurrenderRequested = self.Comm:GetSignal("SurrenderRequested")
 	self.CardPlayed = self.Comm:GetSignal("CardPlayed")
+	self.MessageSent = self.Comm:GetSignal("MessageSent")
 end
 
 function BattleController.ObserveStatus(self: BattleController, callback: (any) -> ()): () -> ()
