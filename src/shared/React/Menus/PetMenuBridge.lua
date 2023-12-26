@@ -22,8 +22,11 @@ return function()
 			Close = function()
 				menu.Unset("Pets")
 			end,
-			Select = function(slotId)
-				return PetController:ToggleEquipped(slotId)
+			Equip = function(hash)
+				return PetController.EquipPetRemote(hash)
+			end,
+			Unequip = function(hash)
+				return PetController.UnequipPetRemote(hash)
 			end,
 			EquipBest = function()
 				return PetController.EquipBestRemote()

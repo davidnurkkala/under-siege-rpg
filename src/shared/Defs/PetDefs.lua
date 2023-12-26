@@ -10,7 +10,7 @@ local Pets = {
 			Idle = { "GenericPetBlink", "GenericPetIdle", "BunnyIdleExtras" },
 			Walk = { "GenericPetWalk", "BunnyWalkExtras" },
 		},
-		Power = 1.6,
+		Power = 0.6,
 	},
 	Doggy = {
 		Name = "Doggy",
@@ -19,7 +19,7 @@ local Pets = {
 			Idle = { "GenericPetBlink", "GenericPetIdle", "DoggyIdleExtras" },
 			Walk = { "GenericPetWalk", "DoggyWalkExtras" },
 		},
-		Power = 1.1,
+		Power = 0.1,
 	},
 	Kitty = {
 		Name = "Kitty",
@@ -28,7 +28,7 @@ local Pets = {
 			Idle = { "GenericPetBlink", "GenericPetIdle", "KittyIdleExtras" },
 			Walk = { "GenericPetWalk", "KittyWalkExtras" },
 		},
-		Power = 1.2,
+		Power = 0.2,
 	},
 	Piggy = {
 		Name = "Piggy",
@@ -37,7 +37,7 @@ local Pets = {
 			Idle = { "GenericPetBlink", "GenericPetIdle", "PiggyIdleExtras" },
 			Walk = { "GenericPetWalk", "PiggyWalkExtras" },
 		},
-		Power = 1.4,
+		Power = 0.4,
 	},
 	Wolfy = {
 		Name = "Wolfy",
@@ -46,7 +46,7 @@ local Pets = {
 			Idle = { "GenericPetBlink", "GenericPetIdle", "WolfyIdleExtras" },
 			Walk = { "GenericPetWalk", "WolfyWalkExtras" },
 		},
-		Power = 2,
+		Power = 1,
 	},
 
 	Bull = {
@@ -56,7 +56,7 @@ local Pets = {
 			Idle = { "GenericPetBlink", "GenericPetIdle", "DoggyIdleExtras" },
 			Walk = { "GenericPetWalk", "DoggyWalkExtras" },
 		},
-		Power = 2.2,
+		Power = 1.2,
 	},
 
 	Lion = {
@@ -66,7 +66,7 @@ local Pets = {
 			Idle = { "GenericPetBlink", "GenericPetIdle", "KittyIdleExtras" },
 			Walk = { "GenericPetWalk", "KittyWalkExtras" },
 		},
-		Power = 2.4,
+		Power = 1.4,
 	},
 
 	Rhino = {
@@ -76,7 +76,7 @@ local Pets = {
 			Idle = { "GenericPetBlink", "GenericPetIdle", "WolfyIdleExtras" },
 			Walk = { "GenericPetWalk", "WolfyWalkExtras" },
 		},
-		Power = 2.6,
+		Power = 1.6,
 	},
 
 	Slime = {
@@ -86,7 +86,7 @@ local Pets = {
 			Idle = { "GenericPetBlink", "GenericPetIdle", "WolfyIdleExtras" },
 			Walk = { "GenericPetWalk", "WolfyWalkExtras" },
 		},
-		Power = 2.8,
+		Power = 1.8,
 	},
 
 	Goat = {
@@ -96,7 +96,7 @@ local Pets = {
 			Idle = { "GenericPetBlink", "GenericPetIdle", "DoggyIdleExtras" },
 			Walk = { "GenericPetWalk", "DoggyWalkExtras" },
 		},
-		Power = 3,
+		Power = 2,
 	},
 
 	Fox = {
@@ -106,7 +106,7 @@ local Pets = {
 			Idle = { "GenericPetBlink", "GenericPetIdle", "KittyIdleExtras" },
 			Walk = { "GenericPetWalk", "KittyWalkExtras" },
 		},
-		Power = 3.2,
+		Power = 2.2,
 	},
 
 	Mouse = {
@@ -116,7 +116,7 @@ local Pets = {
 			Idle = { "GenericPetBlink", "GenericPetIdle", "KittyWalkExtras" },
 			Walk = { "GenericPetWalk", "KittyWalkExtras" },
 		},
-		Power = 3.4,
+		Power = 2.4,
 	},
 
 	Bat = {
@@ -126,7 +126,7 @@ local Pets = {
 			Idle = { "GenericPetBlink", "GenericPetIdle", "BatIdleExtras" },
 			Walk = { "GenericPetWalk", "BatWalkExtras" },
 		},
-		Power = 3.6,
+		Power = 2.6,
 	},
 }
 

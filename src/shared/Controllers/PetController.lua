@@ -12,13 +12,10 @@ function PetController.PrepareBlocking(self: PetController)
 	self.Comm = Comm.ClientComm.new(ReplicatedStorage, true, "PetService")
 	self.PetsRemote = self.Comm:GetProperty("Pets")
 	self.HatchPetFromGachaRemote = self.Comm:GetFunction("HatchPetFromGacha")
-	self.ToggleEquippedRemote = self.Comm:GetFunction("ToggleEquipped")
 	self.MergePetsRemote = self.Comm:GetFunction("MergePets")
 	self.EquipBestRemote = self.Comm:GetFunction("EquipBest")
-end
-
-function PetController.ToggleEquipped(self: PetController, slotId: string)
-	return self.ToggleEquippedRemote(slotId)
+	self.EquipPetRemote = self.Comm:GetFunction("EquipPet")
+	self.UnequipPetRemote = self.Comm:GetFunction("UnequipPet")
 end
 
 function PetController.ObservePets(self: PetController, callback)

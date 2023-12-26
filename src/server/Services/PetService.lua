@@ -40,10 +40,16 @@ function PetService.PrepareBlocking(self: PetService)
 		return self:HatchPetFromGacha(player, gachaId):expect()
 	end)
 
-	self.Comm:BindFunction("ToggleEquipped", function(player, slotId)
-		if not t.string(slotId) then return end
+	self.Comm:BindFunction("EquipPet", function(player, hash)
+		if not t.string(hash) then return end
 
-		return self:TogglePetEquipped(player, slotId):expect()
+		return self:EquipPet(player, hash):expect()
+	end)
+
+	self.Comm:BindFunction("UnequipPet", function(player, hash)
+		if not t.string(hash) then return end
+
+		return self:UnequipPet(player, hash):expect()
 	end)
 
 	self.Comm:BindFunction("MergePets", function(player, hash, count)
@@ -61,37 +67,43 @@ function PetService.PrepareBlocking(self: PetService)
 end
 
 function PetService.EquipBest(self: PetService, player: Player)
-	return DataService:GetSaveFile(player):andThen(function(saveFile)
-		return Promise.all(Sift.Dictionary.map(saveFile:Get("Pets").Equipped, function(_, slotId)
-			return self:SetPetEquipped(player, slotId, false)
-		end))
-			:andThen(function()
-				local owned = saveFile:Get("Pets").Owned
-				local bestSlotIds = Sift.Array.sort(Sift.Dictionary.keys(owned), function(idA, idB)
-					local slotA, slotB = owned[idA], owned[idB]
-					local powerA, powerB = PetHelper.GetPetPower(slotA.PetId, slotA.Tier), PetHelper.GetPetPower(slotB.PetId, slotB.Tier)
-					return powerA > powerB
-				end)
+	return Promise.all({
+		DataService:GetSaveFile(player),
+		self:GetMaxPetSlots(player),
+	}):andThen(function(results)
+		local saveFile, slots = unpack(results)
 
-				return Promise.all(Sift.Array.map(Range(3), function(index)
-					local slotId = bestSlotIds[index]
-					if not slotId then return end
+		local pets = saveFile:Get("Pets")
 
-					return self:SetPetEquipped(player, slotId, true)
-				end))
-			end)
-			:andThenReturn(true)
+		local bestHashes = Sift.Array.sort(Sift.Dictionary.keys(pets.Owned), PetHelper.SortByPower)
+
+		local equipped = {}
+
+		for _, hash in bestHashes do
+			local used = math.min(pets.Owned[hash], slots)
+			equipped[hash] = used
+
+			slots -= used
+
+			if slots == 0 then break end
+		end
+
+		pets = Sift.Dictionary.set(pets, "Equipped", equipped)
+
+		saveFile:Set("Pets", pets)
 	end)
 end
 
 function PetService.AddPet(self: PetService, player: Player, petId: string, tier: number?)
 	return DataService:GetSaveFile(player):andThen(function(saveFile)
 		saveFile:Update("Pets", function(pets)
-			local hash = PetHelper.InfoToHash(petId, tier or 0)
+			local hash = PetHelper.InfoToHash(petId, tier or 1)
 
 			return Sift.Dictionary.update(pets, "Owned", function(owned)
 				return Sift.Dictionary.update(owned, hash, function(value)
-					value = (value or 0) + 1
+					return value + 1
+				end, function()
+					return 1
 				end)
 			end)
 		end)
@@ -199,43 +211,9 @@ function PetService.UnequipPet(self: PetService, player: Player, hash: string)
 	end)
 end
 
-function PetService.TogglePetEquipped(self: PetService, player: Player, slotId: string)
-	return DataService:GetSaveFile(player):andThen(function(saveFile)
-		local pets = saveFile:Get("Pets")
-		if not pets.Owned[slotId] then return end
-
-		local equipped = pets.Equipped[slotId] == true
-		return self:SetPetEquipped(player, slotId, not equipped)
-	end)
-end
-
 function PetService.GetPets(_self: PetService, player: Player)
 	return DataService:GetSaveFile(player):andThen(function(saveFile)
 		return saveFile:Get("Pets")
-	end)
-end
-
-function PetService.SetPetEquipped(self: PetService, player: Player, slotId: string, equipped: boolean)
-	return Promise.all({
-		DataService:GetSaveFile(player),
-		self:GetMaxPetSlots(player),
-	}):andThen(function(results)
-		local saveFile, maxPetSlots = unpack(results)
-
-		saveFile:Update("Pets", function(pets)
-			if not pets.Owned[slotId] then return pets end
-
-			if equipped then
-				if pets.Equipped[slotId] ~= nil then return pets end
-				if #Sift.Dictionary.keys(pets.Equipped) >= maxPetSlots then return pets end
-
-				return Sift.Dictionary.set(pets, "Equipped", Sift.Dictionary.set(pets.Equipped, slotId, true))
-			else
-				if pets.Equipped[slotId] == nil then return pets end
-
-				return Sift.Dictionary.set(pets, "Equipped", Sift.Dictionary.removeKey(pets.Equipped, slotId))
-			end
-		end)
 	end)
 end
 
@@ -246,7 +224,7 @@ function PetService.RemovePet(self: PetService, player: Player, hash: string, co
 		saveFile:Update("Pets", function(pets)
 			if pets.Owned[hash] < count then return pets end
 
-			pets = Sift.Dictionary.update(pets.Owned, function(owned)
+			pets = Sift.Dictionary.update(pets, "Owned", function(owned)
 				return Sift.Dictionary.update(owned, hash, function(countOwned)
 					if countOwned == count then
 						return nil
@@ -256,10 +234,10 @@ function PetService.RemovePet(self: PetService, player: Player, hash: string, co
 				end)
 			end)
 
-			pets = Sift.Dictionary.update(pets.Equipped, function(equipped)
+			pets = Sift.Dictionary.update(pets, "Equipped", function(equipped)
 				return Sift.Dictionary.update(equipped, hash, function(countEquipped)
 					if countEquipped == nil then return nil end
-					if pets.Owned[hash] == 0 then return nil end
+					if pets.Owned[hash] == nil then return nil end
 
 					return math.min(pets.Owned[hash], countEquipped)
 				end)
