@@ -7,7 +7,6 @@ local DataService = require(ServerScriptService.Server.Services.DataService)
 local EffectGrindPets = require(ReplicatedStorage.Shared.Effects.EffectGrindPets)
 local EffectService = require(ServerScriptService.Server.Services.EffectService)
 local EventStream = require(ReplicatedStorage.Shared.Util.EventStream)
-local Guid = require(ReplicatedStorage.Shared.Util.Guid)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local OptionsService = require(ServerScriptService.Server.Services.OptionsService)
 local PetGachaDefs = require(ReplicatedStorage.Shared.Defs.PetGachaDefs)
@@ -47,15 +46,13 @@ function PetService.PrepareBlocking(self: PetService)
 		return self:TogglePetEquipped(player, slotId):expect()
 	end)
 
-	self.Comm:BindFunction("MergePets", function(player, petId, tier, count)
-		if not t.string(petId) then return end
-		if not t.integer(tier) then return end
-		if tier < 1 then return end
+	self.Comm:BindFunction("MergePets", function(player, hash, count)
+		if not t.string(hash) then return end
 		if not t.integer(count) then return end
 		if count < 2 then return end
 		if count > 4 then return end
 
-		return self:MergePets(player, petId, tier, count):expect()
+		return self:MergePets(player, hash, count):expect()
 	end)
 
 	self.Comm:BindFunction("EquipBest", function(player)
@@ -90,17 +87,13 @@ end
 function PetService.AddPet(self: PetService, player: Player, petId: string, tier: number?)
 	return DataService:GetSaveFile(player):andThen(function(saveFile)
 		saveFile:Update("Pets", function(pets)
-			local slotId = Guid()
+			local hash = PetHelper.InfoToHash(petId, tier or 0)
 
-			return Sift.Dictionary.set(
-				pets,
-				"Owned",
-				Sift.Dictionary.set(pets.Owned, slotId, {
-					PetId = petId,
-					Id = slotId,
-					Tier = tier or 1,
-				})
-			)
+			return Sift.Dictionary.update(pets, "Owned", function(owned)
+				return Sift.Dictionary.update(owned, hash, function(value)
+					value = (value or 0) + 1
+				end)
+			end)
 		end)
 
 		return OptionsService:GetOption(player, "AutoEquipBestPets"):andThen(function(autoEquip)
@@ -111,16 +104,16 @@ function PetService.AddPet(self: PetService, player: Player, petId: string, tier
 	end)
 end
 
-function PetService.MergePets(self: PetService, player: Player, petId: string, tier: number, count: number)
+function PetService.MergePets(self: PetService, player: Player, hash: string, count: number)
 	return self:GetPets(player):andThen(function(pets)
-		pets = Sift.Dictionary.values(Sift.Dictionary.filter(pets.Owned, function(pet)
-			return (pet.PetId == petId) and (pet.Tier == tier)
-		end))
+		local countOwned = pets.Owned[hash] or 0
 
-		if #pets < count then return false end
+		if countOwned < count then return false end
 
 		local roll = Rand:NextInteger(1, 4) - count
 		local success = roll < 1
+
+		local petId, tier = PetHelper.HashToInfo(hash)
 
 		return EffectService:Effect(
 			player,
@@ -131,9 +124,7 @@ function PetService.MergePets(self: PetService, player: Player, petId: string, t
 			})
 		)
 			:andThen(function()
-				return Promise.all(Sift.Array.map(Range(count), function(index)
-					return self:RemovePet(player, pets[index].Id)
-				end))
+				return self:RemovePet(player, hash, count)
 			end)
 			:andThen(function()
 				if success then
@@ -153,6 +144,59 @@ end
 
 function PetService.GetMaxPetSlots(_self: PetService, _player: Player)
 	return Promise.resolve(3)
+end
+
+function PetService.EquipPet(self: PetService, player: Player, hash: string)
+	return Promise.all({
+		DataService:GetSaveFile(player),
+		self:GetMaxPetSlots(player),
+	}):andThen(function(results)
+		local saveFile, maxSlots = unpack(results)
+
+		local pets = saveFile:Get("Pets")
+
+		local total = 0
+		for _, count in pets.Equipped do
+			total += count
+		end
+		if total >= maxSlots then return false end
+
+		local equippedCount = pets.Equipped[hash] or 0
+		if equippedCount >= pets.Owned[hash] then return false end
+
+		saveFile:Set(
+			"Pets",
+			Sift.Dictionary.update(pets, "Equipped", function(equipped)
+				return Sift.Dictionary.set(equipped, hash, equippedCount + 1)
+			end)
+		)
+
+		return true
+	end)
+end
+
+function PetService.UnequipPet(self: PetService, player: Player, hash: string)
+	return DataService:GetSaveFile(player):andThen(function(saveFile)
+		local pets = saveFile:Get("Pets")
+
+		local equippedCount = pets.Equipped[hash] or 0
+		if equippedCount <= 0 then return false end
+
+		saveFile:Set(
+			"Pets",
+			Sift.Dictionary.update(pets, "Equipped", function(equipped)
+				return Sift.Dictionary.update(equipped, hash, function(count)
+					if count == 1 then
+						return nil
+					else
+						return count - 1
+					end
+				end)
+			end)
+		)
+
+		return true
+	end)
 end
 
 function PetService.TogglePetEquipped(self: PetService, player: Player, slotId: string)
@@ -195,15 +239,33 @@ function PetService.SetPetEquipped(self: PetService, player: Player, slotId: str
 	end)
 end
 
-function PetService.RemovePet(self: PetService, player: Player, slotId: string)
+function PetService.RemovePet(self: PetService, player: Player, hash: string, count: number?)
+	if count == nil then count = 1 end
+
 	return DataService:GetSaveFile(player):andThen(function(saveFile)
 		saveFile:Update("Pets", function(pets)
-			if not pets.Owned[slotId] then return pets end
+			if pets.Owned[hash] < count then return pets end
 
-			return Sift.Dictionary.merge(pets, {
-				Owned = Sift.Dictionary.removeKey(pets.Owned, slotId),
-				Equipped = Sift.Dictionary.removeKey(pets.Equipped, slotId),
-			})
+			pets = Sift.Dictionary.update(pets.Owned, function(owned)
+				return Sift.Dictionary.update(owned, hash, function(countOwned)
+					if countOwned == count then
+						return nil
+					else
+						return countOwned - count
+					end
+				end)
+			end)
+
+			pets = Sift.Dictionary.update(pets.Equipped, function(equipped)
+				return Sift.Dictionary.update(equipped, hash, function(countEquipped)
+					if countEquipped == nil then return nil end
+					if pets.Owned[hash] == 0 then return nil end
+
+					return math.min(pets.Owned[hash], countEquipped)
+				end)
+			end)
+
+			return pets
 		end)
 	end)
 end

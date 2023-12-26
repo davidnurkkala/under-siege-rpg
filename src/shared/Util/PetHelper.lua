@@ -21,4 +21,15 @@ function PetHelper.GetTotalPower(pets)
 	end, 1)
 end
 
+function PetHelper.InfoToHash(petId: string, tier: number): string
+	return `{petId}_{tier}`
+end
+
+function PetHelper.HashToInfo(hash: string): (string, number)
+	local data = string.split(hash, "_")
+	local petId = data[1]
+	local tier = tonumber(data[2])
+	return petId, tier
+end
+
 return PetHelper

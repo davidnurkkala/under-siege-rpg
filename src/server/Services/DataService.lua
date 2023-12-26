@@ -4,8 +4,10 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local Configuration = require(ReplicatedStorage.Shared.Configuration)
 local Lapis = require(ServerScriptService.ServerPackages.Lapis)
 local Observers = require(ReplicatedStorage.Packages.Observers)
+local PetHelper = require(ReplicatedStorage.Shared.Util.PetHelper)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local SaveFile = require(ServerScriptService.Server.Classes.SaveFile)
+local Sift = require(ReplicatedStorage.Packages.Sift)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
 local COLLECTION_NAME = "DataService" .. Configuration.DataStoreVersion
@@ -73,7 +75,25 @@ function DataService.PrepareBlocking(self: DataService)
 
 		defaultData = self.DefaultData,
 
-		migrations = {},
+		migrations = {
+			function(oldData)
+				local pets = oldData.Pets
+
+				pets = Sift.Dictionary.set(pets, "Equipped", {})
+				pets = Sift.Dictionary.update(pets, "Owned", function(oldOwned)
+					local owned = {}
+					for _, slot in oldOwned do
+						local hash = PetHelper.InfoToHash(slot.PetId, slot.Tier)
+						owned[hash] = (owned[hash] or 0) + 1
+					end
+					return owned
+				end)
+
+				print(pets)
+
+				return Sift.Dictionary.set(oldData, "Pets", pets)
+			end,
+		},
 	})
 
 	Observers.observePlayer(function(player: Player)
