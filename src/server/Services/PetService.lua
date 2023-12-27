@@ -7,6 +7,7 @@ local DataService = require(ServerScriptService.Server.Services.DataService)
 local EffectGrindPets = require(ReplicatedStorage.Shared.Effects.EffectGrindPets)
 local EffectService = require(ServerScriptService.Server.Services.EffectService)
 local EventStream = require(ReplicatedStorage.Shared.Util.EventStream)
+local MultiRollHelper = require(ServerScriptService.Server.Util.MultiRollHelper)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local OptionsService = require(ServerScriptService.Server.Services.OptionsService)
 local PetGachaDefs = require(ReplicatedStorage.Shared.Defs.PetGachaDefs)
@@ -290,6 +291,18 @@ function PetService.HatchPetFromGacha(self: PetService, player: Player, gachaId:
 	local count = countIn or 1
 
 	return Promise.new(function(resolve, _, onCancel)
+		local check = MultiRollHelper.Check(player, count)
+		onCancel(function()
+			check:cancel()
+		end)
+
+		local canProceed = check:expect()
+		if onCancel() then return end
+		if not canProceed then
+			resolve({})
+			return
+		end
+
 		local additions = {}
 
 		for _ = 1, count do
@@ -314,7 +327,7 @@ function PetService.HatchPetFromGacha(self: PetService, player: Player, gachaId:
 		resolve(additions)
 	end)
 		:andThen(function(additions)
-			if Sift.Dictionary.count(additions) == 0 then return end
+			if Sift.Dictionary.count(additions) == 0 then return false, "none" end
 
 			EventStream.Event({ Kind = "PetGachaRolled", Player = player, GachaId = gachaId })
 

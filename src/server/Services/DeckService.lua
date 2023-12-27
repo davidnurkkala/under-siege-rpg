@@ -8,6 +8,7 @@ local Comm = require(ReplicatedStorage.Packages.Comm)
 local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local EventStream = require(ReplicatedStorage.Shared.Util.EventStream)
+local MultiRollHelper = require(ServerScriptService.Server.Util.MultiRollHelper)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local OptionsService = require(ServerScriptService.Server.Services.OptionsService)
 local Promise = require(ReplicatedStorage.Packages.Promise)
@@ -158,6 +159,18 @@ function DeckService.DrawCardFromGacha(self: DeckService, player: Player, gachaI
 	local countBought = countBoughtIn or 1
 
 	return Promise.new(function(resolve, _, onCancel)
+		local check = MultiRollHelper.Check(player, countBought)
+		onCancel(function()
+			check:cancel()
+		end)
+
+		local canProceed = check:expect()
+		if onCancel() then return end
+		if not canProceed then
+			resolve({})
+			return
+		end
+
 		local cards = {}
 
 		for _ = 1, countBought do
@@ -181,7 +194,7 @@ function DeckService.DrawCardFromGacha(self: DeckService, player: Player, gachaI
 		resolve(cards)
 	end)
 		:andThen(function(cards)
-			if Sift.Dictionary.count(cards) == 0 then return end
+			if Sift.Dictionary.count(cards) == 0 then return false, "none" end
 
 			EventStream.Event({ Kind = "CardGachaRolled", Player = player, GachaId = gachaId })
 

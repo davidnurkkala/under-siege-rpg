@@ -1,10 +1,10 @@
 local Rewards = {
 	{ Type = "Currency", CurrencyType = "Premium", Amount = 10 },
-	{ Type = "Boost", Boost = { Type = "Currency", CurrencyType = "Primary", Multiplier = 2, Time = 10 * 60 } },
-	{ Type = "Boost", Boost = { Type = "Currency", CurrencyType = "Secondary", Multiplier = 2, Time = 10 * 60 } },
-	{ Type = "Currency", CurrencyType = "Premium", Amount = 50 },
-	{ Type = "Boost", Boost = { Type = "Currency", CurrencyType = "Primary", Multiplier = 2, Time = 10 * 60 } },
-	{ Type = "Boost", Boost = { Type = "Currency", CurrencyType = "Secondary", Multiplier = 2, Time = 10 * 60 } },
+	{ Type = "Currency", CurrencyType = "Premium", Amount = 25 },
+	{ Type = "Currency", CurrencyType = "Premium", Amount = 40 },
+	{ Type = "Currency", CurrencyType = "Premium", Amount = 55 },
+	{ Type = "Currency", CurrencyType = "Premium", Amount = 70 },
+	{ Type = "Currency", CurrencyType = "Premium", Amount = 85 },
 	{ Type = "Currency", CurrencyType = "Premium", Amount = 100 },
 }
 

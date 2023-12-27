@@ -8,6 +8,7 @@ local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local CurrencyController = require(ReplicatedStorage.Shared.Controllers.CurrencyController)
 local DeckController = require(ReplicatedStorage.Shared.Controllers.DeckController)
 local MenuContext = require(ReplicatedStorage.Shared.React.MenuContext.MenuContext)
+local MultiRollPrompt = require(ReplicatedStorage.Shared.React.Common.MultiRollPrompt)
 local ProductController = require(ReplicatedStorage.Shared.Controllers.ProductController)
 local PromptWindow = require(ReplicatedStorage.Shared.React.Common.PromptWindow)
 local React = require(ReplicatedStorage.Packages.React)
@@ -21,6 +22,7 @@ return function()
 	local gachaId, setGachaId = React.useState(nil)
 	local state, setState = React.useState("Shop")
 	local results, setResults = React.useState(nil)
+	local countRef = React.useRef(1)
 
 	local buy = React.useCallback(function(count)
 		setState("Waiting")
@@ -62,6 +64,8 @@ return function()
 			GachaId = gachaId,
 			Wallet = currency,
 			Buy = function(count)
+				countRef.current = count
+
 				if count > 1 then
 					setState(nil)
 					ProductController.GetOwnsProduct("MultiRoll")
@@ -84,47 +88,14 @@ return function()
 			end,
 		}),
 
-		Sell = React.createElement(PromptWindow, {
+		Sell = React.createElement(MultiRollPrompt, {
 			Visible = state == "Sell",
-			HeaderText = TextStroke("Buy Multi-buy"),
-			Text = TextStroke("Multi-buy can be bought by itself, but it's free for Premium users!"),
-			TextSize = 0.5,
-			[React.Event.Activated] = function()
-				GuiService.SelectedObject = nil
+			Once = function()
+				buy(countRef.current)
+			end,
+			Close = function()
 				setState("Shop")
 			end,
-			Options = {
-				{
-					Text = TextStroke("Buy\nPass"),
-					Select = function()
-						setState(nil)
-						ProductController.PurchaseProduct("MultiRoll"):finally(function()
-							setState("Shop")
-						end)
-					end,
-					Props = {
-						ImageColor3 = ColorDefs.PaleGreen,
-					},
-				},
-				{
-					Text = TextStroke("Buy\nPremium"),
-					Select = function()
-						setState(nil)
-						ProductController.PurchasePremium():finally(function()
-							setState("Shop")
-						end)
-					end,
-					Props = {
-						ImageColor3 = ColorDefs.PaleYellow,
-					},
-				},
-				{
-					Text = TextStroke("Cancel"),
-					Select = function()
-						setState("Shop")
-					end,
-				},
-			},
 		}),
 
 		Result = (state == "Result") and React.createElement(CardGachaResult, {
