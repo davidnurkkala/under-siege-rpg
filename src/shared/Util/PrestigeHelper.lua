@@ -5,7 +5,7 @@ function PrestigeHelper.GetCost(prestige: number)
 end
 
 function PrestigeHelper.GetBoost(points: number)
-	return 1.2 ^ points
+	return 1 + (0.2 * points)
 end
 
 return PrestigeHelper
