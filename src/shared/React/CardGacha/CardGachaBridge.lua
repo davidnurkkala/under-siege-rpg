@@ -20,25 +20,20 @@ return function()
 	local currency, setCurrency = React.useState(nil)
 	local gachaId, setGachaId = React.useState(nil)
 	local state, setState = React.useState("Shop")
-	local resultCardId, setResultCardId = React.useState(nil)
-	local resultCardCount, setResultCardCount = React.useState(nil)
-	local buys = React.useRef(0)
+	local results, setResults = React.useState(nil)
 
-	local buy = React.useCallback(function()
-		buys.current -= 1
-
+	local buy = React.useCallback(function(count)
 		setState("Waiting")
-		DeckController:DrawCardFromGacha(gachaId):andThen(function(success, cardId, cardCount)
+		DeckController:DrawCardFromGacha(gachaId, count):andThen(function(success, resultsIn)
 			if not success then
 				setState("Shop")
 				return
 			end
 
-			setResultCardId(cardId)
-			setResultCardCount(cardCount)
+			setResults(resultsIn)
 			setState("Result")
 		end)
-	end, { gachaId, buys })
+	end, { gachaId })
 
 	React.useEffect(function()
 		local trove = Trove.new()
@@ -72,8 +67,7 @@ return function()
 					ProductController.GetOwnsProduct("MultiRoll")
 						:andThen(function(owned)
 							if owned then
-								buys.current = count
-								buy()
+								buy(count)
 							else
 								setState("Sell")
 							end
@@ -82,8 +76,7 @@ return function()
 							setState("Shop")
 						end)
 				else
-					buys.current = count
-					buy()
+					buy(1)
 				end
 			end,
 			Close = function()
@@ -135,14 +128,9 @@ return function()
 		}),
 
 		Result = (state == "Result") and React.createElement(CardGachaResult, {
-			CardId = resultCardId,
-			CardCount = resultCardCount,
+			Results = results,
 			Close = function()
-				if buys.current > 0 then
-					buy()
-				else
-					setState("Shop")
-				end
+				setState("Shop")
 			end,
 		}),
 	})

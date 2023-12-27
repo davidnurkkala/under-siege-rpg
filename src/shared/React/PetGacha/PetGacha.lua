@@ -6,6 +6,7 @@ local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
 local CurrencyHelper = require(ReplicatedStorage.Shared.Util.CurrencyHelper)
+local FormatBigNumber = require(ReplicatedStorage.Shared.Util.FormatBigNumber)
 local FormatChance = require(ReplicatedStorage.Shared.Util.FormatChance)
 local GridLayout = require(ReplicatedStorage.Shared.React.Common.GridLayout)
 local Image = require(ReplicatedStorage.Shared.React.Common.Image)
@@ -76,7 +77,7 @@ local function buyButton(props: {
 		}),
 
 		PriceText = React.createElement(Label, {
-			Text = TextStroke(`<font color="#{CurrencyDefs.Secondary.Colors.Primary:ToHex()}">{props.Price}</font>`),
+			Text = TextStroke(`<font color="#{CurrencyDefs.Secondary.Colors.Primary:ToHex()}">{FormatBigNumber(props.Price)}</font>`),
 			AutomaticSize = Enum.AutomaticSize.X,
 			Size = UDim2.fromScale(0.6, 0.5),
 			Position = UDim2.fromScale(0, 0.5),
@@ -123,7 +124,7 @@ return function(props: {
 			Buttons = React.createElement(
 				React.Fragment,
 				nil,
-				Sift.Array.map({ 1, 5, 25, 50 }, function(count, index)
+				Sift.Array.map({ 1, 10, 50, 100 }, function(count, index)
 					return React.createElement(buyButton, {
 						LayoutOrder = index,
 						CanAfford = CurrencyHelper.CheckPrice(props.Wallet, gacha.Price, count),
