@@ -104,17 +104,19 @@ function LobbySession.new(args: {
 
 		local number = 0
 		local radius = 5
-		for slotId in pets.Equipped do
-			local slot = pets.Owned[slotId]
+		for hash, count in pets.Equipped do
+			for _ = 1, count do
+				local petId = PetHelper.HashToInfo(hash)
 
-			local angle = math.rad(30) + math.rad(60) * number
-			local dx = math.cos(angle) * radius
-			local dz = math.sin(angle) * radius
-			local cframe = root.CFrame * CFrame.new(dx, -1.5, dz)
+				local angle = math.rad(30) + math.rad(60) * number
+				local dx = math.cos(angle) * radius
+				local dz = math.sin(angle) * radius
+				local cframe = root.CFrame * CFrame.new(dx, -1.5, dz)
 
-			petTrove:Construct(Pet, slot.PetId, root, args.Human, cframe)
+				petTrove:Construct(Pet, petId, root, args.Human, cframe)
 
-			number += 1
+				number += 1
+			end
 		end
 
 		return function()

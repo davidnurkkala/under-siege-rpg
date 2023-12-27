@@ -12,6 +12,7 @@ local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local Flipper = require(ReplicatedStorage.Packages.Flipper)
 local GuiSound = require(ReplicatedStorage.Shared.Util.GuiSound)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
+local ListLayout = require(ReplicatedStorage.Shared.React.Common.ListLayout)
 local Panel = require(ReplicatedStorage.Shared.React.Common.Panel)
 local PlatformContext = require(ReplicatedStorage.Shared.React.PlatformContext.PlatformContext)
 local Promise = require(ReplicatedStorage.Packages.Promise)
@@ -27,8 +28,7 @@ local Random = Random.new()
 local FastSpring = { frequency = 16 }
 
 return function(props: {
-	CardId: string,
-	CardCount: number?,
+	Results: { { CardId: string, CountOld: number, CountNew: number, DidLevelUp: boolean } },
 	Close: () -> (),
 })
 	local dx, dxMotor = UseMotor(0)
@@ -104,7 +104,7 @@ return function(props: {
 		return function()
 			promise:cancel()
 		end
-	end, { props.CardId })
+	end, { props.Results })
 
 	local cardProps = {
 		Size = width:map(function(value)
@@ -121,13 +121,41 @@ return function(props: {
 		CardBack = (not contentsVisible) and React.createElement(Panel, Sift.Dictionary.set(cardProps, "ImageColor3", ColorDefs.DarkGreen)),
 
 		Card = contentsVisible and React.createElement(Container, cardProps, {
-			Panel = React.createElement(Panel, {
-				ImageColor3 = ColorDefs.PaleGreen,
-			}, {
-				Contents = React.createElement(CardContents, {
-					CardId = props.CardId,
-					CardCount = props.CardCount,
+			Results = React.createElement(Container, nil, {
+				Layout = React.createElement(ListLayout, {
+					HorizontalAlignment = Enum.HorizontalAlignment.Center,
+					FillDirection = Enum.FillDirection.Horizontal,
+					Padding = UDim.new(0, 12),
 				}),
+
+				Results = React.createElement(
+					React.Fragment,
+					nil,
+					Sift.Array.map(props.Results, function(result, index)
+						local delta = result.CountNew - result.CountOld
+
+						return React.createElement(Container, {
+							LayoutOrder = index,
+						}, {
+							ChangeText = React.createElement(Label, {
+								Size = UDim2.fromScale(1, 0.2),
+								Text = TextStroke(`{if result.DidLevelUp then "Level up! " else ""}+{delta}`),
+							}),
+
+							Panel = React.createElement(Panel, {
+								ImageColor3 = ColorDefs.PaleGreen,
+								Size = UDim2.fromScale(0.8, 0.8),
+								AnchorPoint = Vector2.new(0.5, 1),
+								Position = UDim2.fromScale(0.5, 1),
+							}, {
+								Contents = React.createElement(CardContents, {
+									CardId = result.CardId,
+									CardCount = result.CountNew,
+								}),
+							}),
+						})
+					end)
+				),
 			}),
 
 			Effect = React.createElement(Container, {
@@ -138,14 +166,6 @@ return function(props: {
 				Position = UDim2.fromScale(0.5, 0.5),
 			}, {
 				Effect = React.createElement(CelebrationEffect),
-			}),
-
-			LevelUp = CardHelper.WasLevelUp(props.CardCount or 1) and React.createElement(Label, {
-				Size = UDim2.fromScale(1, 0.25),
-				SizeConstraint = Enum.SizeConstraint.RelativeXX,
-				AnchorPoint = Vector2.new(0.5, 1),
-				Position = UDim2.fromScale(0.5, 0),
-				Text = TextStroke("Level up!"),
 			}),
 		}),
 

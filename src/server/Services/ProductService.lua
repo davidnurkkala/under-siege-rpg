@@ -41,16 +41,7 @@ function ProductService.PrepareBlocking(self: ProductService)
 	self.Comm:BindFunction("GetOwnsProduct", function(player: Player, id)
 		if not t.string(id) then return end
 
-		local def = ProductDefs[id]
-		if not def then return end
-
-		if def.FreeForPremium and player.MembershipType == Enum.MembershipType.Premium then return true end
-
-		if def.Type == "GamePass" then
-			return MarketplaceService:UserOwnsGamePassAsync(player.UserId, def.AssetId)
-		else
-			error(`Unimplemented product type {def.Type}`)
-		end
+		return self:GetOwnsProduct(player, id):expect()
 	end)
 
 	-- tag VIP players as VIP
@@ -75,6 +66,24 @@ function ProductService.GetVipBoostedSecondary(self: ProductService, player: Pla
 	else
 		return amount
 	end
+end
+
+function ProductService.GetOwnsProduct(self: ProductService, player: Player, productId: string)
+	local def = ProductDefs[productId]
+	assert(def, `No product for id {productId}`)
+
+	return Promise.new(function(resolve)
+		if def.FreeForPremium and player.MembershipType == Enum.MembershipType.Premium then
+			resolve(true)
+			return
+		end
+
+		if def.Type == "GamePass" then
+			resolve(MarketplaceService:UserOwnsGamePassAsync(player.UserId, def.AssetId))
+		else
+			error(`Unimplemented product type {def.Type}`)
+		end
+	end)
 end
 
 function ProductService.IsVip(_self: ProductService, player: Player)

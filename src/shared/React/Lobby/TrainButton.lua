@@ -45,6 +45,7 @@ return function()
 	end, {})
 
 	return React.createElement(PrimaryButton, {
+		LayoutOrder = 1,
 		Selectable = false,
 	}, {
 		Icon = React.createElement(Image, {
@@ -68,6 +69,7 @@ return function()
 			TextXAlignment = Enum.TextXAlignment.Right,
 			TextYAlignment = Enum.TextYAlignment.Bottom,
 			Text = TextStroke(`+{FormatBigNumber(powerGain * petMultiplier)}`, 2, BrickColor.new("Crimson").Color),
+			ZIndex = 4,
 		}),
 	})
 end

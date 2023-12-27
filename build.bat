@@ -1,4 +1,4 @@
-lune LuneScripts/FormatAssets.lua
+lune lune/FormatAssets.lua
 rojo build -o game.rbxl
 set /p key=<"api-key.txt"
 set /p place-id=<"place-id.txt"

@@ -30,6 +30,7 @@ return function(props: {
 	Text: string,
 	Options: any,
 	Ratio: number?,
+	MaxSize: number?,
 	TextSize: number?,
 	children: any,
 })
@@ -37,14 +38,15 @@ return function(props: {
 	local text = props.Text
 	local options = props.Options
 	local textSize = props.TextSize or 0.6
+	local maxSize = props.MaxSize or MaxSize
 
-	props = Sift.Dictionary.removeKeys(props, "Ratio", "Text", "Options", "TextSize")
+	props = Sift.Dictionary.removeKeys(props, "Ratio", "Text", "Options", "TextSize", "MaxSize") :: any
 
 	local defaultProps = Sift.Dictionary.merge(DefaultProps, {
 		RenderContainer = function()
 			return React.createElement(React.Fragment, nil, {
 				SizeConstraint = React.createElement("UISizeConstraint", {
-					MaxSize = Vector2.new(MaxSize, MaxSize),
+					MaxSize = Vector2.new(maxSize, maxSize),
 				}),
 				Aspect = React.createElement(Aspect, {
 					AspectRatio = ratio,
@@ -83,9 +85,11 @@ return function(props: {
 								[React.Event.Activated] = option.Select,
 							}),
 							{
-								Text = React.createElement(Label, {
+								Text = (option.Text ~= nil) and React.createElement(Label, {
 									Text = option.Text,
 								}),
+
+								Children = (option.Children ~= nil) and React.createElement(React.Fragment, nil, option.Children),
 							}
 						),
 					})

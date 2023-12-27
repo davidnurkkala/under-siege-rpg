@@ -1,5 +1,4 @@
 local ContextActionService = game:GetService("ContextActionService")
-local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 
@@ -9,16 +8,20 @@ local CelebrationEffect = require(ReplicatedStorage.Shared.React.Effects.Celebra
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local Flipper = require(ReplicatedStorage.Packages.Flipper)
+local GridLayout = require(ReplicatedStorage.Shared.React.Common.GridLayout)
 local GuiSound = require(ReplicatedStorage.Shared.Util.GuiSound)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
+local LayoutContainer = require(ReplicatedStorage.Shared.React.Common.LayoutContainer)
 local Lerp = require(ReplicatedStorage.Shared.Util.Lerp)
 local PetDefs = require(ReplicatedStorage.Shared.Defs.PetDefs)
+local PetHelper = require(ReplicatedStorage.Shared.Util.PetHelper)
 local PetPreview = require(ReplicatedStorage.Shared.React.PetGacha.PetPreview)
 local PlatformContext = require(ReplicatedStorage.Shared.React.PlatformContext.PlatformContext)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local PromiseMotor = require(ReplicatedStorage.Shared.Util.PromiseMotor)
 local React = require(ReplicatedStorage.Packages.React)
 local RoundButtonWithImage = require(ReplicatedStorage.Shared.React.Common.RoundButtonWithImage)
+local Sift = require(ReplicatedStorage.Packages.Sift)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local UseMotor = require(ReplicatedStorage.Shared.React.Hooks.UseMotor)
@@ -76,13 +79,43 @@ local function eggEffect(props: {
 	})
 end
 
-return function(props: {
+local function petResult(props: {
 	PetId: string,
-	EggId: string,
-	Close: () -> (),
+	Count: number,
 })
 	local petDef = PetDefs[props.PetId]
 
+	return React.createElement(Container, {
+		Size = UDim2.fromScale(1, 1),
+		SizeConstraint = Enum.SizeConstraint.RelativeYY,
+		Position = UDim2.fromScale(0.5, 0),
+		AnchorPoint = Vector2.new(0.5, 0),
+	}, {
+		Name = React.createElement(Label, {
+			Size = UDim2.fromScale(1, 0.2),
+			Text = TextStroke(petDef.Name),
+			ZIndex = 4,
+		}),
+
+		Count = (props.Count > 1) and React.createElement(Label, {
+			Size = UDim2.fromScale(1, 0.2),
+			AnchorPoint = Vector2.new(0, 1),
+			Position = UDim2.fromScale(0, 1),
+			Text = TextStroke(`x{props.Count}`),
+			ZIndex = 4,
+		}),
+
+		Preview = React.createElement(PetPreview, {
+			PetId = props.PetId,
+		}),
+	})
+end
+
+return function(props: {
+	Results: { [string]: number },
+	EggId: string,
+	Close: () -> (),
+})
 	local slide, slideMotor = UseMotor(-1)
 	local size, sizeMotor = UseMotor(0)
 	local width, widthMotor = UseMotor(0)
@@ -102,7 +135,7 @@ return function(props: {
 	React.useEffect(function()
 		if not isActive then return end
 
-		ContextActionService:BindActionAtPriority("DismissPetGachaResult", function(actionName, inputState, inputObject)
+		ContextActionService:BindActionAtPriority("DismissPetGachaResult", function(_, inputState)
 			if inputState ~= Enum.UserInputState.Begin then return Enum.ContextActionResult.Pass end
 
 			dismissCallback()
@@ -118,7 +151,7 @@ return function(props: {
 		slideMotor:setGoal(Flipper.Instant.new(-1))
 		slideMotor:step()
 		slideMotor:setGoal(Flipper.Spring.new(0))
-	end, { props.PetId })
+	end, { props.Results })
 
 	return React.createElement(Container, {
 		Position = slide:map(function(value)
@@ -126,7 +159,7 @@ return function(props: {
 		end),
 	}, {
 		Result = React.createElement(Container, {
-			Size = UDim2.fromScale(0.35, 0.35),
+			Size = UDim2.fromScale(0.75, 0.5),
 			SizeConstraint = Enum.SizeConstraint.RelativeYY,
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Position = UDim2.fromScale(0.5, 0.4),
@@ -154,21 +187,35 @@ return function(props: {
 					return UDim2.fromScale(value, value)
 				end),
 			}, {
-				Name = React.createElement(Label, {
-					Size = UDim2.fromScale(1, 0.2),
-					Text = TextStroke(petDef.Name),
-					ZIndex = 4,
+				Layout = React.createElement(GridLayout, {
+					HorizontalAlignment = Enum.HorizontalAlignment.Center,
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					CellSize = UDim2.fromScale(0.333, 0.5),
 				}),
 
-				Preview = React.createElement(PetPreview, {
-					PetId = props.PetId,
-				}),
+				Results = React.createElement(
+					React.Fragment,
+					nil,
+					Sift.Dictionary.map(props.Results, function(count, hash)
+						local petId = PetHelper.HashToInfo(hash)
+
+						return React.createElement(LayoutContainer, {
+							Padding = 4,
+						}, {
+							Result = React.createElement(petResult, {
+								PetId = petId,
+								Count = count,
+							}),
+						}),
+							hash
+					end)
+				),
 			}),
 
 			Effect = (state == "Pet") and React.createElement(Container, {
 				ZIndex = -4,
-				Size = UDim2.fromScale(1.5, 1.5),
-				SizeConstraint = Enum.SizeConstraint.RelativeXX,
+				Size = UDim2.fromScale(1, 1),
+				SizeConstraint = Enum.SizeConstraint.RelativeYY,
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				Position = UDim2.fromScale(0.5, 0.5),
 			}, {
@@ -185,7 +232,7 @@ return function(props: {
 			end),
 			SizeConstraint = Enum.SizeConstraint.RelativeXX,
 			AnchorPoint = Vector2.new(0.5, 0),
-			Position = UDim2.fromScale(0.5, 0.6),
+			Position = UDim2.fromScale(0.5, 0.75),
 			ImageColor3 = ColorDefs.PalePurple,
 			[React.Event.Activated] = dismissCallback,
 		}, {

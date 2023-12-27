@@ -5,12 +5,14 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local CurrencyController = require(ReplicatedStorage.Shared.Controllers.CurrencyController)
 local MenuContext = require(ReplicatedStorage.Shared.React.MenuContext.MenuContext)
+local MultiRollPrompt = require(ReplicatedStorage.Shared.React.Common.MultiRollPrompt)
 local PetController = require(ReplicatedStorage.Shared.Controllers.PetController)
 local PetGacha = require(ReplicatedStorage.Shared.React.PetGacha.PetGacha)
 local PetGachaDefs = require(ReplicatedStorage.Shared.Defs.PetGachaDefs)
 local PetGachaResult = require(ReplicatedStorage.Shared.React.PetGacha.PetGachaResult)
 local ProductController = require(ReplicatedStorage.Shared.Controllers.ProductController)
 local PromptWindow = require(ReplicatedStorage.Shared.React.Common.PromptWindow)
+local PromptWindowBig = require(ReplicatedStorage.Shared.React.Common.PromptWindowBig)
 local React = require(ReplicatedStorage.Packages.React)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 local Trove = require(ReplicatedStorage.Packages.Trove)
@@ -22,23 +24,21 @@ return function()
 	local currency, setCurrency = React.useState(nil)
 	local gachaId, setGachaId = React.useState(nil)
 	local state, setState = React.useState("Shop")
-	local resultPetId, setResultPetId = React.useState(nil)
-	local buys = React.useRef(0)
+	local results, setResults = React.useState(nil)
+	local countRef = React.useRef(1)
 
-	local buy = React.useCallback(function()
-		buys.current -= 1
-
+	local buy = React.useCallback(function(count)
 		setState("Waiting")
-		PetController:HatchPetFromGacha(gachaId):andThen(function(success, petId)
+		PetController:HatchPetFromGacha(gachaId, count):andThen(function(success, resultsIn)
 			if not success then
 				setState("Shop")
 				return
 			end
 
-			setResultPetId(petId)
+			setResults(resultsIn)
 			setState("Result")
 		end)
-	end, { gachaId, buys })
+	end, { gachaId })
 
 	React.useEffect(function()
 		local trove = Trove.new()
@@ -67,13 +67,14 @@ return function()
 			GachaId = gachaId,
 			Wallet = currency,
 			Buy = function(count)
+				countRef.current = count
+
 				if count > 1 then
 					setState(nil)
 					ProductController.GetOwnsProduct("MultiRoll")
 						:andThen(function(owned)
 							if owned then
-								buys.current = count
-								buy()
+								buy(count)
 							else
 								setState("Sell")
 							end
@@ -82,8 +83,7 @@ return function()
 							setState("Shop")
 						end)
 				else
-					buys.current = count
-					buy()
+					buy(1)
 				end
 			end,
 			Close = function()
@@ -91,59 +91,23 @@ return function()
 			end,
 		}),
 
-		Sell = React.createElement(PromptWindow, {
+		Sell = React.createElement(MultiRollPrompt, {
 			Visible = state == "Sell",
-			HeaderText = TextStroke("Buy Multi-hatch"),
-			Text = TextStroke("Multi-hatch can be bought by itself, but it's free for Premium users!"),
-			TextSize = 0.5,
-			[React.Event.Activated] = function()
+			Once = function()
+				buy(countRef.current)
+			end,
+			Close = function()
 				setState("Shop")
 			end,
-			Options = {
-				{
-					Text = TextStroke("Buy\nPass"),
-					Select = function()
-						setState(nil)
-						ProductController.PurchaseProduct("MultiRoll"):finally(function()
-							setState("Shop")
-						end)
-					end,
-					Props = {
-						ImageColor3 = ColorDefs.PaleGreen,
-					},
-				},
-				{
-					Text = TextStroke("Buy\nPremium"),
-					Select = function()
-						setState(nil)
-						ProductController.PurchasePremium():finally(function()
-							setState("Shop")
-						end)
-					end,
-					Props = {
-						ImageColor3 = ColorDefs.PaleYellow,
-					},
-				},
-				{
-					Text = TextStroke("Cancel"),
-					Select = function()
-						setState("Shop")
-					end,
-				},
-			},
 		}),
 
 		Result = (state == "Result") and React.createElement(PetGachaResult, {
-			PetId = resultPetId,
+			Results = results,
 			EggId = TryNow(function()
 				return PetGachaDefs[gachaId].EggId
 			end, "World1"),
 			Close = function()
-				if buys.current > 0 then
-					buy()
-				else
-					setState("Shop")
-				end
+				setState("Shop")
 			end,
 		}),
 	})

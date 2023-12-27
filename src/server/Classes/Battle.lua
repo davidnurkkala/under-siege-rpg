@@ -427,6 +427,7 @@ function Battle.MoveFieldable(self: Battle, mover: Fieldable, movement: number)
 
 	for object in self.Field do
 		if object == mover then continue end
+		if object.TeamId == mover.TeamId then continue end
 
 		local delta = object.Position - mover.Position
 		if math.sign(delta) ~= direction then continue end

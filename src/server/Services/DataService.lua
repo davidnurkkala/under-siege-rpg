@@ -89,8 +89,6 @@ function DataService.PrepareBlocking(self: DataService)
 					return owned
 				end)
 
-				print(pets)
-
 				return Sift.Dictionary.set(oldData, "Pets", pets)
 			end,
 		},

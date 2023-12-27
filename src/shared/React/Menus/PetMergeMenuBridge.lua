@@ -40,9 +40,9 @@ return function()
 			Close = function()
 				menu.Unset("PetMerge")
 			end,
-			Select = function(slotId, tier, count)
+			Select = function(hash, count)
 				return Promise.all({
-					PetController.MergePetsRemote(slotId, tier, count),
+					PetController.MergePetsRemote(hash, count),
 					Promise.delay(4),
 				}):andThen(function(results)
 					return results[1]

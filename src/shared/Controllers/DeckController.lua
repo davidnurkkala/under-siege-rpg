@@ -14,8 +14,8 @@ function DeckController.PrepareBlocking(self: DeckController)
 	self.CardEquipToggleRequested = self.Comm:GetSignal("CardEquipToggleRequested")
 end
 
-function DeckController.DrawCardFromGacha(self: DeckController, gachaId: string)
-	return self.DrawCardFromGachaRemote(gachaId)
+function DeckController.DrawCardFromGacha(self: DeckController, gachaId: string, count: number)
+	return self.DrawCardFromGachaRemote(gachaId, count)
 end
 
 function DeckController.ObserveDeck(self: DeckController, callback)
