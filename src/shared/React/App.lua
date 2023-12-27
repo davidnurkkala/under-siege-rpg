@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local BattlerPromptBridge = require(ReplicatedStorage.Shared.React.BattlerPromptBridge)
 local CardGachaBridge = require(ReplicatedStorage.Shared.React.CardGacha.CardGachaBridge)
+local ChangeLogBoard = require(ReplicatedStorage.Shared.React.ChangeLog.ChangeLogBoard)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local DeckMenuBridge = require(ReplicatedStorage.Shared.React.Menus.DeckMenuBridge)
 local Hud = require(ReplicatedStorage.Shared.React.Hud.Hud)
@@ -47,6 +48,7 @@ return function()
 
 			Indicators = React.createElement(IndicatorBridge),
 			BattlerPrompts = React.createElement(BattlerPromptBridge),
+			ChangeLogBoard = React.createElement(ChangeLogBoard),
 		}),
 	})
 end
