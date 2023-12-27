@@ -61,7 +61,7 @@ local function buyButton(props: {
 })
 	return React.createElement(Button, {
 		LayoutOrder = props.LayoutOrder,
-		Size = UDim2.fromScale(5.5, 1),
+		Size = UDim2.fromScale(2, 1),
 		SizeConstraint = Enum.SizeConstraint.RelativeYY,
 		ImageColor3 = if props.CanAfford then ColorDefs.Yellow else ColorDefs.PaleBlue,
 		BorderColor3 = if props.CanAfford then nil else ColorDefs.PaleBlue,
@@ -70,24 +70,24 @@ local function buyButton(props: {
 		[React.Event.Activated] = props.Activate,
 		[React.Event.SelectionGained] = props.OnSelectionGained,
 	}, {
-		Layout = React.createElement(ListLayout, {
-			HorizontalAlignment = Enum.HorizontalAlignment.Center,
-			FillDirection = Enum.FillDirection.Horizontal,
-			Padding = UDim.new(0, 4),
+		CountText = React.createElement(Label, {
+			Text = TextStroke(`Hatch {props.Count}`),
+			Size = UDim2.fromScale(1, 0.5),
 		}),
 
-		Text = React.createElement(Label, {
-			Text = TextStroke(
-				`<b>{if props.CanAfford then `Hatch {props.Count}` else "Need"}</b>   <font color="#{CurrencyDefs.Secondary.Colors.Primary:ToHex()}">{props.Price}</font>`
-			),
+		PriceText = React.createElement(Label, {
+			Text = TextStroke(`<font color="#{CurrencyDefs.Secondary.Colors.Primary:ToHex()}">{props.Price}</font>`),
 			AutomaticSize = Enum.AutomaticSize.X,
-			Size = UDim2.fromScale(0, 1),
+			Size = UDim2.fromScale(0.6, 0.5),
+			Position = UDim2.fromScale(0, 0.5),
 			LayoutOrder = 1,
 			TextColor3 = if props.CanAfford then nil else ColorDefs.PaleRed,
 		}),
 
 		Icon = React.createElement(Image, {
-			SizeConstraint = Enum.SizeConstraint.RelativeYY,
+			Size = UDim2.fromScale(0.4, 0.5),
+			Position = UDim2.fromScale(1, 1),
+			AnchorPoint = Vector2.new(1, 1),
 			Image = CurrencyDefs.Secondary.Image,
 			LayoutOrder = 2,
 		}),
@@ -102,19 +102,15 @@ return function(props: {
 	Wallet: CurrencyHelper.Wallet,
 })
 	local gacha = PetGachaDefs[props.GachaId]
-	local lastActiveBuyButton, setLastActiveBuyButton = React.useState(nil)
-
-	local canAfford1 = CurrencyHelper.CheckPrice(props.Wallet, gacha.Price)
-	local canAfford5 = CurrencyHelper.CheckPrice(props.Wallet, gacha.Price, 5)
 
 	return React.createElement(SystemWindow, {
 		Visible = props.Visible,
 		HeaderText = TextStroke(gacha.Name, 2),
 		[React.Event.Activated] = props.Close,
-		Ratio = 1.15,
+		Ratio = 1.05,
 	}, {
 		Buttons = React.createElement(Container, {
-			Size = UDim2.new(1, 0, 0.125, -8),
+			Size = UDim2.new(1, 0, 0.15, -8),
 			Position = UDim2.fromScale(0.5, 1),
 			AnchorPoint = Vector2.new(0.5, 1),
 		}, {
@@ -124,37 +120,26 @@ return function(props: {
 				Padding = UDim.new(0, 12),
 			}),
 
-			Button1 = React.createElement(buyButton, {
-				LayoutOrder = 1,
-				CanAfford = canAfford1,
-				Count = 1,
-				Price = gacha.Price.Secondary,
-				Activate = function()
-					props.Buy(1)
-				end,
-				OnSelectionGained = function()
-					setLastActiveBuyButton(1)
-				end,
-				SelectionOrder = canAfford1 and (lastActiveBuyButton == nil or lastActiveBuyButton == 1) and -1 or 1,
-			}),
-
-			Button5 = React.createElement(buyButton, {
-				LayoutOrder = 2,
-				CanAfford = canAfford5,
-				Count = 5,
-				Price = gacha.Price.Secondary * 5,
-				Activate = function()
-					props.Buy(5)
-				end,
-				OnSelectionGained = function()
-					setLastActiveBuyButton(5)
-				end,
-				SelectionOrder = canAfford5 and (lastActiveBuyButton == nil or lastActiveBuyButton == 5) and -1 or 1,
-			}),
+			Buttons = React.createElement(
+				React.Fragment,
+				nil,
+				Sift.Array.map({ 1, 5, 25, 50 }, function(count, index)
+					return React.createElement(buyButton, {
+						LayoutOrder = index,
+						CanAfford = CurrencyHelper.CheckPrice(props.Wallet, gacha.Price, count),
+						Count = count,
+						Price = gacha.Price.Secondary * count,
+						Activate = function()
+							props.Buy(count)
+						end,
+						SelectionOrder = index,
+					})
+				end)
+			),
 		}),
 
 		PetsContainer = React.createElement(Container, {
-			Size = UDim2.fromScale(1, 0.875),
+			Size = UDim2.fromScale(1, 0.85),
 		}, {
 			Layout = React.createElement(GridLayout, {
 				VerticalAlignment = Enum.VerticalAlignment.Center,

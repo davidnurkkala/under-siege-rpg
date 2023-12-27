@@ -22,23 +22,20 @@ return function()
 	local currency, setCurrency = React.useState(nil)
 	local gachaId, setGachaId = React.useState(nil)
 	local state, setState = React.useState("Shop")
-	local resultPetId, setResultPetId = React.useState(nil)
-	local buys = React.useRef(0)
+	local results, setResults = React.useState(nil)
 
-	local buy = React.useCallback(function()
-		buys.current -= 1
-
+	local buy = React.useCallback(function(count)
 		setState("Waiting")
-		PetController:HatchPetFromGacha(gachaId):andThen(function(success, petId)
+		PetController:HatchPetFromGacha(gachaId, count):andThen(function(success, resultsIn)
 			if not success then
 				setState("Shop")
 				return
 			end
 
-			setResultPetId(petId)
+			setResults(resultsIn)
 			setState("Result")
 		end)
-	end, { gachaId, buys })
+	end, { gachaId })
 
 	React.useEffect(function()
 		local trove = Trove.new()
@@ -72,8 +69,7 @@ return function()
 					ProductController.GetOwnsProduct("MultiRoll")
 						:andThen(function(owned)
 							if owned then
-								buys.current = count
-								buy()
+								buy(count)
 							else
 								setState("Sell")
 							end
@@ -82,8 +78,7 @@ return function()
 							setState("Shop")
 						end)
 				else
-					buys.current = count
-					buy()
+					buy(1)
 				end
 			end,
 			Close = function()
@@ -134,16 +129,12 @@ return function()
 		}),
 
 		Result = (state == "Result") and React.createElement(PetGachaResult, {
-			PetId = resultPetId,
+			Results = results,
 			EggId = TryNow(function()
 				return PetGachaDefs[gachaId].EggId
 			end, "World1"),
 			Close = function()
-				if buys.current > 0 then
-					buy()
-				else
-					setState("Shop")
-				end
+				setState("Shop")
 			end,
 		}),
 	})

@@ -34,10 +34,13 @@ function PetService.PrepareBlocking(self: PetService)
 		end)
 	end)
 
-	self.Comm:BindFunction("HatchPetFromGacha", function(player, gachaId)
+	self.Comm:BindFunction("HatchPetFromGacha", function(player, gachaId, count)
 		if not t.string(gachaId) then return end
+		if not t.integer(count) then return end
+		if count < 1 then return end
+		if count > 1000 then return end
 
-		return self:HatchPetFromGacha(player, gachaId):expect()
+		return self:HatchPetFromGacha(player, gachaId, count):expect()
 	end)
 
 	self.Comm:BindFunction("EquipPet", function(player, hash)
@@ -116,6 +119,29 @@ function PetService.AddPet(self: PetService, player: Player, petId: string, tier
 	end)
 end
 
+function PetService.AddPets(self: PetService, player: Player, additions: { [string]: number })
+	return DataService:GetSaveFile(player):andThen(function(saveFile)
+		saveFile:Update("Pets", function(pets)
+			return Sift.Dictionary.update(pets, "Owned", function(owned)
+				for hash, count in additions do
+					owned = Sift.Dictionary.update(owned, hash, function(oldCount)
+						return oldCount + count
+					end, function()
+						return count
+					end)
+				end
+				return owned
+			end)
+		end)
+
+		return OptionsService:GetOption(player, "AutoEquipBestPets"):andThen(function(autoEquip)
+			if not autoEquip then return end
+
+			return self:EquipBest(player)
+		end)
+	end)
+end
+
 function PetService.MergePets(self: PetService, player: Player, hash: string, count: number)
 	return self:GetPets(player):andThen(function(pets)
 		local countOwned = pets.Owned[hash] or 0
@@ -138,7 +164,9 @@ function PetService.MergePets(self: PetService, player: Player, hash: string, co
 			:andThen(function()
 				return self:RemovePet(player, hash, count)
 			end)
-			:andThen(function()
+			:andThen(function(hadEnoughPets)
+				if not hadEnoughPets then return false end
+
 				if success then
 					return self:AddPet(player, petId, tier + 1):andThenReturn(true)
 				else
@@ -221,8 +249,13 @@ function PetService.RemovePet(self: PetService, player: Player, hash: string, co
 	if count == nil then count = 1 end
 
 	return DataService:GetSaveFile(player):andThen(function(saveFile)
+		local success = true
+
 		saveFile:Update("Pets", function(pets)
-			if pets.Owned[hash] < count then return pets end
+			if pets.Owned[hash] < count then
+				success = false
+				return pets
+			end
 
 			pets = Sift.Dictionary.update(pets, "Owned", function(owned)
 				return Sift.Dictionary.update(owned, hash, function(countOwned)
@@ -245,21 +278,47 @@ function PetService.RemovePet(self: PetService, player: Player, hash: string, co
 
 			return pets
 		end)
+
+		return success
 	end)
 end
 
-function PetService.HatchPetFromGacha(self: PetService, player: Player, gachaId: string)
+function PetService.HatchPetFromGacha(self: PetService, player: Player, gachaId: string, countIn: number?)
 	local gacha = PetGachaDefs[gachaId]
 	assert(gacha, `No gacha with id {gachaId}`)
 
-	return CurrencyService:ApplyPrice(player, gacha.Price)
-		:andThen(function(success)
-			if not success then return false, "notEnoughCurrency" end
+	local count = countIn or 1
+
+	return Promise.new(function(resolve, _, onCancel)
+		local additions = {}
+
+		for _ = 1, count do
+			local applyPrice = CurrencyService:ApplyPrice(player, gacha.Price)
+			onCancel(function()
+				applyPrice:cancel()
+			end)
+
+			local hadFunds = applyPrice:expect()
+			if onCancel() then return end
+
+			if not hadFunds then
+				resolve(additions)
+				return
+			end
+
+			local petId = gacha.WeightTable:Roll()
+			local hash = PetHelper.InfoToHash(petId, 1)
+			additions[hash] = (additions[hash] or 0) + 1
+		end
+
+		resolve(additions)
+	end)
+		:andThen(function(additions)
+			if Sift.Dictionary.count(additions) == 0 then return end
 
 			EventStream.Event({ Kind = "PetGachaRolled", Player = player, GachaId = gachaId })
 
-			local petId = gacha.WeightTable:Roll()
-			return self:AddPet(player, petId):andThenReturn(true, petId)
+			return self:AddPets(player, additions):andThenReturn(true, additions)
 		end)
 		:catch(function(problem)
 			warn(problem)

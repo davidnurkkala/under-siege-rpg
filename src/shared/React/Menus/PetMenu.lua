@@ -35,7 +35,7 @@ local function petButton(props: {
 	}, {
 		Name = React.createElement(Label, {
 			Size = UDim2.fromScale(1, 0.7),
-			Text = TextStroke(`{def.Name}{if tier > 1 then `\nLv. {tier}` else `\n `}{if count > 1 then `\nx{count}` else `\n `}`),
+			Text = TextStroke(`{def.Name}\nLv. {tier}{if count > 1 then `\nx{count}` else `\n `}`),
 			TextXAlignment = Enum.TextXAlignment.Left,
 			ZIndex = 4,
 		}),

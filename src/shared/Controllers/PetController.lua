@@ -25,8 +25,8 @@ function PetController.ObservePets(self: PetController, callback)
 	end
 end
 
-function PetController.HatchPetFromGacha(self: PetController, gachaId: string)
-	return self.HatchPetFromGachaRemote(gachaId)
+function PetController.HatchPetFromGacha(self: PetController, gachaId: string, count: number)
+	return self.HatchPetFromGachaRemote(gachaId, count)
 end
 
 return PetController
