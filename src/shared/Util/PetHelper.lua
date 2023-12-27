@@ -1,7 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local PetDefs = require(ReplicatedStorage.Shared.Defs.PetDefs)
-local Sift = require(ReplicatedStorage.Packages.Sift)
 
 local PetHelper = {}
 

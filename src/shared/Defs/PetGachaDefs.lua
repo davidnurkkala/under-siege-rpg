@@ -27,6 +27,48 @@ local Gachas = {
 			{ Result = "Bunny", Weight = 1 },
 		},
 	},
+
+	World2Pets = {
+		Name = "World 2 Pets",
+		EggId = "World1",
+		Price = {
+			Secondary = 100,
+		},
+		WeightTable = {
+			{ Result = "Bully", Weight = 4 },
+			{ Result = "Liony", Weight = 3 },
+			{ Result = "Rhiny", Weight = 2 },
+			{ Result = "Wolfy", Weight = 1 },
+		},
+	},
+
+	World3Pets = {
+		Name = "World 3 Pets",
+		EggId = "World1",
+		Price = {
+			Secondary = 200,
+		},
+		WeightTable = {
+			{ Result = "Goaty", Weight = 4 },
+			{ Result = "Mousey", Weight = 3 },
+			{ Result = "Batsy", Weight = 2 },
+			{ Result = "Foxy", Weight = 1 },
+		},
+	},
+
+	World4Pets = {
+		Name = "World 4 Pets",
+		EggId = "World1",
+		Price = {
+			Secondary = 300,
+		},
+		WeightTable = {
+			{ Result = "Mousey", Weight = 4 },
+			{ Result = "Batsy", Weight = 3 },
+			{ Result = "Foxy", Weight = 2 },
+			{ Result = "Slimey", Weight = 1 },
+		},
+	},
 }
 
 return Sift.Dictionary.map(Gachas, function(gacha, id)
