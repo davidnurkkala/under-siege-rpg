@@ -27,10 +27,12 @@ local PromptWindow = require(ReplicatedStorage.Shared.React.Common.PromptWindow)
 local React = require(ReplicatedStorage.Packages.React)
 local RoundButtonWithImage = require(ReplicatedStorage.Shared.React.Common.RoundButtonWithImage)
 local Sift = require(ReplicatedStorage.Packages.Sift)
+local Signal = require(ReplicatedStorage.Packages.Signal)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local TryNow = require(ReplicatedStorage.Shared.Util.TryNow)
 local UseMotor = require(ReplicatedStorage.Shared.React.Hooks.UseMotor)
+local UseOption = require(ReplicatedStorage.Shared.React.Hooks.UseOption)
 
 local function getHealthPercent(status, index)
 	return TryNow(function()
@@ -225,6 +227,178 @@ local function broadcast(props: {
 		})
 end
 
+local function autoPlayButton()
+	local autoPlay, setAutoPlay = UseOption("AutoPlayCards", true)
+
+	return React.createElement(Button, {
+		LayoutOrder = 2,
+		Size = UDim2.fromScale(1, 1),
+		SizeConstraint = Enum.SizeConstraint.RelativeYY,
+		[React.Event.Activated] = function()
+			setAutoPlay(not autoPlay)
+		end,
+		ImageColor3 = ColorDefs.Blue,
+		BorderColor3 = ColorDefs.DarkBlue,
+	}, {
+		Text = React.createElement(Label, {
+			Text = if autoPlay then TextStroke("X") else "",
+		}),
+	})
+end
+
+function cardPromptCard(props: {
+	Active: boolean,
+	Delay: number,
+	LayoutOrder: number,
+	CardId: string,
+	CardCount: number,
+	Select: () -> (),
+	Destroy: () -> (),
+})
+	local height, heightMotor = UseMotor(-2)
+	local chosen, setChosen = React.useState(false)
+
+	React.useEffect(function()
+		if props.Active then
+			local promise = Promise.delay(props.Delay):andThenCall(PromiseMotor, heightMotor, Flipper.Spring.new(0), function(value)
+				return value > -0.05
+			end)
+
+			return function()
+				promise:cancel()
+			end
+		else
+			local promise = PromiseMotor(heightMotor, Flipper.Spring.new(-2), function(value)
+				return value < -1.95
+			end):andThenCall(props.Destroy)
+
+			return function()
+				promise:cancel()
+			end
+		end
+	end, { props.Active })
+
+	return React.createElement(Container, {
+		Size = UDim2.fromScale(2.5 / 3.5, 1),
+		SizeConstraint = Enum.SizeConstraint.RelativeYY,
+		LayoutOrder = props.LayoutOrder,
+	}, {
+		Button = React.createElement(Button, {
+			Active = props.Active,
+			Position = height:map(function(value)
+				return UDim2.fromScale(0, value)
+			end),
+			[React.Event.Activated] = function()
+				props.Select()
+				setChosen(true)
+			end,
+			ImageColor3 = ColorDefs.PaleGreen,
+			BorderColor3 = if chosen then ColorDefs.PaleBlue else nil,
+		}, {
+			Contents = React.createElement(CardContents, {
+				CardId = props.CardId,
+				CardCount = props.CardCount,
+			}),
+		}),
+	})
+end
+
+function cardPrompt()
+	local visible, setVisible = React.useState(false)
+	local cards, setCards = React.useState(nil)
+	local indexChosen = React.useRef(Signal.new()).current
+	local scalar, setScalar = React.useBinding(1)
+	local barHeight, barHeightMotor = UseMotor(-1)
+
+	React.useEffect(function()
+		return BattleController:RegisterCardPrompt(function(cardsIn)
+			setVisible(true)
+			setCards(cardsIn)
+
+			return Promise.fromEvent(indexChosen):finally(function()
+				setVisible(false)
+			end)
+		end)
+	end, {})
+
+	React.useEffect(function()
+		if not visible then
+			barHeightMotor:setGoal(Flipper.Spring.new(-1))
+			return
+		end
+
+		barHeightMotor:setGoal(Flipper.Spring.new(1))
+
+		local maxT = 4
+		local t = maxT
+
+		task.spawn(function()
+			while t > 0 do
+				t -= task.wait()
+				setScalar(t / maxT)
+			end
+		end)
+
+		return function()
+			t = 0
+		end
+	end, { visible })
+
+	return React.createElement(Container, {
+		Size = UDim2.fromScale(1, 0.4),
+		AnchorPoint = Vector2.new(0.5, 0),
+		Position = UDim2.fromScale(0.5, 0),
+	}, {
+		TimeBar = React.createElement(Panel, {
+			Size = UDim2.fromScale(0.3, 0.075),
+			AnchorPoint = Vector2.new(0.5, 1),
+			Position = barHeight:map(function(value)
+				return UDim2.fromScale(0.5, value)
+			end),
+			ImageColor3 = Color3.new(0, 0, 0),
+			BorderColor3 = Color3.new(0, 0, 0),
+			Corner = UDim.new(0, 2),
+		}, {
+			Bar = React.createElement(Frame, {
+				Size = scalar:map(function(value)
+					return UDim2.fromScale(value, 1)
+				end),
+				BackgroundColor3 = ColorDefs.PaleBlue,
+			}),
+		}),
+
+		CardContainer = React.createElement(Container, {
+			Size = UDim2.fromScale(1, 0.875),
+		}, {
+			Layout = React.createElement(ListLayout, {
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				FillDirection = Enum.FillDirection.Horizontal,
+				Padding = UDim.new(0.025, 0),
+			}),
+
+			Cards = (cards ~= nil) and React.createElement(
+				React.Fragment,
+				nil,
+				Sift.Array.map(cards, function(card, index)
+					return React.createElement(cardPromptCard, {
+						Active = visible,
+						Delay = 0.1 * (index - 1),
+						LayoutOrder = index,
+						CardId = card.Id,
+						CardCount = card.Count,
+						Select = function()
+							indexChosen:Fire(index)
+						end,
+						Destroy = function()
+							setCards(nil)
+						end,
+					})
+				end)
+			),
+		}),
+	})
+end
+
 return function(props: {
 	Visible: boolean,
 })
@@ -323,6 +497,8 @@ return function(props: {
 	return React.createElement(Container, {
 		Visible = props.Visible,
 	}, {
+		CardPrompt = React.createElement(cardPrompt),
+
 		GoonHealthBars = React.createElement(
 			"Folder",
 			nil,
@@ -430,31 +606,56 @@ return function(props: {
 			buttonRef = surrenderButtonRef,
 		}),
 
-		Surrender = React.createElement(Button, {
-			Visible = not surrendering,
-			Size = UDim2.fromScale(0.1, 0.1),
+		BottomLeft = React.createElement(Container, {
+			Size = UDim2.fromScale(0.8, 0.1),
 			SizeConstraint = Enum.SizeConstraint.RelativeYY,
-			ImageColor3 = ColorDefs.PaleGreen,
-			BorderColor3 = ColorDefs.LightGreen,
-			Position = UDim2.fromScale(0, 1),
 			AnchorPoint = Vector2.new(0, 1),
-			[React.Event.Activated] = function()
-				setSurrendering(true)
-			end,
-			buttonRef = surrenderButtonRef,
-			Selectable = false,
+			Position = UDim2.fromScale(0, 1),
 		}, {
-			Image = React.createElement(Image, {
-				Image = "rbxassetid://15484464238",
+			Layout = React.createElement(ListLayout, {
+				FillDirection = Enum.FillDirection.Horizontal,
+				VerticalAlignment = Enum.VerticalAlignment.Bottom,
+				Padding = UDim.new(0.05, 0),
 			}),
-			GamepadHint = React.createElement(RoundButtonWithImage, {
-				Visible = platform == "Console",
-				Image = UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonSelect),
-				Text = "Surrender",
+
+			AutoPlay = React.createElement(autoPlayButton),
+			AutoPlayLabel = React.createElement(Container, {
+				LayoutOrder = 3,
+				Size = UDim2.fromScale(2, 0.5),
+				SizeConstraint = Enum.SizeConstraint.RelativeYY,
+			}, {
+				Text = React.createElement(Label, {
+					Position = UDim2.fromOffset(-6, 0),
+					TextXAlignment = Enum.TextXAlignment.Left,
+					Text = TextStroke("Auto play"),
+				}),
+			}),
+
+			Surrender = React.createElement(Button, {
+				LayoutOrder = 1,
+				Visible = not surrendering,
+				Size = UDim2.fromScale(1, 1),
+				SizeConstraint = Enum.SizeConstraint.RelativeYY,
+				ImageColor3 = ColorDefs.PaleGreen,
+				BorderColor3 = ColorDefs.LightGreen,
+				[React.Event.Activated] = function()
+					setSurrendering(true)
+				end,
+				buttonRef = surrenderButtonRef,
 				Selectable = false,
-				Position = UDim2.new(0.5, 0, 0, -4),
-				AnchorPoint = Vector2.new(0.5, 1),
-				height = UDim.new(0.4, 0),
+			}, {
+				Image = React.createElement(Image, {
+					Image = "rbxassetid://15484464238",
+				}),
+				GamepadHint = React.createElement(RoundButtonWithImage, {
+					Visible = platform == "Console",
+					Image = UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonSelect),
+					Text = "Surrender",
+					Selectable = false,
+					Position = UDim2.new(0.5, 0, 0, -4),
+					AnchorPoint = Vector2.new(0.5, 1),
+					height = UDim.new(0.4, 0),
+				}),
 			}),
 		}),
 

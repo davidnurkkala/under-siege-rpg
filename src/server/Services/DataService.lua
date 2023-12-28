@@ -41,6 +41,11 @@ local DataService = {
 			Equipped = { Peasant = true },
 			Owned = { Peasant = 1 },
 		},
+		Options = {
+			AutoEquipCards = true,
+			AutoEquipBestPets = true,
+			AutoPlayCards = true,
+		},
 		Pets = {
 			Equipped = {},
 			Owned = {},
@@ -90,6 +95,9 @@ function DataService.PrepareBlocking(self: DataService)
 				end)
 
 				return Sift.Dictionary.set(oldData, "Pets", pets)
+			end,
+			function(oldData)
+				return Sift.Dictionary.set(oldData, "Options", self.DefaultData.Options)
 			end,
 		},
 	})

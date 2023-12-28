@@ -82,7 +82,7 @@ function Battler.new(args: {
 		WeaponModel = weaponModel,
 		WeaponDef = args.WeaponDef,
 		TeamId = args.TeamId,
-		DeckPlayer = args.DeckPlayer,
+		DeckPlayer = trove:Add(args.DeckPlayer),
 		Animator = args.Animator,
 		Destroyed = Signal.new(),
 		Changed = Signal.new(),

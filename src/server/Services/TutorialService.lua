@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local Badger = require(ReplicatedStorage.Shared.Util.Badger)
+local BattlerDefs = require(ReplicatedStorage.Shared.Defs.BattlerDefs)
 local BeInWorld = require(ServerScriptService.Server.Badger.Conditions.BeInWorld)
 local Comm = require(ReplicatedStorage.Packages.Comm)
 local DataService = require(ServerScriptService.Server.Services.DataService)
@@ -12,6 +13,7 @@ local Observers = require(ReplicatedStorage.Packages.Observers)
 local RollCardGacha = require(ServerScriptService.Server.Badger.Conditions.RollCardGacha)
 local RollPetGacha = require(ServerScriptService.Server.Badger.Conditions.RollPetGacha)
 local Sift = require(ReplicatedStorage.Packages.Sift)
+local WorldDefs = require(ReplicatedStorage.Shared.Defs.WorldDefs)
 
 local TutorialService = {
 	Priority = 0,
@@ -63,7 +65,7 @@ local function tutorialCondition(player)
 				State = condition:getState(),
 			}
 		end),
-		HaveCurrency(player, "Primary", 100000):withState(function(condition)
+		HaveCurrency(player, "Primary", BattlerDefs.King.Power):withState(function(condition)
 			return {
 				Instruction = "TrainLongTerm",
 				State = condition:getState(),
@@ -75,7 +77,7 @@ local function tutorialCondition(player)
 				State = condition:getState(),
 			}
 		end),
-		HaveCurrency(player, "Secondary", 1000):withState(function(condition)
+		HaveCurrency(player, "Secondary", WorldDefs.World2.Price):withState(function(condition)
 			return {
 				Instruction = "Gold",
 				State = condition:getState(),
@@ -89,7 +91,7 @@ local function tutorialCondition(player)
 		end),
 
 		-- beat viking world
-		HaveCurrency(player, "Primary", 750000):withState(function(condition)
+		HaveCurrency(player, "Primary", BattlerDefs.VikingKing.Power):withState(function(condition)
 			return {
 				Instruction = "TrainLongTerm",
 				State = condition:getState(),
@@ -101,7 +103,7 @@ local function tutorialCondition(player)
 				State = condition:getState(),
 			}
 		end),
-		HaveCurrency(player, "Secondary", 10000):withState(function(condition)
+		HaveCurrency(player, "Secondary", WorldDefs.World3.Price):withState(function(condition)
 			return {
 				Instruction = "Gold",
 				State = condition:getState(),
@@ -115,7 +117,7 @@ local function tutorialCondition(player)
 		end),
 
 		-- beat elf world
-		HaveCurrency(player, "Primary", 10000000):withState(function(condition)
+		HaveCurrency(player, "Primary", BattlerDefs.ElfKing.Power):withState(function(condition)
 			return {
 				Instruction = "TrainLongTerm",
 				State = condition:getState(),
@@ -127,7 +129,7 @@ local function tutorialCondition(player)
 				State = condition:getState(),
 			}
 		end),
-		HaveCurrency(player, "Secondary", 50000):withState(function(condition)
+		HaveCurrency(player, "Secondary", WorldDefs.World4.Price):withState(function(condition)
 			return {
 				Instruction = "Gold",
 				State = condition:getState(),
@@ -141,7 +143,7 @@ local function tutorialCondition(player)
 		end),
 
 		-- beat orc world
-		HaveCurrency(player, "Primary", 100000000):withState(function(condition)
+		HaveCurrency(player, "Primary", BattlerDefs.OrcGeneral.Power):withState(function(condition)
 			return {
 				Instruction = "TrainLongTerm",
 				State = condition:getState(),
