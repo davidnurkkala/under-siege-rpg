@@ -66,6 +66,7 @@ end
 
 function PrestigeService.Prestige(self: PrestigeService, player: Player, prestigeType: string)
 	if BattleService:Get(player) then return Promise.resolve(false) end
+	if player:GetAttribute("IsPrestiging") then return Promise.resolve(false) end
 
 	return self:GetPrestigeCost(player)
 		:andThen(function(cost)

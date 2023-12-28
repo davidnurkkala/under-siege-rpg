@@ -229,6 +229,19 @@ end
 
 local function autoPlayButton()
 	local autoPlay, setAutoPlay = UseOption("AutoPlayCards", true)
+	local platform = React.useContext(PlatformContext)
+
+	React.useEffect(function()
+		local name = "BattleHudToggleAutoPlay"
+		ContextActionService:BindAction(name, function(_, state)
+			if state ~= Enum.UserInputState.Begin then return end
+			setAutoPlay(not autoPlay)
+		end, false, Enum.KeyCode.ButtonY)
+
+		return function()
+			ContextActionService:UnbindAction(name)
+		end
+	end, { autoPlay })
 
 	return React.createElement(Button, {
 		LayoutOrder = 2,
@@ -243,8 +256,23 @@ local function autoPlayButton()
 		Text = React.createElement(Label, {
 			Text = if autoPlay then TextStroke("X") else "",
 		}),
+		GamepadHint = React.createElement(RoundButtonWithImage, {
+			Visible = platform == "Console",
+			Image = UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonY),
+			Text = "Toggle",
+			Selectable = false,
+			Position = UDim2.new(0.5, 0, 0, -4),
+			AnchorPoint = Vector2.new(0.5, 1),
+			height = UDim.new(0.4, 0),
+		}),
 	})
 end
+
+local KeyCodeByCardPromptLayout = {
+	Enum.KeyCode.DPadLeft,
+	Enum.KeyCode.DPadUp,
+	Enum.KeyCode.DPadRight,
+}
 
 function cardPromptCard(props: {
 	Active: boolean,
@@ -257,6 +285,9 @@ function cardPromptCard(props: {
 })
 	local height, heightMotor = UseMotor(-2)
 	local chosen, setChosen = React.useState(false)
+	local platform = React.useContext(PlatformContext)
+
+	local keyCode = KeyCodeByCardPromptLayout[props.LayoutOrder]
 
 	React.useEffect(function()
 		if props.Active then
@@ -264,19 +295,32 @@ function cardPromptCard(props: {
 				return value > -0.05
 			end)
 
+			local name = "BattleHudPickCard" .. props.LayoutOrder
+			ContextActionService:BindAction(name, function(_, state)
+				if state ~= Enum.UserInputState.Begin then return end
+				setChosen(true)
+				props.Select()
+			end, false, keyCode)
+
 			return function()
 				promise:cancel()
+				ContextActionService:UnbindAction(name)
 			end
 		else
-			local promise = PromiseMotor(heightMotor, Flipper.Spring.new(-2), function(value)
-				return value < -1.95
-			end):andThenCall(props.Destroy)
+			local promise = (if chosen then Promise.delay(0.5) else Promise.resolve())
+				:andThenCall(PromiseMotor, heightMotor, Flipper.Spring.new(-2), function(value)
+					return value < -1.95
+				end)
+				:andThen(function()
+					if chosen then props.Destroy() end
+				end)
+				:finallyCall(setChosen, false)
 
 			return function()
 				promise:cancel()
 			end
 		end
-	end, { props.Active })
+	end, { props.Active, props.Select, chosen })
 
 	return React.createElement(Container, {
 		Size = UDim2.fromScale(2.5 / 3.5, 1),
@@ -289,8 +333,8 @@ function cardPromptCard(props: {
 				return UDim2.fromScale(0, value)
 			end),
 			[React.Event.Activated] = function()
-				props.Select()
 				setChosen(true)
+				props.Select()
 			end,
 			ImageColor3 = ColorDefs.PaleGreen,
 			BorderColor3 = if chosen then ColorDefs.PaleBlue else nil,
@@ -299,11 +343,20 @@ function cardPromptCard(props: {
 				CardId = props.CardId,
 				CardCount = props.CardCount,
 			}),
+			GamepadHint = React.createElement(RoundButtonWithImage, {
+				Visible = platform == "Console",
+				Image = UserInputService:GetImageForKeyCode(keyCode),
+				Text = "Pick",
+				Selectable = false,
+				Position = UDim2.new(0.5, 0, 0, 0),
+				AnchorPoint = Vector2.new(0.5, 1),
+				height = UDim.new(0.15, 0),
+			}),
 		}),
 	})
 end
 
-function cardPrompt()
+local cardPrompt = React.memo(function()
 	local visible, setVisible = React.useState(false)
 	local cards, setCards = React.useState(nil)
 	local indexChosen = React.useRef(Signal.new()).current
@@ -350,6 +403,7 @@ function cardPrompt()
 		Position = UDim2.fromScale(0.5, 0),
 	}, {
 		TimeBar = React.createElement(Panel, {
+			ZIndex = -8,
 			Size = UDim2.fromScale(0.3, 0.075),
 			AnchorPoint = Vector2.new(0.5, 1),
 			Position = barHeight:map(function(value)
@@ -397,7 +451,7 @@ function cardPrompt()
 			),
 		}),
 	})
-end
+end)
 
 return function(props: {
 	Visible: boolean,
