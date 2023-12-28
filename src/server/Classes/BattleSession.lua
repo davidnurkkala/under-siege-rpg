@@ -7,7 +7,7 @@ local Battler = require(ServerScriptService.Server.Classes.Battler)
 local Cooldown = require(ReplicatedStorage.Shared.Classes.Cooldown)
 local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local Deck = require(ServerScriptService.Server.Classes.Deck)
-local DeckPlayerRandom = require(ServerScriptService.Server.Classes.DeckPlayerRandom)
+local DeckPlayerPlayer = require(ServerScriptService.Server.Classes.DeckPlayerPlayer)
 local DeckService = require(ServerScriptService.Server.Services.DeckService)
 local PlayerLeaving = require(ReplicatedStorage.Shared.Util.PlayerLeaving)
 local ProductService = require(ServerScriptService.Server.Services.ProductService)
@@ -153,7 +153,7 @@ function BattleSession.promised(player: Player, position: number, direction: num
 					WeaponDef = def,
 					WeaponHoldPart = holdPart,
 					TeamId = `PLAYER_{player.Name}`,
-					DeckPlayer = DeckPlayerRandom.new(Deck.new(deck)),
+					DeckPlayer = DeckPlayerPlayer.new(Deck.new(deck), player),
 					HealthMax = 50,
 					Power = math.max(50, power),
 				},

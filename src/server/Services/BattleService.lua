@@ -4,6 +4,7 @@ local Comm = require(ReplicatedStorage.Packages.Comm)
 local PlayerLeaving = require(ReplicatedStorage.Shared.Util.PlayerLeaving)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Sift = require(ReplicatedStorage.Packages.Sift)
+local t = require(ReplicatedStorage.Packages.t)
 local BattleService = {
 	Priority = 0,
 }
@@ -30,6 +31,25 @@ function BattleService.PrepareBlocking(self: BattleService)
 
 	self.CardPlayed = self.Comm:CreateSignal("CardPlayed")
 	self.MessageSent = self.Comm:CreateSignal("MessageSent")
+	self.CardPromptInterface = self.Comm:CreateSignal("CardPromptInterface")
+end
+
+function BattleService.PromptCard(self: BattleService, player: Player, choices: { any })
+	self.CardPromptInterface:Fire(player, choices)
+
+	return Promise.new(function(resolve, _, onCancel)
+		local connection
+		connection = self.CardPromptInterface:Connect(function(player, index)
+			if not t.integer(index) then return end
+			resolve(choices[index])
+			connection:Disconnect()
+		end)
+
+		onCancel(function()
+			self.CardPromptInterface:Fire(player, false)
+			connection:Disconnect()
+		end)
+	end)
 end
 
 function BattleService.Get(_self: BattleService, player: Player)

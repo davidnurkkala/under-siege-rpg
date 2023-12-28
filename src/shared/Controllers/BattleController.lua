@@ -25,9 +25,33 @@ function BattleController.PrepareBlocking(self: BattleController)
 		self:OnStatusUpdated(...)
 	end)
 
+	self.MessageSent = self.Comm:GetSignal("MessageSent")
 	self.SurrenderRequested = self.Comm:GetSignal("SurrenderRequested")
 	self.CardPlayed = self.Comm:GetSignal("CardPlayed")
-	self.MessageSent = self.Comm:GetSignal("MessageSent")
+	self.CardPromptInterface = self.Comm:GetSignal("CardPromptInterface")
+end
+
+function BattleController.RegisterCardPrompt(self: BattleController, callback): () -> ()
+	local active = false
+	local connection, promise
+
+	connection = self.CardPromptInterface:Connect(function(...)
+		if not active then
+			active = true
+			promise = callback(...):andThen(function(result)
+				self.CardPromptInterface:Fire(result)
+				active = false
+			end)
+		else
+			active = false
+			promise:cancel()
+		end
+	end)
+
+	return function()
+		promise:cancel()
+		connection:Disconnect()
+	end
 end
 
 function BattleController.ObserveStatus(self: BattleController, callback: (any) -> ()): () -> ()

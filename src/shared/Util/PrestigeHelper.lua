@@ -1,7 +1,9 @@
 local PrestigeHelper = {}
 
 function PrestigeHelper.GetCost(prestige: number)
-	return math.floor(1e6 * (1.5 ^ prestige))
+	local a = 1.5 * (prestige - 1)
+	local b = 1.025 ^ prestige
+	return math.floor(1e6 * a * b)
 end
 
 function PrestigeHelper.GetBoost(points: number)

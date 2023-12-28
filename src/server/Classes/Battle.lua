@@ -61,6 +61,7 @@ export type Battle = typeof(setmetatable(
 		RoundCooldown: any,
 		State: "Active" | "Ended",
 		CritEnabled: boolean,
+		Timer: number,
 	},
 	Battle
 ))
@@ -91,6 +92,7 @@ function Battle.new(args: {
 		Changed = Signal.new(),
 		State = "Active",
 		CritEnabled = Default(args.CritEnabled, true),
+		Timer = 0,
 	}, Battle)
 
 	for _, entry in { { self.Battlers[1], self.Model.Spawns.Left }, { self.Battlers[2], self.Model.Spawns.Right } } do
@@ -293,7 +295,9 @@ end
 function Battle.Update(self: Battle, dt: number)
 	if self.State ~= "Active" then return end
 
-	if self.RoundCooldown:IsReady() then
+	self.Timer += dt
+
+	if (self.Timer >= 1) and self.RoundCooldown:IsReady() then
 		self.RoundCooldown:Use()
 
 		self.Trove:AddPromise(Promise.all({
@@ -307,7 +311,7 @@ function Battle.Update(self: Battle, dt: number)
 			if self.State ~= "Active" then return end
 
 			for _, cardChoice in results[1] do
-				self:PlayCard(cardChoice.Battler, cardChoice.Card.Id, cardChoice.Card.Level)
+				self:PlayCard(cardChoice.Battler, cardChoice.Card.Id, cardChoice.Card.Count)
 			end
 		end))
 	end
@@ -478,6 +482,10 @@ function Battle.End(self: Battle, victor: Battler.Battler)
 				object:DefeatAnimation()
 			end
 		end
+	end
+
+	for _, battler in self.Battlers do
+		battler.DeckPlayer:Destroy()
 	end
 
 	Promise.all(Sift.Array.map(
