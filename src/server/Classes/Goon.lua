@@ -30,6 +30,12 @@ export type Goon = typeof(setmetatable(
 		Root: Part,
 		Brain: any,
 		Remote: RemoteEvent,
+		Tags: { any },
+
+		WillTakeDamage: any,
+		DidTakeDamage: any,
+		WillDealDamage: any,
+		DidDealDamage: any,
 	},
 	Goon
 ))
@@ -95,6 +101,12 @@ function Goon.new(args: {
 		Brain = args.Brain,
 		Destroyed = Signal.new(),
 		Remote = remote,
+		Tags = {},
+
+		WillTakeDamage = Signal.new(),
+		DidTakeDamage = Signal.new(),
+		WillDealDamage = Signal.new(),
+		DidDealDamage = Signal.new(),
 	}, Goon)
 
 	self.Root:SetAttribute("Level", self.Level)
@@ -108,8 +120,16 @@ function Goon.new(args: {
 	end)
 
 	self.Battle:Add(self)
-
 	self.Brain:SetGoon(self)
+
+	if self.Def.Tags then
+		self.Tags = Sift.Array.map(self.Def.Tags, function(tagId)
+			local source = ServerScriptService.Server.Classes.GoonTags:FindFirstChild(`Tag{tagId}`)
+			assert(source, `No tag implementation found for {tagId}`)
+			local class = require(source)
+			return class.new(self)
+		end)
+	end
 
 	return self
 end
@@ -143,6 +163,12 @@ end
 
 function Goon.Is(object)
 	return getmetatable(object) == Goon
+end
+
+function Goon.HasTag(self: Goon, tagId: string)
+	if not self.Def.Tags then return false end
+
+	return Sift.Array.has(self.Def.Tags, tagId)
 end
 
 function Goon.FromDef(self: Goon, key: string)
@@ -200,6 +226,10 @@ function Goon.Destroy(self: Goon)
 			self.Root:Destroy()
 			self.Brain:Destroy()
 		end)
+	end
+
+	for _, tag in self.Tags do
+		tag:Destroy()
 	end
 
 	self.Destroyed:Fire()

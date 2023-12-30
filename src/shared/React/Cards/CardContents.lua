@@ -103,7 +103,7 @@ return function(props: {
 					Label = React.createElement(labelIcon, {
 						Image = "rbxassetid://15483125607",
 						Color = ColorDefs.Red,
-						Label = TextStroke(CardHelper.GetGoonStat(props.CardId, props.CardCount, "HealthMax")),
+						Label = TextStroke(CardHelper.GetGoonStat(props.CardId, props.CardCount, "HealthMax") // 0.01),
 					}),
 				}),
 
@@ -111,7 +111,7 @@ return function(props: {
 					Label = React.createElement(labelIcon, {
 						Image = "rbxassetid://15483125835",
 						Color = ColorDefs.PaleBlue,
-						Label = TextStroke(CardHelper.GetGoonStat(props.CardId, props.CardCount, "Damage")),
+						Label = TextStroke(CardHelper.GetGoonStat(props.CardId, props.CardCount, "Damage") // 0.01),
 					}),
 				}),
 			}),

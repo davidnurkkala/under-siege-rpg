@@ -19,6 +19,7 @@ local PetHelper = require(ReplicatedStorage.Shared.Util.PetHelper)
 local PetService = require(ServerScriptService.Server.Services.PetService)
 local PickRandom = require(ReplicatedStorage.Shared.Util.PickRandom)
 local PlayerLeaving = require(ReplicatedStorage.Shared.Util.PlayerLeaving)
+local ProductHelper = require(ReplicatedStorage.Shared.Util.ProductHelper)
 local ProductService = require(ServerScriptService.Server.Services.ProductService)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Sift = require(ReplicatedStorage.Packages.Sift)
@@ -207,7 +208,7 @@ function LobbySession.GetClosestDummy(self: LobbySession)
 	end, Vector3.zero)
 
 	for _, dummy in ComponentService:GetComponentsByName("TrainingDummy") do
-		if ProductService:IsVip(self.Player) then
+		if ProductHelper.IsVip(self.Player) then
 			if not dummy.IsPremium then continue end
 		else
 			if dummy.IsPremium then continue end
@@ -270,8 +271,8 @@ function LobbySession.Attack(self: LobbySession)
 		:andThen(function(pets)
 			local multiplier = PetHelper.GetTotalPower(pets)
 
-			if ProductService:IsVip(self.Player) then
-				multiplier += 0.25
+			if ProductHelper.IsVip(self.Player) then
+				multiplier *= 1.25
 			end
 
 			return CurrencyService:GetBoosted(self.Player, "Primary", self.WeaponDef.Power * multiplier)

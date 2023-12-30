@@ -10,6 +10,7 @@ local Deck = require(ServerScriptService.Server.Classes.Deck)
 local DeckPlayerPlayer = require(ServerScriptService.Server.Classes.DeckPlayerPlayer)
 local DeckService = require(ServerScriptService.Server.Services.DeckService)
 local PlayerLeaving = require(ReplicatedStorage.Shared.Util.PlayerLeaving)
+local ProductHelper = require(ReplicatedStorage.Shared.Util.ProductHelper)
 local ProductService = require(ServerScriptService.Server.Services.ProductService)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Sift = require(ReplicatedStorage.Packages.Sift)
@@ -81,7 +82,7 @@ function BattleSession.new(args: {
 				cooldown:Use()
 
 				local multiplier = 1
-				if ProductService:IsVip(self.Player) then
+				if ProductHelper.IsVip(self.Player) then
 					multiplier += 1
 				end
 

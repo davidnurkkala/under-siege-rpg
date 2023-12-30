@@ -14,6 +14,7 @@ local Goons = {
 		Brain = {
 			Id = "BasicMelee",
 		},
+		Tags = { "Light" },
 		Animations = {
 			Walk = "PeasantWalk",
 			Attack = "PeasantAttack",
@@ -51,6 +52,7 @@ local Goons = {
 		Brain = {
 			Id = "BasicMelee",
 		},
+		Tags = { "Armored", "Light" },
 		Animations = {
 			Walk = "SwordsmanWalk",
 			Attack = "GenericGoon1hMelee",
@@ -88,6 +90,7 @@ local Goons = {
 		Brain = {
 			Id = "BasicMelee",
 		},
+		Tags = { "Armored" },
 		Animations = {
 			Walk = "SwordsmanWalk",
 			Attack = "GenericGoon1hMelee",
@@ -127,6 +130,7 @@ local Goons = {
 			ProjectileOffset = CFrame.new(0, 0.75, -2),
 			ProjectileName = "Arrow1",
 		},
+		Tags = { "Ranged" },
 		Animations = {
 			Idle = "HunterIdle",
 			Walk = "HunterWalk",
@@ -146,7 +150,7 @@ local Goons = {
 			return 0.05
 		end,
 		Range = function()
-			return 0.7
+			return 0.35
 		end,
 		AttackRate = function()
 			return 1.1
@@ -168,6 +172,7 @@ local Goons = {
 			ProjectileOffset = CFrame.new(0, 0.75, -0.25),
 			ProjectileName = "MagicStar1",
 		},
+		Tags = { "Ranged" },
 		Animations = {
 			Walk = "MageWalk",
 			Attack = "MageAttack",
@@ -186,7 +191,7 @@ local Goons = {
 			return 0.05
 		end,
 		Range = function()
-			return 0.9
+			return 0.45
 		end,
 		AttackRate = function()
 			return 0.5
@@ -243,6 +248,7 @@ local Goons = {
 		Brain = {
 			Id = "BasicMelee",
 		},
+		Tags = { "Light" },
 		Animations = {
 			Walk = "SwordsmanWalk",
 			Attack = "BerserkerAttack",
@@ -280,6 +286,7 @@ local Goons = {
 		Brain = {
 			Id = "BasicMelee",
 		},
+		Tags = { "Light" },
 		Animations = {
 			Walk = "SwordsmanWalk",
 			Attack = "BerserkerAttack",
@@ -317,6 +324,7 @@ local Goons = {
 		Brain = {
 			Id = "BasicMelee",
 		},
+		Tags = { "Armored" },
 		Animations = {
 			Walk = "SwordsmanWalk",
 			Attack = "BerserkerAttack",
@@ -354,6 +362,7 @@ local Goons = {
 		Brain = {
 			Id = "BasicMelee",
 		},
+		Tags = { "Light", "Evasive" },
 		Animations = {
 			Walk = "SwordsmanWalk",
 			Attack = "BerserkerAttack",
@@ -393,6 +402,7 @@ local Goons = {
 			ProjectileOffset = CFrame.new(0, 0.75, -2),
 			ProjectileName = "Arrow1",
 		},
+		Tags = { "Ranged" },
 		Animations = {
 			Idle = "HunterIdle",
 			Walk = "HunterWalk",
@@ -412,7 +422,7 @@ local Goons = {
 			return 0.05
 		end,
 		Range = function()
-			return 0.75
+			return 0.375
 		end,
 		AttackRate = function()
 			return 1.25

@@ -113,6 +113,8 @@ function WorldService.PurchaseWorld(self: WorldService, player: Player, worldId:
 			saveFile:Update("Worlds", function(oldWorlds)
 				return Sift.Set.add(oldWorlds, worldId)
 			end)
+
+			return self:TeleportToWorld(player, worldId)
 		end)
 	end)
 end

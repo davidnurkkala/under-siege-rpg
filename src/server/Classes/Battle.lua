@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
@@ -11,6 +12,7 @@ local CardHelper = require(ReplicatedStorage.Shared.Util.CardHelper)
 local Cooldown = require(ReplicatedStorage.Shared.Classes.Cooldown)
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
 local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
+local Damage = require(ServerScriptService.Server.Classes.Damage)
 local Default = require(ReplicatedStorage.Shared.Util.Default)
 local EventStream = require(ReplicatedStorage.Shared.Util.EventStream)
 local Goon = require(ServerScriptService.Server.Classes.Goon)
@@ -456,14 +458,40 @@ function Battle.MoveFieldable(self: Battle, mover: Fieldable, movement: number)
 	return true
 end
 
-function Battle.Damage(_self: Battle, source: Battler.Battler | Goon.Goon, target: Battler.Battler | Goon.Goon, damage: number)
+function Battle.Damage(self: Battle, damage: Damage.Damage)
+	local source, target = damage.Source, damage.Target
+
 	local attackPower = if Battler.Is(source) then source.Power else source.Battler.Power
 	local defendPower = if Battler.Is(target) then target.Power else target.Battler.Power
 
 	local advantage = math.sqrt(attackPower / defendPower)
-	damage *= advantage
+	damage:SetRaw(damage.Amount * advantage)
 
-	target.Health:Adjust(-damage)
+	if source.WillDealDamage then source.WillDealDamage:Fire(damage) end
+	if target.WillTakeDamage then target.WillTakeDamage:Fire(damage) end
+
+	damage.Amount = math.max(damage.Amount, 0)
+
+	if damage.Amount > 0 then target.Health:Adjust(-damage.Amount) end
+
+	-- show an indicator
+	local text = damage:GetText()
+
+	for _, battler in self.Battlers do
+		-- TODO: replace with better player acquisition pipeline
+		local player = Players:GetPlayerFromCharacter(battler.CharModel)
+		if not player then continue end
+
+		GuiEffectService.DamageNumberRequestedRemote:Fire(player, {
+			TextProps = {
+				Text = text,
+			},
+			Position = damage.Target:GetWorldCFrame().Position,
+		})
+	end
+
+	if source.DidDealDamage then source.DidDealDamage:Fire(damage) end
+	if target.DidTakeDamage then target.DidTakeDamage:Fire(damage) end
 end
 
 function Battle.End(self: Battle, victor: Battler.Battler)

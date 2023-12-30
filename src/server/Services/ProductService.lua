@@ -5,6 +5,7 @@ local RunService = game:GetService("RunService")
 local Comm = require(ReplicatedStorage.Packages.Comm)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local ProductDefs = require(ReplicatedStorage.Shared.Defs.ProductDefs)
+local ProductHelper = require(ReplicatedStorage.Shared.Util.ProductHelper)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local t = require(ReplicatedStorage.Packages.t)
 
@@ -61,7 +62,7 @@ function ProductService.PrepareBlocking(self: ProductService)
 end
 
 function ProductService.GetVipBoostedSecondary(self: ProductService, player: Player, amount: number)
-	if self:IsVip(player) then
+	if ProductHelper.IsVip(player) then
 		return math.ceil(amount * 1.1)
 	else
 		return amount
@@ -84,12 +85,6 @@ function ProductService.GetOwnsProduct(self: ProductService, player: Player, pro
 			error(`Unimplemented product type {def.Type}`)
 		end
 	end)
-end
-
-function ProductService.IsVip(_self: ProductService, player: Player)
-	if RunService:IsStudio() then return false end
-
-	return player:GetAttribute("IsVip")
 end
 
 return ProductService

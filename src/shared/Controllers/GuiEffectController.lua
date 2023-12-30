@@ -10,6 +10,7 @@ type GuiEffectController = typeof(GuiEffectController)
 function GuiEffectController.PrepareBlocking(self: GuiEffectController)
 	self.Comm = Comm.ClientComm.new(ReplicatedStorage, true, "GuiEffectService")
 	self.IndicatorRequestedRemote = self.Comm:GetSignal("IndicatorRequested")
+	self.DamageNumberRequestedRemote = self.Comm:GetSignal("DamageNumberRequested")
 end
 
 return GuiEffectController

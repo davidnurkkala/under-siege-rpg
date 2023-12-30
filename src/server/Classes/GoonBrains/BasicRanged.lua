@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local Cooldown = require(ReplicatedStorage.Shared.Classes.Cooldown)
+local Damage = require(ServerScriptService.Server.Classes.Damage)
 local EffectEmission = require(ReplicatedStorage.Shared.Effects.EffectEmission)
 local EffectGoonModel = require(ReplicatedStorage.Shared.Effects.EffectGoonModel)
 local EffectProjectile = require(ReplicatedStorage.Shared.Effects.EffectProjectile)
@@ -101,7 +102,7 @@ function BasicRanged.SetUpStateMachine(self: BasicRanged)
 									Target = self.Goon.Root,
 								})
 							):andThen(function()
-								self.Battle:Damage(self.Goon, target, self.Goon:FromDef("Damage"))
+								self.Battle:Damage(Damage.new(self.Goon, target, self.Goon:FromDef("Damage")))
 
 								EffectService:ForBattle(
 									self.Battle,

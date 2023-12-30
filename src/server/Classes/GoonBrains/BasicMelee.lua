@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local Cooldown = require(ReplicatedStorage.Shared.Classes.Cooldown)
+local Damage = require(ServerScriptService.Server.Classes.Damage)
 local EffectEmission = require(ReplicatedStorage.Shared.Effects.EffectEmission)
 local EffectGoonModel = require(ReplicatedStorage.Shared.Effects.EffectGoonModel)
 local EffectService = require(ServerScriptService.Server.Services.EffectService)
@@ -67,7 +68,7 @@ function BasicMelee.SetUpStateMachine(self: BasicMelee)
 						self.Goon.Animator:Play(self.Goon.Def.Animations.Attack)
 
 						data.Promise = self.Goon:WhileAlive(Promise.delay(self.Goon:FromDef("AttackWindupTime") or 1):andThen(function()
-							self.Battle:Damage(self.Goon, target, self.Goon:FromDef("Damage"))
+							self.Battle:Damage(Damage.new(self.Goon, target, self.Goon:FromDef("Damage")))
 
 							EffectService:ForBattle(
 								self.Battle,

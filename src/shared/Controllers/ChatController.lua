@@ -4,6 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TextChatService = game:GetService("TextChatService")
 
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
+local ProductHelper = require(ReplicatedStorage.Shared.Util.ProductHelper)
 local TextColor = require(ReplicatedStorage.Shared.React.Util.TextColor)
 
 local ChatController = {
@@ -18,7 +19,7 @@ function ChatController.PrepareBlocking(_self: ChatController)
 
 		if message.TextSource then
 			local player = Players:GetPlayerByUserId(message.TextSource.UserId)
-			if player and player:GetAttribute("IsVip") then properties.PrefixText = TextColor("[VIP] ", ColorDefs.LightYellow) .. message.PrefixText end
+			if player and ProductHelper.IsVip(player) then properties.PrefixText = TextColor("[VIP] ", ColorDefs.LightYellow) .. message.PrefixText end
 		end
 
 		return properties

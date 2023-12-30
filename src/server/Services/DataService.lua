@@ -29,7 +29,7 @@ local DataService = {
 		Currency = {
 			Primary = 0,
 			Secondary = 0,
-			Premium = 0,
+			Premium = 10,
 			Prestige = 0,
 		},
 		PrestigePoints = {
@@ -98,6 +98,13 @@ function DataService.PrepareBlocking(self: DataService)
 			end,
 			function(oldData)
 				return Sift.Dictionary.set(oldData, "Options", self.DefaultData.Options)
+			end,
+			function(oldData)
+				return Sift.Dictionary.update(oldData, "Currency", function(currency)
+					return Sift.Dictionary.update(currency, "Premium", function(premium)
+						return premium + 10
+					end)
+				end)
 			end,
 		},
 	})

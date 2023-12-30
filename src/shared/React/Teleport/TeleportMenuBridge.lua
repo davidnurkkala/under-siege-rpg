@@ -50,12 +50,13 @@ return function()
 	return React.createElement(React.Fragment, nil, {
 		Prompt = worldBuying and React.createElement(PromptWindow, {
 			HeaderText = TextStroke("Buy World"),
-			Text = TextStroke(`Would you like to buy permanent access to {WorldDefs[worldBuying].Name}?`),
+			Text = TextStroke(`Would you like to unlock {WorldDefs[worldBuying].Name}?`),
 			Options = {
 				{
 					Text = TextStroke("Yes"),
 					Select = function()
 						setWorldBuying(nil)
+						menu.Unset("Teleport")
 						WorldController.WorldPurchaseRequested:Fire(worldBuying)
 					end,
 				},

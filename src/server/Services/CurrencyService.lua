@@ -8,6 +8,7 @@ local CurrencyHelper = require(ReplicatedStorage.Shared.Util.CurrencyHelper)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local EventStream = require(ReplicatedStorage.Shared.Util.EventStream)
 local Observers = require(ReplicatedStorage.Packages.Observers)
+local Promise = require(ReplicatedStorage.Packages.Promise)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 
 local CurrencyService = {
@@ -62,17 +63,14 @@ function CurrencyService.GetWallet(_self: CurrencyService, player: Player)
 end
 
 function CurrencyService.GetBoosted(self: CurrencyService, player: Player, currencyType: string, amount: number)
-	return BoostService:GetMultiplier(player, function(boost)
-		return (boost.Type == "Currency") and (boost.CurrencyType == currencyType)
+	return Promise.all({
+		BoostService:GetMultiplier(player, function(boost)
+			return (boost.Type == "Currency") and (boost.CurrencyType == currencyType)
+		end),
+		self.PrestigeService:GetBoost(player, currencyType),
+	}):andThen(function(results)
+		return amount * results[1] * results[2]
 	end)
-		:andThen(function(multiplier)
-			return self.PrestigeService:GetBoost(player, currencyType):andThen(function(prestigeMultiplier)
-				return multiplier * prestigeMultiplier
-			end)
-		end)
-		:andThen(function(multiplier)
-			return amount * multiplier
-		end)
 end
 
 function CurrencyService.AddCurrency(_self: CurrencyService, player: Player, currencyType: string, amount: number)

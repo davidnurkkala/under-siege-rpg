@@ -16,7 +16,7 @@ local Worlds = {
 		Order = 2,
 		ModelName = "World2",
 		LightingName = "World1",
-		Price = 250,
+		Price = 2500,
 		Position = Vector3.new(1000, 20, 1500),
 	},
 	World3 = {
@@ -24,15 +24,15 @@ local Worlds = {
 		Order = 3,
 		ModelName = "World3",
 		LightingName = "World1",
-		Price = 1000,
+		Price = 45000,
 		Position = Vector3.new(-1000, 0, 1500),
 	},
 	World4 = {
-		Name = "Orcish Highalnds",
+		Name = "Orcish Highlands",
 		Order = 4,
 		ModelName = "World4",
 		LightingName = "World1",
-		Price = 2500,
+		Price = 150000,
 		Position = Vector3.new(-1000, 0, -1500),
 	},
 }

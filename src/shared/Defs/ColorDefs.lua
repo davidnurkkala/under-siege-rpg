@@ -1,4 +1,9 @@
 local Colors = {
+	White = Color3.new(1, 1, 1),
+	Black = Color3.new(0, 0, 0),
+	Gray75 = Color3.new(0.75, 0.75, 0.75),
+	Gray50 = Color3.new(0.5, 0.5, 0.5),
+	Gray25 = Color3.new(0.25, 0.25, 0.25),
 	Red = Color3.fromHex("C41E3D"),
 	LightRed = Color3.fromHex("DE2B4C"),
 	DarkRed = Color3.fromHex("9F1931"),

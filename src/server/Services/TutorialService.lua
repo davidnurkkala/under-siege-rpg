@@ -115,46 +115,6 @@ local function tutorialCondition(player)
 				State = condition:getState(),
 			}
 		end),
-
-		-- beat elf world
-		HaveCurrency(player, "Primary", BattlerDefs.ElfKing.Power):withState(function(condition)
-			return {
-				Instruction = "TrainLongTerm",
-				State = condition:getState(),
-			}
-		end),
-		DefeatBattler(player, "ElfKing", 1):withState(function(condition)
-			return {
-				Instruction = "Battler",
-				State = condition:getState(),
-			}
-		end),
-		HaveCurrency(player, "Secondary", WorldDefs.World4.Price):withState(function(condition)
-			return {
-				Instruction = "Gold",
-				State = condition:getState(),
-			}
-		end),
-		BeInWorld(player, "World4"):withState(function(condition)
-			return {
-				Instruction = "Portal",
-				State = condition:getState(),
-			}
-		end),
-
-		-- beat orc world
-		HaveCurrency(player, "Primary", BattlerDefs.OrcGeneral.Power):withState(function(condition)
-			return {
-				Instruction = "TrainLongTerm",
-				State = condition:getState(),
-			}
-		end),
-		DefeatBattler(player, "OrcGeneral", 1):withState(function(condition)
-			return {
-				Instruction = "Battler",
-				State = condition:getState(),
-			}
-		end),
 	})
 end
 

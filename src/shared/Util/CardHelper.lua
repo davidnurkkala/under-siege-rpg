@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local AbilityHelper = require(ReplicatedStorage.Shared.Util.AbilityHelper)
 local CardDefs = require(ReplicatedStorage.Shared.Defs.CardDefs)
 local GoonDefs = require(ReplicatedStorage.Shared.Defs.GoonDefs)
+local GoonTagDefs = require(ReplicatedStorage.Shared.Defs.GoonTagDefs)
 local CardHelper = {}
 
 function CardHelper.GetDescription(id: string, count: number)
@@ -20,6 +21,14 @@ function CardHelper.GetDescription(id: string, count: number)
 		description ..= `\nRange: {get("Range") // 0.01} units`
 		description ..= `\nSpeed: {get("Speed") // 0.01} units/second`
 		description ..= `\nSize: {get("Size") // 0.01} units`
+
+		if goonDef.Tags then
+			description ..= `\n`
+			for _, tagId in goonDef.Tags do
+				local tagDef = GoonTagDefs[tagId]
+				description ..= `\n{tagDef.Name} - {tagDef.Description}`
+			end
+		end
 
 		return description
 	elseif cardDef.Type == "Ability" then

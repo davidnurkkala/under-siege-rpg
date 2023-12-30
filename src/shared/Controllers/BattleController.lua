@@ -36,12 +36,22 @@ function BattleController.RegisterCardPrompt(self: BattleController, callback): 
 	local connection, promise
 
 	connection = self.CardPromptInterface:Connect(function(...)
+		local args = { ... }
+		if args[1] == false then
+			active = false
+			if promise then promise:cancel() end
+		end
+
 		if not active then
 			active = true
-			promise = callback(...):andThen(function(result)
-				self.CardPromptInterface:Fire(result)
-				active = false
-			end)
+			promise = callback(...)
+				:andThen(function(result)
+					self.CardPromptInterface:Fire(result)
+					active = false
+				end)
+				:finally(function()
+					promise = nil
+				end)
 		else
 			active = false
 			promise:cancel()

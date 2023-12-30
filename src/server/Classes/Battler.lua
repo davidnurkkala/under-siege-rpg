@@ -4,6 +4,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
 local BattlerDefs = require(ReplicatedStorage.Shared.Defs.BattlerDefs)
 local Cooldown = require(ReplicatedStorage.Shared.Classes.Cooldown)
+local Damage = require(ServerScriptService.Server.Classes.Damage)
 local Deck = require(ServerScriptService.Server.Classes.Deck)
 local DeckPlayerRandom = require(ServerScriptService.Server.Classes.DeckPlayerRandom)
 local EffectBattlerCollapse = require(ReplicatedStorage.Shared.Effects.EffectBattlerCollapse)
@@ -156,6 +157,10 @@ function Battler.Is(object)
 	return getmetatable(object) == Battler
 end
 
+function Battler.HasTag(self: Battler, tagId: string)
+	return tagId == "Ranged"
+end
+
 function Battler.DefeatAnimation(self: Battler)
 	return Promise.try(function()
 		self.Animator:Play("GenericBattlerDie", 0)
@@ -290,7 +295,7 @@ function Battler.Attack(self: Battler)
 					Target = part,
 				})
 			):andThen(function()
-				battle:Damage(self, target, self.AttackDamage * if isCrit then 5 else 1)
+				battle:Damage(Damage.new(self, target, self.AttackDamage * if isCrit then 5 else 1))
 
 				EffectService:ForBattle(
 					self.Battle,

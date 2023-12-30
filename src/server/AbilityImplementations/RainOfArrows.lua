@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local Battler = require(ServerScriptService.Server.Classes.Battler)
+local Damage = require(ServerScriptService.Server.Classes.Damage)
 local EffectEmission = require(ReplicatedStorage.Shared.Effects.EffectEmission)
 local EffectProjectile = require(ReplicatedStorage.Shared.Effects.EffectProjectile)
 local EffectService = require(ServerScriptService.Server.Services.EffectService)
@@ -53,12 +54,12 @@ return function(def, level, battler, battle)
 					)
 				end)
 				:andThen(function()
-					local damage = def.Damage(level)
+					local amount = def.Damage(level)
 					if Battler.Is(target) then
-						damage *= 0.1
+						amount *= 0.1
 					end
 
-					battle:Damage(battler, target, damage)
+					battle:Damage(Damage.new(battler, target, amount))
 
 					EffectService:All(
 						EffectSound({

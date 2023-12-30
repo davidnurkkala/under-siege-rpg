@@ -13,7 +13,7 @@ local StartSize = UDim2.fromScale(0, 0)
 local EndSize = UDim2.fromScale(0.1, 0.05)
 
 return function(props: {
-	ImageProps: string,
+	ImageProps: any,
 	TextProps: any,
 	StartPosition: UDim2,
 	EndPosition: UDim2,
