@@ -40,6 +40,7 @@ function BattleController.RegisterCardPrompt(self: BattleController, callback): 
 		if args[1] == false then
 			active = false
 			if promise then promise:cancel() end
+			return
 		end
 
 		if not active then
