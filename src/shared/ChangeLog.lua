@@ -21,7 +21,7 @@ return {
 		{
 			"You now immediately teleport to a world when you buy it.",
 			"A lot of balancing of numbers -- rebirths are cheaper and more incremental. Pets are a little weaker, worlds are a lot more expensive, and battles generally give more gold. Changes might be a little drastic but the assumption now is that you will rebirth a few times before reaching the final world.",
-			"Reduced the range of all ranged soldiers by half (Mager, Hunter, and Elf Ranger).",
+			"Reduced the range of all ranged soldiers by half (Mage, Hunter, and Elf Ranger).",
 		},
 		"Fixed",
 		{

@@ -3,12 +3,12 @@
 - Added a WIP warning message. I am deeply sorry if you have invested a lot of time into the game before seeing this. I will consider giving some kind of reward to players who've shown a lot of dedication during this testing period.
 ### Tags
 - Soldiers now have "tags!" Tags are adjectives that describe general aspects that soldiers can have. They affect how they interact with other soldiers. The current tags are as follows:
-- 
+
 - Light - deals extra damage to Armored enemies.
 - Armored - takes significantly less damage from Ranged enemies.
 - Ranged - has a ranged attack and deals slightly more damage to Light enemies.
 - Evasive - has a chance to completely avoid damage from Ranged enemies.
-- 
+
 - Tags have been given to most of the soldiers in the game.
 # Changed
 - You now immediately teleport to a world when you buy it.
