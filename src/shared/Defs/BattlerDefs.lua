@@ -51,11 +51,10 @@ local Battlers = {
 		WeaponId = "WoodenBow",
 		Power = 100000,
 		Deck = {
-			Recruit = 8,
 			Footman = 2,
 			Hunter = 8,
-			Heal = 2,
-			Mob = 1,
+			Mob = 2,
+			Recruitment = 8,
 		},
 	},
 
