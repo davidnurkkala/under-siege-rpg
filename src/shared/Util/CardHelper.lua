@@ -43,8 +43,20 @@ function CardHelper.GetDescription(id: string, count: number)
 	end
 end
 
+function CardHelper.IsGoon(cardId: string)
+	return CardDefs[cardId].Type == "Goon"
+end
+
+function CardHelper.IsAbility(cardId: string)
+	return CardDefs[cardId].Type == "Ability"
+end
+
 function CardHelper.CountToLevel(count: number)
 	return math.floor(math.log(count, 2)) + 1
+end
+
+function CardHelper.LevelToCount(level: number)
+	return math.pow(2, level - 1)
 end
 
 function CardHelper.WasLevelUp(count: number)

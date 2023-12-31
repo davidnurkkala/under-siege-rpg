@@ -55,7 +55,7 @@ local Battlers = {
 			Footman = 2,
 			Hunter = 8,
 			Heal = 2,
-			RainOfArrows = 2,
+			Mob = 1,
 		},
 	},
 

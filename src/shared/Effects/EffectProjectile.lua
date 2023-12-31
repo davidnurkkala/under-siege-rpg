@@ -28,7 +28,11 @@ return function(args: {
 				return args.Start
 			end
 			else function()
-				return args.Start.CFrame
+				if args.Start then
+					return args.Start.CFrame
+				else
+					return CFrame.new()
+				end
 			end
 
 		local finish = if typeof(args.Finish) == "CFrame"
@@ -36,7 +40,11 @@ return function(args: {
 				return args.Finish
 			end
 			else function()
-				return args.Finish.CFrame
+				if args.Finish then
+					return args.Finish.CFrame
+				else
+					return CFrame.new()
+				end
 			end
 
 		local startRotation = Vector3.new(0, 0, 0)

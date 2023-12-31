@@ -244,7 +244,7 @@ function Battler.Attack(self: Battler)
 	local target = battle:TargetNearest({
 		Position = self.Position,
 		Range = math.huge,
-		Filter = battle:DefaultFilter(self.TeamId),
+		Filter = battle:EnemyFilter(self.TeamId),
 	})
 
 	if not target then return end

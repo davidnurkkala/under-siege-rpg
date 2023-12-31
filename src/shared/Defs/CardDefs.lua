@@ -73,6 +73,16 @@ local Cards = {
 		Type = "Ability",
 		Rank = 1,
 	},
+	Mob = {
+		AbilityId = "Mob",
+		Type = "Ability",
+		Rank = 1,
+	},
+	Recruitment = {
+		AbilityId = "Recruitment",
+		Type = "Ability",
+		Rank = 1,
+	},
 }
 
 return Sift.Dictionary.map(Cards, function(card, id)

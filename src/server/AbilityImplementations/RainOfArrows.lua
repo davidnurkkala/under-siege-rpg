@@ -14,17 +14,12 @@ local Sift = require(ReplicatedStorage.Packages.Sift)
 
 return function(def, level, battler, battle)
 	return Promise.delay(0.5):andThen(function()
-		local targets = battle:FilterTargets(battle:DefaultFilter(battler.TeamId))
+		local targets = battle:TargetCloseToFar({
+			Battler = battler,
+			Filter = battle:EnemyFilter(battler.TeamId),
+		})
 
 		if #targets == 0 then return end
-
-		targets = Sift.Array.sort(targets, function(a, b)
-			if battler.Position < 0.5 then
-				return a.Position < b.Position
-			else
-				return a.Position > b.Position
-			end
-		end)
 
 		local offset = Vector3.new(8 * if battler.Position < 0.5 then 1 else -1, 32, 0)
 		local index = 1

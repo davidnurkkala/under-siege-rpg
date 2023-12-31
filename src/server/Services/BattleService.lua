@@ -39,7 +39,8 @@ function BattleService.PromptCard(self: BattleService, player: Player, choices: 
 
 	return Promise.new(function(resolve, _, onCancel)
 		local connection
-		connection = self.CardPromptInterface:Connect(function(player, index)
+		connection = self.CardPromptInterface:Connect(function(respondingPlayer, index)
+			if respondingPlayer ~= player then return end
 			if not t.integer(index) then return end
 			resolve(choices[index])
 			connection:Disconnect()

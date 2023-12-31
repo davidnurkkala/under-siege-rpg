@@ -139,11 +139,13 @@ function Badger.sequence(conditionList: { Condition }): Condition
 
 			self.state.index = data.index
 
-			local condition = conditionList[self.state.index]
-			condition:load(data.conditionData)
+			if data.conditionData then
+				local condition = conditionList[self.state.index]
+				condition:load(data.conditionData)
 
-			if condition:isComplete() then
-				self.state.index += 1
+				if condition:isComplete() then
+					self.state.index += 1
+				end
 			end
 		end,
 		getFilter = function()

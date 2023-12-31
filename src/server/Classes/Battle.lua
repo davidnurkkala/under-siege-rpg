@@ -64,6 +64,7 @@ export type Battle = typeof(setmetatable(
 		State: "Active" | "Ended",
 		CritEnabled: boolean,
 		Timer: number,
+		CardPlayers: any,
 	},
 	Battle
 ))
@@ -95,6 +96,7 @@ function Battle.new(args: {
 		State = "Active",
 		CritEnabled = Default(args.CritEnabled, true),
 		Timer = 0,
+		CardPlayed = Signal.new(),
 	}, Battle)
 
 	for _, entry in { { self.Battlers[1], self.Model.Spawns.Left }, { self.Battlers[2], self.Model.Spawns.Right } } do
@@ -270,14 +272,10 @@ function Battle.PlayCard(self: Battle, battler: Battler.Battler, cardId: string,
 
 	local level = CardHelper.CountToLevel(cardCount)
 
-	BattleService.CardPlayed:FireFor(BattleService:GetPlayersFromBattle(self), {
-		Position = battler.Position,
-		CardId = cardId,
-		CardCount = cardCount,
-	})
+	local retVal
 
 	if card.Type == "Goon" then
-		return Promise.resolve(Goon.fromId({
+		retVal = Promise.resolve(Goon.fromId({
 			Id = card.GoonId,
 			Battle = self,
 			Battler = battler,
@@ -288,10 +286,20 @@ function Battle.PlayCard(self: Battle, battler: Battler.Battler, cardId: string,
 		}))
 	elseif card.Type == "Ability" then
 		local activate = AbilityHelper.GetImplementation(card.AbilityId)
-		return activate(level, battler, self)
+		retVal = activate(level, battler, self)
 	else
 		error(`Unimplemented card type {card.Type}`)
 	end
+
+	self.CardPlayed:Fire(battler, cardId, cardCount)
+
+	BattleService.CardPlayed:FireFor(BattleService:GetPlayersFromBattle(self), {
+		Position = battler.Position,
+		CardId = cardId,
+		CardCount = cardCount,
+	})
+
+	return retVal
 end
 
 function Battle.Update(self: Battle, dt: number)
@@ -345,7 +353,7 @@ function Battle.GetVictor(self: Battle): Battler.Battler?
 	return active
 end
 
-function Battle.DefaultFilter(_self: Battle, teamId: string)
+function Battle.EnemyFilter(_self: Battle, teamId: string)
 	return function(object: BattleTarget)
 		return object.TeamId ~= teamId
 	end
@@ -369,6 +377,42 @@ end
 
 function Battle.FilterTargets(self: Battle, filter: (BattleTarget) -> boolean)
 	return Sift.Array.filter(Sift.Array.concat(Sift.Dictionary.keys(self.Field), self.Battlers), filter)
+end
+
+function Battle.TargetFarToClose(
+	self: Battle,
+	args: {
+		Battler: Battler.Battler,
+		Filter: (BattleTarget) -> boolean,
+	}
+)
+	local compare = if args.Battler.Position < 0.5
+		then function(a, b)
+			return a.Position > b.Position
+		end
+		else function(a, b)
+			return a.Position < b.Position
+		end
+
+	return Sift.Array.sort(self:FilterTargets(args.Filter), compare)
+end
+
+function Battle.TargetCloseToFar(
+	self: Battle,
+	args: {
+		Battler: Battler.Battler,
+		Filter: (BattleTarget) -> boolean,
+	}
+)
+	local compare = if args.Battler.Position < 0.5
+		then function(a, b)
+			return a.Position < b.Position
+		end
+		else function(a, b)
+			return a.Position > b.Position
+		end
+
+	return Sift.Array.sort(self:FilterTargets(args.Filter), compare)
 end
 
 function Battle.TargetNearest(

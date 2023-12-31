@@ -194,7 +194,7 @@ function BasicRanged.GetTarget(self: BasicRanged)
 	return self.Battle:TargetNearest({
 		Position = self.Goon.Position,
 		Range = self.Goon:FromDef("Range"),
-		Filter = self.Battle:DefaultFilter(self.Goon.TeamId),
+		Filter = self.Battle:EnemyFilter(self.Goon.TeamId),
 	})
 end
 
