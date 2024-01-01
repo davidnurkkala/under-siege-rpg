@@ -25,7 +25,7 @@ function Animator.new(controller: Animatable): Animator
 	return self
 end
 
-function Animator.Play(self: Animator, name: string, ...)
+function Animator.Play(self: Animator, name: string, fadeTime, weight, speed, looping)
 	if not self.Tracks[name] then
 		local animation = AnimationDefs[name]
 		assert(animation, `Could not find animation {name}`)
@@ -33,11 +33,14 @@ function Animator.Play(self: Animator, name: string, ...)
 		self.Tracks[name] = self.Controller:LoadAnimation(animation)
 	end
 
-	if self.Tracks[name].IsPlaying then return self.Tracks[name] end
+	local track = self.Tracks[name] :: AnimationTrack
+	if looping ~= nil then track.Looped = looping end
 
-	self.Tracks[name]:Play(...)
+	if track.IsPlaying then return track end
 
-	return self.Tracks[name]
+	track:Play(fadeTime, weight, speed)
+
+	return track
 end
 
 function Animator.Stop(self: Animator, name: string, ...)
