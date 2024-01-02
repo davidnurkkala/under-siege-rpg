@@ -251,7 +251,11 @@ function Encounter.Update(self: Encounter, dt: number)
 				Promise.try(function()
 					local target = self.Target :: Player
 					local session = LobbySessions.Get(target)
-					self:BeBlocked(session)
+					if session.AttackCooldown:IsReady() then
+						self:BeBlocked(session)
+					else
+						session:BeStunned()
+					end
 				end):catch(warn)
 				self.AttackRest = 3
 			end

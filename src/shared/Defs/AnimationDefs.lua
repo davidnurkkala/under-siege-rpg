@@ -67,6 +67,7 @@ local Ids = {
 
 	Prestige = 15683543486,
 	Block = 15818501059,
+	Dizzy = 15828173646,
 }
 
 return Sift.Dictionary.map(Ids, function(id, name)

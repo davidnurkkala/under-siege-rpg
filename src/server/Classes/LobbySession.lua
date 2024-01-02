@@ -42,6 +42,7 @@ type LobbySession = typeof(setmetatable(
 		WeaponDef: any,
 		AttackCooldown: Cooldown.Cooldown,
 		Attacks: any,
+		Stunned: boolean,
 	},
 	LobbySession
 ))
@@ -69,6 +70,7 @@ function LobbySession.new(args: {
 		WeaponDef = args.WeaponDef,
 		AttackCooldown = Cooldown.new(args.WeaponDef.AttackCooldownTime),
 		Attacks = {},
+		Stunned = false,
 	}, LobbySession)
 
 	self.Animator:Play(self.WeaponDef.Animations.Idle)
@@ -182,6 +184,8 @@ function LobbySession.promised(player: Player)
 		end)
 	end, function() end)
 end
+
+function LobbySession.BeStunned(self: LobbySession) end
 
 function LobbySession.SetWeapon(self: LobbySession, weaponDef)
 	return Promise.try(function()
