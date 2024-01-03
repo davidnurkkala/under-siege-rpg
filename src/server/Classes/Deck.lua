@@ -5,13 +5,10 @@ local Sift = require(ReplicatedStorage.Packages.Sift)
 local Deck = {}
 Deck.__index = Deck
 
-export type Deck = typeof(setmetatable(
-	{} :: {
-		Cards: { [string]: number },
-		DrawPile: { string },
-	},
-	Deck
-))
+export type Deck = typeof(setmetatable({} :: {
+	Cards: { [string]: number },
+	DrawPile: { string },
+}, Deck))
 
 function Deck.new(cards: { [string]: number }): Deck
 	local self = setmetatable({

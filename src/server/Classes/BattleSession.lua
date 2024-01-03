@@ -21,15 +21,12 @@ local WeaponService = require(ServerScriptService.Server.Services.WeaponService)
 local BattleSession = {}
 BattleSession.__index = BattleSession
 
-export type BattleSession = typeof(setmetatable(
-	{} :: {
-		Player: Player,
-		Battler: Battler.Battler,
-		Animator: any,
-		Model: Model,
-	},
-	BattleSession
-))
+export type BattleSession = typeof(setmetatable({} :: {
+	Player: Player,
+	Battler: Battler.Battler,
+	Animator: any,
+	Model: Model,
+}, BattleSession))
 
 function BattleSession.new(args: {
 	Player: Player,

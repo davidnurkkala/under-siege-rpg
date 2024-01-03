@@ -9,6 +9,7 @@ local EffectSound = require(ReplicatedStorage.Shared.Effects.EffectSound)
 local EncounterHelper = require(ReplicatedStorage.Shared.Util.EncounterHelper)
 local GoonDefs = require(ReplicatedStorage.Shared.Defs.GoonDefs)
 local LobbySessions = require(ServerScriptService.Server.Singletons.LobbySessions)
+local PickRandom = require(ReplicatedStorage.Shared.Util.PickRandom)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local Trove = require(ReplicatedStorage.Packages.Trove)
@@ -250,11 +251,25 @@ function Encounter.Update(self: Encounter, dt: number)
 			if self.AttackWindup <= 0 then
 				Promise.try(function()
 					local target = self.Target :: Player
+					local root = target.Character.PrimaryPart :: BasePart
 					local session = LobbySessions.Get(target)
+
 					if session.AttackCooldown:IsReady() then
 						self:BeBlocked(session)
 					else
 						session:BeStunned()
+
+						EffectService:All(
+							EffectSound({
+								SoundId = PickRandom(self.GoonDef.Sounds.Hit),
+								Target = root,
+							}),
+							EffectEmission({
+								Emitter = ReplicatedStorage.Assets.Emitters.Impact1,
+								ParticleCount = 2,
+								Target = root,
+							})
+						)
 					end
 				end):catch(warn)
 				self.AttackRest = 3

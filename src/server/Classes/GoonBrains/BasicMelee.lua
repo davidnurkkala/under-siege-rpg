@@ -14,15 +14,12 @@ local StateMachine = require(ServerScriptService.Server.Classes.StateMachine)
 local BasicMelee = {}
 BasicMelee.__index = BasicMelee
 
-export type BasicMelee = typeof(setmetatable(
-	{} :: {
-		Goon: any,
-		Battle: any,
-		StateMachine: any,
-		AttackCooldown: any,
-	},
-	BasicMelee
-))
+export type BasicMelee = typeof(setmetatable({} :: {
+	Goon: any,
+	Battle: any,
+	StateMachine: any,
+	AttackCooldown: any,
+}, BasicMelee))
 
 function BasicMelee.new(): BasicMelee
 	local self: BasicMelee = setmetatable({}, BasicMelee)

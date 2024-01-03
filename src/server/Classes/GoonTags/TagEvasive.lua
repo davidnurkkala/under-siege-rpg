@@ -4,12 +4,9 @@ local Goon = require(ServerScriptService.Server.Classes.Goon)
 local TagEvasive = {}
 TagEvasive.__index = TagEvasive
 
-export type TagEvasive = typeof(setmetatable(
-	{} :: {
-		Connection: any,
-	},
-	TagEvasive
-))
+export type TagEvasive = typeof(setmetatable({} :: {
+	Connection: any,
+}, TagEvasive))
 
 function TagEvasive.new(goon): TagEvasive
 	local self: TagEvasive = setmetatable({}, TagEvasive)

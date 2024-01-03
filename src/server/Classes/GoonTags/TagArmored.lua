@@ -5,12 +5,9 @@ local Goon = require(ServerScriptService.Server.Classes.Goon)
 local TagArmored = {}
 TagArmored.__index = TagArmored
 
-export type TagArmored = typeof(setmetatable(
-	{} :: {
-		Connection: any,
-	},
-	TagArmored
-))
+export type TagArmored = typeof(setmetatable({} :: {
+	Connection: any,
+}, TagArmored))
 
 function TagArmored.new(goon): TagArmored
 	local self: TagArmored = setmetatable({}, TagArmored)

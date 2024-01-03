@@ -6,15 +6,12 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 local Pet = {}
 Pet.__index = Pet
 
-export type Pet = typeof(setmetatable(
-	{} :: {
-		Model: Model,
-		Animator: Animator,
-		Trove: any,
-		Def: any,
-	},
-	Pet
-))
+export type Pet = typeof(setmetatable({} :: {
+	Model: Model,
+	Animator: Animator,
+	Trove: any,
+	Def: any,
+}, Pet))
 
 function Pet.new(petId: string, root: BasePart, human: Humanoid, cframe: CFrame): Pet
 	local petDef = PetDefs[petId]

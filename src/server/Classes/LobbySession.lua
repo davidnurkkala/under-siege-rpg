@@ -8,6 +8,7 @@ local Cooldown = require(ReplicatedStorage.Shared.Classes.Cooldown)
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
 local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local DataService = require(ServerScriptService.Server.Services.DataService)
+local EffectDizzy = require(ReplicatedStorage.Shared.Effects.EffectDizzy)
 local EffectFaceTarget = require(ReplicatedStorage.Shared.Effects.EffectFaceTarget)
 local EffectProjectile = require(ReplicatedStorage.Shared.Effects.EffectProjectile)
 local EffectService = require(ServerScriptService.Server.Services.EffectService)
@@ -42,7 +43,7 @@ type LobbySession = typeof(setmetatable(
 		WeaponDef: any,
 		AttackCooldown: Cooldown.Cooldown,
 		Attacks: any,
-		Stunned: boolean,
+		ActiveStun: any,
 	},
 	LobbySession
 ))
@@ -70,7 +71,7 @@ function LobbySession.new(args: {
 		WeaponDef = args.WeaponDef,
 		AttackCooldown = Cooldown.new(args.WeaponDef.AttackCooldownTime),
 		Attacks = {},
-		Stunned = false,
+		ActiveStun = nil,
 	}, LobbySession)
 
 	self.Animator:Play(self.WeaponDef.Animations.Idle)
@@ -185,7 +186,24 @@ function LobbySession.promised(player: Player)
 	end, function() end)
 end
 
-function LobbySession.BeStunned(self: LobbySession) end
+function LobbySession.BeStunned(self: LobbySession)
+	if self.ActiveStun then self.ActiveStun:cancel() end
+
+	EffectService:All(EffectDizzy({
+		Head = self.Character:FindFirstChild("Head") :: BasePart,
+		Duration = 3,
+	}))
+
+	self.Animator:Play("Dizzy", 0)
+	self.ActiveStun = Promise.delay(3):finally(function()
+		self.Animator:StopHard("Dizzy")
+		self.ActiveStun = nil
+	end)
+end
+
+function LobbySession.IsStunned(self: LobbySession)
+	return self.ActiveStun ~= nil
+end
 
 function LobbySession.SetWeapon(self: LobbySession, weaponDef)
 	return Promise.try(function()
@@ -230,6 +248,8 @@ function LobbySession.GetClosestDummy(self: LobbySession)
 end
 
 function LobbySession.Attack(self: LobbySession)
+	if self:IsStunned() then return end
+
 	if not self.AttackCooldown:IsReady() then return end
 	self.AttackCooldown:Use()
 

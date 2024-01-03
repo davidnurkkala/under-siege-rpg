@@ -10,14 +10,11 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 local DeckPlayerPlayer = {}
 DeckPlayerPlayer.__index = DeckPlayerPlayer
 
-export type DeckPlayerPlayer = typeof(setmetatable(
-	{} :: {
-		Deck: any,
-		Player: Player,
-		Trove: any,
-	},
-	DeckPlayerPlayer
-))
+export type DeckPlayerPlayer = typeof(setmetatable({} :: {
+	Deck: any,
+	Player: Player,
+	Trove: any,
+}, DeckPlayerPlayer))
 
 function DeckPlayerPlayer.new(deck: any, player: Player): DeckPlayerPlayer
 	local self: DeckPlayerPlayer = setmetatable({

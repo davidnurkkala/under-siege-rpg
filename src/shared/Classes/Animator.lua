@@ -8,13 +8,10 @@ Animator.__index = Animator
 
 type Animatable = Humanoid | AnimationController
 
-export type Animator = typeof(setmetatable(
-	{} :: {
-		Controller: any,
-		Tracks: { [string]: AnimationTrack },
-	},
-	Animator
-))
+export type Animator = typeof(setmetatable({} :: {
+	Controller: any,
+	Tracks: { [string]: AnimationTrack },
+}, Animator))
 
 function Animator.new(controller: Animatable): Animator
 	local self: Animator = setmetatable({

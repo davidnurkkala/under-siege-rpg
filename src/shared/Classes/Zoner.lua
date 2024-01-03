@@ -7,12 +7,9 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 local Zoner = {}
 Zoner.__index = Zoner
 
-export type Zoner = typeof(setmetatable(
-	{} :: {
-		Trove: any,
-	},
-	Zoner
-))
+export type Zoner = typeof(setmetatable({} :: {
+	Trove: any,
+}, Zoner))
 
 local function inZone(root, zone)
 	local delta = zone.Position - root.Position
