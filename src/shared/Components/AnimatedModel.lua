@@ -6,12 +6,9 @@ local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
 local AnimatedModel = {}
 AnimatedModel.__index = AnimatedModel
 
-export type AnimatedModel = typeof(setmetatable(
-	{} :: {
-		Animator: Animator.Animator,
-	},
-	AnimatedModel
-))
+export type AnimatedModel = typeof(setmetatable({} :: {
+	Animator: Animator.Animator,
+}, AnimatedModel))
 
 function AnimatedModel.new(model: Model): AnimatedModel
 	local animator = model:FindFirstChildWhichIsA("AnimationController") or model:FindFirstChildWhichIsA("Humanoid")

@@ -9,15 +9,12 @@ end
 local Property = {}
 Property.__index = Property
 
-export type Property = typeof(setmetatable(
-	{} :: {
-		Value: any,
-		Compare: (any, any) -> boolean,
-		Changed: any,
-		CleanUps: { [any]: boolean },
-	},
-	Property
-))
+export type Property = typeof(setmetatable({} :: {
+	Value: any,
+	Compare: (any, any) -> boolean,
+	Changed: any,
+	CleanUps: { [any]: boolean },
+}, Property))
 
 function Property.new(value: any, compare: ((any, any) -> boolean)?): Property
 	local self: Property = setmetatable({

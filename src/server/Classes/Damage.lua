@@ -5,16 +5,13 @@ local TextColor = require(ReplicatedStorage.Shared.React.Util.TextColor)
 local Damage = {}
 Damage.__index = Damage
 
-export type Damage = typeof(setmetatable(
-	{} :: {
-		Source: any,
-		Target: any,
-		Amount: number,
-		AmountOriginal: number,
-		Text: string?,
-	},
-	Damage
-))
+export type Damage = typeof(setmetatable({} :: {
+	Source: any,
+	Target: any,
+	Amount: number,
+	AmountOriginal: number,
+	Text: string?,
+}, Damage))
 
 function Damage.new(source, target, amount): Damage
 	local self: Damage = setmetatable({

@@ -7,9 +7,12 @@ local Sift = require(ReplicatedStorage.Packages.Sift)
 local DeckPlayerRandom = {}
 DeckPlayerRandom.__index = DeckPlayerRandom
 
-export type DeckPlayerRandom = typeof(setmetatable({} :: {
-	Deck: any,
-}, DeckPlayerRandom))
+export type DeckPlayerRandom = typeof(setmetatable(
+	{} :: {
+		Deck: any,
+	},
+	DeckPlayerRandom
+))
 
 function DeckPlayerRandom.new(deck: any): DeckPlayerRandom
 	local self: DeckPlayerRandom = setmetatable({
@@ -20,9 +23,19 @@ function DeckPlayerRandom.new(deck: any): DeckPlayerRandom
 end
 
 function DeckPlayerRandom.ChooseCard(self: DeckPlayerRandom)
-	return Promise.resolve(Sift.Array.first(Sift.Array.shuffle(Sift.Array.map(Range(3), function()
-		return self.Deck:Draw()
-	end))))
+	self.Deck:Tick()
+
+	local choices = self.Deck:Draw(3)
+
+	return Promise.try(function()
+		for _, choice in choices do
+			if choice.Id ~= "Nothing" then return choice end
+		end
+
+		return choices[1]
+	end):andThen(function(choice)
+		return self.Deck:Use(choice)
+	end)
 end
 
 function DeckPlayerRandom.Destroy(self: DeckPlayerRandom) end

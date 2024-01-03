@@ -30,6 +30,7 @@ local Sift = require(ReplicatedStorage.Packages.Sift)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 local Trove = require(ReplicatedStorage.Packages.Trove)
+local GoonHealthBar = require(ReplicatedStorage.Shared.React.Battle.GoonHealthBar)
 local TryNow = require(ReplicatedStorage.Shared.Util.TryNow)
 local UseMotor = require(ReplicatedStorage.Shared.React.Hooks.UseMotor)
 local UseOption = require(ReplicatedStorage.Shared.React.Hooks.UseOption)
@@ -80,25 +81,10 @@ local function goonHealthBar(props: {
 
 	if percent <= 0 then return end
 
-	return React.createElement("BillboardGui", {
-		Size = UDim2.fromScale(6, 2),
+	return React.createElement(GoonHealthBar, {
 		Adornee = props.GoonModel.OverheadPoint,
-	}, {
-		Level = React.createElement(Label, {
-			Size = UDim2.fromScale(1, 1),
-			SizeConstraint = Enum.SizeConstraint.RelativeYY,
-			Text = TextStroke(level),
-		}),
-		HealthBar = React.createElement(Container, {
-			Size = UDim2.fromScale(0.7, 0.25),
-			Position = UDim2.fromScale(0.3, 0.5),
-			AnchorPoint = Vector2.new(0, 0.5),
-		}, {
-			HealthBar = React.createElement(HealthBar, {
-				Alignment = Enum.HorizontalAlignment.Left,
-				Percent = percent,
-			}),
-		}),
+		Level = level,
+		Percent = percent,
 	})
 end
 

@@ -5,13 +5,10 @@ local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
 local PetGrinder = {}
 PetGrinder.__index = PetGrinder
 
-export type PetGrinder = typeof(setmetatable(
-	{} :: {
-		Animator: Animator.Animator,
-		Root: BasePart,
-	},
-	PetGrinder
-))
+export type PetGrinder = typeof(setmetatable({} :: {
+	Animator: Animator.Animator,
+	Root: BasePart,
+}, PetGrinder))
 
 function PetGrinder.new(model): PetGrinder
 	local animator = Animator.new(model:FindFirstChild("AnimationController"))

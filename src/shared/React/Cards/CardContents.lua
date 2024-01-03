@@ -79,13 +79,33 @@ return function(props: {
 				Image = AbilityHelper.GetAbility(cardDef.AbilityId).Image,
 			}),
 
-			Level = (props.CardCount ~= nil) and React.createElement(Label, {
+			Level = (props.CardId ~= "Nothing") and (props.CardCount ~= nil) and React.createElement(Label, {
 				ZIndex = 4,
 				Size = UDim2.fromScale(1, 0.25),
 				TextXAlignment = Enum.TextXAlignment.Right,
 				AnchorPoint = Vector2.new(1, 1),
 				Position = UDim2.fromScale(1, 1),
 				Text = TextStroke(`Lv. {CardHelper.CountToLevel(props.CardCount)}\n({props.CardCount}/{CardHelper.GetNextUpgrade(props.CardCount)})`),
+			}),
+
+			Cooldown = (props.CardId ~= "Nothing") and React.createElement(Container, {
+				ZIndex = 4,
+				Size = UDim2.fromScale(0.25, 0.25),
+				SizeConstraint = Enum.SizeConstraint.RelativeYY,
+				AnchorPoint = Vector2.new(0, 1),
+				Position = UDim2.fromScale(0, 1),
+			}, {
+				Icon = React.createElement(Image, {
+					Image = "rbxassetid://15860100491",
+				}),
+
+				Text = React.createElement(Label, {
+					Size = UDim2.fromScale(0.5, 0.5),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Position = UDim2.fromScale(0.5, 0.5),
+					Text = TextStroke(cardDef.Cooldown),
+					ZIndex = 4,
+				}),
 			}),
 		}),
 

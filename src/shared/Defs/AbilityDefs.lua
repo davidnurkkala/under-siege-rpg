@@ -1,4 +1,13 @@
 local Abilities = {
+	Nothing = {
+		Name = "Nothing",
+		Image = "",
+		Summary = "Out of cards!",
+		Description = function()
+			return ""
+		end,
+	},
+
 	Heal = {
 		Name = "Heal",
 		Image = "rbxassetid://15582200046",

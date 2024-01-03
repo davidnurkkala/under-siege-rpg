@@ -13,14 +13,11 @@ type Observer = {
 	Disconnected: boolean,
 }
 
-export type SaveFile = typeof(setmetatable(
-	{} :: {
-		Document: any,
-		Observers: { [string]: { [Observer]: boolean } },
-		Destroyed: boolean,
-	},
-	SaveFile
-))
+export type SaveFile = typeof(setmetatable({} :: {
+	Document: any,
+	Observers: { [string]: { [Observer]: boolean } },
+	Destroyed: boolean,
+}, SaveFile))
 
 function SaveFile.new(document): SaveFile
 	local self: SaveFile = setmetatable({
