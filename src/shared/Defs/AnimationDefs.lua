@@ -11,6 +11,8 @@ local Ids = {
 	JavelinThrow = 15330799715,
 	WandIdle = 15331170210,
 	WandShoot = 15330801847,
+	BookIdle = 15861515795,
+	BookShoot = 15861496585,
 
 	GenericGoonDie = 15152357009,
 	GenericGoon1hMelee = 15340578529,
