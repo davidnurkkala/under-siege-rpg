@@ -10,11 +10,14 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 local DeckPlayerPlayer = {}
 DeckPlayerPlayer.__index = DeckPlayerPlayer
 
-export type DeckPlayerPlayer = typeof(setmetatable({} :: {
-	Deck: any,
-	Player: Player,
-	Trove: any,
-}, DeckPlayerPlayer))
+export type DeckPlayerPlayer = typeof(setmetatable(
+	{} :: {
+		Deck: any,
+		Player: Player,
+		Trove: any,
+	},
+	DeckPlayerPlayer
+))
 
 function DeckPlayerPlayer.new(deck: any, player: Player): DeckPlayerPlayer
 	local self: DeckPlayerPlayer = setmetatable({
@@ -27,19 +30,31 @@ function DeckPlayerPlayer.new(deck: any, player: Player): DeckPlayerPlayer
 end
 
 function DeckPlayerPlayer.ChooseCard(self: DeckPlayerPlayer)
-	local choices = Sift.Array.shuffle(Sift.Array.map(Range(3), function()
-		return self.Deck:Draw()
-	end))
+	self.Deck:Tick()
 
-	return self.Trove:AddPromise(OptionsService:GetOption(self.Player, "AutoPlayCards"):andThen(function(autoPlay)
-		if autoPlay then
-			return choices[1]
-		else
-			return BattleService:PromptCard(self.Player, choices):timeout(4):catch(function()
-				return choices[1]
-			end)
+	local choices = self.Deck:Draw(3)
+
+	local function getAutoPick()
+		for _, choice in choices do
+			if choice.Id ~= "Nothing" then return choice end
 		end
-	end))
+
+		return choices[1]
+	end
+
+	return self.Trove:AddPromise(OptionsService:GetOption(self.Player, "AutoPlayCards")
+		:andThen(function(autoPlay)
+			if autoPlay then
+				return getAutoPick()
+			else
+				return BattleService:PromptCard(self.Player, choices):timeout(4):catch(function()
+					return getAutoPick()
+				end)
+			end
+		end)
+		:andThen(function(choice)
+			return self.Deck:Use(choice)
+		end))
 end
 
 function DeckPlayerPlayer.Destroy(self: DeckPlayerPlayer)

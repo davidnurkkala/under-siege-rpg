@@ -8,7 +8,7 @@ local Sift = require(ReplicatedStorage.Packages.Sift)
 return function(def, level, battler, battle)
 	return Promise.all(Sift.Array.map(Range(2), function(number)
 		return Promise.delay(number - 1):andThen(function()
-			battle:PlayCard(battler, "Peasant", CardHelper.LevelToCount(level))
+			battle:PlayCard(battler, "Peasant", CardHelper.LevelToCount(level), true)
 		end)
 	end))
 end

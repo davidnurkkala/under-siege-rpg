@@ -13,6 +13,7 @@ local Cooldown = require(ReplicatedStorage.Shared.Classes.Cooldown)
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
 local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local Damage = require(ServerScriptService.Server.Classes.Damage)
+local Deck = require(ServerScriptService.Server.Classes.Deck)
 local Default = require(ReplicatedStorage.Shared.Util.Default)
 local EventStream = require(ReplicatedStorage.Shared.Util.EventStream)
 local Goon = require(ServerScriptService.Server.Classes.Goon)
@@ -243,28 +244,32 @@ function Battle.Remove(self: Battle, object: Fieldable)
 end
 
 function Battle.DeployStartingGoons(self: Battle, battler: Battler.Battler)
-	local cards = battler.DeckPlayer.Deck.Cards
-	local goonCardIds = Sift.Array.shuffle(Sift.Array.filter(Sift.Dictionary.keys(cards), function(cardId)
+	local realDeck = battler.DeckPlayer.Deck
+
+	local goonCards = Sift.Dictionary.filter(realDeck.Cards, function(_, cardId)
 		return CardDefs[cardId].Type == "Goon"
-	end))
-	if #goonCardIds == 0 then return end
+	end)
+	if Sift.Dictionary.count(goonCards) == 0 then return end
 
-	local index = 1
-	for number = 1, 3 do
-		local cardId = goonCardIds[index]
+	local goonDeck = Deck.new(goonCards)
 
-		index += 1
-		if index > #goonCardIds then index = 1 end
+	for count = 1, 3 do
+		goonDeck:Tick()
+		realDeck:Tick()
 
-		Promise.delay(number * 0.75):andThen(function()
+		local choice = goonDeck:Draw(3)[1]
+		goonDeck:Use(choice)
+		realDeck:Use(choice)
+
+		Promise.delay(count * 0.75):andThen(function()
 			if self.State ~= "Active" then return end
 
-			self:PlayCard(battler, cardId, cards[cardId])
+			self:PlayCard(battler, choice.Id, choice.Count)
 		end)
 	end
 end
 
-function Battle.PlayCard(self: Battle, battler: Battler.Battler, cardId: string, cardCount: number)
+function Battle.PlayCard(self: Battle, battler: Battler.Battler, cardId: string, cardCount: number, notificationDisabled: boolean?)
 	if not cardId then return end
 
 	local card = CardDefs[cardId]
@@ -293,11 +298,13 @@ function Battle.PlayCard(self: Battle, battler: Battler.Battler, cardId: string,
 
 	self.CardPlayed:Fire(battler, cardId, cardCount)
 
-	BattleService.CardPlayed:FireFor(BattleService:GetPlayersFromBattle(self), {
-		Position = battler.Position,
-		CardId = cardId,
-		CardCount = cardCount,
-	})
+	if not notificationDisabled then
+		BattleService.CardPlayed:FireFor(BattleService:GetPlayersFromBattle(self), {
+			Position = battler.Position,
+			CardId = cardId,
+			CardCount = cardCount,
+		})
+	end
 
 	return retVal
 end
