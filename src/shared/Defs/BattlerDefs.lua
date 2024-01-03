@@ -123,8 +123,8 @@ local Battlers = {
 	-- world 3
 	ElfCommoner = {
 		Name = "Elf Commoner",
-		BattlegroundName = "World2",
-		BaseName = "Tower",
+		BattlegroundName = "World3",
+		BaseName = "ElfBase",
 		Reward = 750,
 		WeaponId = "ElvenBow",
 		Power = 1000000,
@@ -137,8 +137,8 @@ local Battlers = {
 	},
 	ElfHunter = {
 		Name = "Elf Hunter",
-		BattlegroundName = "World2",
-		BaseName = "Tower",
+		BattlegroundName = "World3",
+		BaseName = "ElfBase",
 		Reward = 1000,
 		WeaponId = "ElvenBow",
 		Power = 2000000,
@@ -150,8 +150,8 @@ local Battlers = {
 	},
 	ElfWarrior = {
 		Name = "Elf Warrior",
-		BattlegroundName = "World2",
-		BaseName = "Tower",
+		BattlegroundName = "World3",
+		BaseName = "ElfBase",
 		Reward = 1300,
 		WeaponId = "ElvenBow",
 		Power = 4000000,
@@ -163,8 +163,8 @@ local Battlers = {
 	},
 	ElfKing = {
 		Name = "Elf King",
-		BattlegroundName = "World2",
-		BaseName = "Tower",
+		BattlegroundName = "World3",
+		BaseName = "ElfBase",
 		Reward = 1750,
 		WeaponId = "ElvenBow",
 		Power = 10000000,
@@ -179,7 +179,7 @@ local Battlers = {
 	-- world 4
 	OrcGrunt = {
 		Name = "Orc Grunt",
-		BattlegroundName = "World3",
+		BattlegroundName = "World4",
 		BaseName = "VikingBase",
 		Reward = 2000,
 		WeaponId = "WoodenBow",
@@ -192,7 +192,7 @@ local Battlers = {
 	},
 	OrcBrute = {
 		Name = "Orc Brute",
-		BattlegroundName = "World3",
+		BattlegroundName = "World4",
 		BaseName = "VikingBase",
 		Reward = 2500,
 		WeaponId = "WoodenBow",
@@ -206,7 +206,7 @@ local Battlers = {
 	},
 	OrcFighter = {
 		Name = "Orc Fighter",
-		BattlegroundName = "World3",
+		BattlegroundName = "World4",
 		BaseName = "VikingBase",
 		Reward = 3250,
 		WeaponId = "Javelin",
@@ -220,7 +220,7 @@ local Battlers = {
 	},
 	OrcGeneral = {
 		Name = "Orc General",
-		BattlegroundName = "World3",
+		BattlegroundName = "World4",
 		BaseName = "VikingBase",
 		Reward = 4500,
 		WeaponId = "Javelin",
