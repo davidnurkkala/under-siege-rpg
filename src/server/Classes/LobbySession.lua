@@ -44,6 +44,7 @@ type LobbySession = typeof(setmetatable(
 		AttackCooldown: Cooldown.Cooldown,
 		Attacks: any,
 		ActiveStun: any,
+		Human: Humanoid,
 	},
 	LobbySession
 ))
@@ -66,6 +67,7 @@ function LobbySession.new(args: {
 		Player = args.Player,
 		Trove = trove,
 		Character = args.Character,
+		Human = args.Human,
 		Model = model,
 		Animator = animator,
 		WeaponDef = args.WeaponDef,
@@ -194,8 +196,13 @@ function LobbySession.BeStunned(self: LobbySession)
 		Duration = 3,
 	}))
 
+	local delta = -self.Human.WalkSpeed
+	self.Human.WalkSpeed += delta
+
 	self.Animator:Play("Dizzy", 0)
+
 	self.ActiveStun = Promise.delay(3):finally(function()
+		self.Human.WalkSpeed -= delta
 		self.Animator:StopHard("Dizzy")
 		self.ActiveStun = nil
 	end)
@@ -247,6 +254,28 @@ function LobbySession.GetClosestDummy(self: LobbySession)
 	return bestDummy
 end
 
+function LobbySession.GetClosestEncounter(self: LobbySession)
+	local bestEncounter = nil
+	local bestDistance = math.huge
+
+	local root = self.Character.PrimaryPart
+	local here = TryNow(function()
+		return root.Position
+	end, Vector3.zero)
+
+	for _, encounter in ComponentService:GetComponentsByName("Encounter") do
+		local there = encounter.Origin.Position
+		local distance = (there - here).Magnitude
+		if distance > encounter.Radius then continue end
+		if distance < bestDistance then
+			bestDistance = distance
+			bestEncounter = encounter
+		end
+	end
+
+	return bestEncounter
+end
+
 function LobbySession.Attack(self: LobbySession)
 	if self:IsStunned() then return end
 
@@ -255,14 +284,17 @@ function LobbySession.Attack(self: LobbySession)
 
 	self.Animator:Play(self.WeaponDef.Animations.Shoot, 0)
 
+	local encounter = self:GetClosestEncounter()
 	local dummy = self:GetClosestDummy()
-	local there = dummy:GetPosition()
+
+	local target = if encounter then encounter else dummy
+	local there = target:GetPosition()
 
 	EffectService:Effect(
 		self.Player,
 		EffectFaceTarget({
 			Root = self.Character.PrimaryPart,
-			Target = dummy.Model,
+			Target = there,
 			Duration = 0.25,
 		})
 	)
@@ -295,6 +327,10 @@ function LobbySession.Attack(self: LobbySession)
 		:andThen(function(pets)
 			local multiplier = PetHelper.GetTotalPower(pets)
 
+			if encounter then
+				multiplier += 1.25
+			end
+
 			if ProductHelper.IsVip(self.Player) then
 				multiplier *= 1.25
 			end
@@ -309,14 +345,18 @@ function LobbySession.Attack(self: LobbySession)
 				EndGui = "GuiPanelPrimary",
 			})
 
-			dummy:HitEffect(PickRandom(self.WeaponDef.Sounds.Hit))
+			if encounter then
+				encounter:GetHit(PickRandom(self.WeaponDef.Sounds.Hit))
+			else
+				dummy:HitEffect(PickRandom(self.WeaponDef.Sounds.Hit))
+			end
 
 			return Promise.delay(0.5):andThenReturn(amountAdded)
 		end)
 		:andThen(function(amountAdded)
 			CurrencyService:AddCurrency(self.Player, "Primary", amountAdded)
 		end)
-		:catch(function() end)
+		:catch(warn)
 
 	self.Attacks[attack] = true
 	attack:finally(function()

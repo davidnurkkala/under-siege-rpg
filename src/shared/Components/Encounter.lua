@@ -17,6 +17,7 @@ export type Encounter = typeof(setmetatable(
 		Trove: any,
 		Root: Attachment,
 		StateRemote: any,
+		HealthRemote: any,
 		Model: Model?,
 		Animator: Animator.Animator?,
 		Active: boolean,
@@ -37,6 +38,9 @@ function Encounter.new(part): Encounter
 
 	local comm = self.Trove:Construct(Comm.ClientComm, part, true, "Encounter")
 	self.StateRemote = comm:GetProperty("State")
+	self.HealthRemote = comm:GetProperty("Health")
+
+	self.HealthRemote:Observe(print)
 
 	self.Trove:Add(self.StateRemote:Observe(function(...)
 		self:OnStateChanged(...)
@@ -85,6 +89,7 @@ function Encounter.OnStateChanged(self: Encounter, newState)
 	-- exiting old state
 	if self.State == EncounterHelper.State.Walking then self:StopAnimation("Walk") end
 	if self.State == EncounterHelper.State.Chasing then self:StopAnimation("Walk") end
+	if self.State == EncounterHelper.State.Dying then self:StopAnimation("Die") end
 
 	self.State = newState
 
@@ -92,6 +97,7 @@ function Encounter.OnStateChanged(self: Encounter, newState)
 	if self.State == EncounterHelper.State.Walking then self:PlayAnimation("Walk", 0) end
 	if self.State == EncounterHelper.State.Chasing then self:PlayAnimation("Walk", 0, nil, 2) end
 	if self.State == EncounterHelper.State.Attacking then self:PlayAnimation("Attack", 0, nil, nil, false) end
+	if self.State == EncounterHelper.State.Dying then self:PlayAnimation("Die", 0) end
 end
 
 function Encounter.Destroy(self: Encounter)

@@ -13,11 +13,12 @@ local PickRandom = require(ReplicatedStorage.Shared.Util.PickRandom)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local Trove = require(ReplicatedStorage.Packages.Trove)
+local Health = require(ReplicatedStorage.Shared.Classes.Health)
 local TryNow = require(ReplicatedStorage.Shared.Util.TryNow)
 local Updater = require(ReplicatedStorage.Shared.Classes.Updater)
 
 local ActivationRadius = 64
-local ActivationWait = 3
+local ActivationWait = 2
 
 local WalkSpeed = 8
 local RunSpeed = 20
@@ -44,6 +45,7 @@ export type Encounter = typeof(setmetatable(
 		AttackWindup: number,
 		AttackRest: number,
 		GoonDef: any,
+		Health: Health.Health,
 	},
 	Encounter
 ))
@@ -69,10 +71,16 @@ function Encounter.new(part: BasePart): Encounter
 		AttackWindup = 0,
 		AttackRest = 0,
 		GoonDef = GoonDefs.Peasant, -- TODO: use actual data
+		Health = Health.new(100) -- TODO: use actual data
 	}, Encounter)
 
 	local comm = self.Trove:Construct(Comm.ServerComm, part, "Encounter")
 	self.StateRemote = comm:CreateProperty("State", EncounterHelper.State.Inactive)
+
+	local healthRemote = comm:CreateProperty("Health", 1)
+	self.Health:Observe(function()
+		healthRemote:SetForList(Sift.Set.toArray(self.Players), self.Health:GetPercent())
+	end)
 
 	self.Trove:Add(task.spawn(function()
 		while true do
@@ -82,12 +90,18 @@ function Encounter.new(part: BasePart): Encounter
 
 			-- clear data for removed players
 			for player in self.Players do
-				if not newPlayers[player] then self.StateRemote:ClearFor(player) end
+				if not newPlayers[player] then
+					self.StateRemote:ClearFor(player)
+					healthRemote:ClearFor(player)
+				end
 			end
 
 			-- replicate data for added players
 			for player in newPlayers do
-				if not self.Players[player] then self.StateRemote:SetFor(player, self.State) end
+				if not self.Players[player] then
+					self.StateRemote:SetFor(player, self.State)
+					healthRemote:SetFor(player, self.Health:GetPercent())
+				end
 			end
 
 			self.Players = newPlayers
@@ -164,6 +178,29 @@ function Encounter.FaceTowards(self: Encounter, position: Vector3)
 	local here = self.Root.WorldPosition
 	local there = position
 	self.Root.WorldCFrame = CFrame.lookAt(here, there)
+end
+
+function Encounter.GetHit(self: Encounter, soundId: string)
+	EffectService:All(
+		EffectEmission({
+			Emitter = ReplicatedStorage.Assets.Emitters.Impact1,
+			ParticleCount = 2,
+			Target = self:GetPosition(),
+		}),
+		EffectSound({
+			SoundId = soundId,
+			Target = self:GetPosition(),
+		})
+	)
+
+	self.Health:Adjust(-10)
+	if self.Health:Get() <= 0 then
+		self:SetState(EncounterHelper.State.Dying)
+	end
+end
+
+function Encounter.GetPosition(self: Encounter)
+	return self.Root.WorldPosition + Vector3.new(0, 2.5, 0)
 end
 
 function Encounter.GetTargetPosition(self: Encounter)
