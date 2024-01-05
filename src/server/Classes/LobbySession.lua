@@ -264,6 +264,8 @@ function LobbySession.GetClosestEncounter(self: LobbySession)
 	end, Vector3.zero)
 
 	for _, encounter in ComponentService:GetComponentsByName("Encounter") do
+		if not encounter:IsAlive() then continue end
+
 		local there = encounter.Origin.Position
 		local distance = (there - here).Magnitude
 		if distance > encounter.Radius then continue end
@@ -346,7 +348,7 @@ function LobbySession.Attack(self: LobbySession)
 			})
 
 			if encounter then
-				encounter:GetHit(PickRandom(self.WeaponDef.Sounds.Hit))
+				encounter:GetHit(self.Player, PickRandom(self.WeaponDef.Sounds.Hit))
 			else
 				dummy:HitEffect(PickRandom(self.WeaponDef.Sounds.Hit))
 			end

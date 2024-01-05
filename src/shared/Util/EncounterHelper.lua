@@ -7,6 +7,7 @@ EncounterHelper.State = {
 	Attacking = 4,
 	Dying = 5,
 	Chasing = 6,
+	Dead = 7,
 }
 
 return EncounterHelper

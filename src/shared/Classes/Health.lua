@@ -4,10 +4,13 @@ local Signal = require(ReplicatedStorage.Packages.Signal)
 local Health = {}
 Health.__index = Health
 
-export type Health = typeof(setmetatable({} :: {
-	Amount: number,
-	Max: number,
-}, Health))
+export type Health = typeof(setmetatable(
+	{} :: {
+		Amount: number,
+		Max: number,
+	},
+	Health
+))
 
 function Health.new(max: number): Health
 	local self: Health = setmetatable({
@@ -61,6 +64,10 @@ end
 
 function Health.Adjust(self: Health, delta: number)
 	self:Set(self:Get() + delta)
+end
+
+function Health.Reset(self: Health)
+	self:Set(self:GetMax())
 end
 
 function Health.Destroy(self: Health) end
