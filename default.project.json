@@ -1,5 +1,6 @@
 {
   "name": "SiegeSimulator",
+
   "tree": {
     "$className": "DataModel",
 
@@ -35,6 +36,13 @@
     "Workspace": {
       "Effects": {
         "$className": "Folder"
+      }
+    },
+
+    "Lighting": {
+      "$properties": {
+        "Technology": "Voxel",
+        "GlobalShadows": true
       }
     },
 

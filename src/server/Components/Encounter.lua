@@ -3,17 +3,23 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local Comm = require(ReplicatedStorage.Packages.Comm)
+local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
+local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local EffectEmission = require(ReplicatedStorage.Shared.Effects.EffectEmission)
 local EffectService = require(ServerScriptService.Server.Services.EffectService)
 local EffectSound = require(ReplicatedStorage.Shared.Effects.EffectSound)
+local EncounterDefs = require(ReplicatedStorage.Shared.Defs.EncounterDefs)
 local EncounterHelper = require(ReplicatedStorage.Shared.Util.EncounterHelper)
+local EventStream = require(ReplicatedStorage.Shared.Util.EventStream)
 local GoonDefs = require(ReplicatedStorage.Shared.Defs.GoonDefs)
+local GuiEffectService = require(ServerScriptService.Server.Services.GuiEffectService)
+local Health = require(ReplicatedStorage.Shared.Classes.Health)
 local LobbySessions = require(ServerScriptService.Server.Singletons.LobbySessions)
 local PickRandom = require(ReplicatedStorage.Shared.Util.PickRandom)
+local ProductService = require(ServerScriptService.Server.Services.ProductService)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local Trove = require(ReplicatedStorage.Packages.Trove)
-local Health = require(ReplicatedStorage.Shared.Classes.Health)
 local TryNow = require(ReplicatedStorage.Shared.Util.TryNow)
 local Updater = require(ReplicatedStorage.Shared.Classes.Updater)
 
@@ -32,6 +38,7 @@ Encounter.__index = Encounter
 
 export type Encounter = typeof(setmetatable(
 	{} :: {
+		Def: any,
 		Origin: CFrame,
 		Radius: number,
 		Trove: any,
@@ -46,6 +53,7 @@ export type Encounter = typeof(setmetatable(
 		AttackRest: number,
 		GoonDef: any,
 		Health: Health.Health,
+		HitTracker: { [Player]: number },
 	},
 	Encounter
 ))
@@ -58,7 +66,14 @@ local function createRoot(parent: BasePart)
 end
 
 function Encounter.new(part: BasePart): Encounter
+	local encounterId = part:GetAttribute("EncounterId")
+	assert(encounterId, `{part:GetFullName()} is an Encounter but has no EncounterId`)
+
+	local def = EncounterDefs[encounterId]
+	assert(def, `{encounterId} has no def`)
+
 	local self: Encounter = setmetatable({
+		Def = def,
 		Origin = part.CFrame,
 		Radius = math.max(part.Size.X, part.Size.Z) / 2,
 		Trove = Trove.new(),
@@ -70,8 +85,9 @@ function Encounter.new(part: BasePart): Encounter
 		Target = nil,
 		AttackWindup = 0,
 		AttackRest = 0,
-		GoonDef = GoonDefs.Peasant, -- TODO: use actual data
-		Health = Health.new(100) -- TODO: use actual data
+		GoonDef = GoonDefs[def.GoonId],
+		Health = Health.new(def.Health),
+		HitTracker = {},
 	}, Encounter)
 
 	local comm = self.Trove:Construct(Comm.ServerComm, part, "Encounter")
@@ -180,7 +196,7 @@ function Encounter.FaceTowards(self: Encounter, position: Vector3)
 	self.Root.WorldCFrame = CFrame.lookAt(here, there)
 end
 
-function Encounter.GetHit(self: Encounter, soundId: string)
+function Encounter.GetHit(self: Encounter, player: Player, soundId: string)
 	EffectService:All(
 		EffectEmission({
 			Emitter = ReplicatedStorage.Assets.Emitters.Impact1,
@@ -193,10 +209,58 @@ function Encounter.GetHit(self: Encounter, soundId: string)
 		})
 	)
 
-	self.Health:Adjust(-10)
-	if self.Health:Get() <= 0 then
-		self:SetState(EncounterHelper.State.Dying)
+	self.HitTracker[player] = (self.HitTracker[player] or 0) + 1
+
+	self.Health:Adjust(-1)
+	if self.Health:Get() <= 0 then self:Die() end
+end
+
+function Encounter.GiveRewards(self: Encounter)
+	for player, hitCount in self.HitTracker do
+		if hitCount < self.Health:GetMax() * 0.25 then continue end
+
+		local reward = self.Def.Level * 10
+
+		CurrencyService:GetBoosted(player, "Secondary", reward)
+			:andThen(function(amountAdded)
+				amountAdded = ProductService:GetVipBoostedSecondary(player, amountAdded)
+
+				GuiEffectService.IndicatorRequestedRemote:Fire(player, {
+					Text = `+{amountAdded // 0.1 / 10}`,
+					Image = CurrencyDefs.Secondary.Image,
+					Start = self:GetPosition(),
+					EndGui = "GuiPanelSecondary",
+				})
+
+				Promise.delay(0.5):andThen(function()
+					CurrencyService:AddCurrency(player, "Secondary", amountAdded)
+				end)
+			end)
+			:andThen(function()
+				EventStream.Event({ Kind = "EncounterDefeated", Player = player, EncounterId = self.Def.Id })
+			end)
 	end
+
+	self.HitTracker = {}
+end
+
+function Encounter.Die(self: Encounter)
+	if self.State == EncounterHelper.State.Dying then return end
+	if self.State == EncounterHelper.State.Dead then return end
+
+	self:SetState(EncounterHelper.State.Dying)
+	self.Trove
+		:AddPromise(Promise.delay(1))
+		:andThen(function()
+			self:GiveRewards()
+			self:SetState(EncounterHelper.State.Dead)
+			return Promise.delay(5)
+		end)
+		:andThen(function()
+			self.Health:Reset()
+			self.Root.CFrame = CFrame.new()
+			self:SetState(EncounterHelper.State.Idle)
+		end)
 end
 
 function Encounter.GetPosition(self: Encounter)
@@ -252,6 +316,10 @@ function Encounter.BeBlocked(self: Encounter, session)
 			Target = target,
 		})
 	)
+end
+
+function Encounter.IsAlive(self: Encounter)
+	return (self.State ~= EncounterHelper.State.Dying) and (self.State ~= EncounterHelper.State.Dead)
 end
 
 function Encounter.Update(self: Encounter, dt: number)

@@ -21,14 +21,18 @@ local PetService = require(ServerScriptService.Server.Services.PetService)
 local PickRandom = require(ReplicatedStorage.Shared.Util.PickRandom)
 local PlayerLeaving = require(ReplicatedStorage.Shared.Util.PlayerLeaving)
 local ProductHelper = require(ReplicatedStorage.Shared.Util.ProductHelper)
-local ProductService = require(ServerScriptService.Server.Services.ProductService)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local TryNow = require(ReplicatedStorage.Shared.Util.TryNow)
+local Updater = require(ReplicatedStorage.Shared.Classes.Updater)
 local WeaponDefs = require(ReplicatedStorage.Shared.Defs.WeaponDefs)
 local WeaponHelper = require(ReplicatedStorage.Shared.Util.WeaponHelper)
 local WeaponService = require(ServerScriptService.Server.Services.WeaponService)
+
+local LobbySessionUpdater = Updater.new()
+
+local AutoRunTime = 2 / 3
 
 local LobbySession = {}
 LobbySession.__index = LobbySession
@@ -45,6 +49,7 @@ type LobbySession = typeof(setmetatable(
 		Attacks: any,
 		ActiveStun: any,
 		Human: Humanoid,
+		AutoRunTimer: number,
 	},
 	LobbySession
 ))
@@ -74,6 +79,7 @@ function LobbySession.new(args: {
 		AttackCooldown = Cooldown.new(args.WeaponDef.AttackCooldownTime),
 		Attacks = {},
 		ActiveStun = nil,
+		AutoRunTimer = 0,
 	}, LobbySession)
 
 	self.Animator:Play(self.WeaponDef.Animations.Idle)
@@ -129,6 +135,11 @@ function LobbySession.new(args: {
 			petTrove:Clean()
 		end
 	end))
+
+	LobbySessionUpdater:Add(self)
+	self.Trove:Add(function()
+		LobbySessionUpdater:Remove(self)
+	end)
 
 	return self
 end
@@ -195,17 +206,33 @@ function LobbySession.BeStunned(self: LobbySession)
 		Head = self.Character:FindFirstChild("Head") :: BasePart,
 		Duration = 3,
 	}))
-
-	local delta = -self.Human.WalkSpeed
-	self.Human.WalkSpeed += delta
-
 	self.Animator:Play("Dizzy", 0)
 
 	self.ActiveStun = Promise.delay(3):finally(function()
-		self.Human.WalkSpeed -= delta
 		self.Animator:StopHard("Dizzy")
 		self.ActiveStun = nil
 	end)
+end
+
+function LobbySession.Update(self: LobbySession, dt: number)
+	local isMoving = self.Human.MoveDirection.Magnitude > 0.01
+	if isMoving then
+		self.AutoRunTimer = math.min(self.AutoRunTimer + dt, AutoRunTime)
+	else
+		self.AutoRunTimer = 0
+	end
+	local isRunning = self.AutoRunTimer >= AutoRunTime
+
+	if self:IsStunned() then
+		self.AutoRunTimer = 0
+		self.Human.WalkSpeed = 0
+	else
+		if isRunning then
+			self.Human.WalkSpeed = 28
+		else
+			self.Human.WalkSpeed = 16
+		end
+	end
 end
 
 function LobbySession.IsStunned(self: LobbySession)
@@ -264,6 +291,8 @@ function LobbySession.GetClosestEncounter(self: LobbySession)
 	end, Vector3.zero)
 
 	for _, encounter in ComponentService:GetComponentsByName("Encounter") do
+		if not encounter:IsAlive() then continue end
+
 		local there = encounter.Origin.Position
 		local distance = (there - here).Magnitude
 		if distance > encounter.Radius then continue end
@@ -346,7 +375,7 @@ function LobbySession.Attack(self: LobbySession)
 			})
 
 			if encounter then
-				encounter:GetHit(PickRandom(self.WeaponDef.Sounds.Hit))
+				encounter:GetHit(self.Player, PickRandom(self.WeaponDef.Sounds.Hit))
 			else
 				dummy:HitEffect(PickRandom(self.WeaponDef.Sounds.Hit))
 			end
