@@ -191,6 +191,9 @@ end
 function Encounter.MoveTowards(self: Encounter, position: Vector3, movement: number, arrivalDistance: number)
 	local here = self.Root.WorldPosition
 	local there = position
+
+	if here:FuzzyEq(there, 0.01) then return true end
+
 	local cframe = CFrame.lookAt(here, there)
 	cframe *= CFrame.new(0, 0, -movement)
 	self.Root.WorldCFrame = cframe

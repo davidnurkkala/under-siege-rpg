@@ -259,11 +259,11 @@ function Badger.onCompleted(condition: Condition, callback: (Condition) -> ()): 
 	wrapped = Badger.wrap(condition, {
 		process = function(_self, ...)
 			condition:process(...)
-			if condition:isComplete() then callback(wrapped) end
+			if condition:isComplete() then task.defer(callback, wrapped) end
 		end,
 		load = function(_self, ...)
 			condition:load(...)
-			if condition:isComplete() then callback(wrapped) end
+			if condition:isComplete() then task.defer(callback, wrapped) end
 		end,
 	})
 	return wrapped

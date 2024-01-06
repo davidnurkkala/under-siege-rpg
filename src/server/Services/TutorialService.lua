@@ -5,6 +5,7 @@ local Badger = require(ReplicatedStorage.Shared.Util.Badger)
 local BattlerDefs = require(ReplicatedStorage.Shared.Defs.BattlerDefs)
 local BeInWorld = require(ServerScriptService.Server.Badger.Conditions.BeInWorld)
 local Comm = require(ReplicatedStorage.Packages.Comm)
+local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local DefeatBattler = require(ServerScriptService.Server.Badger.Conditions.DefeatBattler)
 local HaveCurrency = require(ServerScriptService.Server.Badger.Conditions.HaveCurrency)
@@ -23,15 +24,11 @@ type TutorialService = typeof(TutorialService)
 
 local function tutorialCondition(player)
 	return Badger.sequence({
-		DefeatBattler(player, "Peasant", 1):withState(function(condition)
+		Badger.onCompleted(DefeatBattler(player, "Peasant", 1), function()
+			CurrencyService:AddCurrency(player, "Primary", 300)
+		end):withState(function(condition)
 			return {
 				Instruction = "Battler",
-				State = condition:getState(),
-			}
-		end),
-		HaveCurrency(player, "Primary", 100):withState(function(condition)
-			return {
-				Instruction = "TrainingDummy",
 				State = condition:getState(),
 			}
 		end),
@@ -41,19 +38,21 @@ local function tutorialCondition(player)
 				State = condition:getState(),
 			}
 		end),
-		HaveCurrency(player, "Primary", 200):withState(function(condition)
-			return {
-				Instruction = "TrainingDummy",
-				State = condition:getState(),
-			}
-		end),
 		RollCardGacha(player, "World1Goons", 1):withState(function(condition)
 			return {
 				Instruction = "CardGacha",
 				State = condition:getState(),
 			}
 		end),
-		DefeatBattler(player, "Peasant", 2):withState(function(condition)
+		Badger.onCompleted(HaveCurrency(player, "Primary", BattlerDefs.Noble.Power), function()
+			CurrencyService:AddCurrency(player, "Primary", 1500)
+		end):withState(function(condition)
+			return {
+				Instruction = "TrainingDummy",
+				State = condition:getState(),
+			}
+		end),
+		DefeatBattler(player, "Noble", 1):withState(function(condition)
 			return {
 				Instruction = "Battler",
 				State = condition:getState(),

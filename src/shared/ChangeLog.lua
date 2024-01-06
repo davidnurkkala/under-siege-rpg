@@ -1,4 +1,20 @@
 return {
+	"1/6/2024",
+	{
+		"Changed",
+		{
+			"Balanced world costs, NPC power levels, weapon power gain, pet power multiplier, and weapon costs.",
+			"Changed order of weapons throughout the worlds.",
+		},
+		"Added",
+		{
+			"A few new weapons!",
+		},
+		"Fixed",
+		{
+			"Solved some issues with overworld fights.",
+		},
+	},
 	"1/5/2024",
 	{
 		"Added",

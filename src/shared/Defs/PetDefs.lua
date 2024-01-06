@@ -134,6 +134,7 @@ return Sift.Dictionary.map(Pets, function(pet, id)
 	assert(model, `No model found with name {pet.ModelName}`)
 
 	return Sift.Dictionary.merge(pet, {
+		Power = (pet.Power / 3) + 1,
 		Id = id,
 		Model = model,
 	})
