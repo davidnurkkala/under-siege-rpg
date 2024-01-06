@@ -417,6 +417,10 @@ function LobbySession.Attack(self: LobbySession)
 			return CurrencyService:GetBoosted(self.Player, "Primary", self.WeaponDef.Power * multiplier)
 		end)
 		:andThen(function(amountAdded)
+			if isCrit then
+				amountAdded *= 5
+			end
+
 			GuiEffectService.IndicatorRequestedRemote:Fire(self.Player, {
 				Text = `+{amountAdded // 0.1 / 10}`,
 				Image = CurrencyDefs.Primary.Image,
