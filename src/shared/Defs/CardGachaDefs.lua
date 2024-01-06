@@ -19,6 +19,7 @@ local Gachas = {
 	World1Goons = {
 		Name = "World 1 Soldiers",
 		Verb = "Hire",
+		Header = "Soldiers",
 		Price = {
 			Secondary = 5,
 		},
@@ -31,6 +32,7 @@ local Gachas = {
 	World2Goons = {
 		Name = "World 2 Soldiers",
 		Verb = "Hire",
+		Header = "Soldiers",
 		Price = {
 			Secondary = 50,
 		},
@@ -43,6 +45,7 @@ local Gachas = {
 	World3Goons = {
 		Name = "World 3 Soldiers",
 		Verb = "Hire",
+		Header = "Soldiers",
 		Price = {
 			Secondary = 100,
 		},
@@ -55,6 +58,7 @@ local Gachas = {
 	World4Goons = {
 		Name = "World 4 Soldiers",
 		Verb = "Hire",
+		Header = "Soldiers",
 		Price = {
 			Secondary = 250,
 		},
@@ -70,6 +74,7 @@ local Gachas = {
 	World1Abilities = {
 		Name = "World 1 Abilities",
 		Verb = "Learn",
+		Header = "Abilities",
 		Price = {
 			Secondary = 10,
 		},
@@ -81,6 +86,7 @@ local Gachas = {
 	World2Abilities = {
 		Name = "World 2 Abilities",
 		Verb = "Learn",
+		Header = "Abilities",
 		Price = {
 			Secondary = 10,
 		},
@@ -92,6 +98,7 @@ local Gachas = {
 	World3Abilities = {
 		Name = "World 3 Abilities",
 		Verb = "Learn",
+		Header = "Abilities",
 		Price = {
 			Secondary = 10,
 		},
@@ -103,6 +110,7 @@ local Gachas = {
 	World4Abilities = {
 		Name = "World 4 Abilities",
 		Verb = "Learn",
+		Header = "Abilities",
 		Price = {
 			Secondary = 10,
 		},

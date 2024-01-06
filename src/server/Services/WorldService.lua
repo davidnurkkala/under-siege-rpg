@@ -10,6 +10,7 @@ local Observers = require(ReplicatedStorage.Packages.Observers)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local ServerFade = require(ServerScriptService.Server.Util.ServerFade)
 local Sift = require(ReplicatedStorage.Packages.Sift)
+local Trove = require(ReplicatedStorage.Packages.Trove)
 local WorldDefs = require(ReplicatedStorage.Shared.Defs.WorldDefs)
 local t = require(ReplicatedStorage.Packages.t)
 
@@ -30,7 +31,7 @@ function WorldService.PrepareBlocking(self: WorldService)
 			if object:IsA("Humanoid") then object.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None end
 		end
 
-		model.Parent = workspace
+		model.Parent = workspace.Worlds
 
 		return model, id
 	end)
@@ -38,11 +39,22 @@ function WorldService.PrepareBlocking(self: WorldService)
 	self.Comm = Comm.ServerComm.new(ReplicatedStorage, "WorldService")
 
 	self.WorldsRemote = self.Comm:CreateProperty("Worlds", {})
+	local worldCurrentRemote = self.Comm:CreateProperty("WorldCurrent", "World1")
 
 	Observers.observePlayer(function(player)
-		return DataService:ObserveKey(player, "Worlds", function(worlds)
+		local trove = Trove.new()
+
+		trove:Add(DataService:ObserveKey(player, "Worlds", function(worlds)
 			self.WorldsRemote:SetFor(player, worlds)
-		end)
+		end))
+
+		trove:Add(DataService:ObserveKey(player, "WorldCurrent", function(worldCurrent)
+			worldCurrentRemote:SetFor(player, worldCurrent)
+		end))
+
+		return function()
+			trove:Clean()
+		end
 	end)
 
 	Observers.observePlayer(function(player)
@@ -164,10 +176,9 @@ function WorldService.TeleportToWorld(self: WorldService, player: Player, worldI
 	return DataService:GetSaveFile(player):andThen(function(saveFile)
 		if not saveFile:Get("Worlds")[worldId] then return end
 
-		saveFile:Set("WorldCurrent", worldId)
-
 		return ServerFade(player, nil, function()
 			if callback then callback() end
+			saveFile:Set("WorldCurrent", worldId)
 			LightingService.LightingChangeRequested:Fire(player, def.LightingName)
 			char:PivotTo(model:GetPivot() + Vector3.new(0, 4, 0))
 		end)

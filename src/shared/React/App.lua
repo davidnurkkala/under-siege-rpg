@@ -18,6 +18,7 @@ local PlatformProvider = require(ReplicatedStorage.Shared.React.PlatformContext.
 local PrestigeMenuBridge = require(ReplicatedStorage.Shared.React.Menus.PrestigeMenuBridge)
 local React = require(ReplicatedStorage.Packages.React)
 local SessionRewardsMenuBridge = require(ReplicatedStorage.Shared.React.Menus.SessionRewardsMenuBridge)
+local ShoplikeBridge = require(ReplicatedStorage.Shared.React.ShoplikeBridge)
 local TeleportMenuBridge = require(ReplicatedStorage.Shared.React.Teleport.TeleportMenuBridge)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 local TutorialHud = require(ReplicatedStorage.Shared.React.Tutorial.TutorialHud)
@@ -59,6 +60,7 @@ return function()
 
 			Indicators = React.createElement(IndicatorBridge),
 			BattlerPrompts = React.createElement(BattlerPromptBridge),
+			Shoplikes = React.createElement(ShoplikeBridge),
 			ChangeLogBoard = React.createElement(ChangeLogBoard),
 		}),
 	})

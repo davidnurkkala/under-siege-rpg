@@ -118,11 +118,24 @@ function Battle.new(args: {
 	end
 
 	self.Model.Spawns:Destroy()
+	self.Model:SetAttribute(
+		"UserIds",
+		table.concat(
+			Sift.Array.map(self.Battlers, function(battler)
+				local player = Players:GetPlayerFromCharacter(battler.CharModel)
+				if player then
+					return player.UserId
+				else
+					return nil
+				end
+			end),
+			","
+		)
+	)
+	self.Model.Parent = workspace.Battles
+	self.Trove:Add(self.Model)
 
 	self.RoundCooldown = Cooldown.new(RoundDuration)
-
-	self.Model.Parent = workspace
-	self.Trove:Add(self.Model)
 
 	BattleUpdater:Add(self)
 	self.Trove:Add(function()

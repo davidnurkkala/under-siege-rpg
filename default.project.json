@@ -36,6 +36,12 @@
     "Workspace": {
       "Effects": {
         "$className": "Folder"
+      },
+      "Worlds": {
+        "$className": "Folder"
+      },
+      "Battles": {
+        "$className": "Folder"
       }
     },
 

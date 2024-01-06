@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Animate = require(ReplicatedStorage.Shared.Util.Animate)
@@ -7,6 +8,7 @@ local Property = require(ReplicatedStorage.Shared.Classes.Property)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local SmoothStep = require(ReplicatedStorage.Shared.Util.SmoothStep)
+local Trove = require(ReplicatedStorage.Packages.Trove)
 
 local BattleController = {
 	Priority = 0,
@@ -29,6 +31,15 @@ function BattleController.PrepareBlocking(self: BattleController)
 	self.SurrenderRequested = self.Comm:GetSignal("SurrenderRequested")
 	self.CardPlayed = self.Comm:GetSignal("CardPlayed")
 	self.CardPromptInterface = self.Comm:GetSignal("CardPromptInterface")
+
+	workspace.Battles.ChildAdded:Connect(function(battleModel)
+		local userIds = Sift.Array.map(string.split(battleModel:GetAttribute("UserIds"), ","), function(userIdString)
+			return tonumber(userIdString)
+		end)
+		if table.find(userIds, Players.LocalPlayer.UserId) == nil then task.defer(function()
+			battleModel.Parent = nil
+		end) end
+	end)
 end
 
 function BattleController.RegisterCardPrompt(self: BattleController, callback): () -> ()
