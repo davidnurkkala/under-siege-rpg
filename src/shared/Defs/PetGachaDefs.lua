@@ -63,9 +63,9 @@ local Gachas = {
 			Secondary = 300,
 		},
 		WeightTable = {
-			{ Result = "Mousey", Weight = 4 },
-			{ Result = "Batsy", Weight = 3 },
-			{ Result = "Foxy", Weight = 2 },
+			{ Result = "MooCow", Weight = 4 },
+			{ Result = "Tigre", Weight = 3 },
+			{ Result = "Monke", Weight = 2 },
 			{ Result = "Slimey", Weight = 1 },
 		},
 	},

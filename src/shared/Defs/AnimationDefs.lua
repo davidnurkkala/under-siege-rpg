@@ -61,6 +61,8 @@ local Ids = {
 
 	BatIdleExtras = 15514695992,
 	BatWalkExtras = 15514695992,
+	SlimeHop = 15896178110,
+	SlimeIdleExtras = 15897256540,
 
 	ElfBattlerIdle = 15418698499,
 

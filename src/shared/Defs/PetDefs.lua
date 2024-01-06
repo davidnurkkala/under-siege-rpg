@@ -46,8 +46,8 @@ local Pets = {
 		Name = "Bully",
 		ModelName = "BullPet",
 		Animations = {
-			Idle = { "GenericPetBlink", "GenericPetIdle", "DoggyIdleExtras" },
-			Walk = { "GenericPetWalk", "DoggyWalkExtras" },
+			Idle = { "GenericPetBlink", "GenericPetIdle", "KittyIdleExtras" },
+			Walk = { "GenericPetWalk", "PiggyWalkExtras" },
 		},
 		Power = 3,
 	},
@@ -56,7 +56,7 @@ local Pets = {
 		ModelName = "LionPet",
 		Animations = {
 			Idle = { "GenericPetBlink", "GenericPetIdle", "KittyIdleExtras" },
-			Walk = { "GenericPetWalk", "KittyWalkExtras" },
+			Walk = { "GenericPetWalk", "PiggyWalkExtras" },
 		},
 		Power = 3.5,
 	},
@@ -64,8 +64,8 @@ local Pets = {
 		Name = "Rhiny",
 		ModelName = "RhinoPet",
 		Animations = {
-			Idle = { "GenericPetBlink", "GenericPetIdle", "WolfyIdleExtras" },
-			Walk = { "GenericPetWalk", "WolfyWalkExtras" },
+			Idle = { "GenericPetBlink", "GenericPetIdle", "KittyIdleExtras" },
+			Walk = { "GenericPetWalk", "PiggyWalkExtras" },
 		},
 		Power = 4,
 	},
@@ -122,10 +122,37 @@ local Pets = {
 		Name = "Slimey",
 		ModelName = "SlimePet",
 		Animations = {
+			Idle = { "GenericPetBlink", "GenericPetIdle", "SlimeIdleExtras" },
+			Walk = { "SlimeHop", "WolfyWalkExtras" },
+		},
+		Power = 9.5,
+	},
+	MooCow = {
+		Name = "MooCow",
+		ModelName = "CowPet",
+		Animations = {
 			Idle = { "GenericPetBlink", "GenericPetIdle", "WolfyIdleExtras" },
 			Walk = { "GenericPetWalk", "WolfyWalkExtras" },
 		},
 		Power = 8,
+	},
+	Tigre = {
+		Name = "Tigre",
+		ModelName = "TigerPet",
+		Animations = {
+			Idle = { "GenericPetBlink", "GenericPetIdle", "KittyIdleExtras" },
+			Walk = { "GenericPetWalk", "KittyWalkExtras" },
+		},
+		Power = 8.5,
+	},
+	Monke = {
+		Name = "Monke",
+		ModelName = "MonkeyPet",
+		Animations = {
+			Idle = { "GenericPetBlink", "GenericPetIdle", "KittyIdleExtras" },
+			Walk = { "GenericPetWalk", "KittyWalkExtras" },
+		},
+		Power = 9,
 	},
 }
 
