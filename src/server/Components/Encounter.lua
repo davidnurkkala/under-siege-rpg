@@ -19,6 +19,7 @@ local PickRandom = require(ReplicatedStorage.Shared.Util.PickRandom)
 local ProductService = require(ServerScriptService.Server.Services.ProductService)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Sift = require(ReplicatedStorage.Packages.Sift)
+local Timestamp = require(ReplicatedStorage.Shared.Util.Timestamp)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local TryNow = require(ReplicatedStorage.Shared.Util.TryNow)
 local Updater = require(ReplicatedStorage.Shared.Classes.Updater)
@@ -30,6 +31,8 @@ local WalkSpeed = 8
 local RunSpeed = 20
 
 local AttackRange = 4.5
+
+local Rand = Random.new()
 
 local EncounterUpdater = Updater.new()
 
@@ -54,6 +57,7 @@ export type Encounter = typeof(setmetatable(
 		GoonDef: any,
 		Health: Health.Health,
 		HitTracker: { [Player]: number },
+		Part: BasePart,
 	},
 	Encounter
 ))
@@ -73,6 +77,7 @@ function Encounter.new(part: BasePart): Encounter
 	assert(def, `{encounterId} has no def`)
 
 	local self: Encounter = setmetatable({
+		Part = part,
 		Def = def,
 		Origin = part.CFrame,
 		Radius = math.max(part.Size.X, part.Size.Z) / 2,
@@ -160,9 +165,13 @@ function Encounter.SetActive(self: Encounter, active: boolean)
 end
 
 function Encounter.GetRandomPosition(self: Encounter)
+	return self.Origin:PointToWorldSpace(self:GetRandomLocalPosition())
+end
+
+function Encounter.GetRandomLocalPosition(self: Encounter)
 	local theta = math.random() * math.pi * 2
 	local radius = math.random() * self.Radius
-	return self.Origin:PointToWorldSpace(Vector3.new(math.cos(theta) * radius, 0, math.sin(theta) * radius))
+	return Vector3.new(math.cos(theta) * radius, 0, math.sin(theta) * radius)
 end
 
 function Encounter.GetPlayersInRange(self: Encounter)
@@ -196,7 +205,7 @@ function Encounter.FaceTowards(self: Encounter, position: Vector3)
 	self.Root.WorldCFrame = CFrame.lookAt(here, there)
 end
 
-function Encounter.GetHit(self: Encounter, player: Player, soundId: string)
+function Encounter.GetHit(self: Encounter, player: Player, damage: number, soundId: string)
 	EffectService:All(
 		EffectEmission({
 			Emitter = ReplicatedStorage.Assets.Emitters.Impact1,
@@ -211,7 +220,7 @@ function Encounter.GetHit(self: Encounter, player: Player, soundId: string)
 
 	self.HitTracker[player] = (self.HitTracker[player] or 0) + 1
 
-	self.Health:Adjust(-1)
+	self.Health:Adjust(-damage)
 	if self.Health:Get() <= 0 then self:Die() end
 end
 
@@ -316,13 +325,50 @@ function Encounter.BeBlocked(self: Encounter, session)
 			Target = target,
 		})
 	)
+
+	if Rand:NextNumber() < 0.5 then
+		local critPoint = Instance.new("Attachment")
+		critPoint.Name = "CritPoint"
+		critPoint.Position = self:GetRandomLocalPosition()
+		critPoint:SetAttribute("SpawnTimestamp", Timestamp())
+		critPoint.Parent = self.Part
+	end
 end
 
 function Encounter.IsAlive(self: Encounter)
 	return (self.State ~= EncounterHelper.State.Dying) and (self.State ~= EncounterHelper.State.Dead)
 end
 
+function Encounter.CheckCritPoints(self: Encounter)
+	for _, object in self.Part:GetChildren() do
+		if object.Name == "CritPoint" then
+			local timeExisted = Timestamp() - object:GetAttribute("SpawnTimestamp")
+			if timeExisted < 1 then continue end
+			if timeExisted > 5 then
+				object:Destroy()
+				continue
+			end
+
+			for player in self.Players do
+				local distance = TryNow(function()
+					local delta = player.Character.PrimaryPart.Position - object.WorldPosition
+					return math.sqrt(delta.X ^ 2 + delta.Z ^ 2)
+				end, math.huge)
+
+				if distance < 2.5 then
+					object:Destroy()
+
+					local session = LobbySessions.Get(player)
+					if session then session:GetCrit() end
+				end
+			end
+		end
+	end
+end
+
 function Encounter.Update(self: Encounter, dt: number)
+	self:CheckCritPoints()
+
 	if self.State == EncounterHelper.State.Idle then
 		if math.random() < 0.05 then
 			self.Destination = self:GetRandomPosition()

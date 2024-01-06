@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 
 local Animate = require(ReplicatedStorage.Shared.Util.Animate)
 local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
@@ -15,6 +16,22 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 local Updater = require(ReplicatedStorage.Shared.Classes.Updater)
 
 local EncounterUpdater = Updater.new()
+
+local function fadeIn(model)
+	local fadePairs = Sift.Array.map(
+		Sift.Array.filter(model:GetDescendants(), function(object)
+			return object:IsA("BasePart")
+		end),
+		function(part)
+			return { Part = part, Transparency = part.Transparency }
+		end
+	)
+	return Animate(0.5, function(scalar)
+		for _, pair in fadePairs do
+			pair.Part.Transparency = Lerp(1, pair.Transparency, scalar)
+		end
+	end)
+end
 
 local Encounter = {}
 Encounter.__index = Encounter
@@ -75,6 +92,36 @@ function Encounter.new(part: BasePart): Encounter
 		self:OnStateChanged(...)
 	end))
 
+	self.Trove:Connect(part.ChildAdded, function(object)
+		if object.Name == "CritPoint" then
+			local coinTrove = Trove.new()
+
+			local coin = ReplicatedStorage.Assets.Models.Effects.CritCoin:Clone()
+			coin.Parent = part
+
+			local cframe = object.WorldCFrame
+			local connection = RunService.Heartbeat:Connect(function()
+				if object:IsDescendantOf(workspace) then cframe = object.WorldCFrame end
+
+				local clock = tick() % 0.5 / 0.5
+				coin:PivotTo(cframe * CFrame.Angles(0, math.pi * 2 * clock, 0) + Vector3.new(0, 3, 0))
+			end)
+
+			coinTrove:AddPromise(fadeIn(coin))
+			coinTrove:Add(function()
+				EffectController:Effect(EffectFadeModel({
+					Model = coin,
+					FadeTime = 0.5,
+				})):finally(function()
+					coin:Destroy()
+					connection:Disconnect()
+				end)
+			end)
+
+			coinTrove:AttachToInstance(object)
+		end
+	end)
+
 	return self
 end
 
@@ -93,19 +140,7 @@ function Encounter.SetActive(self: Encounter, active: boolean)
 		self.Model = model
 
 		-- fade in the model
-		local fadePairs = Sift.Array.map(
-			Sift.Array.filter(model:GetDescendants(), function(object)
-				return object:IsA("BasePart")
-			end),
-			function(part)
-				return { Part = part, Transparency = part.Transparency }
-			end
-		)
-		Animate(0.5, function(scalar)
-			for _, pair in fadePairs do
-				pair.Part.Transparency = Lerp(1, pair.Transparency, scalar)
-			end
-		end)
+		fadeIn(model)
 
 		local animator = Animator.new(model.AnimationController)
 		self.Animator = animator

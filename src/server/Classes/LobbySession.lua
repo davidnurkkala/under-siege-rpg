@@ -10,6 +10,7 @@ local CurrencyService = require(ServerScriptService.Server.Services.CurrencyServ
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local EffectDizzy = require(ReplicatedStorage.Shared.Effects.EffectDizzy)
 local EffectFaceTarget = require(ReplicatedStorage.Shared.Effects.EffectFaceTarget)
+local EffectGrowFade = require(ReplicatedStorage.Shared.Effects.EffectGrowFade)
 local EffectProjectile = require(ReplicatedStorage.Shared.Effects.EffectProjectile)
 local EffectService = require(ServerScriptService.Server.Services.EffectService)
 local EffectSound = require(ReplicatedStorage.Shared.Effects.EffectSound)
@@ -48,6 +49,7 @@ type LobbySession = typeof(setmetatable(
 		AttackCooldown: Cooldown.Cooldown,
 		Attacks: any,
 		ActiveStun: any,
+		ActiveCrit: any,
 		Human: Humanoid,
 		AutoRunTimer: number,
 	},
@@ -214,6 +216,14 @@ function LobbySession.BeStunned(self: LobbySession)
 	end)
 end
 
+function LobbySession.GetCrit(self: LobbySession)
+	if self.ActiveCrit then self.ActiveCrit:cancel() end
+
+	self.ActiveCrit = Promise.delay(5):finally(function()
+		self.ActiveCrit = nil
+	end)
+end
+
 function LobbySession.Update(self: LobbySession, dt: number)
 	local isMoving = self.Human.MoveDirection.Magnitude > 0.01
 	if isMoving then
@@ -239,6 +249,10 @@ function LobbySession.IsStunned(self: LobbySession)
 	return self.ActiveStun ~= nil
 end
 
+function LobbySession.IsCritting(self: LobbySession)
+	return self.ActiveCrit ~= nil
+end
+
 function LobbySession.SetWeapon(self: LobbySession, weaponDef)
 	return Promise.try(function()
 		local holdPart = self.Character:FindFirstChild(weaponDef.HoldPartName)
@@ -256,7 +270,7 @@ end
 
 function LobbySession.GetClosestDummy(self: LobbySession)
 	local bestDummy = nil
-	local bestDistance = math.huge
+	local bestDistance = 48
 
 	local root = self.Character.PrimaryPart
 	local here = TryNow(function()
@@ -311,13 +325,15 @@ function LobbySession.Attack(self: LobbySession)
 	if not self.AttackCooldown:IsReady() then return end
 	self.AttackCooldown:Use()
 
-	self.Animator:Play(self.WeaponDef.Animations.Shoot, 0)
-
 	local encounter = self:GetClosestEncounter()
 	local dummy = self:GetClosestDummy()
-
 	local target = if encounter then encounter else dummy
+	if not target then return end
+
 	local there = target:GetPosition()
+
+	local isCrit = (encounter ~= nil) and self:IsCritting()
+	if isCrit then self.ActiveCrit:cancel() end
 
 	EffectService:Effect(
 		self.Player,
@@ -328,6 +344,8 @@ function LobbySession.Attack(self: LobbySession)
 		})
 	)
 
+	self.Animator:Play(self.WeaponDef.Animations.Shoot, 0)
+
 	local attack = Promise.delay(0.05)
 		:andThen(function()
 			local part = self.Model:FindFirstChild("Weapon")
@@ -336,19 +354,51 @@ function LobbySession.Attack(self: LobbySession)
 			local here = part.Position
 			local start = CFrame.lookAt(here, there)
 			local finish = start - here + there
+			local speed = 128
+
+			if isCrit then
+				EffectService:All(
+					EffectProjectile({
+						Model = ReplicatedStorage.Assets.Models.Effects.CritProjectile,
+						Start = start,
+						Finish = finish,
+						Speed = speed,
+					}),
+					EffectSound({
+						SoundId = "CritStart1",
+						Target = part,
+					})
+				)
+			end
 
 			return EffectService:All(
 				EffectProjectile({
 					Model = ReplicatedStorage.Assets.Models.Projectiles[self.WeaponDef.ProjectileName],
 					Start = start,
 					Finish = finish,
-					Speed = 128,
+					Speed = speed,
 				}),
 				EffectSound({
 					SoundId = PickRandom(self.WeaponDef.Sounds.Shoot),
 					Target = part,
 				})
-			)
+			):andThen(function()
+				if isCrit then
+					EffectService:All(
+						EffectGrowFade({
+							Part = ReplicatedStorage.Assets.Models.Effects.CritHitEffect,
+							Target = finish,
+							Duration = 0.25,
+							StartSize = Vector3.zero,
+							EndSize = Vector3.one * 20,
+						}),
+						EffectSound({
+							SoundId = "CritImpact1",
+							Target = finish.Position,
+						})
+					)
+				end
+			end)
 		end)
 		:andThen(function()
 			return PetService:GetPets(self.Player)
@@ -375,7 +425,7 @@ function LobbySession.Attack(self: LobbySession)
 			})
 
 			if encounter then
-				encounter:GetHit(self.Player, PickRandom(self.WeaponDef.Sounds.Hit))
+				encounter:GetHit(self.Player, if isCrit then 5 else 1, PickRandom(self.WeaponDef.Sounds.Hit))
 			else
 				dummy:HitEffect(PickRandom(self.WeaponDef.Sounds.Hit))
 			end
