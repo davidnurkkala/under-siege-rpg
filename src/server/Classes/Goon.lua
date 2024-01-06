@@ -110,7 +110,7 @@ function Goon.new(args: {
 	}, Goon)
 
 	self.Root:SetAttribute("Level", self.Level)
-	self.Root.Parent = workspace
+	self.Root.Parent = self.Battle.Model
 
 	self.Health:Observe(function(old, new)
 		local change = new - old
