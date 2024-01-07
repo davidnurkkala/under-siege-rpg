@@ -58,6 +58,23 @@ local Battlers = {
 		},
 	},
 
+	RebelLeader = {
+		Name = "Rebel Leader",
+		BattlegroundName = "World1",
+		BaseName = "Tower",
+		Reward = 250,
+		WeaponId = "Crossbow",
+		Power = 20000,
+		Deck = {
+			Peasant = 16,
+			Recruit = 12,
+			Footman = 16,
+			Hunter = 16,
+			Mob = 8,
+			Recruitment = 8,
+		},
+	},
+
 	-- world 2
 	VikingRunt = {
 		Name = "Viking Runt",
