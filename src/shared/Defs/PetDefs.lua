@@ -118,15 +118,6 @@ local Pets = {
 	},
 
 	-- rank 4
-	Slimey = {
-		Name = "Slimey",
-		ModelName = "SlimePet",
-		Animations = {
-			Idle = { "GenericPetBlink", "GenericPetIdle", "SlimeIdleExtras" },
-			Walk = { "SlimeHop", "WolfyWalkExtras" },
-		},
-		Power = 9.5,
-	},
 	MooCow = {
 		Name = "MooCow",
 		ModelName = "CowPet",
@@ -153,6 +144,15 @@ local Pets = {
 			Walk = { "GenericPetWalk", "KittyWalkExtras" },
 		},
 		Power = 9,
+	},
+	Slimey = {
+		Name = "Slimey",
+		ModelName = "SlimePet",
+		Animations = {
+			Idle = { "GenericPetBlink", "GenericPetIdle", "SlimeIdleExtras" },
+			Walk = { "SlimeHop", "WolfyWalkExtras" },
+		},
+		Power = 9.5,
 	},
 }
 
