@@ -272,6 +272,10 @@ function Badger.onProcess(condition: Condition, callback: (Condition) -> ()): Co
 			condition:process(...)
 			callback(wrapped)
 		end,
+		load = function(_, ...)
+			condition:load(...)
+			callback(wrapped)
+		end,
 	})
 	callback(wrapped)
 	return wrapped

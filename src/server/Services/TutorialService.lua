@@ -149,7 +149,6 @@ function TutorialService.PrepareBlocking(self: TutorialService)
 
 			-- load data if it exists
 			if tutorialData ~= nil then
-				print("Loading data", tutorialData)
 				condition:load(tutorialData)
 				self.StatusRemote:SetFor(player, condition:getState())
 			end
