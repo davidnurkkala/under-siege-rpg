@@ -57,6 +57,20 @@ local Battlers = {
 			Recruitment = 8,
 		},
 	},
+	MinerBoss = {
+		Name = "Miner Boss",
+		BattlegroundName = "World1",
+		BaseName = "Tower",
+		Reward = 300,
+		WeaponId = "Crossbow",
+		Power = 50000,
+		Deck = {
+			Miner = 32,
+			Demolitionist = 64,
+			PickaxeThrower = 32,
+		},
+	},
+
 	RebelLeader = {
 		Name = "Rebel Leader",
 		BattlegroundName = "World1",

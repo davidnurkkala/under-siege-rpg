@@ -32,8 +32,26 @@ local Cards = {
 		Rank = 1,
 		Cooldown = 3,
 	},
+	Miner = {
+		GoonId = "Miner",
+		Type = "Goon",
+		Rank = 1,
+		Cooldown = 2,
+	},
 	Hunter = {
 		GoonId = "Hunter",
+		Type = "Goon",
+		Rank = 1,
+		Cooldown = 2,
+	},
+	Demolitionist = {
+		GoonId = "Demolitionist",
+		Type = "Goon",
+		Rank = 1,
+		Cooldown = 3,
+	},
+	PickaxeThrower = {
+		GoonId = "PickaxeThrower",
 		Type = "Goon",
 		Rank = 1,
 		Cooldown = 2,

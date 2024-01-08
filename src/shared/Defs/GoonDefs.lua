@@ -163,6 +163,128 @@ local Goons = {
 		end,
 	},
 
+	Miner = {
+		Name = "Miner",
+		Description = "A local laborer smeared in coal and filth.",
+		ModelName = "Miner",
+		Brain = {
+			Id = "BasicMelee",
+		},
+		Tags = { "Light" },
+		Animations = {
+			Walk = "SwordsmanWalk",
+			Attack = "GenericGoon1hMelee",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Size = 0.03,
+		AttackWindupTime = function()
+			return 0.2
+		end,
+		Speed = function()
+			return 0.05
+		end,
+		Range = function()
+			return 0.1
+		end,
+		AttackRate = function()
+			return 0.85
+		end,
+		Damage = function(level)
+			return scaling(3, 1, level)
+		end,
+		HealthMax = function(level)
+			return scaling(15, 1, level)
+		end,
+	},
+
+	Demolitionist = {
+		Name = "Demolitionist",
+		Description = "An experienced miner with a passion for explosives",
+		ModelName = "Demolitionist",
+		Brain = {
+			Id = "BasicRanged",
+			ProjectileOffset = CFrame.new(0, 0.75, -2),
+			ProjectileName = "TNT",
+		},
+		Tags = { "Ranged" },
+		Animations = {
+			Idle = "HunterIdle",
+			Walk = "SwordsmanWalk",
+			Attack = "GenericGoonThrow",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Shoot = { "WhooshMedium1", "WhooshMedium2", "WhooshMedium3", "WhooshMedium4" },
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Size = 0.03,
+		AttackWindupTime = function()
+			return 0.85
+		end,
+		Speed = function()
+			return 0.05
+		end,
+		Range = function()
+			return 0.2
+		end,
+		AttackRate = function()
+			return 1.5
+		end,
+		Damage = function(level)
+			return scaling(3, 0.5, level)
+		end,
+		HealthMax = function(level)
+			return scaling(10, 1, level)
+		end,
+	},
+
+	PickaxeThrower = {
+		Name = "Pickaxe Thrower",
+		Description = "That's now how you're supposed to use a pickaxe, but he makes it work",
+		ModelName = "PickaxeThrower",
+		Brain = {
+			Id = "BasicRanged",
+			ProjectileOffset = CFrame.new(0, 0.75, -2),
+			ProjectileName = "ThrownPickaxe",
+		},
+		Tags = { "Ranged" },
+		Animations = {
+			Idle = "HunterIdle",
+			Walk = "SwordsmanWalk",
+			Attack = "GenericGoonThrow",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Shoot = { "WhooshMedium1", "WhooshMedium2", "WhooshMedium3", "WhooshMedium4" },
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Size = 0.03,
+		AttackWindupTime = function()
+			return 0.85
+		end,
+		Speed = function()
+			return 0.05
+		end,
+		Range = function()
+			return 0.18
+		end,
+		AttackRate = function()
+			return 1.2
+		end,
+		Damage = function(level)
+			return scaling(2, 0.5, level)
+		end,
+		HealthMax = function(level)
+			return scaling(12, 1, level)
+		end,
+	},
+
 	Mage = {
 		Name = "Mage",
 		Description = "A student of the magical arts lacking in any real practical experience.",

@@ -9,6 +9,11 @@ local Encounters = {
 		Health = 10,
 		GoonId = "Peasant",
 	},
+	AngryMiner = {
+		Level = 5,
+		Health = 50,
+		GoonId = "Miner",
+	},
 	Mercenary = {
 		Level = 3,
 		Health = 30,

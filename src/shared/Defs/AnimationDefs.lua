@@ -18,6 +18,7 @@ local Ids = {
 	GenericGoon1hMelee = 15340578529,
 	GenericGoonShoot = 15340585721,
 	GenericGoonCheer = 15511129700,
+	GenericGoonThrow = 15919709023,
 
 	GenericBattlerFlinch = 15408070949,
 	GenericBattlerDie = 15408391566,
@@ -25,6 +26,8 @@ local Ids = {
 	MasterMageIdle = 15418696124,
 	GuildmasterIdle = 15418693843,
 	ShopkeeperIdle = 15418697238,
+	PickaxeSwingIdle = 15920213980,
+	PickaxeSwingIdleSlow = 15920832797,
 
 	PeasantWalk = 15082639586,
 	MageWalk = 15082639586,
