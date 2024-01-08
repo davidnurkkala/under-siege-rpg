@@ -10,8 +10,6 @@ type QuestController = typeof(QuestController)
 function QuestController.PrepareBlocking(self: QuestController)
 	self.Comm = Comm.ClientComm.new(ReplicatedStorage, true, "QuestService")
 	self.QuestsRemote = self.Comm:GetProperty("Quests")
-
-	self.QuestsRemote:Observe(print)
 end
 
 function QuestController.ObserveQuests(self: QuestController, callback)
