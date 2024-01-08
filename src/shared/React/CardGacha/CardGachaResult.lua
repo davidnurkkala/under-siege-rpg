@@ -138,7 +138,9 @@ return function(props: {
 							LayoutOrder = index,
 						}, {
 							ChangeText = React.createElement(Label, {
-								Size = UDim2.fromScale(1, 0.2),
+								AnchorPoint = Vector2.new(0.5, 0),
+								Position = UDim2.fromScale(0.5, 0),
+								Size = UDim2.fromScale(0.8, 0.2),
 								Text = TextStroke(`{if result.DidLevelUp then "Level up! " else ""}+{delta}`),
 							}),
 

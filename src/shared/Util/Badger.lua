@@ -70,7 +70,7 @@ function Badger.create(condition: Condition)
 end
 
 function Badger.wrap(core: Condition, wrapper: Condition)
-	return setmetatable(wrapper, { __index = core })
+	return setmetatable(wrapper, { __index = core, __newindex = core })
 end
 
 function Badger.processFiltered(condition, kind, payload)
@@ -253,33 +253,40 @@ function Badger.with(condition: Condition, prerequisite: Condition): Condition
 end
 
 function Badger.onCompleted(condition: Condition, callback: (Condition) -> ()): Condition
+	return Badger.wrap(condition, {
+		process = function(self, ...)
+			condition:process(...)
+			if condition:isComplete() then task.defer(callback, self) end
+		end,
+		load = function(self, ...)
+			condition:load(...)
+			if condition:isComplete() then task.defer(callback, self) end
+		end,
+	})
+end
+
+function Badger.withDescription(condition: Condition, getDescription: (Condition) -> string): Condition
 	local wrapped
 	wrapped = Badger.wrap(condition, {
-		process = function(_self, ...)
-			condition:process(...)
-			if condition:isComplete() then task.defer(callback, wrapped) end
-		end,
-		load = function(_self, ...)
-			condition:load(...)
-			if condition:isComplete() then task.defer(callback, wrapped) end
+		getDescription = function()
+			return getDescription(condition)
 		end,
 	})
 	return wrapped
 end
 
 function Badger.onProcess(condition: Condition, callback: (Condition) -> ()): Condition
-	local wrapped
-	wrapped = Badger.wrap(condition, {
-		process = function(_, ...)
+	local wrapped = Badger.wrap(condition, {
+		process = function(self, ...)
 			condition:process(...)
-			callback(wrapped)
+			callback(self)
 		end,
-		load = function(_, ...)
+		load = function(self, ...)
 			condition:load(...)
-			callback(wrapped)
+			callback(self)
 		end,
 	})
-	callback(wrapped)
+	task.defer(callback, wrapped)
 	return wrapped
 end
 
@@ -341,6 +348,8 @@ end
 function Badger.stop(condition: Condition)
 	for eventKind in condition:getFilter() do
 		local set = ConditionSetsByKind[eventKind]
+		if not set then continue end
+
 		set[condition] = nil
 
 		if Sift.Set.count(set) == 0 then

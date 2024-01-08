@@ -55,6 +55,7 @@ local DataService = {
 			Streak = 0,
 			AvailableRewardIndices = {},
 		},
+		QuestData = {},
 		IsFirstSession = true,
 	},
 }
@@ -105,6 +106,9 @@ function DataService.PrepareBlocking(self: DataService)
 						return premium + 10
 					end)
 				end)
+			end,
+			function(oldData)
+				return Sift.Dictionary.set(oldData, "QuestData", {})
 			end,
 		},
 	})

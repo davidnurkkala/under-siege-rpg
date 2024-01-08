@@ -3,10 +3,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CardGachaDefs = require(ReplicatedStorage.Shared.Defs.CardGachaDefs)
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
-local FormatBigNumber = require(ReplicatedStorage.Shared.Util.FormatBigNumber)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local ListLayout = require(ReplicatedStorage.Shared.React.Common.ListLayout)
 local Observers = require(ReplicatedStorage.Packages.Observers)
+local QuestController = require(ReplicatedStorage.Shared.Controllers.QuestController)
 local React = require(ReplicatedStorage.Packages.React)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
@@ -15,6 +15,7 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 local function overhead(props: {
 	Adornee: BasePart | Attachment,
 	Name: string,
+	Text: string?,
 })
 	return React.createElement("BillboardGui", {
 		Size = UDim2.fromScale(16, 9),
@@ -25,23 +26,10 @@ local function overhead(props: {
 			Size = UDim2.fromScale(1, 0.65),
 			Text = TextStroke(props.Name),
 		}),
-		Quest = false and React.createElement(Container, {
+		Text = props.Text and React.createElement(Label, {
 			Size = UDim2.fromScale(1, 0.35),
 			Position = UDim2.fromScale(0, 0.65),
-		}, {
-			Layout = React.createElement(ListLayout, {
-				HorizontalAlignment = Enum.HorizontalAlignment.Center,
-				FillDirection = Enum.FillDirection.Horizontal,
-				Padding = UDim.new(0, 2),
-			}),
-
-			Text = React.createElement(Label, {
-				LayoutOrder = 2,
-				Size = UDim2.fromScale(0, 1),
-				TextColor3 = ColorDefs.PaleRed,
-				AutomaticSize = Enum.AutomaticSize.X,
-				Text = "Unimplemented quest requirement",
-			}),
+			Text = TextStroke(props.Text),
 		}),
 	})
 end
@@ -65,10 +53,28 @@ return function()
 					})
 				end)
 
-				return function()
+				local gachaTrove = Trove.new()
+
+				gachaTrove:Add(function()
 					setShoplikes(function(oldShoplikes)
 						return Sift.Dictionary.removeKey(oldShoplikes, part)
 					end)
+				end)
+
+				if def.QuestRequirement then
+					gachaTrove:Add(QuestController:ObserveQuests(function(quests)
+						local description = quests[def.QuestRequirement]
+
+						setShoplikes(function(oldShoplikes)
+							return Sift.Dictionary.update(oldShoplikes, part, function(oldShoplike)
+								return Sift.Dictionary.set(oldShoplike, "Text", if description == "Complete" then nil else description)
+							end)
+						end)
+					end))
+				end
+
+				return function()
+					gachaTrove:Clean()
 				end
 			end)
 		end, { workspace }))
@@ -127,6 +133,7 @@ return function()
 			return React.createElement(overhead, {
 				Adornee = adornee,
 				Name = data.Name,
+				Text = data.Text,
 			})
 		end)
 	)

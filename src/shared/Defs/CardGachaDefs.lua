@@ -29,6 +29,20 @@ local Gachas = {
 			{ Result = "Hunter", Weight = 1 },
 		},
 	},
+	World1RebelCards = {
+		Name = "Peasant Rebellion",
+		Verb = "Recruit",
+		Header = "Rebels",
+		QuestRequirement = "PutDownRebellion",
+		Price = {
+			Secondary = 25,
+		},
+		WeightTable = {
+			{ Result = "Recruit", Weight = 3 },
+			{ Result = "Mob", Weight = 2 },
+			{ Result = "Recruitment", Weight = 2 },
+		},
+	},
 	World2Goons = {
 		Name = "World 2 Soldiers",
 		Verb = "Hire",

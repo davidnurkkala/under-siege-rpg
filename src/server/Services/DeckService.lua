@@ -12,6 +12,7 @@ local MultiRollHelper = require(ServerScriptService.Server.Util.MultiRollHelper)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local OptionsService = require(ServerScriptService.Server.Services.OptionsService)
 local Promise = require(ReplicatedStorage.Packages.Promise)
+local QuestService = require(ServerScriptService.Server.Services.QuestService)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local t = require(ReplicatedStorage.Packages.t)
 
@@ -169,6 +170,20 @@ function DeckService.DrawCardFromGacha(self: DeckService, player: Player, gachaI
 		if not canProceed then
 			resolve({})
 			return
+		end
+
+		if gacha.QuestRequirement then
+			local questCheck = QuestService:IsQuestComplete(player, gacha.QuestRequirement)
+			onCancel(function()
+				questCheck:cancel()
+			end)
+
+			local questComplete = questCheck:expect()
+			if onCancel() then return end
+			if not questComplete then
+				resolve({})
+				return
+			end
 		end
 
 		local cards = {}

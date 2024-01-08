@@ -1,18 +1,16 @@
-local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local CardGacha = require(ReplicatedStorage.Shared.React.CardGacha.CardGacha)
+local CardGachaDefs = require(ReplicatedStorage.Shared.Defs.CardGachaDefs)
 local CardGachaResult = require(ReplicatedStorage.Shared.React.CardGacha.CardGachaResult)
-local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local CurrencyController = require(ReplicatedStorage.Shared.Controllers.CurrencyController)
 local DeckController = require(ReplicatedStorage.Shared.Controllers.DeckController)
 local MenuContext = require(ReplicatedStorage.Shared.React.MenuContext.MenuContext)
 local MultiRollPrompt = require(ReplicatedStorage.Shared.React.Common.MultiRollPrompt)
 local ProductController = require(ReplicatedStorage.Shared.Controllers.ProductController)
-local PromptWindow = require(ReplicatedStorage.Shared.React.Common.PromptWindow)
+local QuestController = require(ReplicatedStorage.Shared.Controllers.QuestController)
 local React = require(ReplicatedStorage.Packages.React)
-local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local Zoner = require(ReplicatedStorage.Shared.Classes.Zoner)
 
@@ -44,7 +42,15 @@ return function()
 
 		trove:Add(Zoner.new(Players.LocalPlayer, "CardGachaZone", function(entered, zone)
 			if entered then
-				setGachaId(zone:GetAttribute("GachaId"))
+				local id = zone:GetAttribute("GachaId")
+				local def = CardGachaDefs[id]
+				if not def then return end
+
+				if def.QuestRequirement then
+					if not QuestController:IsQuestComplete(def.QuestRequirement) then return end
+				end
+
+				setGachaId(id)
 				menu.Set("CardGacha")
 			else
 				menu.Unset("CardGacha")

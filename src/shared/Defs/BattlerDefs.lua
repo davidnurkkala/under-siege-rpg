@@ -57,7 +57,6 @@ local Battlers = {
 			Recruitment = 8,
 		},
 	},
-
 	RebelLeader = {
 		Name = "Rebel Leader",
 		BattlegroundName = "World1",
