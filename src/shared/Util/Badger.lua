@@ -46,7 +46,9 @@ Badger.condition = {
 
 		described = function(self, getDescription)
 			return Badger.wrap(self, {
-				getDescription = getDescription,
+				getDescription = function()
+					return getDescription(self)
+				end,
 			})
 		end,
 
