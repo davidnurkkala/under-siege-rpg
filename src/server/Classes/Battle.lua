@@ -435,6 +435,22 @@ function Battle.TargetCloseToFar(
 	return Sift.Array.sort(self:FilterTargets(args.Filter), compare)
 end
 
+function Battle.TargetRadius(
+	self: Battle,
+	args: {
+		Position: number,
+		Radius: number,
+		Filter: (BattleTarget) -> boolean,
+	}
+): { BattleTarget }
+	return self:FilterTargets(function(target)
+		if not args.Filter(target) then return false end
+
+		local distance = math.abs(target.Position - args.Position)
+		return distance <= args.Radius
+	end)
+end
+
 function Battle.TargetNearest(
 	self: Battle,
 	args: {

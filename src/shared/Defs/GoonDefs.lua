@@ -213,7 +213,7 @@ local Goons = {
 
 	Demolitionist = {
 		Name = "Demolitionist",
-		Description = "An experienced miner with a passion for explosives",
+		Description = "An experienced miner that throws bombs. Deals damage in an area.",
 		ModelName = "Demolitionist",
 		Brain = {
 			Id = "Demolitionist",
@@ -247,10 +247,10 @@ local Goons = {
 				return 0.4
 			end,
 			AttackRate = function()
-				return 1.5
+				return 0.5
 			end,
 			Damage = function(level)
-				return scaling(3, 0.5, level)
+				return scaling(1, 0.5, level)
 			end,
 			HealthMax = function(level)
 				return scaling(10, 1, level)

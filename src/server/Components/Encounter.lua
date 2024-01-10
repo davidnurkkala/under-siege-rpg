@@ -302,7 +302,7 @@ end
 
 function Encounter.Attack(self: Encounter)
 	self:SetState(EncounterHelper.State.Attacking)
-	self.AttackWindup = self.GoonDef.AttackWindupTime()
+	self.AttackWindup = self.GoonDef.Stats.AttackWindupTime()
 end
 
 function Encounter.BeBlocked(self: Encounter, session)
