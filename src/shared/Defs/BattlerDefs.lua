@@ -206,6 +206,22 @@ local Battlers = {
 		},
 	},
 
+	BanditLeader = {
+		Name = "Bandit Leader",
+		BattlegroundName = "World1",
+		BaseName = "ElfBase",
+		Reward = 3000,
+		WeaponId = "Crossbow",
+		Power = 4000000,
+		Deck = {
+			BanditRogue = 64,
+			BanditDuelist = 64,
+			BanditScout = 64,
+			BanditOfficer = 32,
+			Mob = 24,
+		},
+	},
+
 	-- world 4
 	OrcGrunt = {
 		Name = "Orc Grunt",

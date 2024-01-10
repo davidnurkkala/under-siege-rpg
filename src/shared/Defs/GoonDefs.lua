@@ -425,6 +425,164 @@ local Goons = {
 		},
 	},
 
+	BanditScout = {
+		Name = "Bandit Scout",
+		Description = "An Elven marksman with a keen eye, keeping watch for the guards",
+		ModelName = "BanditScout",
+		Brain = {
+			Id = "BasicRanged",
+			ProjectileOffset = CFrame.new(0, 0.75, -2),
+			ProjectileName = "Arrow1",
+		},
+		Tags = { "Ranged" },
+		Animations = {
+			Idle = "HunterIdle",
+			Walk = "HunterWalk",
+			Attack = "HunterAttack",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Shoot = { "BowShoot1", "BowShoot2", "BowShoot3", "BowShoot4" },
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Size = 0.03,
+		AttackWindupTime = function()
+			return 0.5
+		end,
+		Speed = function()
+			return 0.05
+		end,
+		Range = function()
+			return 0.4
+		end,
+		AttackRate = function()
+			return 1
+		end,
+		Damage = function(level)
+			return scaling(2, 0.5, level)
+		end,
+		HealthMax = function(level)
+			return scaling(8, 1, level)
+		end,
+	},
+
+	BanditRogue = {
+		Name = "Bandit Rogue",
+		Description = `A sneaky fighter with a taste for ill gotten goods. Watch your pockets!`,
+		ModelName = "BanditRogue",
+		Brain = {
+			Id = "BasicMelee",
+		},
+		Tags = { "Light" },
+		{ "Charger" },
+		Animations = {
+			Walk = "SwordsmanWalk",
+			Attack = "RogueAttack",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Size = 0.03,
+		AttackWindupTime = function()
+			return 0.2
+		end,
+		Speed = function()
+			return 0.3
+		end,
+		Range = function()
+			return 0.1
+		end,
+		AttackRate = function()
+			return 0.4
+		end,
+		Damage = function(level)
+			return scaling(6, 2, level)
+		end,
+		HealthMax = function(level)
+			return scaling(3, 1, level)
+		end,
+	},
+
+	BanditDuelist = {
+		Name = "Bandit Duelist",
+		Description = `A versatile and unpredictable bandit fighter.`,
+		ModelName = "BanditDuelist",
+		Brain = {
+			Id = "BasicMelee",
+		},
+		Tags = { "Light" },
+		Animations = {
+			Walk = "SwordsmanWalk",
+			Attack = "DuelistAttack",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Size = 0.03,
+		AttackWindupTime = function()
+			return 0.43
+		end,
+		Speed = function()
+			return 0.2
+		end,
+		Range = function()
+			return 0.15
+		end,
+		AttackRate = function()
+			return 0.55
+		end,
+		Damage = function(level)
+			return scaling(8, 2, level)
+		end,
+		HealthMax = function(level)
+			return scaling(10, 1, level)
+		end,
+	},
+
+	BanditOfficer = {
+		Name = "Bandit Officer",
+		Description = `His blades dance gracefully across the battlefield, cutting down foes in his path.`,
+		ModelName = "BanditOfficer",
+		Brain = {
+			Id = "BasicMelee",
+		},
+		Tags = { "Armored" },
+		{ "Brutal" },
+		Animations = {
+			Walk = "SwordsmanWalk",
+			Attack = "DualSwordsAttack",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Size = 0.03,
+		AttackWindupTime = function()
+			return 0.3
+		end,
+		Speed = function()
+			return 0.15
+		end,
+		Range = function()
+			return 0.1
+		end,
+		AttackRate = function()
+			return 0.75
+		end,
+		Damage = function(level)
+			return scaling(10, 2, level)
+		end,
+		HealthMax = function(level)
+			return scaling(12, 1, level)
+		end,
+	},
+
 	OrcWarrior = {
 		Name = "Orc Warrior",
 		Description = `A powerful Orcish brute clad in crude scraps of leather.`,

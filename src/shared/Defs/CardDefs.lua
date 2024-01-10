@@ -62,6 +62,30 @@ local Cards = {
 		Rank = 1,
 		Cooldown = 3,
 	},
+	BanditScout = {
+		GoonId = "BanditScout",
+		Type = "Goon",
+		Rank = 1,
+		Cooldown = 4,
+	},
+	BanditRogue = {
+		GoonId = "Mage",
+		Type = "Goon",
+		Rank = 1,
+		Cooldown = 4,
+	},
+	BanditDuelist = {
+		GoonId = "BanditDuelist",
+		Type = "Goon",
+		Rank = 1,
+		Cooldown = 3,
+	},
+	BanditOfficer = {
+		GoonId = "BanditOfficer",
+		Type = "Goon",
+		Rank = 1,
+		Cooldown = 2,
+	},
 	Berserker = {
 		GoonId = "Berserker",
 		Type = "Goon",

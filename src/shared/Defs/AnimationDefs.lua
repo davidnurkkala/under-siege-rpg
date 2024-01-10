@@ -36,6 +36,9 @@ local Ids = {
 	MageAttack = 15340597447,
 	AxemanAttack = 15366912173,
 	BerserkerAttack = 15366913772,
+	RogueAttack = 15933013282,
+	DuelistAttack = 15933105581,
+	DualSwordsAttack = 15933136127,
 
 	HunterIdle = 15484910251,
 	HunterWalk = 15484942080,
