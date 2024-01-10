@@ -19,6 +19,14 @@ local Tags = {
 		Name = "Evasive",
 		Description = "Has a chance of avoiding attacks from Ranged enemies.",
 	},
+	Charger = {
+		Name = "Charger",
+		Description = "Moves much faster until first attack.",
+	},
+	Brutal = {
+		Name = "Brutal",
+		Description = "First damage dealt is dramatically increased.",
+	},
 }
 
 return Sift.Dictionary.map(Tags, function(tag, id)

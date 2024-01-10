@@ -7,15 +7,26 @@ local Lerp = require(ReplicatedStorage.Shared.Util.Lerp)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local TryNow = require(ReplicatedStorage.Shared.Util.TryNow)
 
+local function arc(scalar)
+	return (4 * scalar) - (4 * scalar ^ 2)
+end
+
 return function(args: {
 	Model: Model,
 	Start: BasePart | CFrame,
 	Finish: BasePart | CFrame,
 	Speed: number,
+	ArcRatio: number?,
 })
+	local arcRatio = args.ArcRatio or 0
+
+	local distance = TryNow(function()
+		return (args.Finish.Position - args.Start.Position).Magnitude
+	end, 1)
 	local duration = TryNow(function()
-		return (args.Finish.Position - args.Start.Position).Magnitude / args.Speed
-	end, 0)
+		return distance / args.Speed
+	end, 1)
+	local arcHeight = distance * arcRatio
 
 	return function()
 		return script.Name, args, Promise.delay(duration)
@@ -54,6 +65,11 @@ return function(args: {
 		return Animate(duration, function(scalar)
 			local position = Lerp(start().Position, finish().Position, scalar)
 			local cframe = CFrame.lookAt(position, finish().Position).Rotation + position
+
+			if arcHeight ~= 0 then
+				local dy = arc(scalar) * arcHeight
+				cframe *= CFrame.new(0, dy, 0)
+			end
 
 			if doesRotate then
 				local rotation = Lerp(startRotation, finishRotation, scalar)
