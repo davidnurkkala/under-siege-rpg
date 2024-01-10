@@ -35,7 +35,8 @@ return function(def, level, battler, battle)
 				:andThen(function()
 					local start = root.Position + offset
 
-					return EffectService:All(
+					return EffectService:ForBattle(
+						battle,
 						EffectProjectile({
 							Model = ReplicatedStorage.Assets.Models.Projectiles.Arrow1,
 							Start = CFrame.new(start),
@@ -56,7 +57,8 @@ return function(def, level, battler, battle)
 
 					battle:Damage(Damage.new(battler, target, amount))
 
-					EffectService:All(
+					EffectService:ForBattle(
+						battle,
 						EffectSound({
 							SoundId = PickRandom({ "BowHit1", "BowHit2", "BowHit3", "BowHit4" }),
 							Target = root,

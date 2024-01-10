@@ -24,25 +24,27 @@ local Goons = {
 			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
 			Death = { "MaleUgh1", "MaleUgh2" },
 		},
-		Size = 0.03,
-		AttackWindupTime = function()
-			return 1
-		end,
-		Speed = function()
-			return 0.05
-		end,
-		Range = function()
-			return 0.1
-		end,
-		AttackRate = function()
-			return 0.75
-		end,
-		Damage = function(level)
-			return scaling(1, 1, level)
-		end,
-		HealthMax = function(level)
-			return scaling(10, 1, level)
-		end,
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 1
+			end,
+			Speed = function()
+				return 0.05
+			end,
+			Range = function()
+				return 0.1
+			end,
+			AttackRate = function()
+				return 0.75
+			end,
+			Damage = function(level)
+				return scaling(1, 1, level)
+			end,
+			HealthMax = function(level)
+				return scaling(10, 1, level)
+			end,
+		},
 	},
 
 	Recruit = {
@@ -62,25 +64,27 @@ local Goons = {
 			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
 			Death = { "MaleUgh1", "MaleUgh2" },
 		},
-		Size = 0.03,
-		AttackWindupTime = function()
-			return 0.27
-		end,
-		Speed = function()
-			return 0.05
-		end,
-		Range = function()
-			return 0.1
-		end,
-		AttackRate = function()
-			return 0.75
-		end,
-		Damage = function(level)
-			return scaling(2, 1, level)
-		end,
-		HealthMax = function(level)
-			return scaling(15, 1, level)
-		end,
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.27
+			end,
+			Speed = function()
+				return 0.05
+			end,
+			Range = function()
+				return 0.1
+			end,
+			AttackRate = function()
+				return 0.75
+			end,
+			Damage = function(level)
+				return scaling(2, 1, level)
+			end,
+			HealthMax = function(level)
+				return scaling(15, 1, level)
+			end,
+		},
 	},
 
 	Footman = {
@@ -100,25 +104,27 @@ local Goons = {
 			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
 			Death = { "MaleUgh1", "MaleUgh2" },
 		},
-		Size = 0.03,
-		AttackWindupTime = function()
-			return 0.27
-		end,
-		Speed = function()
-			return 0.05
-		end,
-		Range = function()
-			return 0.1
-		end,
-		AttackRate = function()
-			return 0.75
-		end,
-		Damage = function(level)
-			return scaling(2.5, 1, level)
-		end,
-		HealthMax = function(level)
-			return scaling(20, 1, level)
-		end,
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.27
+			end,
+			Speed = function()
+				return 0.05
+			end,
+			Range = function()
+				return 0.1
+			end,
+			AttackRate = function()
+				return 0.75
+			end,
+			Damage = function(level)
+				return scaling(2.5, 1, level)
+			end,
+			HealthMax = function(level)
+				return scaling(20, 1, level)
+			end,
+		},
 	},
 
 	Hunter = {
@@ -142,25 +148,27 @@ local Goons = {
 			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
 			Death = { "MaleUgh1", "MaleUgh2" },
 		},
-		Size = 0.03,
-		AttackWindupTime = function()
-			return 0.55
-		end,
-		Speed = function()
-			return 0.05
-		end,
-		Range = function()
-			return 0.35
-		end,
-		AttackRate = function()
-			return 1.1
-		end,
-		Damage = function(level)
-			return scaling(1, 0.5, level)
-		end,
-		HealthMax = function(level)
-			return scaling(10, 1, level)
-		end,
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.55
+			end,
+			Speed = function()
+				return 0.05
+			end,
+			Range = function()
+				return 0.35
+			end,
+			AttackRate = function()
+				return 1.1
+			end,
+			Damage = function(level)
+				return scaling(1, 0.5, level)
+			end,
+			HealthMax = function(level)
+				return scaling(10, 1, level)
+			end,
+		},
 	},
 
 	Miner = {
@@ -180,25 +188,27 @@ local Goons = {
 			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
 			Death = { "MaleUgh1", "MaleUgh2" },
 		},
-		Size = 0.03,
-		AttackWindupTime = function()
-			return 0.2
-		end,
-		Speed = function()
-			return 0.05
-		end,
-		Range = function()
-			return 0.1
-		end,
-		AttackRate = function()
-			return 0.85
-		end,
-		Damage = function(level)
-			return scaling(3, 1, level)
-		end,
-		HealthMax = function(level)
-			return scaling(15, 1, level)
-		end,
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.2
+			end,
+			Speed = function()
+				return 0.05
+			end,
+			Range = function()
+				return 0.1
+			end,
+			AttackRate = function()
+				return 0.85
+			end,
+			Damage = function(level)
+				return scaling(3, 1, level)
+			end,
+			HealthMax = function(level)
+				return scaling(15, 1, level)
+			end,
+		},
 	},
 
 	Demolitionist = {
@@ -206,15 +216,18 @@ local Goons = {
 		Description = "An experienced miner with a passion for explosives",
 		ModelName = "Demolitionist",
 		Brain = {
-			Id = "BasicRanged",
+			Id = "Demolitionist",
+			KeepDistanceRatio = 0,
 			ProjectileOffset = CFrame.new(0, 0.75, -2),
 			ProjectileName = "TNT",
+			ProjectileSpeed = 16,
+			ProjectileArcRatio = 0.5,
 		},
 		Tags = { "Ranged" },
 		Animations = {
 			Idle = "HunterIdle",
 			Walk = "SwordsmanWalk",
-			Attack = "GenericGoonThrow",
+			Attack = "DemolitionistThrow",
 			Die = "GenericGoonDie",
 		},
 		Sounds = {
@@ -222,25 +235,27 @@ local Goons = {
 			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
 			Death = { "MaleUgh1", "MaleUgh2" },
 		},
-		Size = 0.03,
-		AttackWindupTime = function()
-			return 0.85
-		end,
-		Speed = function()
-			return 0.05
-		end,
-		Range = function()
-			return 0.2
-		end,
-		AttackRate = function()
-			return 1.5
-		end,
-		Damage = function(level)
-			return scaling(3, 0.5, level)
-		end,
-		HealthMax = function(level)
-			return scaling(10, 1, level)
-		end,
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.85
+			end,
+			Speed = function()
+				return 0.05
+			end,
+			Range = function()
+				return 0.4
+			end,
+			AttackRate = function()
+				return 1.5
+			end,
+			Damage = function(level)
+				return scaling(3, 0.5, level)
+			end,
+			HealthMax = function(level)
+				return scaling(10, 1, level)
+			end,
+		},
 	},
 
 	PickaxeThrower = {
@@ -264,25 +279,27 @@ local Goons = {
 			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
 			Death = { "MaleUgh1", "MaleUgh2" },
 		},
-		Size = 0.03,
-		AttackWindupTime = function()
-			return 0.85
-		end,
-		Speed = function()
-			return 0.05
-		end,
-		Range = function()
-			return 0.18
-		end,
-		AttackRate = function()
-			return 1.2
-		end,
-		Damage = function(level)
-			return scaling(2, 0.5, level)
-		end,
-		HealthMax = function(level)
-			return scaling(12, 1, level)
-		end,
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.85
+			end,
+			Speed = function()
+				return 0.05
+			end,
+			Range = function()
+				return 0.18
+			end,
+			AttackRate = function()
+				return 1.2
+			end,
+			Damage = function(level)
+				return scaling(2, 0.5, level)
+			end,
+			HealthMax = function(level)
+				return scaling(12, 1, level)
+			end,
+		},
 	},
 
 	Mage = {
@@ -305,25 +322,27 @@ local Goons = {
 			Hit = { "MagicImpact1", "MagicImpact2", "MagicImpact3" },
 			Death = { "MaleUgh1", "MaleUgh2" },
 		},
-		Size = 0.03,
-		AttackWindupTime = function()
-			return 0.55
-		end,
-		Speed = function()
-			return 0.05
-		end,
-		Range = function()
-			return 0.45
-		end,
-		AttackRate = function()
-			return 0.5
-		end,
-		Damage = function(level)
-			return scaling(2, 0.75, level)
-		end,
-		HealthMax = function(level)
-			return scaling(5, 1, level)
-		end,
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.55
+			end,
+			Speed = function()
+				return 0.05
+			end,
+			Range = function()
+				return 0.45
+			end,
+			AttackRate = function()
+				return 0.5
+			end,
+			Damage = function(level)
+				return scaling(2, 0.75, level)
+			end,
+			HealthMax = function(level)
+				return scaling(5, 1, level)
+			end,
+		},
 	},
 
 	VikingWarrior = {
@@ -333,6 +352,7 @@ local Goons = {
 		Brain = {
 			Id = "BasicMelee",
 		},
+		Tags = { "Brutal" },
 		Animations = {
 			Walk = "SwordsmanWalk",
 			Attack = "AxemanAttack",
@@ -342,25 +362,27 @@ local Goons = {
 			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
 			Death = { "MaleUgh1", "MaleUgh2" },
 		},
-		Size = 0.03,
-		AttackWindupTime = function()
-			return 0.55
-		end,
-		Speed = function()
-			return 0.075
-		end,
-		Range = function()
-			return 0.1
-		end,
-		AttackRate = function()
-			return 0.75
-		end,
-		Damage = function(level)
-			return scaling(3, 1, level)
-		end,
-		HealthMax = function(level)
-			return scaling(15, 2, level)
-		end,
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.55
+			end,
+			Speed = function()
+				return 0.075
+			end,
+			Range = function()
+				return 0.1
+			end,
+			AttackRate = function()
+				return 0.75
+			end,
+			Damage = function(level)
+				return scaling(3, 1, level)
+			end,
+			HealthMax = function(level)
+				return scaling(15, 2, level)
+			end,
+		},
 	},
 
 	Berserker = {
@@ -370,7 +392,7 @@ local Goons = {
 		Brain = {
 			Id = "BasicMelee",
 		},
-		Tags = { "Light" },
+		Tags = { "Charger", "Brutal" },
 		Animations = {
 			Walk = "SwordsmanWalk",
 			Attack = "BerserkerAttack",
@@ -380,25 +402,27 @@ local Goons = {
 			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
 			Death = { "MaleUgh1", "MaleUgh2" },
 		},
-		Size = 0.03,
-		AttackWindupTime = function()
-			return 0.43
-		end,
-		Speed = function()
-			return 0.1
-		end,
-		Range = function()
-			return 0.1
-		end,
-		AttackRate = function()
-			return 0.75
-		end,
-		Damage = function(level)
-			return scaling(4, 2, level)
-		end,
-		HealthMax = function(level)
-			return scaling(5, 1, level)
-		end,
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.43
+			end,
+			Speed = function()
+				return 0.1
+			end,
+			Range = function()
+				return 0.1
+			end,
+			AttackRate = function()
+				return 0.75
+			end,
+			Damage = function(level)
+				return scaling(4, 2, level)
+			end,
+			HealthMax = function(level)
+				return scaling(5, 1, level)
+			end,
+		},
 	},
 
 	BanditScout = {
@@ -576,25 +600,27 @@ local Goons = {
 			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
 			Death = { "MaleUgh1", "MaleUgh2" },
 		},
-		Size = 0.03,
-		AttackWindupTime = function()
-			return 0.43
-		end,
-		Speed = function()
-			return 0.1
-		end,
-		Range = function()
-			return 0.1
-		end,
-		AttackRate = function()
-			return 0.75
-		end,
-		Damage = function(level)
-			return scaling(5, 1, level)
-		end,
-		HealthMax = function(level)
-			return scaling(15, 2, level)
-		end,
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.43
+			end,
+			Speed = function()
+				return 0.1
+			end,
+			Range = function()
+				return 0.1
+			end,
+			AttackRate = function()
+				return 0.75
+			end,
+			Damage = function(level)
+				return scaling(5, 1, level)
+			end,
+			HealthMax = function(level)
+				return scaling(15, 2, level)
+			end,
+		},
 	},
 
 	OrcChampion = {
@@ -614,25 +640,27 @@ local Goons = {
 			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
 			Death = { "MaleUgh1", "MaleUgh2" },
 		},
-		Size = 0.03,
-		AttackWindupTime = function()
-			return 0.43
-		end,
-		Speed = function()
-			return 0.05
-		end,
-		Range = function()
-			return 0.1
-		end,
-		AttackRate = function()
-			return 0.25
-		end,
-		Damage = function(level)
-			return scaling(8, 2, level)
-		end,
-		HealthMax = function(level)
-			return scaling(20, 3, level)
-		end,
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.43
+			end,
+			Speed = function()
+				return 0.05
+			end,
+			Range = function()
+				return 0.1
+			end,
+			AttackRate = function()
+				return 0.25
+			end,
+			Damage = function(level)
+				return scaling(8, 2, level)
+			end,
+			HealthMax = function(level)
+				return scaling(20, 3, level)
+			end,
+		},
 	},
 
 	ElfBrawler = {
@@ -652,25 +680,27 @@ local Goons = {
 			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
 			Death = { "MaleUgh1", "MaleUgh2" },
 		},
-		Size = 0.03,
-		AttackWindupTime = function()
-			return 0.43
-		end,
-		Speed = function()
-			return 0.1
-		end,
-		Range = function()
-			return 0.1
-		end,
-		AttackRate = function()
-			return 1.25
-		end,
-		Damage = function(level)
-			return scaling(1, 0.5, level)
-		end,
-		HealthMax = function(level)
-			return scaling(15, 2, level)
-		end,
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.43
+			end,
+			Speed = function()
+				return 0.1
+			end,
+			Range = function()
+				return 0.1
+			end,
+			AttackRate = function()
+				return 1.25
+			end,
+			Damage = function(level)
+				return scaling(1, 0.5, level)
+			end,
+			HealthMax = function(level)
+				return scaling(15, 2, level)
+			end,
+		},
 	},
 
 	ElfRanger = {
@@ -694,25 +724,27 @@ local Goons = {
 			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
 			Death = { "MaleUgh1", "MaleUgh2" },
 		},
-		Size = 0.03,
-		AttackWindupTime = function()
-			return 0.55
-		end,
-		Speed = function()
-			return 0.05
-		end,
-		Range = function()
-			return 0.375
-		end,
-		AttackRate = function()
-			return 1.25
-		end,
-		Damage = function(level)
-			return scaling(1, 0.5, level)
-		end,
-		HealthMax = function(level)
-			return scaling(10, 1, level)
-		end,
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.55
+			end,
+			Speed = function()
+				return 0.05
+			end,
+			Range = function()
+				return 0.375
+			end,
+			AttackRate = function()
+				return 1.25
+			end,
+			Damage = function(level)
+				return scaling(1, 0.5, level)
+			end,
+			HealthMax = function(level)
+				return scaling(10, 1, level)
+			end,
+		},
 	},
 }
 

@@ -16,7 +16,8 @@ return function(def, level, battler, battle)
 	if not target then return end
 
 	Promise.try(function()
-		EffectService:All(
+		EffectService:ForBattle(
+			battle,
 			EffectEmission({
 				Emitter = ReplicatedStorage.Assets.Emitters.Heal1,
 				ParticleCount = 1,

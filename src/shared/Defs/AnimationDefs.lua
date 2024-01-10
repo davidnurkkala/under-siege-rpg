@@ -44,6 +44,8 @@ local Ids = {
 	HunterWalk = 15484942080,
 	HunterAttack = 15484935063,
 
+	DemolitionistThrow = 15933526512,
+
 	GenericPetIdle = 15421734157,
 	GenericPetWalk = 15421736818,
 	GenericPetHop = 15514879390,

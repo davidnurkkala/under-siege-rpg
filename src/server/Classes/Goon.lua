@@ -8,6 +8,7 @@ local Health = require(ReplicatedStorage.Shared.Classes.Health)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local Signal = require(ReplicatedStorage.Packages.Signal)
+local Stat = require(ServerScriptService.Server.Classes.Stat)
 
 local Rand = Random.new()
 
@@ -17,7 +18,6 @@ Goon.__index = Goon
 export type Goon = typeof(setmetatable(
 	{} :: {
 		Position: number,
-		Size: number,
 		TeamId: string,
 		Direction: number,
 		Health: Health.Health,
@@ -36,6 +36,8 @@ export type Goon = typeof(setmetatable(
 		DidTakeDamage: any,
 		WillDealDamage: any,
 		DidDealDamage: any,
+
+		Stats: { [string]: Stat.Stat },
 	},
 	Goon
 ))
@@ -88,12 +90,11 @@ function Goon.new(args: {
 
 	local self: Goon = setmetatable({
 		Level = args.Level,
-		Health = Health.new(args.Def.HealthMax(args.Level)),
+		Health = Health.new(args.Def.Stats.HealthMax(args.Level)),
 		Position = args.Position,
 		Direction = args.Direction,
 		Root = root,
 		Animator = animator,
-		Size = args.Def.Size,
 		TeamId = args.TeamId,
 		Battle = args.Battle,
 		Battler = args.Battler,
@@ -107,6 +108,10 @@ function Goon.new(args: {
 		DidTakeDamage = Signal.new(),
 		WillDealDamage = Signal.new(),
 		DidDealDamage = Signal.new(),
+
+		Stats = Sift.Dictionary.map(args.Def.Stats, function(value)
+			return Stat.new(if typeof(value) == "function" then value(args.Level) else value)
+		end),
 	}, Goon)
 
 	self.Root:SetAttribute("Level", self.Level)
@@ -171,10 +176,16 @@ function Goon.HasTag(self: Goon, tagId: string)
 	return Sift.Array.has(self.Def.Tags, tagId)
 end
 
-function Goon.FromDef(self: Goon, key: string)
-	local value = self.Def[key]
-	if typeof(value) == "function" then value = value(self.Level) end
-	return value
+function Goon.GetSize(self: Goon)
+	return self:GetStat("Size")
+end
+
+function Goon.GetStat(self: Goon, name: string)
+	return self.Stats[name]:Get()
+end
+
+function Goon.ModStat(self: Goon, name: string, numberName: string, modifier: (number) -> number)
+	return self.Stats[name]:Modify(numberName, modifier)
 end
 
 function Goon.IsActive(self: Goon)

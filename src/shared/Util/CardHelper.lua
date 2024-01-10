@@ -79,7 +79,7 @@ function CardHelper.GetGoonStatRaw(cardId: string, count: number?, key: string)
 
 	if count == nil then count = 1 end
 
-	local value = def[key]
+	local value = def.Stats[key]
 
 	if typeof(value) == "function" then
 		local level = CardHelper.CountToLevel(count :: number)

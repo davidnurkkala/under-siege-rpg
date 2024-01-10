@@ -36,7 +36,7 @@ local BattleUpdater = Updater.new()
 
 type Fieldable = {
 	Position: number,
-	Size: number,
+	GetSize: (Fieldable) -> number,
 	TeamId: string,
 	IsActive: (Fieldable) -> boolean,
 	Update: (Fieldable, number) -> (),
@@ -494,6 +494,7 @@ end
 
 function Battle.MoveFieldable(self: Battle, mover: Fieldable, movement: number)
 	local direction = math.sign(movement)
+	local moverSize = mover:GetSize()
 
 	for object in self.Field do
 		if object == mover then continue end
@@ -504,7 +505,7 @@ function Battle.MoveFieldable(self: Battle, mover: Fieldable, movement: number)
 
 		delta = object.Position - (mover.Position + movement)
 		local distance = math.abs(delta)
-		local desiredDistance = (object.Size / 2) + (mover.Size / 2)
+		local desiredDistance = (object:GetSize() / 2) + (moverSize / 2)
 		local tooClose = distance < desiredDistance
 		local movingPast = math.sign(delta) ~= direction
 		if (not tooClose) and not movingPast then continue end
@@ -514,7 +515,7 @@ function Battle.MoveFieldable(self: Battle, mover: Fieldable, movement: number)
 		if movement == 0 then return false end
 	end
 
-	local halfSize = mover.Size / 2
+	local halfSize = moverSize / 2
 	local position = math.clamp(mover.Position + movement, halfSize, 1 - halfSize)
 	if mover.Position == position then return false end
 

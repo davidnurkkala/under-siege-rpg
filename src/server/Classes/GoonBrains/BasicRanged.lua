@@ -10,6 +10,8 @@ local EffectService = require(ServerScriptService.Server.Services.EffectService)
 local EffectSound = require(ReplicatedStorage.Shared.Effects.EffectSound)
 local PickRandom = require(ReplicatedStorage.Shared.Util.PickRandom)
 local Promise = require(ReplicatedStorage.Packages.Promise)
+local Sift = require(ReplicatedStorage.Packages.Sift)
+local Signal = require(ReplicatedStorage.Packages.Signal)
 local StateMachine = require(ServerScriptService.Server.Classes.StateMachine)
 
 local BasicRanged = {}
@@ -21,8 +23,14 @@ export type BasicRanged = typeof(setmetatable(
 		Battle: any,
 		StateMachine: any,
 		AttackCooldown: any,
+		KeepDistanceRatio: number?,
 		ProjectileOffset: CFrame,
 		ProjectileName: string,
+		ProjectileArcRatio: number?,
+		ProjectileSpeed: number?,
+
+		WillAttack: any,
+		DidAttack: any,
 	},
 	BasicRanged
 ))
@@ -30,11 +38,21 @@ export type BasicRanged = typeof(setmetatable(
 function BasicRanged.new(args: {
 	ProjectileOffset: CFrame,
 	ProjectileName: string,
+	ProjectileArcRatio: number?,
+	ProjectileSpeed: number?,
+	KeepDistanceRatio: number?,
 }): BasicRanged
-	local self: BasicRanged = setmetatable({
-		ProjectileOffset = args.ProjectileOffset,
-		ProjectileName = args.ProjectileName,
-	}, BasicRanged)
+	local self = setmetatable(
+		Sift.Dictionary.merge({
+			KeepDistanceRatio = 0.5,
+			ProjectileSpeed = 128,
+			ProjectileArcRatio = 0,
+
+			WillAttack = Signal.new(),
+			DidAttack = Signal.new(),
+		}, args),
+		BasicRanged
+	)
 
 	return self
 end
@@ -73,7 +91,7 @@ function BasicRanged.SetUpStateMachine(self: BasicRanged)
 				if target then
 					if data.AttackIsFinished then
 						local distance = math.abs(target.Position - self.Goon.Position)
-						local isPastHalfRange = distance > self.Goon:FromDef("Range") * 0.5
+						local isPastHalfRange = distance > self.Goon:GetStat("Range") * self.KeepDistanceRatio
 						local currentlyAttacking = data.Attacking == true
 						local shouldWalk = isPastHalfRange and not currentlyAttacking
 
@@ -85,8 +103,10 @@ function BasicRanged.SetUpStateMachine(self: BasicRanged)
 
 						self.Goon.Animator:Play(self.Goon.Def.Animations.Attack)
 
+						self.WillAttack:Fire(target)
+
 						data.AttackIsFinished = nil
-						data.Promise = self.Goon:WhileAlive(Promise.delay(self.Goon:FromDef("AttackWindupTime") or 1):andThen(function()
+						data.Promise = self.Goon:WhileAlive(Promise.delay(self.Goon:GetStat("AttackWindupTime") or 1):andThen(function()
 							data.AttackIsFinished = true
 
 							EffectService:ForBattle(
@@ -95,14 +115,15 @@ function BasicRanged.SetUpStateMachine(self: BasicRanged)
 									Model = ReplicatedStorage.Assets.Models.Projectiles[self.ProjectileName],
 									Start = self.Goon.Root.CFrame * self.ProjectileOffset,
 									Finish = target:GetRoot(),
-									Speed = 128,
+									Speed = self.ProjectileSpeed,
+									ArcRatio = self.ProjectileArcRatio,
 								}),
 								EffectSound({
 									SoundId = PickRandom(self.Goon.Def.Sounds.Shoot),
 									Target = self.Goon.Root,
 								})
 							):andThen(function()
-								self.Battle:Damage(Damage.new(self.Goon, target, self.Goon:FromDef("Damage")))
+								self.Battle:Damage(Damage.new(self.Goon, target, self.Goon:GetStat("Damage")))
 
 								EffectService:ForBattle(
 									self.Battle,
@@ -116,6 +137,8 @@ function BasicRanged.SetUpStateMachine(self: BasicRanged)
 										Target = target:GetRoot(),
 									})
 								)
+
+								self.DidAttack:Fire(target)
 							end, function()
 								-- catch
 							end)
@@ -139,7 +162,7 @@ end
 function BasicRanged.SetGoon(self: BasicRanged, goon: any)
 	self.Goon = goon
 	self.Battle = goon.Battle
-	self.AttackCooldown = Cooldown.new(1 / self.Goon:FromDef("AttackRate"))
+	self.AttackCooldown = Cooldown.new(1 / self.Goon:GetStat("AttackRate"))
 	self:SetUpStateMachine()
 end
 
@@ -193,13 +216,13 @@ end
 function BasicRanged.GetTarget(self: BasicRanged)
 	return self.Battle:TargetNearest({
 		Position = self.Goon.Position,
-		Range = self.Goon:FromDef("Range"),
+		Range = self.Goon:GetStat("Range"),
 		Filter = self.Battle:EnemyFilter(self.Goon.TeamId),
 	})
 end
 
 function BasicRanged.Walk(self: BasicRanged, dt: number)
-	return self.Battle:MoveFieldable(self.Goon, self.Goon.Direction * self.Goon:FromDef("Speed") * dt)
+	return self.Battle:MoveFieldable(self.Goon, self.Goon.Direction * self.Goon:GetStat("Speed") * dt)
 end
 
 function BasicRanged.Destroy(self: BasicRanged)

@@ -9,5 +9,7 @@ return function(_context, player)
 		end
 	end)
 
+	player:Kick("Your data has been reset.")
+
 	return "Success"
 end

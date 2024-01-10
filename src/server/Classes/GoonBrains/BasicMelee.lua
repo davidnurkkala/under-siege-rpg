@@ -9,20 +9,30 @@ local EffectService = require(ServerScriptService.Server.Services.EffectService)
 local EffectSound = require(ReplicatedStorage.Shared.Effects.EffectSound)
 local PickRandom = require(ReplicatedStorage.Shared.Util.PickRandom)
 local Promise = require(ReplicatedStorage.Packages.Promise)
+local Signal = require(ReplicatedStorage.Packages.Signal)
 local StateMachine = require(ServerScriptService.Server.Classes.StateMachine)
 
 local BasicMelee = {}
 BasicMelee.__index = BasicMelee
 
-export type BasicMelee = typeof(setmetatable({} :: {
-	Goon: any,
-	Battle: any,
-	StateMachine: any,
-	AttackCooldown: any,
-}, BasicMelee))
+export type BasicMelee = typeof(setmetatable(
+	{} :: {
+		Goon: any,
+		Battle: any,
+		StateMachine: any,
+		AttackCooldown: any,
+
+		WillAttack: any,
+		DidAttack: any,
+	},
+	BasicMelee
+))
 
 function BasicMelee.new(): BasicMelee
-	local self: BasicMelee = setmetatable({}, BasicMelee)
+	local self: BasicMelee = setmetatable({
+		WillAttack = Signal.new(),
+		DidAttack = Signal.new(),
+	}, BasicMelee)
 
 	return self
 end
@@ -64,8 +74,10 @@ function BasicMelee.SetUpStateMachine(self: BasicMelee)
 
 						self.Goon.Animator:Play(self.Goon.Def.Animations.Attack)
 
-						data.Promise = self.Goon:WhileAlive(Promise.delay(self.Goon:FromDef("AttackWindupTime") or 1):andThen(function()
-							self.Battle:Damage(Damage.new(self.Goon, target, self.Goon:FromDef("Damage")))
+						self.WillAttack:Fire(target)
+
+						data.Promise = self.Goon:WhileAlive(Promise.delay(self.Goon:GetStat("AttackWindupTime") or 1):andThen(function()
+							self.Battle:Damage(Damage.new(self.Goon, target, self.Goon:GetStat("Damage")))
 
 							EffectService:ForBattle(
 								self.Battle,
@@ -81,6 +93,8 @@ function BasicMelee.SetUpStateMachine(self: BasicMelee)
 							)
 
 							data.AttackIsFinished = true
+
+							self.DidAttack:Fire(target)
 						end))
 					end
 				else
@@ -101,7 +115,7 @@ end
 function BasicMelee.SetGoon(self: BasicMelee, goon: any)
 	self.Goon = goon
 	self.Battle = goon.Battle
-	self.AttackCooldown = Cooldown.new(1 / self.Goon:FromDef("AttackRate"))
+	self.AttackCooldown = Cooldown.new(1 / self.Goon:GetStat("AttackRate"))
 	self:SetUpStateMachine()
 end
 
@@ -155,13 +169,13 @@ end
 function BasicMelee.GetTarget(self: BasicMelee)
 	return self.Battle:TargetNearest({
 		Position = self.Goon.Position,
-		Range = self.Goon:FromDef("Range"),
+		Range = self.Goon:GetStat("Range"),
 		Filter = self.Battle:EnemyFilter(self.Goon.TeamId),
 	})
 end
 
 function BasicMelee.Walk(self: BasicMelee, dt: number)
-	return self.Battle:MoveFieldable(self.Goon, self.Goon.Direction * self.Goon:FromDef("Speed") * dt)
+	return self.Battle:MoveFieldable(self.Goon, self.Goon.Direction * self.Goon:GetStat("Speed") * dt)
 end
 
 function BasicMelee.Destroy(self: BasicMelee)
