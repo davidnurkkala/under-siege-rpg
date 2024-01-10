@@ -454,7 +454,7 @@ local Goons = {
 		{ "Charger" },
 		Animations = {
 			Walk = "SwordsmanWalk",
-			Attack = "BerserkerAttack",
+			Attack = "RogueAttack",
 			Die = "GenericGoonDie",
 		},
 		Sounds = {

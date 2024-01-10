@@ -214,9 +214,10 @@ local Battlers = {
 		WeaponId = "Crossbow",
 		Power = 4000000,
 		Deck = {
-			Recruit = 64,
-			ElfRanger = 32,
-			Hunter = 32,
+			BanditRogue = 64,
+			BanditDuelist = 64,
+			BanditScout = 64,
+			BanditOfficer = 32,
 			Mob = 24,
 		},
 	},
