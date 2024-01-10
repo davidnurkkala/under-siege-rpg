@@ -208,10 +208,10 @@ local Battlers = {
 
 	BanditLeader = {
 		Name = "Bandit Leader",
-		BattlegroundName = "World1",
+		BattlegroundName = "World3",
 		BaseName = "ElfBase",
 		Reward = 3000,
-		WeaponId = "Crossbow",
+		WeaponId = "FairyBow",
 		Power = 4000000,
 		Deck = {
 			BanditRogue = 64,
