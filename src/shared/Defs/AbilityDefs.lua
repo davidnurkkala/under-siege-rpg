@@ -1,13 +1,4 @@
 local Abilities = {
-	Nothing = {
-		Name = "Nothing",
-		Image = "",
-		Summary = "Out of cards!",
-		Description = function()
-			return ""
-		end,
-	},
-
 	Heal = {
 		Name = "Heal",
 		Image = "rbxassetid://15582200046",
@@ -32,15 +23,6 @@ local Abilities = {
 		end,
 		Damage = function(level)
 			return 2 + 0.1 * level
-		end,
-	},
-
-	Mob = {
-		Name = "Mob",
-		Image = "",
-		Summary = "Deploy two Peasants.",
-		Description = function(self, level)
-			return `Immediately deploy two level {level} Peasants.`
 		end,
 	},
 

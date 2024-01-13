@@ -25,7 +25,6 @@ local function makeModelIntangible(model)
 end
 
 forEachModel("Assets/Weapons", makeModelIntangible)
-forEachModel("Assets/Models/Pets", makeModelIntangible)
 
 forEachModel("Assets/Models/Goons", function(model)
 	local animSaves = model:FindFirstChild("AnimSaves")

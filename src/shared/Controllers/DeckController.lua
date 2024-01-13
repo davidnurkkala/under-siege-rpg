@@ -10,12 +10,7 @@ type DeckController = typeof(DeckController)
 function DeckController.PrepareBlocking(self: DeckController)
 	self.Comm = Comm.ClientComm.new(ReplicatedStorage, true, "DeckService")
 	self.DeckRemote = self.Comm:GetProperty("Deck")
-	self.DrawCardFromGachaRemote = self.Comm:GetFunction("DrawCardFromGacha")
 	self.CardEquipToggleRequested = self.Comm:GetSignal("CardEquipToggleRequested")
-end
-
-function DeckController.DrawCardFromGacha(self: DeckController, gachaId: string, count: number)
-	return self.DrawCardFromGachaRemote(gachaId, count)
 end
 
 function DeckController.ObserveDeck(self: DeckController, callback)

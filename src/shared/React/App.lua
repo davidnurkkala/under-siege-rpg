@@ -1,7 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local BattlerPromptBridge = require(ReplicatedStorage.Shared.React.BattlerPromptBridge)
-local CardGachaBridge = require(ReplicatedStorage.Shared.React.CardGacha.CardGachaBridge)
 local ChangeLogBoard = require(ReplicatedStorage.Shared.React.ChangeLog.ChangeLogBoard)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local DeckMenuBridge = require(ReplicatedStorage.Shared.React.Menus.DeckMenuBridge)
@@ -11,11 +10,7 @@ local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local LoginStreakRewardsMenuBridge = require(ReplicatedStorage.Shared.React.Menus.LoginStreakRewardsMenuBridge)
 local MenuProvider = require(ReplicatedStorage.Shared.React.MenuContext.MenuProvider)
 local PaddingAll = require(ReplicatedStorage.Shared.React.Common.PaddingAll)
-local PetGachaBridge = require(ReplicatedStorage.Shared.React.PetGacha.PetGachaBridge)
-local PetMenuBridge = require(ReplicatedStorage.Shared.React.Menus.PetMenuBridge)
-local PetMergeMenuBridge = require(ReplicatedStorage.Shared.React.Menus.PetMergeMenuBridge)
 local PlatformProvider = require(ReplicatedStorage.Shared.React.PlatformContext.PlatformProvider)
-local PrestigeMenuBridge = require(ReplicatedStorage.Shared.React.Menus.PrestigeMenuBridge)
 local React = require(ReplicatedStorage.Packages.React)
 local SessionRewardsMenuBridge = require(ReplicatedStorage.Shared.React.Menus.SessionRewardsMenuBridge)
 local ShoplikeBridge = require(ReplicatedStorage.Shared.React.ShoplikeBridge)
@@ -37,16 +32,11 @@ return function()
 				TutorialHud = React.createElement(TutorialHud),
 
 				WeaponShop = React.createElement(WeaponShopBridge),
-				CardGacha = React.createElement(CardGachaBridge),
-				PetGacha = React.createElement(PetGachaBridge),
-				PetMerge = React.createElement(PetMergeMenuBridge),
 				TeleportMenu = React.createElement(TeleportMenuBridge),
 				DeckMenu = React.createElement(DeckMenuBridge),
-				PetMenu = React.createElement(PetMenuBridge),
 				SessionRewardsMenu = React.createElement(SessionRewardsMenuBridge),
 				LoginStreakRewardsMenu = React.createElement(LoginStreakRewardsMenuBridge),
 				VipMenu = React.createElement(VipMenuBridge),
-				PrestigeMenu = React.createElement(PrestigeMenuBridge),
 
 				AlphaMessage = React.createElement(Label, {
 					Size = UDim2.fromScale(0.3, 0.1),

@@ -13,7 +13,7 @@ return function(props: {
 		Selectable = false,
 	}, {
 		Icon = React.createElement(Image, {
-			Image = CurrencyDefs.Primary.Image,
+			Image = "rbxassetid://15243978990",
 		}),
 	})
 end

@@ -10,7 +10,6 @@ local Observers = require(ReplicatedStorage.Packages.Observers)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local React = require(ReplicatedStorage.Packages.React)
 local Sift = require(ReplicatedStorage.Packages.Sift)
-local TrainButton = require(ReplicatedStorage.Shared.React.Lobby.TrainButton)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
 local function encounterHealthBar(props: {
@@ -103,9 +102,6 @@ return function(props: {
 	return React.createElement(Container, {
 		Visible = props.Visible,
 	}, {
-		Bottom = menu.Is(nil) and React.createElement(React.Fragment, nil, {
-			TrainButton = React.createElement(TrainButton),
-		}),
 		Top = React.createElement(LobbyTop),
 		Buttons = React.createElement(LobbyButtons, {
 			Visible = props.Visible and menu.Is(nil),

@@ -232,7 +232,7 @@ local Goons = {
 		},
 		Sounds = {
 			Shoot = { "WhooshMedium1", "WhooshMedium2", "WhooshMedium3", "WhooshMedium4" },
-			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Hit = { "Explosion1" },
 			Death = { "MaleUgh1", "MaleUgh2" },
 		},
 		Stats = {

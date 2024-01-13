@@ -23,7 +23,7 @@ function PlayerListLeaderboardService.PrepareBlocking(_self: PlayerListLeaderboa
 
 		local valueByCurrencyType = {}
 
-		for _, currencyType in { "Primary", "Secondary", "Prestige" } do
+		for _, currencyType in { "Coins" } do
 			local val = Instance.new("StringValue")
 			val.Name = CurrencyDefs[currencyType].Name
 			val.Parent = folder

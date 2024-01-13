@@ -4,10 +4,8 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local Configuration = require(ReplicatedStorage.Shared.Configuration)
 local Lapis = require(ServerScriptService.ServerPackages.Lapis)
 local Observers = require(ReplicatedStorage.Packages.Observers)
-local PetHelper = require(ReplicatedStorage.Shared.Util.PetHelper)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local SaveFile = require(ServerScriptService.Server.Classes.SaveFile)
-local Sift = require(ReplicatedStorage.Packages.Sift)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
 local COLLECTION_NAME = "DataService" .. Configuration.DataStoreVersion
@@ -27,14 +25,8 @@ local DataService = {
 		},
 		WorldCurrent = "World1",
 		Currency = {
-			Primary = 0,
-			Secondary = 0,
-			Premium = 10,
-			Prestige = 0,
-		},
-		PrestigePoints = {
-			Primary = 0,
-			Secondary = 0,
+			Coins = 0,
+			Gems = 10,
 		},
 		Boosts = {},
 		Deck = {
@@ -43,12 +35,6 @@ local DataService = {
 		},
 		Options = {
 			AutoEquipCards = true,
-			AutoEquipBestPets = true,
-			AutoPlayCards = true,
-		},
-		Pets = {
-			Equipped = {},
-			Owned = {},
 		},
 		LoginStreakData = {
 			Timestamp = 0,
@@ -81,36 +67,7 @@ function DataService.PrepareBlocking(self: DataService)
 
 		defaultData = self.DefaultData,
 
-		migrations = {
-			function(oldData)
-				local pets = oldData.Pets
-
-				pets = Sift.Dictionary.set(pets, "Equipped", {})
-				pets = Sift.Dictionary.update(pets, "Owned", function(oldOwned)
-					local owned = {}
-					for _, slot in oldOwned do
-						local hash = PetHelper.InfoToHash(slot.PetId, slot.Tier)
-						owned[hash] = (owned[hash] or 0) + 1
-					end
-					return owned
-				end)
-
-				return Sift.Dictionary.set(oldData, "Pets", pets)
-			end,
-			function(oldData)
-				return Sift.Dictionary.set(oldData, "Options", self.DefaultData.Options)
-			end,
-			function(oldData)
-				return Sift.Dictionary.update(oldData, "Currency", function(currency)
-					return Sift.Dictionary.update(currency, "Premium", function(premium)
-						return premium + 10
-					end)
-				end)
-			end,
-			function(oldData)
-				return Sift.Dictionary.set(oldData, "QuestData", {})
-			end,
-		},
+		migrations = {},
 	})
 
 	Observers.observePlayer(function(player: Player)

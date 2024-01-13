@@ -40,7 +40,7 @@ local function element(props)
 		Sift.Dictionary.map(popups, function(data, guid)
 			return React.createElement(Indicator, {
 				TextProps = { Text = TextStroke(`+{data.Number}`) },
-				ImageProps = { Image = CurrencyDefs.Primary.Image },
+				ImageProps = { Image = "" },
 				StartPosition = data.StartPosition,
 				EndPosition = data.EndPosition,
 				OnFinished = function()

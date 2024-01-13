@@ -95,7 +95,7 @@ return function(props: {
 										LayoutOrder = 1,
 										Size = UDim2.fromScale(1, 1),
 										SizeConstraint = Enum.SizeConstraint.RelativeYY,
-										Image = CurrencyDefs.Secondary.Image,
+										Image = CurrencyDefs.Coins.Image,
 									}),
 
 									Price = React.createElement(Label, {
@@ -103,7 +103,7 @@ return function(props: {
 										Size = UDim2.fromScale(0.5, 1),
 										Text = TextStroke(FormatBigNumber(def.Price)),
 										TextXAlignment = Enum.TextXAlignment.Left,
-										TextColor3 = CurrencyDefs.Secondary.Colors.Primary,
+										TextColor3 = CurrencyDefs.Coins.Colors.Primary,
 									}),
 								}),
 							}),

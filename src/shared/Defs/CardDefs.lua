@@ -5,14 +5,6 @@ local GoonDefs = require(ReplicatedStorage.Shared.Defs.GoonDefs)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 
 local Cards = {
-	-- SPECIAL
-	Nothing = {
-		AbilityId = "Nothing",
-		Type = "Ability",
-		Rank = 1,
-		Cooldown = 1,
-	},
-
 	-- GOONS
 	Peasant = {
 		GoonId = "Peasant",
@@ -135,12 +127,6 @@ local Cards = {
 		Type = "Ability",
 		Rank = 1,
 		Cooldown = 3,
-	},
-	Mob = {
-		AbilityId = "Mob",
-		Type = "Ability",
-		Rank = 1,
-		Cooldown = 4,
 	},
 	Recruitment = {
 		AbilityId = "Recruitment",

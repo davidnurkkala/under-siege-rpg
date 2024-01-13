@@ -11,8 +11,6 @@ local DefeatBattler = require(ServerScriptService.Server.Badger.Conditions.Defea
 local HaveCurrency = require(ServerScriptService.Server.Badger.Conditions.HaveCurrency)
 local HaveWeapon = require(ServerScriptService.Server.Badger.Conditions.HaveWeapon)
 local Observers = require(ReplicatedStorage.Packages.Observers)
-local RollCardGacha = require(ServerScriptService.Server.Badger.Conditions.RollCardGacha)
-local RollPetGacha = require(ServerScriptService.Server.Badger.Conditions.RollPetGacha)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local WorldDefs = require(ReplicatedStorage.Shared.Defs.WorldDefs)
 
@@ -38,12 +36,6 @@ local function tutorialCondition(player)
 				State = condition:getState(),
 			}
 		end),
-		RollCardGacha(player, "World1Goons", 1):withState(function(condition)
-			return {
-				Instruction = "CardGacha",
-				State = condition:getState(),
-			}
-		end),
 		Badger.onCompleted(HaveCurrency(player, "Primary", BattlerDefs.Noble.Power), function()
 			CurrencyService:AddCurrency(player, "Primary", 1500)
 		end):withState(function(condition)
@@ -55,12 +47,6 @@ local function tutorialCondition(player)
 		DefeatBattler(player, "Noble", 1):withState(function(condition)
 			return {
 				Instruction = "Battler",
-				State = condition:getState(),
-			}
-		end),
-		RollPetGacha(player, "World1Pets", 1):withState(function(condition)
-			return {
-				Instruction = "PetGacha",
 				State = condition:getState(),
 			}
 		end),

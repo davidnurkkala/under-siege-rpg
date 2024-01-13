@@ -41,7 +41,7 @@ end
 
 return function(props: {
 	CardId: string,
-	CardCount: number?,
+	Level: number?,
 	children: any,
 })
 	local cardDef = CardDefs[props.CardId]
@@ -79,16 +79,16 @@ return function(props: {
 				Image = AbilityHelper.GetAbility(cardDef.AbilityId).Image,
 			}),
 
-			Level = (props.CardId ~= "Nothing") and (props.CardCount ~= nil) and React.createElement(Label, {
+			Level = (props.Level ~= nil) and React.createElement(Label, {
 				ZIndex = 4,
 				Size = UDim2.fromScale(1, 0.25),
 				TextXAlignment = Enum.TextXAlignment.Right,
 				AnchorPoint = Vector2.new(1, 1),
 				Position = UDim2.fromScale(1, 1),
-				Text = TextStroke(`Lv. {CardHelper.CountToLevel(props.CardCount)}\n({props.CardCount}/{CardHelper.GetNextUpgrade(props.CardCount)})`),
+				Text = TextStroke(`Lv. {props.Level}`),
 			}),
 
-			Cooldown = (props.CardId ~= "Nothing") and React.createElement(Container, {
+			Cooldown = React.createElement(Container, {
 				ZIndex = 4,
 				Size = UDim2.fromScale(0.25, 0.25),
 				SizeConstraint = Enum.SizeConstraint.RelativeYY,
@@ -123,7 +123,7 @@ return function(props: {
 					Label = React.createElement(labelIcon, {
 						Image = "rbxassetid://15483125607",
 						Color = ColorDefs.Red,
-						Label = TextStroke(CardHelper.GetGoonStat(props.CardId, props.CardCount, "HealthMax") // 0.01),
+						Label = TextStroke(CardHelper.GetGoonStat(props.CardId, props.Level, "HealthMax") // 0.01),
 					}),
 				}),
 
@@ -131,7 +131,7 @@ return function(props: {
 					Label = React.createElement(labelIcon, {
 						Image = "rbxassetid://15483125835",
 						Color = ColorDefs.PaleBlue,
-						Label = TextStroke(CardHelper.GetGoonStat(props.CardId, props.CardCount, "Damage") // 0.01),
+						Label = TextStroke(CardHelper.GetGoonStat(props.CardId, props.Level, "Damage") // 0.01),
 					}),
 				}),
 			}),

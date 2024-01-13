@@ -151,7 +151,7 @@ return function(props: {
 											LayoutOrder = 1,
 											Size = UDim2.fromScale(0.4, 0.4),
 											SizeConstraint = Enum.SizeConstraint.RelativeYY,
-											Image = CurrencyDefs.Primary.Image,
+											Image = CurrencyDefs.Coins.Image,
 											ZIndex = 4,
 										}),
 

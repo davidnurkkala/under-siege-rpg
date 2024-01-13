@@ -18,8 +18,8 @@ local function element()
 		Visible = visible,
 		Size = UDim2.fromScale(16 / 23, 9 / 23),
 		Position = UDim2.fromScale(0.1, 0.1),
-		BackgroundColor3 = CurrencyDefs.Primary.Colors.Secondary,
-		ImageColor3 = CurrencyDefs.Primary.Colors.Primary,
+		BackgroundColor3 = CurrencyDefs.Coins.Colors.Secondary,
+		ImageColor3 = CurrencyDefs.Coins.Colors.Primary,
 		HeaderText = TextStroke("Test Window", 2),
 		[React.Event.Activated] = function()
 			setVisible(false)

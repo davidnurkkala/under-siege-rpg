@@ -57,14 +57,6 @@ function OptionsService.SetOption(self: OptionsService, player: Player, optionNa
 		assert(t.boolean(value), value)
 
 		return save()
-	elseif optionName == "AutoEquipBestPets" then
-		assert(t.boolean(value), value)
-
-		return save()
-	elseif optionName == "AutoPlayCards" then
-		assert(t.boolean(value), value)
-
-		return save()
 	else
 		error(`Unsupported option name {optionName}`)
 	end

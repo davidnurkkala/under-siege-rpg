@@ -1,17 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
-local ActionService = require(ServerScriptService.Server.Services.ActionService)
 local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
 local Battler = require(ServerScriptService.Server.Classes.Battler)
-local Cooldown = require(ReplicatedStorage.Shared.Classes.Cooldown)
 local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
-local Deck = require(ServerScriptService.Server.Classes.Deck)
-local DeckPlayerPlayer = require(ServerScriptService.Server.Classes.DeckPlayerPlayer)
 local DeckService = require(ServerScriptService.Server.Services.DeckService)
 local PlayerLeaving = require(ReplicatedStorage.Shared.Util.PlayerLeaving)
-local ProductHelper = require(ReplicatedStorage.Shared.Util.ProductHelper)
-local ProductService = require(ServerScriptService.Server.Services.ProductService)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local Trove = require(ReplicatedStorage.Packages.Trove)
@@ -21,12 +15,15 @@ local WeaponService = require(ServerScriptService.Server.Services.WeaponService)
 local BattleSession = {}
 BattleSession.__index = BattleSession
 
-export type BattleSession = typeof(setmetatable({} :: {
-	Player: Player,
-	Battler: Battler.Battler,
-	Animator: any,
-	Model: Model,
-}, BattleSession))
+export type BattleSession = typeof(setmetatable(
+	{} :: {
+		Player: Player,
+		Battler: Battler.Battler,
+		Animator: any,
+		Model: Model,
+	},
+	BattleSession
+))
 
 function BattleSession.new(args: {
 	Player: Player,
@@ -54,39 +51,6 @@ function BattleSession.new(args: {
 	self.Trove:Add(function()
 		root.Anchored = false
 	end)
-
-	self.Trove:AddPromise(Promise.new(function(resolve, _, onCancel)
-		local battle
-		repeat
-			battle = self.Battler:GetBattle()
-			if battle == nil then
-				task.wait()
-				if onCancel() then return end
-			end
-		until battle ~= nil
-
-		resolve(battle)
-	end):andThen(function(battle)
-		if not battle.CritEnabled then return end
-
-		local critPerSecond = 1 / 3
-		local clicksPerSecond = 5
-		local critPerClick = critPerSecond / clicksPerSecond
-
-		local cooldown = Cooldown.new(1 / clicksPerSecond)
-		self.Trove:Add(ActionService:Subscribe(self.Player, "Primary", function()
-			if cooldown:IsReady() then
-				cooldown:Use()
-
-				local multiplier = 1
-				if ProductHelper.IsVip(self.Player) then
-					multiplier += 1
-				end
-
-				self.Battler:AddCrit(critPerClick * multiplier)
-			end
-		end))
-	end))
 
 	return self
 end
@@ -133,9 +97,6 @@ function BattleSession.promised(player: Player, position: number, direction: num
 			local deck = DeckService:GetDeckForBattle(player):expect()
 			if onCancel() then return end
 
-			local power = CurrencyService:GetCurrency(player, "Primary"):expect()
-			if onCancel() then return end
-
 			local base = ReplicatedStorage.Assets.Models.Bases.Tower:Clone()
 
 			resolve(BattleSession.new({
@@ -151,9 +112,8 @@ function BattleSession.promised(player: Player, position: number, direction: num
 					WeaponDef = def,
 					WeaponHoldPart = holdPart,
 					TeamId = `PLAYER_{player.Name}`,
-					DeckPlayer = DeckPlayerPlayer.new(Deck.new(deck), player),
+					Deck = deck,
 					HealthMax = 50,
-					Power = math.max(50, power),
 				},
 			}))
 		end)

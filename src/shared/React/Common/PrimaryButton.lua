@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local ActionController = require(ReplicatedStorage.Shared.Controllers.ActionController)
 local Button = require(ReplicatedStorage.Shared.React.Common.Button)
+local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
 local React = require(ReplicatedStorage.Packages.React)
 
@@ -15,8 +16,8 @@ return function(props: {
 		SizeConstraint = Enum.SizeConstraint.RelativeXX,
 		AnchorPoint = Vector2.new(0.5, 1),
 		Position = UDim2.fromScale(0.5, 1),
-		ImageColor3 = CurrencyDefs.Primary.Colors.Primary,
-		BorderColor3 = CurrencyDefs.Primary.Colors.Secondary,
+		ImageColor3 = ColorDefs.LightRed,
+		BorderColor3 = ColorDefs.Red,
 		LayoutOrder = props.LayoutOrder,
 		Selectable = props.Selectable,
 		ZIndex = 16,

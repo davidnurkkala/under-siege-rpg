@@ -23,7 +23,7 @@ local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 
 function cardDetails(props: {
 	CardId: string,
-	CardCount: number,
+	Level: number,
 	Equipped: boolean,
 	Close: () -> (),
 	Toggle: () -> (),
@@ -39,7 +39,7 @@ function cardDetails(props: {
 
 			Contents = React.createElement(CardContents, {
 				CardId = props.CardId,
-				CardCount = props.CardCount,
+				Level = props.Level,
 			}),
 		}),
 
@@ -54,7 +54,7 @@ function cardDetails(props: {
 			Text = React.createElement(Label, {
 				TextXAlignment = Enum.TextXAlignment.Left,
 				TextYAlignment = Enum.TextYAlignment.Top,
-				Text = TextStroke(CardHelper.GetDescription(props.CardId, props.CardCount)),
+				Text = TextStroke(CardHelper.GetDescription(props.CardId, props.Level)),
 			}),
 		}),
 
@@ -116,7 +116,7 @@ return function(props: {
 	}, {
 		Details = (selectedId ~= nil) and React.createElement(cardDetails, {
 			CardId = selectedId,
-			CardCount = props.Deck.Owned[selectedId],
+			Level = props.Deck.Owned[selectedId],
 			Equipped = props.Deck.Equipped[selectedId] == true,
 			Close = function()
 				setSelectedId(nil)
@@ -144,7 +144,7 @@ return function(props: {
 			Cards = React.createElement(
 				React.Fragment,
 				nil,
-				Sift.Dictionary.map(props.Deck.Owned, function(count, cardId)
+				Sift.Dictionary.map(props.Deck.Owned, function(level, cardId)
 					return React.createElement(LayoutContainer, {
 						Padding = 6,
 					}, {
@@ -157,7 +157,7 @@ return function(props: {
 						}, {
 							Contents = React.createElement(CardContents, {
 								CardId = cardId,
-								CardCount = count,
+								Level = level,
 							}, {
 								Check = props.Deck.Equipped[cardId] and React.createElement(Image, {
 									Size = UDim2.fromScale(0.15, 0.15),

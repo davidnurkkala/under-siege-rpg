@@ -12,11 +12,14 @@ local TryNow = require(ReplicatedStorage.Shared.Util.TryNow)
 local BattlerPrompt = {}
 BattlerPrompt.__index = BattlerPrompt
 
-export type BattlerPrompt = typeof(setmetatable({} :: {
-	Model: Model,
-	Id: string,
-	Def: any,
-}, BattlerPrompt))
+export type BattlerPrompt = typeof(setmetatable(
+	{} :: {
+		Model: Model,
+		Id: string,
+		Def: any,
+	},
+	BattlerPrompt
+))
 
 function BattlerPrompt.new(model: Model): BattlerPrompt
 	local id = model:GetAttribute("BattlerId")
@@ -61,7 +64,7 @@ function BattlerPrompt.new(model: Model): BattlerPrompt
 		end
 
 		ServerFade(player, nil, function()
-				return Battle.fromPlayerVersusBattler(player, self.Id)
+				return Battle.fromPlayerVersusBattler(player, self.Id):catch(warn)
 			end)
 			:andThen(function(battle)
 				return Promise.fromEvent(battle.Finished):andThenReturn(battle)

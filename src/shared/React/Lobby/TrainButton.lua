@@ -9,8 +9,6 @@ local FormatBigNumber = require(ReplicatedStorage.Shared.Util.FormatBigNumber)
 local Image = require(ReplicatedStorage.Shared.React.Common.Image)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local Observers = require(ReplicatedStorage.Packages.Observers)
-local PetController = require(ReplicatedStorage.Shared.Controllers.PetController)
-local PetHelper = require(ReplicatedStorage.Shared.Util.PetHelper)
 local PlatformContext = require(ReplicatedStorage.Shared.React.PlatformContext.PlatformContext)
 local PrimaryButton = require(ReplicatedStorage.Shared.React.Common.PrimaryButton)
 local React = require(ReplicatedStorage.Packages.React)
@@ -22,7 +20,6 @@ local WeaponDefs = require(ReplicatedStorage.Shared.Defs.WeaponDefs)
 
 return function()
 	local powerGain, setPowerGain = React.useState(0)
-	local petMultiplier, setPetMultiplier = React.useState(1)
 	local vipMultiplier, setVipMultiplier = React.useState(1)
 	local boostMultiplier, setBoostMultiplier = React.useState(1)
 
@@ -39,12 +36,6 @@ return function()
 			if not def then return end
 
 			setPowerGain(def.Power)
-		end))
-
-		trove:Add(PetController:ObservePets(function(pets)
-			if not pets then return end
-
-			setPetMultiplier(PetHelper.GetTotalPower(pets))
 		end))
 
 		trove:Add(Observers.observeAttribute(Players.LocalPlayer, "IsVip", function(value)
@@ -73,7 +64,7 @@ return function()
 		Selectable = false,
 	}, {
 		Icon = React.createElement(Image, {
-			Image = CurrencyDefs.Primary.Image,
+			Image = "rbxassetid://15243978990",
 		}),
 
 		GamepadHint = React.createElement(RoundButtonWithImage, {
@@ -92,7 +83,7 @@ return function()
 			AnchorPoint = Vector2.new(1, 1),
 			TextXAlignment = Enum.TextXAlignment.Right,
 			TextYAlignment = Enum.TextYAlignment.Bottom,
-			Text = TextStroke(`+{FormatBigNumber(powerGain * petMultiplier * vipMultiplier * boostMultiplier)}`, 2, BrickColor.new("Crimson").Color),
+			Text = TextStroke(`+{FormatBigNumber(powerGain * vipMultiplier * boostMultiplier)}`, 2, BrickColor.new("Crimson").Color),
 			ZIndex = 4,
 		}),
 	})
