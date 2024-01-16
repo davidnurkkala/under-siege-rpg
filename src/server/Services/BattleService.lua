@@ -4,6 +4,7 @@ local Comm = require(ReplicatedStorage.Packages.Comm)
 local PlayerLeaving = require(ReplicatedStorage.Shared.Util.PlayerLeaving)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Sift = require(ReplicatedStorage.Packages.Sift)
+local t = require(ReplicatedStorage.Packages.t)
 
 local BattleService = {
 	Priority = 0,
@@ -26,6 +27,18 @@ function BattleService.PrepareBlocking(self: BattleService)
 		-- TODO: better way to find the player's battler?
 		for _, battler in battle.Battlers do
 			if battler.CharModel == player.Character then battler.Health:Set(-100) end
+		end
+	end)
+
+	self.Comm:CreateSignal("CardPlayed"):Connect(function(player, cardId)
+		if not t.string(cardId) then return end
+
+		local battle = self:Get(player)
+		if not battle then return end
+
+		-- TODO: better way to find the player's battler?
+		for _, battler in battle.Battlers do
+			if battler.CharModel == player.Character then battle:PlayCard(battler, cardId) end
 		end
 	end)
 

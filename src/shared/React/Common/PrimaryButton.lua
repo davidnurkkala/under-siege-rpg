@@ -4,20 +4,27 @@ local ActionController = require(ReplicatedStorage.Shared.Controllers.ActionCont
 local Button = require(ReplicatedStorage.Shared.React.Common.Button)
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
+local Default = require(ReplicatedStorage.Shared.Util.Default)
 local React = require(ReplicatedStorage.Packages.React)
 
 return function(props: {
 	LayoutOrder: number,
 	children: any,
 	Selectable: boolean?,
+	Active: boolean?,
 })
+	local active = Default(props.Active, true)
+
+	local color = ColorDefs.LightRed
+	if not active then color = color:Lerp(ColorDefs.Gray25, 0.5) end
+
 	return React.createElement(Button, {
-		Size = UDim2.fromScale(0.075, 0.075),
-		SizeConstraint = Enum.SizeConstraint.RelativeXX,
+		Active = active,
 		AnchorPoint = Vector2.new(0.5, 1),
 		Position = UDim2.fromScale(0.5, 1),
-		ImageColor3 = ColorDefs.LightRed,
-		BorderColor3 = ColorDefs.Red,
+		ImageColor3 = color,
+		BorderColor3 = if active then ColorDefs.Black else ColorDefs.PaleBlue,
+		BorderSizePixel = if active then nil else 1,
 		LayoutOrder = props.LayoutOrder,
 		Selectable = props.Selectable,
 		ZIndex = 16,

@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local ActionService = require(ServerScriptService.Server.Services.ActionService)
 local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
 local Battler = require(ServerScriptService.Server.Classes.Battler)
 local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
@@ -51,6 +52,10 @@ function BattleSession.new(args: {
 	self.Trove:Add(function()
 		root.Anchored = false
 	end)
+
+	self.Trove:Add(ActionService:Subscribe(self.Player, "Primary", function()
+		self.Battler:Attack()
+	end))
 
 	return self
 end

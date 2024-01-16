@@ -23,80 +23,10 @@ type TutorialService = typeof(TutorialService)
 local function tutorialCondition(player)
 	return Badger.sequence({
 		Badger.onCompleted(DefeatBattler(player, "Peasant", 1), function()
-			CurrencyService:AddCurrency(player, "Primary", 300)
+			CurrencyService:AddCurrency(player, "Coins", 10)
 		end):withState(function(condition)
 			return {
 				Instruction = "Battler",
-				State = condition:getState(),
-			}
-		end),
-		HaveWeapon(player, "HuntersBow"):withState(function(condition)
-			return {
-				Instruction = "WeaponShop",
-				State = condition:getState(),
-			}
-		end),
-		Badger.onCompleted(HaveCurrency(player, "Primary", BattlerDefs.Noble.Power), function()
-			CurrencyService:AddCurrency(player, "Primary", 1500)
-		end):withState(function(condition)
-			return {
-				Instruction = "TrainingDummy",
-				State = condition:getState(),
-			}
-		end),
-		DefeatBattler(player, "Noble", 1):withState(function(condition)
-			return {
-				Instruction = "Battler",
-				State = condition:getState(),
-			}
-		end),
-		HaveCurrency(player, "Primary", BattlerDefs.King.Power):withState(function(condition)
-			return {
-				Instruction = "TrainLongTerm",
-				State = condition:getState(),
-			}
-		end),
-		DefeatBattler(player, "King", 1):withState(function(condition)
-			return {
-				Instruction = "Battler",
-				State = condition:getState(),
-			}
-		end),
-		HaveCurrency(player, "Secondary", WorldDefs.World2.Price):withState(function(condition)
-			return {
-				Instruction = "Gold",
-				State = condition:getState(),
-			}
-		end),
-		BeInWorld(player, "World2"):withState(function(condition)
-			return {
-				Instruction = "Portal",
-				State = condition:getState(),
-			}
-		end),
-
-		-- beat viking world
-		HaveCurrency(player, "Primary", BattlerDefs.VikingKing.Power):withState(function(condition)
-			return {
-				Instruction = "TrainLongTerm",
-				State = condition:getState(),
-			}
-		end),
-		DefeatBattler(player, "VikingKing", 1):withState(function(condition)
-			return {
-				Instruction = "Battler",
-				State = condition:getState(),
-			}
-		end),
-		HaveCurrency(player, "Secondary", WorldDefs.World3.Price):withState(function(condition)
-			return {
-				Instruction = "Gold",
-				State = condition:getState(),
-			}
-		end),
-		BeInWorld(player, "World3"):withState(function(condition)
-			return {
-				Instruction = "Portal",
 				State = condition:getState(),
 			}
 		end),

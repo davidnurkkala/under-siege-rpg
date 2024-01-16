@@ -1,8 +1,10 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local ActionService = require(ServerScriptService.Server.Services.ActionService)
 local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
 local BattlerDefs = require(ReplicatedStorage.Shared.Defs.BattlerDefs)
+local CardDefs = require(ReplicatedStorage.Shared.Defs.CardDefs)
 local Cooldown = require(ReplicatedStorage.Shared.Classes.Cooldown)
 local Damage = require(ServerScriptService.Server.Classes.Damage)
 local EffectBattlerCollapse = require(ReplicatedStorage.Shared.Effects.EffectBattlerCollapse)
@@ -13,6 +15,7 @@ local EffectSound = require(ReplicatedStorage.Shared.Effects.EffectSound)
 local Health = require(ReplicatedStorage.Shared.Classes.Health)
 local PickRandom = require(ReplicatedStorage.Shared.Util.PickRandom)
 local Promise = require(ReplicatedStorage.Packages.Promise)
+local Sift = require(ReplicatedStorage.Packages.Sift)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local WeaponDefs = require(ReplicatedStorage.Shared.Defs.WeaponDefs)
@@ -20,10 +23,6 @@ local WeaponHelper = require(ReplicatedStorage.Shared.Util.WeaponHelper)
 
 local Battler = {}
 Battler.__index = Battler
-
-type DeckPlayer = {
-	ChooseCard: (DeckPlayer) -> any,
-} | any
 
 export type Battler = typeof(setmetatable(
 	{} :: {
@@ -38,10 +37,13 @@ export type Battler = typeof(setmetatable(
 		Battle: any?,
 		TeamId: string,
 		Active: boolean,
-		DeckPlayer: DeckPlayer,
+		Deck: { [string]: number },
+		DeckCooldowns: { [string]: Cooldown.Cooldown },
 		Animator: Animator.Animator,
 		AttackDamage: number,
 		Trove: any,
+		Supplies: number,
+		SuppliesGain: number,
 	},
 	Battler
 ))
@@ -80,9 +82,31 @@ function Battler.new(args: {
 		AttackCooldown = Cooldown.new(5),
 		Trove = trove,
 		AttackDamage = attackDamage,
+		Deck = args.Deck,
+		DeckCooldowns = Sift.Dictionary.map(args.Deck, function(_, cardId)
+			local def = CardDefs[cardId]
+
+			local cooldown = Cooldown.new(def.Cooldown)
+			cooldown:Use()
+
+			return cooldown, cardId
+		end),
+		Supplies = 0,
+		SuppliesGain = 5,
 	}, Battler)
 
 	self.AttackCooldown:Use()
+
+	do
+		local function update()
+			self.Changed:Fire(self:GetStatus())
+		end
+
+		for _, cooldown in self:GetCooldowns() do
+			self.Trove:Connect(cooldown.Used, update)
+			self.Trove:Connect(cooldown.Completed, update)
+		end
+	end
 
 	self.Animator:Play(self.WeaponDef.Animations.Idle)
 
@@ -97,6 +121,13 @@ function Battler.new(args: {
 
 		self.Changed:Fire(self:GetStatus())
 	end)
+
+	self.Trove:Add(task.spawn(function()
+		while true do
+			self.Changed:Fire(self:GetStatus())
+			task.wait(0.5)
+		end
+	end))
 
 	return self
 end
@@ -141,6 +172,10 @@ end
 
 function Battler.HasTag(self: Battler, tagId: string)
 	return tagId == "Ranged"
+end
+
+function Battler.GetCooldowns(self: Battler)
+	return Sift.Array.append(Sift.Dictionary.values(self.DeckCooldowns), self.AttackCooldown)
 end
 
 function Battler.DefeatAnimation(self: Battler)
@@ -188,7 +223,12 @@ function Battler.GetStatus(self: Battler)
 		CharModel = self.CharModel,
 		Health = self.Health:Get(),
 		HealthMax = self.Health.Max,
-		Crit = self.Crit,
+		AttackCooldown = { Time = self.AttackCooldown.Time, TimeMax = self.AttackCooldown.TimeMax },
+		DeckCooldowns = Sift.Dictionary.map(self.DeckCooldowns, function(cooldown)
+			return { Time = cooldown.Time, TimeMax = cooldown.TimeMax }
+		end),
+		Supplies = math.floor(self.Supplies),
+		SuppliesGain = math.floor(self.SuppliesGain),
 	}
 end
 

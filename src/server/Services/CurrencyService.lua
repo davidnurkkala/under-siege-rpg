@@ -34,10 +34,6 @@ function CurrencyService.PrepareBlocking(self: CurrencyService)
 	end)
 end
 
-function CurrencyService.Start(self: CurrencyService)
-	self.PrestigeService = require(ServerScriptService.Server.Services.PrestigeService) :: any
-end
-
 function CurrencyService.GetCurrency(_self: CurrencyService, player: Player, currencyType: string)
 	assert(Sift.Dictionary.has(CurrencyDefs, currencyType), `Invalid currency type {currencyType}`)
 
@@ -63,13 +59,10 @@ function CurrencyService.GetWallet(_self: CurrencyService, player: Player)
 end
 
 function CurrencyService.GetBoosted(self: CurrencyService, player: Player, currencyType: string, amount: number)
-	return Promise.all({
-		BoostService:GetMultiplier(player, function(boost)
-			return (boost.Type == "Currency") and (boost.CurrencyType == currencyType)
-		end),
-		self.PrestigeService:GetBoost(player, currencyType),
-	}):andThen(function(results)
-		return amount * results[1] * results[2]
+	return BoostService:GetMultiplier(player, function(boost)
+		return (boost.Type == "Currency") and (boost.CurrencyType == currencyType)
+	end):andThen(function(multiplier)
+		return amount * multiplier
 	end)
 end
 

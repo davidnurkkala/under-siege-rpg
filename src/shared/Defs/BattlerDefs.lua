@@ -14,6 +14,13 @@ local Battlers = {
 			Peasant = 1,
 			Recruit = 1,
 		},
+		Brain = {
+			Id = "NaiveOrder",
+			Order = {
+				{ CardId = "Peasant", Count = 3 },
+				{ CardId = "Recruit", Count = 1 },
+			},
+		},
 	},
 	Noble = {
 		Name = "Noble",

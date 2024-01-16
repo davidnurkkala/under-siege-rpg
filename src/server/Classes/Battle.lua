@@ -26,9 +26,6 @@ local Updater = require(ReplicatedStorage.Shared.Classes.Updater)
 local Battle = {}
 Battle.__index = Battle
 
-local ChooseDuration = 4
-local RoundDuration = ChooseDuration + 1
-
 local BattleUpdater = Updater.new()
 
 type Fieldable = {
@@ -104,7 +101,7 @@ function Battle.new(args: {
 		local cframe, size = char:GetBoundingBox()
 		local dy = char:GetPivot().Y - (cframe.Y - size.Y / 2)
 		char:PivotTo(base.Spawn.CFrame + Vector3.new(0, dy, 0))
-		base.Spawn:Destroy()
+		base.Spawn.Transparency = 1
 
 		battler:Observe(function()
 			self.Changed:Fire(self:GetStatus())
@@ -183,7 +180,7 @@ function Battle.fromPlayerVersusBattler(player: Player, battlerId: string)
 				local def = BattlerDefs[battlerId]
 				local reward = def.Reward
 
-				CurrencyService:GetBoosted(player, "Secondary", reward)
+				CurrencyService:GetBoosted(player, "Coins", reward)
 					:andThen(function(amountAdded)
 						amountAdded = ProductService:GetVipBoostedSecondary(player, amountAdded)
 
@@ -243,11 +240,23 @@ function Battle.Remove(self: Battle, object: Fieldable)
 	self.Field[object] = nil
 end
 
-function Battle.PlayCard(self: Battle, battler: Battler.Battler, cardId: string, level: number)
+function Battle.PlayCard(self: Battle, battler: Battler.Battler, cardId: string)
 	if not cardId then return end
 
 	local card = CardDefs[cardId]
 	assert(card, `No card for id {cardId}`)
+
+	local level = battler.Deck[cardId]
+	if not level then return end
+
+	local cooldown = battler.DeckCooldowns[cardId]
+	if not cooldown:IsReady() then return end
+
+	local canAfford = battler.Supplies > card.Cost
+	if not canAfford then return end
+
+	battler.Supplies -= card.Cost
+	cooldown:Use()
 
 	local retVal
 
@@ -285,6 +294,10 @@ function Battle.Update(self: Battle, dt: number)
 			object:Destroy()
 			self:Remove(object)
 		end
+	end
+
+	for _, battler in self.Battlers do
+		battler.Supplies += battler.SuppliesGain * dt
 	end
 
 	local victor = self:GetVictor()
@@ -517,10 +530,6 @@ function Battle.End(self: Battle, victor: Battler.Battler)
 				object:DefeatAnimation()
 			end
 		end
-	end
-
-	for _, battler in self.Battlers do
-		battler.DeckPlayer:Destroy()
 	end
 
 	Promise.all(Sift.Array.map(
