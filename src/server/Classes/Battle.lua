@@ -7,8 +7,8 @@ local BattleService = require(ServerScriptService.Server.Services.BattleService)
 local BattleSession = require(ServerScriptService.Server.Classes.BattleSession)
 local Battler = require(ServerScriptService.Server.Classes.Battler)
 local BattlerDefs = require(ReplicatedStorage.Shared.Defs.BattlerDefs)
+local BattlerHelper = require(ServerScriptService.Server.Util.BattlerHelper)
 local CardDefs = require(ReplicatedStorage.Shared.Defs.CardDefs)
-local Cooldown = require(ReplicatedStorage.Shared.Classes.Cooldown)
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
 local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local Damage = require(ServerScriptService.Server.Classes.Damage)
@@ -18,6 +18,7 @@ local GuiEffectService = require(ServerScriptService.Server.Services.GuiEffectSe
 local PartPath = require(ReplicatedStorage.Shared.Classes.PartPath)
 local ProductService = require(ServerScriptService.Server.Services.ProductService)
 local Promise = require(ReplicatedStorage.Packages.Promise)
+local RewardHelper = require(ServerScriptService.Server.Util.RewardHelper)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local Trove = require(ReplicatedStorage.Packages.Trove)
@@ -169,6 +170,8 @@ function Battle.fromPlayerVersusBattler(player: Player, battlerId: string)
 				Model = battleground,
 			})
 
+			local opponentBrain = BattlerHelper.CreateBrain(battlerId, opponent)
+
 			BattleService:Add(player, battle)
 			battle.Ended:Connect(function(victor)
 				if victor ~= battleSession.Battler then
@@ -178,25 +181,14 @@ function Battle.fromPlayerVersusBattler(player: Player, battlerId: string)
 				end
 
 				local def = BattlerDefs[battlerId]
-				local reward = def.Reward
+				-- TODO: random chance some rewards or whatever
+				local rewards = def.Rewards
 
-				CurrencyService:GetBoosted(player, "Coins", reward)
-					:andThen(function(amountAdded)
-						amountAdded = ProductService:GetVipBoostedSecondary(player, amountAdded)
-
-						BattleService.MessageSent:Fire(player, "Victory!")
-
-						GuiEffectService.IndicatorRequestedRemote:Fire(player, {
-							Text = `+{amountAdded // 0.1 / 10}`,
-							Image = CurrencyDefs.Coins.Image,
-							Start = opponent:GetRoot().Position,
-							Finish = victor:GetRoot().Position,
-							Mode = "Slow",
-						})
-
-						Promise.delay(0.5):andThen(function()
-							CurrencyService:AddCurrency(player, "Coins", amountAdded)
-						end)
+				Promise.all(Sift.Array.map(rewards, function(reward)
+					return RewardHelper.GiveReward(player, reward)
+				end))
+					:andThen(function()
+						BattleService.RewardsDisplayed:Fire(player, rewards)
 					end)
 					:andThen(function()
 						EventStream.Event({ Kind = "BattleWon", Player = player, BattlerId = battlerId })
@@ -204,6 +196,7 @@ function Battle.fromPlayerVersusBattler(player: Player, battlerId: string)
 			end)
 			battle.Destroyed:Connect(function()
 				BattleService:Remove(player)
+				opponentBrain:Destroy()
 			end)
 
 			return battle
@@ -241,45 +234,66 @@ function Battle.Remove(self: Battle, object: Fieldable)
 end
 
 function Battle.PlayCard(self: Battle, battler: Battler.Battler, cardId: string)
-	if not cardId then return end
+	return Promise.try(function()
+		if not cardId then return end
 
-	local card = CardDefs[cardId]
-	assert(card, `No card for id {cardId}`)
+		local card = CardDefs[cardId]
+		assert(card, `No card for id {cardId}`)
 
-	local level = battler.Deck[cardId]
-	if not level then return end
+		local level = battler.Deck[cardId]
+		if not level then return end
 
-	local cooldown = battler.DeckCooldowns[cardId]
-	if not cooldown:IsReady() then return end
+		local cooldown = battler.DeckCooldowns[cardId]
+		if not cooldown:IsReady() then return end
 
-	local canAfford = battler.Supplies > card.Cost
-	if not canAfford then return end
+		local canAfford = battler.Supplies > card.Cost
+		if not canAfford then return end
 
-	battler.Supplies -= card.Cost
-	cooldown:Use()
+		battler.Supplies -= card.Cost
+		cooldown:Use()
 
-	local retVal
+		local retVal
 
-	if card.Type == "Goon" then
-		retVal = Promise.resolve(Goon.fromId({
-			Id = card.GoonId,
-			Battle = self,
-			Battler = battler,
-			Direction = battler.Direction,
-			Position = battler.Position,
-			TeamId = battler.TeamId,
-			Level = level,
-		}))
-	elseif card.Type == "Ability" then
-		local activate = AbilityHelper.GetImplementation(card.AbilityId)
-		retVal = activate(level, battler, self)
-	else
-		error(`Unimplemented card type {card.Type}`)
-	end
+		if card.Type == "Goon" then
+			retVal = Goon.fromId({
+				Id = card.GoonId,
+				Battle = self,
+				Battler = battler,
+				Direction = battler.Direction,
+				Position = battler.Position,
+				TeamId = battler.TeamId,
+				Level = level,
+			})
 
-	self.CardPlayed:Fire(battler, cardId, level)
+			retVal.Died:Connect(function()
+				local bounty = math.floor(card.Cost * 0.33)
+				for _, otherBattler in self.Battlers do
+					if otherBattler == battler then continue end
+					otherBattler.Supplies += bounty
 
-	return retVal
+					-- TODO: replace with better player acquisition pipeline
+					local player = Players:GetPlayerFromCharacter(otherBattler.CharModel)
+					if not player then continue end
+
+					GuiEffectService.IndicatorRequestedRemote:Fire(player, {
+						Text = `+{bounty}`,
+						Image = CurrencyDefs.Supplies.Image,
+						Start = retVal:GetRoot().Position,
+						Finish = otherBattler:GetRoot().Position,
+					})
+				end
+			end)
+		elseif card.Type == "Ability" then
+			local activate = AbilityHelper.GetImplementation(card.AbilityId)
+			retVal = activate(level, battler, self)
+		else
+			error(`Unimplemented card type {card.Type}`)
+		end
+
+		self.CardPlayed:Fire(battler, cardId, level)
+
+		return retVal
+	end)
 end
 
 function Battle.Update(self: Battle, dt: number)

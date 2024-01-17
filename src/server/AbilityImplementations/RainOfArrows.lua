@@ -31,7 +31,7 @@ return function(def, level, battler, battle)
 			index += 1
 			if index > #targets then index = 1 end
 
-			return Promise.delay((number - 1) * 0.3)
+			return Promise.delay((number - 1) * 0.1)
 				:andThen(function()
 					local start = root.Position + offset
 

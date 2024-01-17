@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local BattleController = require(ReplicatedStorage.Shared.Controllers.BattleController)
+local BattleResultBridge = require(ReplicatedStorage.Shared.React.BattleResult.BattleResultBridge)
 local BattlerPromptBridge = require(ReplicatedStorage.Shared.React.BattlerPromptBridge)
 local ChangeLogBoard = require(ReplicatedStorage.Shared.React.ChangeLog.ChangeLogBoard)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
@@ -54,6 +55,7 @@ return function()
 				SessionRewardsMenu = React.createElement(SessionRewardsMenuBridge),
 				LoginStreakRewardsMenu = React.createElement(LoginStreakRewardsMenuBridge),
 				VipMenu = React.createElement(VipMenuBridge),
+				BattleResult = React.createElement(BattleResultBridge),
 
 				AlphaMessage = React.createElement(alphaMessage),
 			}),

@@ -10,6 +10,7 @@ local CardDefs = require(ReplicatedStorage.Shared.Defs.CardDefs)
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local ComponentController = require(ReplicatedStorage.Shared.Controllers.ComponentController)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
+local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
 local Flipper = require(ReplicatedStorage.Packages.Flipper)
 local Frame = require(ReplicatedStorage.Shared.React.Common.Frame)
 local GoonHealthBar = require(ReplicatedStorage.Shared.React.Battle.GoonHealthBar)
@@ -126,7 +127,12 @@ local function suppliesContent(props: {
 		Label = React.createElement(Label, {
 			Text = TextStroke(`Supplies`),
 			TextXAlignment = Enum.TextXAlignment.Center,
-			Size = UDim2.fromScale(1, 0.5),
+			Size = UDim2.fromScale(0.7, 0.5),
+			Position = UDim2.fromScale(0.3, 0),
+		}),
+		Icon = React.createElement(Image, {
+			Image = CurrencyDefs.Supplies.Image,
+			Size = UDim2.fromScale(0.25, 0.5),
 		}),
 		Current = React.createElement(Label, {
 			Text = TextStroke(supplies),
@@ -199,6 +205,41 @@ local function attackButton(props: {
 			CooldownBar = onCooldown and React.createElement(cooldownBar, cooldown),
 		}),
 	})
+end
+
+local function upgradeButton(props: {
+	Status: any,
+})
+	local battler = props.Status and props.Status.Battlers[1]
+
+	return (battler ~= nil)
+		and React.createElement(Button, {
+			ImageColor3 = if battler.Supplies > battler.SuppliesUpgradeCost then ColorDefs.PaleGreen else ColorDefs.PaleRed,
+			[React.Event.Activated] = function()
+				BattleController.SuppliesUpgraded:Fire()
+			end,
+		}, {
+			Image = React.createElement(Image, {
+				Image = CurrencyDefs.Supplies.Image,
+				Size = UDim2.fromScale(0.75, 0.75),
+				Position = UDim2.fromScale(0, 1),
+				AnchorPoint = Vector2.new(0, 1),
+			}),
+			Arrow = React.createElement(Image, {
+				Image = "rbxassetid://15548681925",
+				ZIndex = 4,
+				Size = UDim2.fromScale(0.75, 0.75),
+				Position = UDim2.fromScale(1, 0),
+				AnchorPoint = Vector2.new(1, 0),
+			}),
+			Cost = React.createElement(Label, {
+				ZIndex = 16,
+				Size = UDim2.fromScale(1, 0.5),
+				Position = UDim2.fromScale(0, 0.5),
+				Text = TextStroke(tostring(battler.SuppliesUpgradeCost)),
+				TextXAlignment = Enum.TextXAlignment.Right,
+			}),
+		})
 end
 
 local function hotbar(props: {
@@ -455,6 +496,16 @@ return function(props: {
 						SizeConstraint = Enum.SizeConstraint.RelativeYY,
 					}, {
 						Content = React.createElement(suppliesContent, {
+							Status = status,
+						}),
+					}),
+
+					Upgrade = React.createElement(Container, {
+						LayoutOrder = 3,
+						Size = UDim2.fromScale(0.75, 0.75),
+						SizeConstraint = Enum.SizeConstraint.RelativeYY,
+					}, {
+						Content = React.createElement(upgradeButton, {
 							Status = status,
 						}),
 					}),

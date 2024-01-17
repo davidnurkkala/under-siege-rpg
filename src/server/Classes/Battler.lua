@@ -229,7 +229,22 @@ function Battler.GetStatus(self: Battler)
 		end),
 		Supplies = math.floor(self.Supplies),
 		SuppliesGain = math.floor(self.SuppliesGain),
+		SuppliesUpgradeCost = self:GetSuppliesUpgradeCost(),
 	}
+end
+
+function Battler.GetSuppliesUpgradeCost(self: Battler)
+	return 50 + 30 * (self.SuppliesGain - 5)
+end
+
+function Battler.UpgradeSupplies(self: Battler)
+	local cost = self:GetSuppliesUpgradeCost()
+	if self.Supplies < cost then return end
+
+	self.Supplies -= cost
+	self.SuppliesGain += 1
+
+	self.Changed:Fire(self:GetStatus())
 end
 
 function Battler.Observe(self: Battler, callback)

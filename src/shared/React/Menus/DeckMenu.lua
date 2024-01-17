@@ -6,6 +6,7 @@ local Button = require(ReplicatedStorage.Shared.React.Common.Button)
 local CardContents = require(ReplicatedStorage.Shared.React.Cards.CardContents)
 local CardHelper = require(ReplicatedStorage.Shared.Util.CardHelper)
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
+local Configuration = require(ReplicatedStorage.Shared.Configuration)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local DeckController = require(ReplicatedStorage.Shared.Controllers.DeckController)
 local GridLayout = require(ReplicatedStorage.Shared.React.Common.GridLayout)
@@ -22,6 +23,7 @@ local SystemWindow = require(ReplicatedStorage.Shared.React.Common.SystemWindow)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 
 function cardDetails(props: {
+	DeckIsFull: boolean,
 	CardId: string,
 	Level: number,
 	Equipped: boolean,
@@ -84,9 +86,11 @@ function cardDetails(props: {
 				LayoutOrder = -2,
 				Size = UDim2.fromScale(0.3, 1),
 				[React.Event.Activated] = props.Toggle,
+				Active = props.Equipped or not props.DeckIsFull,
+				ImageColor3 = if props.DeckIsFull and not props.Equipped then ColorDefs.PaleRed else ColorDefs.PaleGreen,
 			}, {
 				Text = React.createElement(Label, {
-					Text = TextStroke(if props.Equipped then "Unequip" else "Equip"),
+					Text = TextStroke(if props.Equipped then "Unequip" else if props.DeckIsFull then "<i>Full!</i>" else "Equip"),
 				}),
 			}),
 
@@ -108,13 +112,16 @@ return function(props: {
 	},
 })
 	local selectedId, setSelectedId = React.useState(nil)
+	local equippedCount = Sift.Set.count(props.Deck.Equipped)
+	local deckIsFull = equippedCount >= Configuration.DeckSizeMax
 
 	return React.createElement(SystemWindow, {
 		Visible = props.Visible,
-		HeaderText = TextStroke("Deck"),
+		HeaderText = TextStroke(`Deck ({equippedCount} / {Configuration.DeckSizeMax})`),
 		[React.Event.Activated] = props.Close,
 	}, {
 		Details = (selectedId ~= nil) and React.createElement(cardDetails, {
+			DeckIsFull = deckIsFull,
 			CardId = selectedId,
 			Level = props.Deck.Owned[selectedId],
 			Equipped = props.Deck.Equipped[selectedId] == true,
@@ -149,7 +156,7 @@ return function(props: {
 						Padding = 6,
 					}, {
 						Button = React.createElement(Button, {
-							ImageColor3 = ColorDefs.PaleGreen,
+							ImageColor3 = if props.Deck.Equipped[cardId] then ColorDefs.PaleGreen else ColorDefs.PaleBlue,
 							[React.Event.Activated] = function()
 								setSelectedId(cardId)
 							end,

@@ -8,17 +8,21 @@ local Battlers = {
 		Name = "Peasant",
 		BattlegroundName = "World1",
 		BaseName = "Tower",
-		Reward = 5,
+		Rewards = {
+			{ Type = "Currency", CurrencyType = "Coins", Amount = 10 },
+			{ Type = "Currency", CurrencyType = "Gems", Amount = 1 },
+			{ Type = "Card", CardId = "Peasant" },
+		},
 		WeaponId = "WoodenBow",
 		Deck = {
 			Peasant = 1,
-			Recruit = 1,
+			Heal = 1,
 		},
 		Brain = {
 			Id = "NaiveOrder",
 			Order = {
 				{ CardId = "Peasant", Count = 3 },
-				{ CardId = "Recruit", Count = 1 },
+				{ CardId = "Heal", Count = 1 },
 			},
 		},
 	},

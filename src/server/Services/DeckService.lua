@@ -3,6 +3,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 
 local CardDefs = require(ReplicatedStorage.Shared.Defs.CardDefs)
 local Comm = require(ReplicatedStorage.Packages.Comm)
+local Configuration = require(ReplicatedStorage.Shared.Configuration)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local OptionsService = require(ServerScriptService.Server.Services.OptionsService)
@@ -93,6 +94,12 @@ function DeckService.AddCards(self: DeckService, player: Player, cards: { [strin
 	end)
 end
 
+function DeckService.HasCard(self: DeckService, player: Player, cardId: string)
+	return DataService:GetSaveFile(player):andThen(function(saveFile)
+		return saveFile:Get("Deck").Owned[cardId] ~= nil
+	end)
+end
+
 function DeckService.AddCard(self: DeckService, player: Player, cardId: string)
 	assert(CardDefs[cardId], `No card with id {cardId}`)
 
@@ -127,6 +134,7 @@ function DeckService.SetCardEquipped(self: DeckService, player: Player, cardId: 
 
 			if equipped then
 				if oldDeck.Equipped[cardId] then return oldDeck end
+				if Sift.Set.count(oldDeck.Equipped) >= Configuration.DeckSizeMax then return oldDeck end
 
 				return Sift.Dictionary.set(oldDeck, "Equipped", Sift.Dictionary.set(oldDeck.Equipped, cardId, true))
 			else

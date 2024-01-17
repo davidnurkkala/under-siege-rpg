@@ -42,7 +42,18 @@ function BattleService.PrepareBlocking(self: BattleService)
 		end
 	end)
 
+	self.Comm:CreateSignal("SuppliesUpgraded"):Connect(function(player)
+		local battle = self:Get(player)
+		if not battle then return end
+
+		-- TODO: better way to find the player's battler?
+		for _, battler in battle.Battlers do
+			if battler.CharModel == player.Character then battler:UpgradeSupplies() end
+		end
+	end)
+
 	self.MessageSent = self.Comm:CreateSignal("MessageSent")
+	self.RewardsDisplayed = self.Comm:CreateSignal("RewardsDisplayed")
 end
 
 function BattleService.Get(_self: BattleService, player: Player)

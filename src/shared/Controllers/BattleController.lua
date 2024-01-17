@@ -29,6 +29,8 @@ function BattleController.PrepareBlocking(self: BattleController)
 	self.MessageSent = self.Comm:GetSignal("MessageSent")
 	self.SurrenderRequested = self.Comm:GetSignal("SurrenderRequested")
 	self.CardPlayed = self.Comm:GetSignal("CardPlayed")
+	self.SuppliesUpgraded = self.Comm:GetSignal("SuppliesUpgraded")
+	self.RewardsDisplayed = self.Comm:GetSignal("RewardsDisplayed")
 
 	workspace.Battles.ChildAdded:Connect(function(battleModel)
 		local userIds = Sift.Array.map(string.split(battleModel:GetAttribute("UserIds"), ","), function(userIdString)

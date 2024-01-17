@@ -30,6 +30,14 @@ local Currencies = {
 			Secondary = ColorDefs.Purple,
 		},
 	},
+	Supplies = {
+		Name = "Supplies",
+		Image = "rbxassetid://16009665245",
+		Colors = {
+			Primary = ColorDefs.White,
+			Secondary = ColorDefs.White,
+		},
+	},
 }
 
 return Sift.Dictionary.map(Currencies, function(currency, id)
