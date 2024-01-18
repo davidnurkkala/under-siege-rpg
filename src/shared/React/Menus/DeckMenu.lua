@@ -16,6 +16,7 @@ local LayoutContainer = require(ReplicatedStorage.Shared.React.Common.LayoutCont
 local ListLayout = require(ReplicatedStorage.Shared.React.Common.ListLayout)
 local PaddingAll = require(ReplicatedStorage.Shared.React.Common.PaddingAll)
 local Panel = require(ReplicatedStorage.Shared.React.Common.Panel)
+local RatioText = require(ReplicatedStorage.Shared.React.Common.RatioText)
 local React = require(ReplicatedStorage.Packages.React)
 local ScrollingFrame = require(ReplicatedStorage.Shared.React.Common.ScrollingFrame)
 local Sift = require(ReplicatedStorage.Packages.Sift)
@@ -53,10 +54,27 @@ function cardDetails(props: {
 				Padding = UDim.new(0.05, 0),
 			}),
 
-			Text = React.createElement(Label, {
-				TextXAlignment = Enum.TextXAlignment.Left,
-				TextYAlignment = Enum.TextYAlignment.Top,
-				Text = TextStroke(CardHelper.GetDescription(props.CardId, props.Level)),
+			ScrollingFrame = React.createElement(ScrollingFrame, {
+				ScrollBarThickness = 8,
+				ScrollBarImageColor3 = ColorDefs.Blue,
+				RenderLayout = function(setCanvasSize)
+					return React.createElement(ListLayout, {
+						[React.Change.AbsoluteContentSize] = function(object)
+							setCanvasSize(UDim2.fromOffset(0, object.AbsoluteContentSize.Y + 4))
+						end,
+					})
+				end,
+			}, {
+				Padding = React.createElement("UIPadding", {
+					PaddingRight = UDim.new(0, 12),
+				}),
+
+				Text = React.createElement(RatioText, {
+					Ratio = 1 / 15,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextYAlignment = Enum.TextYAlignment.Top,
+					Text = TextStroke(CardHelper.GetDescription(props.CardId, props.Level)),
+				}),
 			}),
 		}),
 

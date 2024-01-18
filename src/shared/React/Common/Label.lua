@@ -12,6 +12,6 @@ local DefaultProps = {
 	Size = UDim2.fromScale(1, 1),
 }
 
-return function(props)
-	return React.createElement("TextLabel", Sift.Dictionary.merge(DefaultProps, props))
-end
+return React.forwardRef(function(props, ref)
+	return React.createElement("TextLabel", Sift.Dictionary.merge(DefaultProps, props, { ref = ref }))
+end)
