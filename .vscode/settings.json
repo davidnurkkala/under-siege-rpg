@@ -9,5 +9,6 @@
 	"luau-lsp.completion.imports.separateGroupsWithLine": true,
 	"luau-lsp.fflags.override": {
 		"LuauTransitiveSubtyping": "False"
-	}
+	},
+	"stylua.targetReleaseVersion": "latest"
 }

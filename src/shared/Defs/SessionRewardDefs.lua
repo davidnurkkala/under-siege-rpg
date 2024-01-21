@@ -23,8 +23,6 @@ local Rewards = {
 	{ Type = "Boost", Boost = { Type = "Currency", CurrencyType = "Coins", Multiplier = 2, Time = 5 * 60 } },
 	{ Type = "Currency", CurrencyType = "Coins", Amount = 2500 },
 	{ Type = "Currency", CurrencyType = "Coins", Amount = 120 },
-	{ Type = "Currency", CurrencyType = "Gems", Amount = 25 },
-	{ Type = "Boost", Boost = { Type = "Currency", CurrencyType = "Coins", Multiplier = 1.5, Time = 10 * 60 } },
 }
 
 return Sift.Array.map(Rewards, function(reward, index)

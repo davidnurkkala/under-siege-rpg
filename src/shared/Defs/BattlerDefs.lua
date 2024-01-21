@@ -38,6 +38,9 @@ local Battlers = {
 			Hunter = 1,
 			RainOfArrows = 1,
 		},
+		Brain = {
+			Id = "WeightedCost",
+		},
 	},
 	Knight = {
 		Name = "Knight",
@@ -49,6 +52,9 @@ local Battlers = {
 			Footman = 1,
 			Heal = 1,
 			RainOfArrows = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
 		},
 	},
 	King = {
@@ -63,6 +69,9 @@ local Battlers = {
 			Peasant = 2,
 			Recruitment = 3,
 		},
+		Brain = {
+			Id = "WeightedCost",
+		},
 	},
 	MinerBoss = {
 		Name = "Miner Boss",
@@ -74,6 +83,9 @@ local Battlers = {
 			Miner = 1,
 			Demolitionist = 1,
 			PickaxeThrower = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
 		},
 	},
 
@@ -89,6 +101,9 @@ local Battlers = {
 			Hunter = 1,
 			Recruitment = 1,
 		},
+		Brain = {
+			Id = "WeightedCost",
+		},
 	},
 
 	-- world 2
@@ -103,6 +118,9 @@ local Battlers = {
 			Recruit = 1,
 			VikingWarrior = 1,
 		},
+		Brain = {
+			Id = "WeightedCost",
+		},
 	},
 	VikingWarrior = {
 		Name = "Viking Warrior",
@@ -115,6 +133,9 @@ local Battlers = {
 			Recruit = 1,
 			VikingWarrior = 1,
 			RainOfArrows = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
 		},
 	},
 	VikingChief = {
@@ -130,6 +151,9 @@ local Battlers = {
 			Berserker = 1,
 			Heal = 1,
 			RainOfArrows = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
 		},
 	},
 	VikingKing = {
@@ -147,6 +171,9 @@ local Battlers = {
 			Heal = 1,
 			RainOfArrows = 1,
 		},
+		Brain = {
+			Id = "WeightedCost",
+		},
 	},
 
 	-- world 3
@@ -162,6 +189,9 @@ local Battlers = {
 			Heal = 1,
 			RainOfArrows = 1,
 		},
+		Brain = {
+			Id = "WeightedCost",
+		},
 	},
 	ElfHunter = {
 		Name = "Elf Hunter",
@@ -173,6 +203,9 @@ local Battlers = {
 			ElfBrawler = 1,
 			ElfRanger = 1,
 			RainOfArrows = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
 		},
 	},
 	ElfWarrior = {
@@ -186,6 +219,9 @@ local Battlers = {
 			ElfRanger = 1,
 			Heal = 1,
 		},
+		Brain = {
+			Id = "WeightedCost",
+		},
 	},
 	ElfKing = {
 		Name = "Elf King",
@@ -198,6 +234,9 @@ local Battlers = {
 			ElfRanger = 1,
 			Heal = 1,
 			RainOfArrows = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
 		},
 	},
 
@@ -214,6 +253,9 @@ local Battlers = {
 			BanditOfficer = 1,
 			Mob = 1,
 		},
+		Brain = {
+			Id = "WeightedCost",
+		},
 	},
 
 	-- world 4
@@ -228,6 +270,9 @@ local Battlers = {
 			OrcChampion = 1,
 			RainOfArrows = 1,
 		},
+		Brain = {
+			Id = "WeightedCost",
+		},
 	},
 	OrcBrute = {
 		Name = "Orc Brute",
@@ -240,6 +285,9 @@ local Battlers = {
 			OrcChampion = 1,
 			Heal = 1,
 			RainOfArrows = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
 		},
 	},
 	OrcFighter = {
@@ -254,6 +302,9 @@ local Battlers = {
 			Heal = 1,
 			RainOfArrows = 1,
 		},
+		Brain = {
+			Id = "WeightedCost",
+		},
 	},
 	OrcGeneral = {
 		Name = "Orc General",
@@ -266,6 +317,9 @@ local Battlers = {
 			OrcChampion = 1,
 			Heal = 1,
 			RainOfArrows = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
 		},
 	},
 }

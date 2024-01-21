@@ -55,6 +55,7 @@ function cardDetails(props: {
 			}),
 
 			ScrollingFrame = React.createElement(ScrollingFrame, {
+				ScrollingDirection = Enum.ScrollingDirection.Y,
 				ScrollBarThickness = 8,
 				ScrollBarImageColor3 = ColorDefs.Blue,
 				RenderLayout = function(setCanvasSize)
@@ -67,6 +68,7 @@ function cardDetails(props: {
 			}, {
 				Padding = React.createElement("UIPadding", {
 					PaddingRight = UDim.new(0, 12),
+					PaddingLeft = UDim.new(0, 2),
 				}),
 
 				Text = React.createElement(RatioText, {

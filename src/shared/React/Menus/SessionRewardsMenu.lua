@@ -47,10 +47,10 @@ return function(props: {
 		Visible = props.Visible,
 		HeaderText = TextStroke("Gifts"),
 		[React.Event.Activated] = props.Close,
-		Ratio = 1.1,
+		--Ratio = 1.1,
 	}, {
 		Layout = React.createElement(GridLayout, {
-			CellSize = UDim2.fromScale(1 / 5, 1 / 4),
+			CellSize = UDim2.fromScale(1 / 6, 1 / 3),
 		}),
 
 		Buttons = React.createElement(
