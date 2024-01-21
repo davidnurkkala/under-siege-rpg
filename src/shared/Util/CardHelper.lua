@@ -6,6 +6,20 @@ local GoonDefs = require(ReplicatedStorage.Shared.Defs.GoonDefs)
 local GoonTagDefs = require(ReplicatedStorage.Shared.Defs.GoonTagDefs)
 local CardHelper = {}
 
+function CardHelper.GetName(id: string)
+	local cardDef = CardDefs[id]
+	if not cardDef then return "" end
+
+	if cardDef.Type == "Goon" then
+		return GoonDefs[cardDef.GoonId].Name
+	elseif cardDef.Type == "Ability" then
+		local ability = AbilityHelper.GetAbility(cardDef.AbilityId)
+		return ability.Name
+	else
+		error("Unsupported type")
+	end
+end
+
 function CardHelper.GetDescription(id: string, level: number)
 	local cardDef = CardDefs[id]
 
@@ -65,6 +79,16 @@ function CardHelper.GetGoonStatRaw(cardId: string, level: number?, key: string)
 	if typeof(value) == "function" then value = value(level) end
 
 	return value
+end
+
+function CardHelper.HasUpgrade(cardId: string, level: number)
+	return CardHelper.GetUpgrade(cardId, level) ~= nil
+end
+
+function CardHelper.GetUpgrade(cardId: string, level: number)
+	local cardDef = CardDefs[cardId]
+	if not cardDef.Upgrades then return nil end
+	return cardDef.Upgrades[level]
 end
 
 function CardHelper.GetGoonStat(cardId: string, level: number?, key: string)

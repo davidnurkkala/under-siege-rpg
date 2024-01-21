@@ -11,6 +11,7 @@ function DeckController.PrepareBlocking(self: DeckController)
 	self.Comm = Comm.ClientComm.new(ReplicatedStorage, true, "DeckService")
 	self.DeckRemote = self.Comm:GetProperty("Deck")
 	self.CardEquipToggleRequested = self.Comm:GetSignal("CardEquipToggleRequested")
+	self.CardUpgradeRequested = self.Comm:GetSignal("CardUpgradeRequested")
 end
 
 function DeckController.ObserveDeck(self: DeckController, callback)

@@ -81,11 +81,11 @@ return function(props: {
 
 			Level = (props.Level ~= nil) and React.createElement(Label, {
 				ZIndex = 4,
-				Size = UDim2.fromScale(1, 0.25),
+				Size = UDim2.fromScale(0.5, 0.25),
 				TextXAlignment = Enum.TextXAlignment.Right,
 				AnchorPoint = Vector2.new(1, 1),
 				Position = UDim2.fromScale(1, 1),
-				Text = TextStroke(`Lv. {props.Level}`),
+				Text = TextStroke(`Lv. {if CardHelper.HasUpgrade(props.CardId, props.Level) then props.Level else "MAX"}`),
 			}),
 
 			Cooldown = React.createElement(Container, {

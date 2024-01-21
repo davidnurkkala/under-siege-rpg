@@ -26,18 +26,19 @@ return function(props: {
 		Visible = props.Visible,
 		HeaderText = TextStroke("Login Streak"),
 		[React.Event.Activated] = props.Close,
+		RatioDisabled = true,
+		Size = UDim2.fromScale(0.8, 0.3),
+		HeaderSize = 0.2,
 	}, {
 		Message = React.createElement(Label, {
-			Size = UDim2.fromScale(1, 0.6),
+			Size = UDim2.fromScale(1, 0.25),
 			Position = UDim2.fromScale(0.5, 0),
 			AnchorPoint = Vector2.new(0.5, 0),
-			Text = TextStroke(
-				`Your current login streak is {props.Streak} day{if props.Streak > 1 then "s" else ""} long.\n\nLog in every day to get better rewards!`
-			),
+			Text = TextStroke(`Your current login streak is {props.Streak} day{if props.Streak > 1 then "s" else ""} long.`),
 		}),
 		Grid = React.createElement(Container, {
-			Size = UDim2.fromScale(1, 0.4),
-			Position = UDim2.fromScale(0, 0.6),
+			Size = UDim2.fromScale(1, 0.75),
+			Position = UDim2.fromScale(0, 0.25),
 		}, {
 			Layout = React.createElement(GridLayout, {
 				CellSize = UDim2.fromScale(1 / 7, 1),

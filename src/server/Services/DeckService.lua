@@ -2,8 +2,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local CardDefs = require(ReplicatedStorage.Shared.Defs.CardDefs)
+local CardHelper = require(ReplicatedStorage.Shared.Util.CardHelper)
 local Comm = require(ReplicatedStorage.Packages.Comm)
 local Configuration = require(ReplicatedStorage.Shared.Configuration)
+local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local OptionsService = require(ServerScriptService.Server.Services.OptionsService)
@@ -37,6 +39,12 @@ function DeckService.PrepareBlocking(self: DeckService)
 				return self:SetCardEquipped(player, cardId, deck.Equipped[cardId] == nil)
 			end)
 			:expect()
+	end)
+
+	self.Comm:CreateSignal("CardUpgradeRequested"):Connect(function(player, cardId)
+		if not t.string(cardId) then return end
+
+		return self:UpgradeCard(player, cardId):expect()
 	end)
 end
 
@@ -98,6 +106,35 @@ function DeckService.HasCard(self: DeckService, player: Player, cardId: string)
 	return DataService:GetSaveFile(player):andThen(function(saveFile)
 		return saveFile:Get("Deck").Owned[cardId] ~= nil
 	end)
+end
+
+function DeckService.UpgradeCard(self: DeckService, player: Player, cardId: string)
+	return DataService:GetSaveFile(player)
+		:andThen(function(saveFile)
+			local deck = saveFile:Get("Deck")
+
+			local level = deck.Owned[cardId]
+			if not level then return false end
+			local upgrade = CardHelper.GetUpgrade(cardId, level)
+			if upgrade == nil then return false end
+
+			return CurrencyService:ApplyPrice(player, upgrade):andThen(function(success)
+				if not success then return false end
+
+				saveFile:Update("Deck", function(oldDeck)
+					return Sift.Dictionary.update(oldDeck, "Owned", function(oldOwned)
+						return Sift.Dictionary.update(oldOwned, cardId, function(oldLevel)
+							return oldLevel + 1
+						end)
+					end)
+				end)
+
+				return true
+			end)
+		end)
+		:catch(function()
+			return false
+		end)
 end
 
 function DeckService.AddCard(self: DeckService, player: Player, cardId: string)

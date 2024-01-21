@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Aspect = require(ReplicatedStorage.Shared.React.Common.Aspect)
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
+local Default = require(ReplicatedStorage.Shared.Util.Default)
 local React = require(ReplicatedStorage.Packages.React)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local SquishWindow = require(ReplicatedStorage.Shared.React.Common.SquishWindow)
@@ -21,9 +22,10 @@ local DefaultProps = {
 }
 
 return function(props)
+	local ratioDisabled = Default(props.RatioDisabled, false)
 	local ratio = props.Ratio or Ratio
 	local maxSize = props.MaxSize or MaxSize
-	props = Sift.Dictionary.removeKeys(props, "Ratio", "MaxSize")
+	props = Sift.Dictionary.removeKeys(props, "Ratio", "MaxSize", "RatioDisabled")
 
 	local defaultProps = Sift.Dictionary.merge(DefaultProps, {
 		RenderContainer = function()
@@ -31,7 +33,7 @@ return function(props)
 				SizeConstraint = React.createElement("UISizeConstraint", {
 					MaxSize = Vector2.new(maxSize, maxSize),
 				}),
-				Aspect = React.createElement(Aspect, {
+				Aspect = (not ratioDisabled) and React.createElement(Aspect, {
 					AspectRatio = ratio,
 					DominantAxis = Enum.DominantAxis.Height,
 				}),

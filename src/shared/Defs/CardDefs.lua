@@ -12,6 +12,12 @@ local Cards = {
 		Rank = 1,
 		Cooldown = 1,
 		Cost = 10,
+		Upgrades = {
+			{
+				Coins = 10,
+				Gems = 5,
+			},
+		},
 	},
 	Recruit = {
 		GoonId = "Recruit",
