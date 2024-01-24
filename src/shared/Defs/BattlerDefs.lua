@@ -212,7 +212,6 @@ local Battlers = {
 		BaseName = "ElfBase",
 		Reward = 3000,
 		WeaponId = "FairyBow",
-		Power = 4000000,
 		Deck = {
 			BanditRogue = 64,
 			BanditDuelist = 64,

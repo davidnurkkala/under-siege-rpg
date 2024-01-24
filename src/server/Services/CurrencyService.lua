@@ -8,7 +8,6 @@ local CurrencyHelper = require(ReplicatedStorage.Shared.Util.CurrencyHelper)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local EventStream = require(ReplicatedStorage.Shared.Util.EventStream)
 local Observers = require(ReplicatedStorage.Packages.Observers)
-local Promise = require(ReplicatedStorage.Packages.Promise)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 
 local CurrencyService = {
@@ -28,17 +27,23 @@ function CurrencyService.PrepareBlocking(self: CurrencyService)
 	)
 
 	Observers.observePlayer(function(player)
-		return DataService:ObserveKey(player, "Currency", function(currency)
-			self.CurrencyRemote:SetFor(player, currency)
+		return DataService:ObserveKey(player, "Currency", function()
+			local promise = self:GetWallet(player):andThen(function(wallet)
+				self.CurrencyRemote:SetFor(player, wallet)
+			end)
+
+			return function()
+				promise:cancel()
+			end
 		end)
 	end)
 end
 
-function CurrencyService.GetCurrency(_self: CurrencyService, player: Player, currencyType: string)
+function CurrencyService.GetCurrency(self: CurrencyService, player: Player, currencyType: string)
 	assert(Sift.Dictionary.has(CurrencyDefs, currencyType), `Invalid currency type {currencyType}`)
 
-	return DataService:GetSaveFile(player):andThen(function(saveFile)
-		return saveFile:Get("Currency")[currencyType]
+	return self:GetWallet(player):andThen(function(wallet)
+		return wallet[currencyType]
 	end)
 end
 
@@ -54,11 +59,15 @@ end
 
 function CurrencyService.GetWallet(_self: CurrencyService, player: Player)
 	return DataService:GetSaveFile(player):andThen(function(saveFile)
-		return saveFile:Get("Currency")
+		local ownedCurrency = saveFile:Get("Currency")
+
+		return Sift.Dictionary.map(CurrencyDefs, function(_, currencyType)
+			return ownedCurrency[currencyType] or 0
+		end)
 	end)
 end
 
-function CurrencyService.GetBoosted(self: CurrencyService, player: Player, currencyType: string, amount: number)
+function CurrencyService.GetBoosted(_self: CurrencyService, player: Player, currencyType: string, amount: number)
 	return BoostService:GetMultiplier(player, function(boost)
 		return (boost.Type == "Currency") and (boost.CurrencyType == currencyType)
 	end):andThen(function(multiplier)
@@ -70,11 +79,16 @@ function CurrencyService.AddCurrency(_self: CurrencyService, player: Player, cur
 	assert(Sift.Dictionary.has(CurrencyDefs, currencyType), `Invalid currency type {currencyType}`)
 
 	return DataService:GetSaveFile(player):andThen(function(saveFile)
-		saveFile:Update("Currency", function(oldCurrency)
-			return Sift.Dictionary.set(oldCurrency, currencyType, oldCurrency[currencyType] + amount)
+		saveFile:Update("Currency", function(currency)
+			return Sift.Dictionary.update(currency, currencyType, function(current)
+				return current + amount
+			end, function()
+				return amount
+			end)
 		end)
 
 		EventStream.Event({
+
 			Kind = "CurrencyAdded",
 			Player = player,
 			CurrencyType = currencyType,

@@ -14,6 +14,7 @@ export type Currency = {
 }
 
 local Currencies = {
+	-- SPECIAL
 	Coins = {
 		Name = "Coins",
 		Image = "rbxassetid://15243978848",
@@ -33,6 +34,25 @@ local Currencies = {
 	Supplies = {
 		Name = "Supplies",
 		Image = "rbxassetid://16009665245",
+		Colors = {
+			Primary = ColorDefs.White,
+			Secondary = ColorDefs.White,
+		},
+	},
+
+	-- REGULAR
+	SimpleFood = {
+		Name = "Simple Food",
+		Image = "rbxassetid://16075817975",
+		Colors = {
+			Primary = ColorDefs.White,
+			Secondary = ColorDefs.White,
+		},
+	},
+
+	SimpleMaterials = {
+		Name = "Simple Materials",
+		Image = "rbxassetid://16076031410",
 		Colors = {
 			Primary = ColorDefs.White,
 			Secondary = ColorDefs.White,
