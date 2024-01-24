@@ -146,7 +146,7 @@ function TutorialController.Update(self: TutorialController, status)
 		self.Target:Set(self:GetNearestTag("WorldPortal"))
 	elseif status.Instruction == "TrainLongTerm" then
 		self.Message:Set({
-			`Train, battle, hire soldiers, hatch pets, and become stronger.\n{status.State.current // 1} / {status.State.required} Power`,
+			`Train, battle, hire soldiers, and become stronger.\n{status.State.current // 1} / {status.State.required} Power`,
 		})
 		self.Target:Set(nil)
 	elseif status.Instruction == "WeaponShop" then
@@ -162,18 +162,6 @@ function TutorialController.Update(self: TutorialController, status)
 
 		self.Target:Set(self:GetNearestTag("BattlerPrompt", function(model)
 			return model:GetAttribute("BattlerId") == status.State.battlerId
-		end))
-	elseif status.Instruction == "CardGacha" then
-		self.Message:Set({ `Hire a soldier.` })
-
-		self.Target:Set(self:GetNearestTag("CardGachaZone", function(model)
-			return model:GetAttribute("GachaId") == "World1Goons"
-		end))
-	elseif status.Instruction == "PetGacha" then
-		self.Message:Set({ `Hatch a pet.` })
-
-		self.Target:Set(self:GetNearestTag("PetGachaZone", function(model)
-			return model:GetAttribute("GachaId") == "World1Pets"
 		end))
 	end
 end

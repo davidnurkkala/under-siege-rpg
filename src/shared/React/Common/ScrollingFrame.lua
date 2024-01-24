@@ -7,6 +7,10 @@ local DefaultProps = {
 	BackgroundTransparency = 1,
 	ScrollBarThickness = 0,
 	Size = UDim2.fromScale(1, 1),
+	BottomImage = "rbxassetid://16014422972",
+	MidImage = "rbxassetid://16014422972",
+	TopImage = "rbxassetid://16014422972",
+	BorderSizePixel = 0,
 }
 
 return function(props: {

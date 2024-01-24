@@ -59,12 +59,6 @@ local Ids = {
 
 	DemolitionistThrow = 15933526512,
 
-	GenericPetIdle = 15421734157,
-	GenericPetWalk = 15421736818,
-	GenericPetHop = 15514879390,
-	GenericPetFly = 15421736818,
-	GenericPetBlink = 15421776463,
-
 	KittyIdleExtras = 15422083467,
 	KittyWalkExtras = 15423233124,
 

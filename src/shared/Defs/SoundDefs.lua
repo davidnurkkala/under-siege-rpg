@@ -43,12 +43,23 @@ local Ids = {
 	Heal1 = "rbxassetid://15592283200",
 	PrestigeSound = "rbxassetid://15683617761",
 	Block1 = "rbxassetid://15818652556",
+	Explosion1 = {
+		SoundId = "rbxassetid://15941227202",
+		Volume = 3,
+	},
 }
 
-return Sift.Dictionary.map(Ids, function(id, name)
+return Sift.Dictionary.map(Ids, function(entry, name)
 	local sound = Instance.new("Sound")
 	sound.Name = name
-	sound.SoundId = id
+
+	if typeof(entry) == "table" then
+		for key, val in entry do
+			sound[key] = val
+		end
+	else
+		sound.SoundId = entry
+	end
 
 	return sound, name
 end)

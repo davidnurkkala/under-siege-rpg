@@ -6,12 +6,26 @@ local GoonDefs = require(ReplicatedStorage.Shared.Defs.GoonDefs)
 local GoonTagDefs = require(ReplicatedStorage.Shared.Defs.GoonTagDefs)
 local CardHelper = {}
 
-function CardHelper.GetDescription(id: string, count: number)
+function CardHelper.GetName(id: string)
+	local cardDef = CardDefs[id]
+	if not cardDef then return "" end
+
+	if cardDef.Type == "Goon" then
+		return GoonDefs[cardDef.GoonId].Name
+	elseif cardDef.Type == "Ability" then
+		local ability = AbilityHelper.GetAbility(cardDef.AbilityId)
+		return ability.Name
+	else
+		error("Unsupported type")
+	end
+end
+
+function CardHelper.GetDescription(id: string, level: number)
 	local cardDef = CardDefs[id]
 
 	if cardDef.Type == "Goon" then
 		local function get(key)
-			return CardHelper.GetGoonStatRaw(id, count, key)
+			return CardHelper.GetGoonStatRaw(id, level, key)
 		end
 
 		local goonDef = GoonDefs[cardDef.GoonId]
@@ -35,7 +49,7 @@ function CardHelper.GetDescription(id: string, count: number)
 		local ability = AbilityHelper.GetAbility(cardDef.AbilityId)
 
 		local description = ability.Description
-		if typeof(description) == "function" then description = description(ability, CardHelper.CountToLevel(count)) end
+		if typeof(description) == "function" then description = description(ability, level) end
 
 		return description
 	else
@@ -51,46 +65,34 @@ function CardHelper.IsAbility(cardId: string)
 	return CardDefs[cardId].Type == "Ability"
 end
 
-function CardHelper.CountToLevel(count: number)
-	return math.floor(math.log(count, 2)) + 1
-end
-
-function CardHelper.LevelToCount(level: number)
-	return math.pow(2, level - 1)
-end
-
-function CardHelper.WasLevelUp(count: number)
-	if count < 2 then return false end
-
-	local _, frac = math.modf(math.log(count, 2))
-	return frac == 0
-end
-
-function CardHelper.GetNextUpgrade(count: number)
-	return math.pow(2, CardHelper.CountToLevel(count))
-end
-
-function CardHelper.GetGoonStatRaw(cardId: string, count: number?, key: string)
+function CardHelper.GetGoonStatRaw(cardId: string, level: number?, key: string)
 	local cardDef = CardDefs[cardId]
 	assert(cardDef, `No card def found for card id {cardId}`)
 	assert(cardDef.Type == "Goon", `Requested card is not a goon`)
 
 	local def = GoonDefs[cardDef.GoonId]
 
-	if count == nil then count = 1 end
+	if level == nil then level = 1 end
 
 	local value = def.Stats[key]
 
-	if typeof(value) == "function" then
-		local level = CardHelper.CountToLevel(count :: number)
-		value = value(level)
-	end
+	if typeof(value) == "function" then value = value(level) end
 
 	return value
 end
 
-function CardHelper.GetGoonStat(cardId: string, count: number?, key: string)
-	return CardHelper.GetGoonStatRaw(cardId, count, key) // 0.1 / 10
+function CardHelper.HasUpgrade(cardId: string, level: number)
+	return CardHelper.GetUpgrade(cardId, level) ~= nil
+end
+
+function CardHelper.GetUpgrade(cardId: string, level: number)
+	local cardDef = CardDefs[cardId]
+	if not cardDef.Upgrades then return nil end
+	return cardDef.Upgrades[level]
+end
+
+function CardHelper.GetGoonStat(cardId: string, level: number?, key: string)
+	return CardHelper.GetGoonStatRaw(cardId, level, key) // 0.1 / 10
 end
 
 return CardHelper

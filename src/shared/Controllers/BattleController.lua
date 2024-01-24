@@ -8,7 +8,6 @@ local Property = require(ReplicatedStorage.Shared.Classes.Property)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local SmoothStep = require(ReplicatedStorage.Shared.Util.SmoothStep)
-local Trove = require(ReplicatedStorage.Packages.Trove)
 
 local BattleController = {
 	Priority = 0,
@@ -30,7 +29,8 @@ function BattleController.PrepareBlocking(self: BattleController)
 	self.MessageSent = self.Comm:GetSignal("MessageSent")
 	self.SurrenderRequested = self.Comm:GetSignal("SurrenderRequested")
 	self.CardPlayed = self.Comm:GetSignal("CardPlayed")
-	self.CardPromptInterface = self.Comm:GetSignal("CardPromptInterface")
+	self.SuppliesUpgraded = self.Comm:GetSignal("SuppliesUpgraded")
+	self.RewardsDisplayed = self.Comm:GetSignal("RewardsDisplayed")
 
 	workspace.Battles.ChildAdded:Connect(function(battleModel)
 		local userIds = Sift.Array.map(string.split(battleModel:GetAttribute("UserIds"), ","), function(userIdString)
@@ -40,40 +40,6 @@ function BattleController.PrepareBlocking(self: BattleController)
 			battleModel.Parent = nil
 		end) end
 	end)
-end
-
-function BattleController.RegisterCardPrompt(self: BattleController, callback): () -> ()
-	local active = false
-	local connection, promise
-
-	connection = self.CardPromptInterface:Connect(function(...)
-		local args = { ... }
-		if args[1] == false then
-			active = false
-			if promise then promise:cancel() end
-			return
-		end
-
-		if not active then
-			active = true
-			promise = callback(...)
-				:andThen(function(result)
-					self.CardPromptInterface:Fire(result)
-					active = false
-				end)
-				:finally(function()
-					promise = nil
-				end)
-		else
-			active = false
-			promise:cancel()
-		end
-	end)
-
-	return function()
-		promise:cancel()
-		connection:Disconnect()
-	end
 end
 
 function BattleController.ObserveStatus(self: BattleController, callback: (any) -> ()): () -> ()

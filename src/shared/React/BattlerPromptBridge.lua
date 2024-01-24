@@ -16,41 +16,14 @@ local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 local function overhead(props: {
 	Model: Model,
 	Name: string,
-	Power: string,
 })
 	return React.createElement("BillboardGui", {
-		Size = UDim2.fromScale(8, 3),
+		Size = UDim2.fromScale(8, 2),
 		StudsOffsetWorldSpace = Vector3.new(0, 4, 0),
 		Adornee = props.Model.PrimaryPart,
 	}, {
 		Name = React.createElement(Label, {
-			Size = UDim2.fromScale(1, 0.65),
 			Text = TextStroke(props.Name),
-		}),
-		Power = React.createElement(Container, {
-			Size = UDim2.fromScale(1, 0.35),
-			Position = UDim2.fromScale(0, 0.65),
-		}, {
-			Layout = React.createElement(ListLayout, {
-				HorizontalAlignment = Enum.HorizontalAlignment.Center,
-				FillDirection = Enum.FillDirection.Horizontal,
-				Padding = UDim.new(0, 2),
-			}),
-
-			Image = React.createElement(Image, {
-				LayoutOrder = 1,
-				Size = UDim2.fromScale(1, 1),
-				SizeConstraint = Enum.SizeConstraint.RelativeYY,
-				Image = CurrencyDefs.Primary.Image,
-			}),
-
-			Text = React.createElement(Label, {
-				LayoutOrder = 2,
-				Size = UDim2.fromScale(0, 1),
-				TextColor3 = ColorDefs.PaleRed,
-				AutomaticSize = Enum.AutomaticSize.X,
-				Text = TextStroke(props.Power),
-			}),
 		}),
 	})
 end
@@ -69,7 +42,6 @@ return function()
 				setPrompts(function(oldPrompts)
 					return Sift.Dictionary.set(oldPrompts, model, {
 						Name = def.Name,
-						Power = def.Power,
 					})
 				end)
 
@@ -89,7 +61,6 @@ return function()
 			return React.createElement(overhead, {
 				Model = model,
 				Name = data.Name,
-				Power = FormatBigNumber(data.Power),
 			})
 		end)
 	)

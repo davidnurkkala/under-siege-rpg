@@ -1,13 +1,4 @@
 local Abilities = {
-	Nothing = {
-		Name = "Nothing",
-		Image = "",
-		Summary = "Out of cards!",
-		Description = function()
-			return ""
-		end,
-	},
-
 	Heal = {
 		Name = "Heal",
 		Image = "rbxassetid://15582200046",
@@ -25,22 +16,13 @@ local Abilities = {
 		Image = "rbxassetid://15582199910",
 		Summary = "Hit enemies with arrows.",
 		Description = function(self, level)
-			return `{self.Count(level)} arrows that deal {self.Damage(level) // 0.01} damage fall from the sky to hit enemies.\n\nEach arrow will hit a different target, starting from the front-most enemy soldier and moving backwards.\n\nDeals 10% damage to the enemy battler.`
+			return `{self.Count(level)} arrows that deal {self.Damage(level) // 0.01} damage fall from the sky to hit enemies.\n\nEach arrow will hit a different target, starting from the front-most enemy soldier and moving backwards.\n\nDeals 10% damage to the enemy leader.`
 		end,
 		Count = function(level)
 			return 5 + level * 2
 		end,
 		Damage = function(level)
-			return 2 + 0.1 * level
-		end,
-	},
-
-	Mob = {
-		Name = "Mob",
-		Image = "",
-		Summary = "Deploy two Peasants.",
-		Description = function(self, level)
-			return `Immediately deploy two level {level} Peasants.`
+			return 3 + 0.25 * level
 		end,
 	},
 

@@ -1,34 +1,28 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local ActionService = require(ServerScriptService.Server.Services.ActionService)
 local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
 local BattlerDefs = require(ReplicatedStorage.Shared.Defs.BattlerDefs)
+local CardDefs = require(ReplicatedStorage.Shared.Defs.CardDefs)
 local Cooldown = require(ReplicatedStorage.Shared.Classes.Cooldown)
 local Damage = require(ServerScriptService.Server.Classes.Damage)
-local Deck = require(ServerScriptService.Server.Classes.Deck)
-local DeckPlayerRandom = require(ServerScriptService.Server.Classes.DeckPlayerRandom)
 local EffectBattlerCollapse = require(ReplicatedStorage.Shared.Effects.EffectBattlerCollapse)
 local EffectEmission = require(ReplicatedStorage.Shared.Effects.EffectEmission)
-local EffectGrowFade = require(ReplicatedStorage.Shared.Effects.EffectGrowFade)
 local EffectProjectile = require(ReplicatedStorage.Shared.Effects.EffectProjectile)
 local EffectService = require(ServerScriptService.Server.Services.EffectService)
 local EffectSound = require(ReplicatedStorage.Shared.Effects.EffectSound)
 local Health = require(ReplicatedStorage.Shared.Classes.Health)
 local PickRandom = require(ReplicatedStorage.Shared.Util.PickRandom)
 local Promise = require(ReplicatedStorage.Packages.Promise)
+local Sift = require(ReplicatedStorage.Packages.Sift)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local WeaponDefs = require(ReplicatedStorage.Shared.Defs.WeaponDefs)
 local WeaponHelper = require(ReplicatedStorage.Shared.Util.WeaponHelper)
 
-local AttackSlowdown = 0.4
-
 local Battler = {}
 Battler.__index = Battler
-
-type DeckPlayer = {
-	ChooseCard: (DeckPlayer) -> any,
-} | any
 
 export type Battler = typeof(setmetatable(
 	{} :: {
@@ -43,12 +37,13 @@ export type Battler = typeof(setmetatable(
 		Battle: any?,
 		TeamId: string,
 		Active: boolean,
-		DeckPlayer: DeckPlayer,
+		Deck: { [string]: number },
+		DeckCooldowns: { [string]: Cooldown.Cooldown },
 		Animator: Animator.Animator,
-		Power: number,
 		AttackDamage: number,
 		Trove: any,
-		Crit: number,
+		Supplies: number,
+		SuppliesGain: number,
 	},
 	Battler
 ))
@@ -61,18 +56,15 @@ function Battler.new(args: {
 	CharModel: Model,
 	WeaponHoldPart: BasePart,
 	TeamId: string,
-	DeckPlayer: DeckPlayer,
+	Deck: { [string]: number },
 	Animator: Animator.Animator,
 	WeaponDef: any,
-	Power: number,
 }): Battler
 	local trove = Trove.new()
 
 	local weaponModel = trove:Add(WeaponHelper.attachModel(args.WeaponDef, args.CharModel, args.WeaponHoldPart))
 
-	local damagePerSecond = 1
-	local attacksPerSecond = 1 / (args.WeaponDef.AttackCooldownTime / AttackSlowdown)
-	local attackDamage = damagePerSecond / attacksPerSecond
+	local attackDamage = 10
 
 	local self: Battler = setmetatable({
 		Health = Health.new(args.HealthMax),
@@ -83,25 +75,40 @@ function Battler.new(args: {
 		WeaponModel = weaponModel,
 		WeaponDef = args.WeaponDef,
 		TeamId = args.TeamId,
-		DeckPlayer = trove:Add(args.DeckPlayer),
 		Animator = args.Animator,
 		Destroyed = Signal.new(),
 		Changed = Signal.new(),
 		Active = true,
-		AttackCooldown = Cooldown.new(args.WeaponDef.AttackCooldownTime / AttackSlowdown),
+		AttackCooldown = Cooldown.new(5),
 		Trove = trove,
-		Power = args.Power,
 		AttackDamage = attackDamage,
-		Crit = 0,
+		Deck = args.Deck,
+		DeckCooldowns = Sift.Dictionary.map(args.Deck, function(_, cardId)
+			local def = CardDefs[cardId]
+
+			local cooldown = Cooldown.new(def.Cooldown)
+			cooldown:Use()
+
+			return cooldown, cardId
+		end),
+		Supplies = 0,
+		SuppliesGain = 5,
 	}, Battler)
 
-	self.Animator:Play(self.WeaponDef.Animations.Idle)
+	self.AttackCooldown:Use()
 
-	self.Trove:AddPromise(Promise.delay(2.5):andThen(function()
-		self.Trove:Add(self.AttackCooldown:OnReady(function()
-			self:Attack()
-		end))
-	end))
+	do
+		local function update()
+			self.Changed:Fire(self:GetStatus())
+		end
+
+		for _, cooldown in self:GetCooldowns() do
+			self.Trove:Connect(cooldown.Used, update)
+			self.Trove:Connect(cooldown.Completed, update)
+		end
+	end
+
+	self.Animator:Play(self.WeaponDef.Animations.Idle)
 
 	self.Trove:Add(function()
 		self.Active = false
@@ -114,6 +121,13 @@ function Battler.new(args: {
 
 		self.Changed:Fire(self:GetStatus())
 	end)
+
+	self.Trove:Add(task.spawn(function()
+		while true do
+			self.Changed:Fire(self:GetStatus())
+			task.wait(0.5)
+		end
+	end))
 
 	return self
 end
@@ -140,10 +154,9 @@ function Battler.fromBattlerId(battlerId: string, position: number, direction: n
 		Position = position,
 		Direction = direction,
 		TeamId = `NON_PLAYER_{battlerId}`,
-		DeckPlayer = DeckPlayerRandom.new(Deck.new(def.Deck)),
+		Deck = def.Deck,
 		Animator = Animator.new(char.Humanoid),
 		HealthMax = 50,
-		Power = def.Power,
 	})
 
 	battler.Destroyed:Connect(function()
@@ -159,6 +172,10 @@ end
 
 function Battler.HasTag(self: Battler, tagId: string)
 	return tagId == "Ranged"
+end
+
+function Battler.GetCooldowns(self: Battler)
+	return Sift.Array.append(Sift.Dictionary.values(self.DeckCooldowns), self.AttackCooldown)
 end
 
 function Battler.DefeatAnimation(self: Battler)
@@ -200,26 +217,34 @@ function Battler.GetBattle(self: Battler)
 	return self.Battle
 end
 
-function Battler.AddCrit(self: Battler, amount: number)
-	self:SetCrit(self.Crit + amount)
-end
-
-function Battler.SetCrit(self: Battler, amount: number)
-	amount = math.clamp(amount, 0, 1)
-	if self.Crit == amount then return end
-
-	self.Crit = amount
-	self.Changed:Fire(self:GetStatus())
-end
-
 function Battler.GetStatus(self: Battler)
 	return {
 		BaseModel = self.BaseModel,
 		CharModel = self.CharModel,
 		Health = self.Health:Get(),
 		HealthMax = self.Health.Max,
-		Crit = self.Crit,
+		AttackCooldown = { Time = self.AttackCooldown.Time, TimeMax = self.AttackCooldown.TimeMax },
+		DeckCooldowns = Sift.Dictionary.map(self.DeckCooldowns, function(cooldown)
+			return { Time = cooldown.Time, TimeMax = cooldown.TimeMax }
+		end),
+		Supplies = math.floor(self.Supplies),
+		SuppliesGain = math.floor(self.SuppliesGain),
+		SuppliesUpgradeCost = self:GetSuppliesUpgradeCost(),
 	}
+end
+
+function Battler.GetSuppliesUpgradeCost(self: Battler)
+	return 50 + 30 * (self.SuppliesGain - 5)
+end
+
+function Battler.UpgradeSupplies(self: Battler)
+	local cost = self:GetSuppliesUpgradeCost()
+	if self.Supplies < cost then return end
+
+	self.Supplies -= cost
+	self.SuppliesGain += 1
+
+	self.Changed:Fire(self:GetStatus())
 end
 
 function Battler.Observe(self: Battler, callback)
@@ -263,25 +288,6 @@ function Battler.Attack(self: Battler)
 			local start = CFrame.lookAt(here, there)
 			local speed = 128
 
-			local isCrit = self.Crit >= 1
-			if isCrit then
-				self:SetCrit(0)
-
-				EffectService:ForBattle(
-					self.Battle,
-					EffectProjectile({
-						Model = ReplicatedStorage.Assets.Models.Effects.CritProjectile,
-						Start = start,
-						Finish = root,
-						Speed = speed,
-					}),
-					EffectSound({
-						SoundId = "CritStart1",
-						Target = part,
-					})
-				)
-			end
-
 			EffectService:ForBattle(
 				self.Battle,
 				EffectProjectile({
@@ -295,7 +301,7 @@ function Battler.Attack(self: Battler)
 					Target = part,
 				})
 			):andThen(function()
-				battle:Damage(Damage.new(self, target, self.AttackDamage * if isCrit then 5 else 1))
+				battle:Damage(Damage.new(self, target, self.AttackDamage))
 
 				EffectService:ForBattle(
 					self.Battle,
@@ -309,23 +315,6 @@ function Battler.Attack(self: Battler)
 						Target = root,
 					})
 				)
-
-				if isCrit then
-					EffectService:ForBattle(
-						self.Battle,
-						EffectGrowFade({
-							Part = ReplicatedStorage.Assets.Models.Effects.CritHitEffect,
-							Target = root,
-							Duration = 0.25,
-							StartSize = Vector3.zero,
-							EndSize = Vector3.one * 20,
-						}),
-						EffectSound({
-							SoundId = "CritImpact1",
-							Target = root,
-						})
-					)
-				end
 			end)
 		end)
 		:catch(function() end)

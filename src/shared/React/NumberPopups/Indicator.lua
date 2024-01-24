@@ -25,18 +25,18 @@ return function(props: {
 	local position, positionMotor = UseMotor(0)
 
 	React.useEffect(function()
-		local promise = PromiseMotor(sizeMotor, Flipper.Spring.new(1, if mode == "Quick" then nil else { frequency = 2 }), function(value)
+		local promise = PromiseMotor(sizeMotor, Flipper.Spring.new(1, if mode == "Quick" then { frequency = 4 } else { frequency = 2 }), function(value)
 				return value > 0.95
 			end)
 			:andThenCall(
 				PromiseMotor,
 				positionMotor,
-				if mode == "Quick" then Flipper.Spring.new(1) else Flipper.Linear.new(1, { velocity = 0.5 }),
+				if mode == "Quick" then Flipper.Spring.new(1, { frequency = 2 }) else Flipper.Linear.new(1, { velocity = 0.5 }),
 				function(value)
 					return value > 0.975
 				end
 			)
-			:andThenCall(PromiseMotor, sizeMotor, Flipper.Spring.new(0, if mode == "Quick" then nil else { frequency = 2 }), function(value)
+			:andThenCall(PromiseMotor, sizeMotor, Flipper.Spring.new(0, if mode == "Quick" then { frequency = 4 } else { frequency = 2 }), function(value)
 				return value < 0.05
 			end)
 			:andThenCall(props.OnFinished)

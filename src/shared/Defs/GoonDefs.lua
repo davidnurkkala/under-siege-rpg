@@ -1,9 +1,15 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Lerp = require(ReplicatedStorage.Shared.Util.Lerp)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 
 local function scaling(base, perLevel, level)
 	return base + perLevel * (level - 1)
+end
+
+local function lerped(level1, level5, level)
+	local scalar = (level - 1) / 4
+	return Lerp(level1, level5, scalar)
 end
 
 local Goons = {
@@ -39,10 +45,10 @@ local Goons = {
 				return 0.75
 			end,
 			Damage = function(level)
-				return scaling(1, 1, level)
+				return lerped(1, 2, level)
 			end,
 			HealthMax = function(level)
-				return scaling(10, 1, level)
+				return lerped(5, 7.5, level)
 			end,
 		},
 	},
@@ -79,10 +85,10 @@ local Goons = {
 				return 0.75
 			end,
 			Damage = function(level)
-				return scaling(2, 1, level)
+				return lerped(2, 3, level)
 			end,
 			HealthMax = function(level)
-				return scaling(15, 1, level)
+				return lerped(10, 15, level)
 			end,
 		},
 	},
@@ -232,7 +238,7 @@ local Goons = {
 		},
 		Sounds = {
 			Shoot = { "WhooshMedium1", "WhooshMedium2", "WhooshMedium3", "WhooshMedium4" },
-			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Hit = { "Explosion1" },
 			Death = { "MaleUgh1", "MaleUgh2" },
 		},
 		Stats = {

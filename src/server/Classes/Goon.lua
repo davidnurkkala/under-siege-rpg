@@ -36,6 +36,7 @@ export type Goon = typeof(setmetatable(
 		DidTakeDamage: any,
 		WillDealDamage: any,
 		DidDealDamage: any,
+		Died: any,
 
 		Stats: { [string]: Stat.Stat },
 	},
@@ -108,6 +109,7 @@ function Goon.new(args: {
 		DidTakeDamage = Signal.new(),
 		WillDealDamage = Signal.new(),
 		DidDealDamage = Signal.new(),
+		Died = Signal.new(),
 
 		Stats = Sift.Dictionary.map(args.Def.Stats, function(value)
 			return Stat.new(if typeof(value) == "function" then value(args.Level) else value)
@@ -237,6 +239,8 @@ function Goon.Destroy(self: Goon)
 			self.Root:Destroy()
 			self.Brain:Destroy()
 		end)
+
+		self.Died:Fire()
 	end
 
 	for _, tag in self.Tags do

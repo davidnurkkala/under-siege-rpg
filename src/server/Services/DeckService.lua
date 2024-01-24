@@ -2,17 +2,14 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local CardDefs = require(ReplicatedStorage.Shared.Defs.CardDefs)
-local CardGachaDefs = require(ReplicatedStorage.Shared.Defs.CardGachaDefs)
 local CardHelper = require(ReplicatedStorage.Shared.Util.CardHelper)
 local Comm = require(ReplicatedStorage.Packages.Comm)
+local Configuration = require(ReplicatedStorage.Shared.Configuration)
 local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local DataService = require(ServerScriptService.Server.Services.DataService)
-local EventStream = require(ReplicatedStorage.Shared.Util.EventStream)
-local MultiRollHelper = require(ServerScriptService.Server.Util.MultiRollHelper)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local OptionsService = require(ServerScriptService.Server.Services.OptionsService)
 local Promise = require(ReplicatedStorage.Packages.Promise)
-local QuestService = require(ServerScriptService.Server.Services.QuestService)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local t = require(ReplicatedStorage.Packages.t)
 
@@ -32,15 +29,6 @@ function DeckService.PrepareBlocking(self: DeckService)
 		end)
 	end)
 
-	self.Comm:BindFunction("DrawCardFromGacha", function(player, gachaId, count)
-		if not t.string(gachaId) then return end
-		if not t.integer(count) then return end
-		if count < 1 then return end
-		if count > 1000 then return end
-
-		return self:DrawCardFromGacha(player, gachaId, count):catch(warn):expect()
-	end)
-
 	self.Comm:CreateSignal("CardEquipToggleRequested"):Connect(function(player, cardId)
 		if not t.string(cardId) then return end
 
@@ -51,6 +39,12 @@ function DeckService.PrepareBlocking(self: DeckService)
 				return self:SetCardEquipped(player, cardId, deck.Equipped[cardId] == nil)
 			end)
 			:expect()
+	end)
+
+	self.Comm:CreateSignal("CardUpgradeRequested"):Connect(function(player, cardId)
+		if not t.string(cardId) then return end
+
+		return self:UpgradeCard(player, cardId):expect()
 	end)
 end
 
@@ -74,13 +68,13 @@ function DeckService.AddCards(self: DeckService, player: Player, cards: { [strin
 
 		saveFile:Update("Deck", function(deck)
 			return Sift.Dictionary.update(deck, "Owned", function(owned)
-				for cardId, count in cards do
+				for cardId, level in cards do
 					if owned[cardId] == nil then table.insert(newCards, cardId) end
 
-					owned = Sift.Dictionary.update(owned, cardId, function(oldCount)
-						return oldCount + count
+					owned = Sift.Dictionary.update(owned, cardId, function(oldLevel)
+						return oldLevel + level
 					end, function()
-						return count
+						return level
 					end)
 				end
 
@@ -108,20 +102,55 @@ function DeckService.AddCards(self: DeckService, player: Player, cards: { [strin
 	end)
 end
 
+function DeckService.HasCard(self: DeckService, player: Player, cardId: string)
+	return DataService:GetSaveFile(player):andThen(function(saveFile)
+		return saveFile:Get("Deck").Owned[cardId] ~= nil
+	end)
+end
+
+function DeckService.UpgradeCard(self: DeckService, player: Player, cardId: string)
+	return DataService:GetSaveFile(player)
+		:andThen(function(saveFile)
+			local deck = saveFile:Get("Deck")
+
+			local level = deck.Owned[cardId]
+			if not level then return false end
+			local upgrade = CardHelper.GetUpgrade(cardId, level)
+			if upgrade == nil then return false end
+
+			return CurrencyService:ApplyPrice(player, upgrade):andThen(function(success)
+				if not success then return false end
+
+				saveFile:Update("Deck", function(oldDeck)
+					return Sift.Dictionary.update(oldDeck, "Owned", function(oldOwned)
+						return Sift.Dictionary.update(oldOwned, cardId, function(oldLevel)
+							return oldLevel + 1
+						end)
+					end)
+				end)
+
+				return true
+			end)
+		end)
+		:catch(function()
+			return false
+		end)
+end
+
 function DeckService.AddCard(self: DeckService, player: Player, cardId: string)
 	assert(CardDefs[cardId], `No card with id {cardId}`)
 
 	return DataService:GetSaveFile(player):andThen(function(saveFile)
 		local isNewCard = saveFile:Get("Deck").Owned[cardId] == nil
-		local count = 0
+		local level = 0
 
 		saveFile:Update("Deck", function(oldDeck)
-			count = (oldDeck.Owned[cardId] or 0) + 1
-			local owned = Sift.Dictionary.set(oldDeck.Owned, cardId, count)
+			level = (oldDeck.Owned[cardId] or 0) + 1
+			local owned = Sift.Dictionary.set(oldDeck.Owned, cardId, level)
 			return Sift.Dictionary.set(oldDeck, "Owned", owned)
 		end)
 
-		if not isNewCard then return Promise.resolve(count) end
+		if not isNewCard then return Promise.resolve(level) end
 
 		return OptionsService:GetOption(player, "AutoEquipCards")
 			:andThen(function(autoEquip)
@@ -129,7 +158,7 @@ function DeckService.AddCard(self: DeckService, player: Player, cardId: string)
 
 				return self:SetCardEquipped(player, cardId, true)
 			end)
-			:andThenReturn(count)
+			:andThenReturn(level)
 	end)
 end
 
@@ -142,6 +171,7 @@ function DeckService.SetCardEquipped(self: DeckService, player: Player, cardId: 
 
 			if equipped then
 				if oldDeck.Equipped[cardId] then return oldDeck end
+				if Sift.Set.count(oldDeck.Equipped) >= Configuration.DeckSizeMax then return oldDeck end
 
 				return Sift.Dictionary.set(oldDeck, "Equipped", Sift.Dictionary.set(oldDeck.Equipped, cardId, true))
 			else
@@ -151,99 +181,6 @@ function DeckService.SetCardEquipped(self: DeckService, player: Player, cardId: 
 			end
 		end)
 	end)
-end
-
-function DeckService.DrawCardFromGacha(self: DeckService, player: Player, gachaId: string, countBoughtIn: number?)
-	local gacha = CardGachaDefs[gachaId]
-	assert(gacha, `No gacha with id {gachaId}`)
-
-	local countBought = countBoughtIn or 1
-
-	return Promise.new(function(resolve, _, onCancel)
-		local check = MultiRollHelper.Check(player, countBought)
-		onCancel(function()
-			check:cancel()
-		end)
-
-		local canProceed = check:expect()
-		if onCancel() then return end
-		if not canProceed then
-			resolve({})
-			return
-		end
-
-		if gacha.QuestRequirement then
-			local questCheck = QuestService:IsQuestComplete(player, gacha.QuestRequirement)
-			onCancel(function()
-				questCheck:cancel()
-			end)
-
-			local questComplete = questCheck:expect()
-			if onCancel() then return end
-			if not questComplete then
-				resolve({})
-				return
-			end
-		end
-
-		local cards = {}
-
-		for _ = 1, countBought do
-			local applyPrice = CurrencyService:ApplyPrice(player, gacha.Price)
-			onCancel(function()
-				applyPrice:cancel()
-			end)
-
-			local hadFunds = applyPrice:expect()
-			if onCancel() then return end
-
-			if not hadFunds then
-				resolve(cards)
-				return
-			end
-
-			local cardId = gacha.WeightTable:Roll()
-			cards[cardId] = (cards[cardId] or 0) + 1
-		end
-
-		resolve(cards)
-	end)
-		:andThen(function(cards)
-			if Sift.Dictionary.count(cards) == 0 then return false, "none" end
-
-			EventStream.Event({ Kind = "CardGachaRolled", Player = player, GachaId = gachaId })
-
-			return self:GetDeck(player)
-				:andThen(function(deck)
-					return Sift.Dictionary.map(cards, function(_, cardId)
-						return (deck.Owned[cardId] or 0), cardId
-					end),
-						Sift.Dictionary.map(cards, function(count, cardId)
-							return (deck.Owned[cardId] or 0) + count, cardId
-						end)
-				end)
-				:andThen(function(oldCounts, newCounts)
-					return self:AddCards(player, cards):andThenReturn(
-						true,
-						Sift.Array.map(Sift.Dictionary.keys(cards), function(cardId)
-							local countOld = oldCounts[cardId]
-							local countNew = newCounts[cardId]
-							local didLevelUp = CardHelper.CountToLevel(countNew) > CardHelper.CountToLevel(countOld)
-
-							return {
-								CardId = cardId,
-								CountOld = countOld,
-								CountNew = countNew,
-								DidLevelUp = didLevelUp,
-							}
-						end)
-					)
-				end)
-		end)
-		:catch(function(problem)
-			warn(problem)
-			return false, "error"
-		end)
 end
 
 return DeckService

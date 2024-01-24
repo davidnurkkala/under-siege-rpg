@@ -1,4 +1,3 @@
-local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Aspect = require(ReplicatedStorage.Shared.React.Common.Aspect)
@@ -6,7 +5,9 @@ local Button = require(ReplicatedStorage.Shared.React.Common.Button)
 local CardContents = require(ReplicatedStorage.Shared.React.Cards.CardContents)
 local CardHelper = require(ReplicatedStorage.Shared.Util.CardHelper)
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
+local Configuration = require(ReplicatedStorage.Shared.Configuration)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
+local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
 local DeckController = require(ReplicatedStorage.Shared.Controllers.DeckController)
 local GridLayout = require(ReplicatedStorage.Shared.React.Common.GridLayout)
 local Image = require(ReplicatedStorage.Shared.React.Common.Image)
@@ -15,19 +16,67 @@ local LayoutContainer = require(ReplicatedStorage.Shared.React.Common.LayoutCont
 local ListLayout = require(ReplicatedStorage.Shared.React.Common.ListLayout)
 local PaddingAll = require(ReplicatedStorage.Shared.React.Common.PaddingAll)
 local Panel = require(ReplicatedStorage.Shared.React.Common.Panel)
+local PromptWindow = require(ReplicatedStorage.Shared.React.Common.PromptWindow)
+local RatioText = require(ReplicatedStorage.Shared.React.Common.RatioText)
 local React = require(ReplicatedStorage.Packages.React)
 local ScrollingFrame = require(ReplicatedStorage.Shared.React.Common.ScrollingFrame)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local SystemWindow = require(ReplicatedStorage.Shared.React.Common.SystemWindow)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
+local UseCheckPrice = require(ReplicatedStorage.Shared.React.Hooks.UseCheckPrice)
+local UseCurrency = require(ReplicatedStorage.Shared.React.Hooks.UseCurrency)
+
+function cardUpgradeReq(props: {
+	LayoutOrder: number,
+	CurrencyType: string,
+	Amount: number,
+})
+	local owned = UseCurrency(props.CurrencyType)
+
+	return React.createElement(Container, {
+		LayoutOrder = props.LayoutOrder,
+		Size = UDim2.fromScale(1, 0.1),
+		SizeConstraint = Enum.SizeConstraint.RelativeXX,
+	}, {
+		Layout = React.createElement(ListLayout, {
+			FillDirection = Enum.FillDirection.Horizontal,
+			Padding = UDim.new(0, 12),
+		}),
+
+		Image = React.createElement(Panel, {
+			LayoutOrder = 1,
+			Size = UDim2.fromScale(1, 1),
+			SizeConstraint = Enum.SizeConstraint.RelativeYY,
+			ImageColor3 = CurrencyDefs[props.CurrencyType].Colors.Primary,
+		}, {
+			Image = React.createElement(Image, {
+				Image = CurrencyDefs[props.CurrencyType].Image,
+			}),
+		}),
+
+		Text = React.createElement(Label, {
+			LayoutOrder = 2,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			Size = UDim2.fromScale(0.6, 1),
+			Text = TextStroke(`{owned} / {props.Amount}`),
+			TextColor3 = if owned < props.Amount then ColorDefs.PaleRed else nil,
+		}),
+	})
+end
 
 function cardDetails(props: {
+	DeckIsFull: boolean,
 	CardId: string,
-	CardCount: number,
+	Level: number,
 	Equipped: boolean,
 	Close: () -> (),
+	Upgrade: () -> (),
 	Toggle: () -> (),
 })
+	local textRatio = 1 / 15
+	local upgrade = CardHelper.GetUpgrade(props.CardId, props.Level)
+	local canUpgrade = UseCheckPrice(upgrade)
+
 	return React.createElement(React.Fragment, nil, {
 		Card = React.createElement(Panel, {
 			Size = UDim2.fromScale(0.3, 1),
@@ -39,7 +88,7 @@ function cardDetails(props: {
 
 			Contents = React.createElement(CardContents, {
 				CardId = props.CardId,
-				CardCount = props.CardCount,
+				Level = props.Level,
 			}),
 		}),
 
@@ -51,10 +100,62 @@ function cardDetails(props: {
 				Padding = UDim.new(0.05, 0),
 			}),
 
-			Text = React.createElement(Label, {
-				TextXAlignment = Enum.TextXAlignment.Left,
-				TextYAlignment = Enum.TextYAlignment.Top,
-				Text = TextStroke(CardHelper.GetDescription(props.CardId, props.CardCount)),
+			ScrollingFrame = React.createElement(ScrollingFrame, {
+				ScrollingDirection = Enum.ScrollingDirection.Y,
+				ScrollBarThickness = 8,
+				ScrollBarImageColor3 = ColorDefs.Blue,
+				RenderLayout = function(setCanvasSize)
+					return React.createElement(ListLayout, {
+						Padding = UDim.new(0, 6),
+						[React.Change.AbsoluteContentSize] = function(object)
+							setCanvasSize(UDim2.fromOffset(0, object.AbsoluteContentSize.Y + 4))
+						end,
+					})
+				end,
+			}, {
+				Padding = React.createElement("UIPadding", {
+					PaddingRight = UDim.new(0, 12),
+					PaddingLeft = UDim.new(0, 2),
+				}),
+
+				Text = React.createElement(RatioText, {
+					LayoutOrder = 1,
+					Ratio = textRatio,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextYAlignment = Enum.TextYAlignment.Top,
+					Text = TextStroke(CardHelper.GetDescription(props.CardId, props.Level)),
+				}),
+
+				Upgrade = (upgrade ~= nil) and React.createElement(React.Fragment, nil, {
+					Text = React.createElement(RatioText, {
+						LayoutOrder = 3,
+						Ratio = textRatio,
+						TextXAlignment = Enum.TextXAlignment.Left,
+						TextColor3 = ColorDefs.Blue,
+						Text = TextStroke(`To upgrade to Lv. {if CardHelper.HasUpgrade(props.CardId, props.Level + 1) then props.Level + 1 else "MAX"}:`),
+					}),
+
+					Reqs = React.createElement(
+						React.Fragment,
+						nil,
+						Sift.Array.map(
+							Sift.Array.sort(Sift.Dictionary.keys(upgrade), function(a, b)
+								if upgrade[a] == upgrade[b] then
+									return a > b
+								else
+									return upgrade[a] > upgrade[b]
+								end
+							end),
+							function(currencyType, index)
+								return React.createElement(cardUpgradeReq, {
+									LayoutOrder = 3 + index,
+									CurrencyType = currencyType,
+									Amount = upgrade[currencyType],
+								})
+							end
+						)
+					),
+				}),
 			}),
 		}),
 
@@ -80,18 +181,32 @@ function cardDetails(props: {
 				}),
 			}),
 
-			Toggle = React.createElement(Button, {
+			Upgrade = (upgrade ~= nil) and React.createElement(Button, {
 				LayoutOrder = -2,
 				Size = UDim2.fromScale(0.3, 1),
-				[React.Event.Activated] = props.Toggle,
+				[React.Event.Activated] = props.Upgrade,
+				Active = canUpgrade,
+				ImageColor3 = if canUpgrade then ColorDefs.PaleGreen else ColorDefs.PaleRed,
 			}, {
 				Text = React.createElement(Label, {
-					Text = TextStroke(if props.Equipped then "Unequip" else "Equip"),
+					Text = TextStroke("Upgrade"),
+				}),
+			}),
+
+			Toggle = React.createElement(Button, {
+				LayoutOrder = -3,
+				Size = UDim2.fromScale(0.3, 1),
+				[React.Event.Activated] = props.Toggle,
+				Active = props.Equipped or not props.DeckIsFull,
+				ImageColor3 = if props.DeckIsFull and not props.Equipped then ColorDefs.PaleRed else ColorDefs.PaleGreen,
+			}, {
+				Text = React.createElement(Label, {
+					Text = TextStroke(if props.Equipped then "Unequip" else if props.DeckIsFull then "<i>Full!</i>" else "Equip"),
 				}),
 			}),
 
 			Equipped = React.createElement(Label, {
-				LayoutOrder = -3,
+				LayoutOrder = -4,
 				Size = UDim2.fromScale(0.3, 0.7),
 				Text = TextStroke(if props.Equipped then "EQUIPPED" else "NOT EQUIPPED"),
 			}),
@@ -108,71 +223,108 @@ return function(props: {
 	},
 })
 	local selectedId, setSelectedId = React.useState(nil)
+	local promptingUpgrade, setPromptingUpgrade = React.useState(false)
+	local equippedCount = Sift.Set.count(props.Deck.Equipped)
+	local deckIsFull = equippedCount >= Configuration.DeckSizeMax
 
-	return React.createElement(SystemWindow, {
-		Visible = props.Visible,
-		HeaderText = TextStroke("Deck"),
-		[React.Event.Activated] = props.Close,
-	}, {
-		Details = (selectedId ~= nil) and React.createElement(cardDetails, {
-			CardId = selectedId,
-			CardCount = props.Deck.Owned[selectedId],
-			Equipped = props.Deck.Equipped[selectedId] == true,
-			Close = function()
-				setSelectedId(nil)
-			end,
-			Toggle = function()
-				DeckController.CardEquipToggleRequested:Fire(selectedId)
+	return React.createElement(React.Fragment, nil, {
+		UpgradePrompt = React.createElement(PromptWindow, {
+			Visible = promptingUpgrade,
+
+			HeaderText = TextStroke("Upgrade"),
+			Text = TextStroke(`Are you sure you want to upgrade {CardHelper.GetName(selectedId)}?`),
+			Options = {
+				{
+					Text = TextStroke("Yes"),
+					Select = function()
+						setPromptingUpgrade(false)
+						DeckController.CardUpgradeRequested:Fire(selectedId)
+					end,
+				},
+				{
+					Text = TextStroke("No"),
+					Select = function()
+						setPromptingUpgrade(false)
+					end,
+				},
+			},
+			[React.Event.Activated] = function()
+				setPromptingUpgrade(false)
 			end,
 		}),
 
-		Cards = React.createElement(ScrollingFrame, {
-			Visible = (selectedId == nil),
-			RenderLayout = function(setCanvasSize)
-				return React.createElement(GridLayout, {
-					CellSize = UDim2.fromScale(1 / 4, 1),
-					[React.Change.AbsoluteContentSize] = function(object)
-						setCanvasSize(UDim2.fromOffset(0, object.AbsoluteContentSize.Y))
-					end,
-				}, {
-					Ratio = React.createElement(Aspect, {
-						AspectRatio = 2.5 / 3.5,
-					}),
-				})
-			end,
+		MainWindow = React.createElement(SystemWindow, {
+			Visible = (not promptingUpgrade) and props.Visible,
+			HeaderText = TextStroke(`Deck ({equippedCount} / {Configuration.DeckSizeMax})`),
+			[React.Event.Activated] = props.Close,
+			RatioDisabled = true,
+			Size = UDim2.fromScale(1.2, 0.8),
+			HeaderSize = 0.075,
 		}, {
-			Cards = React.createElement(
-				React.Fragment,
-				nil,
-				Sift.Dictionary.map(props.Deck.Owned, function(count, cardId)
-					return React.createElement(LayoutContainer, {
-						Padding = 6,
+			Details = (selectedId ~= nil) and React.createElement(cardDetails, {
+				DeckIsFull = deckIsFull,
+				CardId = selectedId,
+				Level = props.Deck.Owned[selectedId],
+				Equipped = props.Deck.Equipped[selectedId] == true,
+				Close = function()
+					setSelectedId(nil)
+				end,
+				Toggle = function()
+					DeckController.CardEquipToggleRequested:Fire(selectedId)
+				end,
+				Upgrade = function()
+					setPromptingUpgrade(true)
+				end,
+			}),
+
+			Cards = React.createElement(ScrollingFrame, {
+				Visible = (selectedId == nil),
+				RenderLayout = function(setCanvasSize)
+					return React.createElement(GridLayout, {
+						CellSize = UDim2.fromScale(1 / 5, 1),
+						[React.Change.AbsoluteContentSize] = function(object)
+							setCanvasSize(UDim2.fromOffset(0, object.AbsoluteContentSize.Y))
+						end,
 					}, {
-						Button = React.createElement(Button, {
-							ImageColor3 = ColorDefs.PaleGreen,
-							[React.Event.Activated] = function()
-								setSelectedId(cardId)
-							end,
-							SelectionOrder = -1,
-						}, {
-							Contents = React.createElement(CardContents, {
-								CardId = cardId,
-								CardCount = count,
-							}, {
-								Check = props.Deck.Equipped[cardId] and React.createElement(Image, {
-									Size = UDim2.fromScale(0.15, 0.15),
-									ZIndex = 8,
-									SizeConstraint = Enum.SizeConstraint.RelativeXX,
-									AnchorPoint = Vector2.new(1, 0),
-									Position = UDim2.fromScale(1, 0),
-									Image = "rbxassetid://15360109124",
-									ImageColor3 = ColorDefs.LightGreen,
-								}),
-							}),
+						Ratio = React.createElement(Aspect, {
+							AspectRatio = 2.5 / 3.5,
 						}),
 					})
-				end)
-			),
+				end,
+			}, {
+				Cards = React.createElement(
+					React.Fragment,
+					nil,
+					Sift.Dictionary.map(props.Deck.Owned, function(level, cardId)
+						return React.createElement(LayoutContainer, {
+							Padding = 6,
+						}, {
+							Button = React.createElement(Button, {
+								ImageColor3 = if props.Deck.Equipped[cardId] then ColorDefs.PaleGreen else ColorDefs.PaleBlue,
+								[React.Event.Activated] = function()
+									setSelectedId(cardId)
+								end,
+								SelectionOrder = -1,
+							}, {
+								Contents = React.createElement(CardContents, {
+									CardId = cardId,
+									Level = level,
+								}, {
+									Check = props.Deck.Equipped[cardId] and React.createElement(Image, {
+										Size = UDim2.fromScale(0.15, 0.15),
+										ZIndex = 8,
+										SizeConstraint = Enum.SizeConstraint.RelativeXX,
+										AnchorPoint = Vector2.new(1, 0),
+										Position = UDim2.fromScale(1, 0),
+										Image = "rbxassetid://15360109124",
+										ImageColor3 = ColorDefs.LightGreen,
+									}),
+								}),
+							}),
+						})
+					end)
+				),
+			}),
 		}),
 	})
 end

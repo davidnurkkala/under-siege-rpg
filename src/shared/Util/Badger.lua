@@ -129,6 +129,8 @@ function Badger.sequence(conditionList: { Condition }): Condition
 	return Badger.create({
 		state = getState(),
 		save = function(self)
+			if self:isComplete() then return end
+
 			return {
 				index = self.state.index,
 				conditionData = conditionList[self.state.index]:save(),

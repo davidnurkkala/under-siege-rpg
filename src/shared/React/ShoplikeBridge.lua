@@ -1,10 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local CardGachaDefs = require(ReplicatedStorage.Shared.Defs.CardGachaDefs)
-local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
-local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
-local ListLayout = require(ReplicatedStorage.Shared.React.Common.ListLayout)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local QuestController = require(ReplicatedStorage.Shared.Controllers.QuestController)
 local React = require(ReplicatedStorage.Packages.React)
@@ -39,73 +35,6 @@ return function()
 
 	React.useEffect(function()
 		local trove = Trove.new()
-
-		trove:Add(Observers.observeTag("CardGachaZone", function(part)
-			return Observers.observeAttribute(part, "GachaId", function(id)
-				if id == nil then return end
-
-				local def = CardGachaDefs[id]
-				if not def then return end
-
-				setShoplikes(function(oldShoplikes)
-					return Sift.Dictionary.set(oldShoplikes, part, {
-						Name = def.Header,
-					})
-				end)
-
-				local gachaTrove = Trove.new()
-
-				gachaTrove:Add(function()
-					setShoplikes(function(oldShoplikes)
-						return Sift.Dictionary.removeKey(oldShoplikes, part)
-					end)
-				end)
-
-				if def.QuestRequirement then
-					gachaTrove:Add(QuestController:ObserveQuests(function(quests)
-						local description = quests[def.QuestRequirement]
-
-						setShoplikes(function(oldShoplikes)
-							return Sift.Dictionary.update(oldShoplikes, part, function(oldShoplike)
-								return Sift.Dictionary.set(oldShoplike, "Text", if description == "Complete" then nil else description)
-							end)
-						end)
-					end))
-				end
-
-				return function()
-					gachaTrove:Clean()
-				end
-			end)
-		end, { workspace }))
-
-		trove:Add(Observers.observeTag("PetGachaZone", function(part)
-			setShoplikes(function(oldShoplikes)
-				return Sift.Dictionary.set(oldShoplikes, part, {
-					Name = "Pets",
-				})
-			end)
-
-			return function()
-				setShoplikes(function(oldShoplikes)
-					return Sift.Dictionary.removeKey(oldShoplikes, part)
-				end)
-			end
-		end, { workspace }))
-
-		trove:Add(Observers.observeTag("PetMergeZone", function(part)
-			setShoplikes(function(oldShoplikes)
-				return Sift.Dictionary.set(oldShoplikes, part, {
-					Name = "Merge",
-				})
-			end)
-
-			return function()
-				setShoplikes(function(oldShoplikes)
-					return Sift.Dictionary.removeKey(oldShoplikes, part)
-				end)
-			end
-		end, { workspace }))
 
 		trove:Add(Observers.observeTag("WeaponShopZone", function(part)
 			setShoplikes(function(oldShoplikes)

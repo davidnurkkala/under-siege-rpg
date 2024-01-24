@@ -1,0 +1,4 @@
+return {
+	Name = "winBattle",
+	Args = {},
+}

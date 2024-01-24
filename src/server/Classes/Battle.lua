@@ -7,20 +7,18 @@ local BattleService = require(ServerScriptService.Server.Services.BattleService)
 local BattleSession = require(ServerScriptService.Server.Classes.BattleSession)
 local Battler = require(ServerScriptService.Server.Classes.Battler)
 local BattlerDefs = require(ReplicatedStorage.Shared.Defs.BattlerDefs)
+local BattlerHelper = require(ServerScriptService.Server.Util.BattlerHelper)
 local CardDefs = require(ReplicatedStorage.Shared.Defs.CardDefs)
-local CardHelper = require(ReplicatedStorage.Shared.Util.CardHelper)
-local Cooldown = require(ReplicatedStorage.Shared.Classes.Cooldown)
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
 local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local Damage = require(ServerScriptService.Server.Classes.Damage)
-local Deck = require(ServerScriptService.Server.Classes.Deck)
-local Default = require(ReplicatedStorage.Shared.Util.Default)
 local EventStream = require(ReplicatedStorage.Shared.Util.EventStream)
 local Goon = require(ServerScriptService.Server.Classes.Goon)
 local GuiEffectService = require(ServerScriptService.Server.Services.GuiEffectService)
 local PartPath = require(ReplicatedStorage.Shared.Classes.PartPath)
 local ProductService = require(ServerScriptService.Server.Services.ProductService)
 local Promise = require(ReplicatedStorage.Packages.Promise)
+local RewardHelper = require(ServerScriptService.Server.Util.RewardHelper)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local Trove = require(ReplicatedStorage.Packages.Trove)
@@ -28,9 +26,6 @@ local Updater = require(ReplicatedStorage.Shared.Classes.Updater)
 
 local Battle = {}
 Battle.__index = Battle
-
-local ChooseDuration = 4
-local RoundDuration = ChooseDuration + 1
 
 local BattleUpdater = Updater.new()
 
@@ -63,7 +58,6 @@ export type Battle = typeof(setmetatable(
 		Path: PartPath.PartPath,
 		RoundCooldown: any,
 		State: "Active" | "Ended",
-		CritEnabled: boolean,
 		Timer: number,
 		CardPlayers: any,
 	},
@@ -73,7 +67,6 @@ export type Battle = typeof(setmetatable(
 function Battle.new(args: {
 	Model: BattlegroundModel,
 	Battlers: { Battler.Battler },
-	CritEnabled: boolean?,
 }): Battle
 	local trove = Trove.new()
 
@@ -95,7 +88,6 @@ function Battle.new(args: {
 		Destroyed = Signal.new(),
 		Changed = Signal.new(),
 		State = "Active",
-		CritEnabled = Default(args.CritEnabled, true),
 		Timer = 0,
 		CardPlayed = Signal.new(),
 	}, Battle)
@@ -110,7 +102,7 @@ function Battle.new(args: {
 		local cframe, size = char:GetBoundingBox()
 		local dy = char:GetPivot().Y - (cframe.Y - size.Y / 2)
 		char:PivotTo(base.Spawn.CFrame + Vector3.new(0, dy, 0))
-		base.Spawn:Destroy()
+		base.Spawn.Transparency = 1
 
 		battler:Observe(function()
 			self.Changed:Fire(self:GetStatus())
@@ -135,8 +127,6 @@ function Battle.new(args: {
 	self.Model.Parent = workspace.Battles
 	self.Trove:Add(self.Model)
 
-	self.RoundCooldown = Cooldown.new(RoundDuration)
-
 	BattleUpdater:Add(self)
 	self.Trove:Add(function()
 		BattleUpdater:Remove(self)
@@ -154,10 +144,6 @@ function Battle.new(args: {
 
 	for _, battler in self.Battlers do
 		battler:SetBattle(self)
-	end
-
-	for _, battler in self.Battlers do
-		self:DeployStartingGoons(battler)
 	end
 
 	return self
@@ -184,6 +170,8 @@ function Battle.fromPlayerVersusBattler(player: Player, battlerId: string)
 				Model = battleground,
 			})
 
+			local opponentBrain = BattlerHelper.CreateBrain(battlerId, opponent)
+
 			BattleService:Add(player, battle)
 			battle.Ended:Connect(function(victor)
 				if victor ~= battleSession.Battler then
@@ -193,25 +181,14 @@ function Battle.fromPlayerVersusBattler(player: Player, battlerId: string)
 				end
 
 				local def = BattlerDefs[battlerId]
-				local reward = def.Reward
+				-- TODO: random chance some rewards or whatever
+				local rewards = def.Rewards
 
-				CurrencyService:GetBoosted(player, "Secondary", reward)
-					:andThen(function(amountAdded)
-						amountAdded = ProductService:GetVipBoostedSecondary(player, amountAdded)
-
-						BattleService.MessageSent:Fire(player, "Victory!")
-
-						GuiEffectService.IndicatorRequestedRemote:Fire(player, {
-							Text = `+{amountAdded // 0.1 / 10}`,
-							Image = CurrencyDefs.Secondary.Image,
-							Start = opponent:GetRoot().Position,
-							Finish = victor:GetRoot().Position,
-							Mode = "Slow",
-						})
-
-						Promise.delay(0.5):andThen(function()
-							CurrencyService:AddCurrency(player, "Secondary", amountAdded)
-						end)
+				Promise.all(Sift.Array.map(rewards, function(reward)
+					return RewardHelper.GiveReward(player, reward)
+				end))
+					:andThen(function()
+						BattleService.RewardsDisplayed:Fire(player, rewards)
 					end)
 					:andThen(function()
 						EventStream.Event({ Kind = "BattleWon", Player = player, BattlerId = battlerId })
@@ -219,6 +196,7 @@ function Battle.fromPlayerVersusBattler(player: Player, battlerId: string)
 			end)
 			battle.Destroyed:Connect(function()
 				BattleService:Remove(player)
+				opponentBrain:Destroy()
 			end)
 
 			return battle
@@ -228,7 +206,6 @@ end
 
 function Battle.GetStatus(self: Battle)
 	return {
-		CritEnabled = self.CritEnabled,
 		Model = self.Model,
 		Battlers = Sift.Array.map(self.Battlers, function(battler: Battler.Battler)
 			return battler:GetStatus()
@@ -256,95 +233,73 @@ function Battle.Remove(self: Battle, object: Fieldable)
 	self.Field[object] = nil
 end
 
-function Battle.DeployStartingGoons(self: Battle, battler: Battler.Battler)
-	local realDeck = battler.DeckPlayer.Deck
+function Battle.PlayCard(self: Battle, battler: Battler.Battler, cardId: string)
+	return Promise.try(function()
+		if not cardId then return end
 
-	local goonCards = Sift.Dictionary.filter(realDeck.Cards, function(_, cardId)
-		return CardDefs[cardId].Type == "Goon"
+		local card = CardDefs[cardId]
+		assert(card, `No card for id {cardId}`)
+
+		local level = battler.Deck[cardId]
+		if not level then return end
+
+		local cooldown = battler.DeckCooldowns[cardId]
+		if not cooldown:IsReady() then return end
+
+		local canAfford = battler.Supplies > card.Cost
+		if not canAfford then return end
+
+		battler.Supplies -= card.Cost
+		cooldown:Use()
+
+		local retVal
+
+		if card.Type == "Goon" then
+			retVal = Goon.fromId({
+				Id = card.GoonId,
+				Battle = self,
+				Battler = battler,
+				Direction = battler.Direction,
+				Position = battler.Position,
+				TeamId = battler.TeamId,
+				Level = level,
+			})
+
+			retVal.Died:Connect(function()
+				local bounty = math.floor(card.Cost * 0.33)
+				for _, otherBattler in self.Battlers do
+					if otherBattler == battler then continue end
+					otherBattler.Supplies += bounty
+
+					-- TODO: replace with better player acquisition pipeline
+					local player = Players:GetPlayerFromCharacter(otherBattler.CharModel)
+					if not player then continue end
+
+					GuiEffectService.IndicatorRequestedRemote:Fire(player, {
+						Text = `+{bounty}`,
+						Image = CurrencyDefs.Supplies.Image,
+						Start = retVal:GetRoot().Position,
+						Finish = otherBattler:GetRoot().Position,
+					})
+				end
+			end)
+		elseif card.Type == "Ability" then
+			local activate = AbilityHelper.GetImplementation(card.AbilityId)
+			retVal = activate(level, battler, self)
+		else
+			error(`Unimplemented card type {card.Type}`)
+		end
+
+		self.CardPlayed:Fire(battler, cardId, level)
+
+		return retVal
 	end)
-	if Sift.Dictionary.count(goonCards) == 0 then return end
-
-	local goonDeck = Deck.new(goonCards)
-
-	for count = 1, 3 do
-		goonDeck:Tick()
-		realDeck:Tick()
-
-		local choice = goonDeck:Draw(3)[1]
-		goonDeck:Use(choice)
-		realDeck:Use(choice)
-
-		Promise.delay(count * 0.75):andThen(function()
-			if self.State ~= "Active" then return end
-
-			self:PlayCard(battler, choice.Id, choice.Count)
-		end)
-	end
-end
-
-function Battle.PlayCard(self: Battle, battler: Battler.Battler, cardId: string, cardCount: number, notificationDisabled: boolean?)
-	if not cardId then return end
-
-	local card = CardDefs[cardId]
-	assert(card, `No card for id {cardId}`)
-
-	local level = CardHelper.CountToLevel(cardCount)
-
-	local retVal
-
-	if card.Type == "Goon" then
-		retVal = Promise.resolve(Goon.fromId({
-			Id = card.GoonId,
-			Battle = self,
-			Battler = battler,
-			Direction = battler.Direction,
-			Position = battler.Position,
-			TeamId = battler.TeamId,
-			Level = level,
-		}))
-	elseif card.Type == "Ability" then
-		local activate = AbilityHelper.GetImplementation(card.AbilityId)
-		retVal = activate(level, battler, self)
-	else
-		error(`Unimplemented card type {card.Type}`)
-	end
-
-	self.CardPlayed:Fire(battler, cardId, cardCount)
-
-	if not notificationDisabled then
-		BattleService.CardPlayed:FireFor(BattleService:GetPlayersFromBattle(self), {
-			Position = battler.Position,
-			CardId = cardId,
-			CardCount = cardCount,
-		})
-	end
-
-	return retVal
 end
 
 function Battle.Update(self: Battle, dt: number)
 	if self.State ~= "Active" then return end
 
 	self.Timer += dt
-
-	if (self.Timer >= 1) and self.RoundCooldown:IsReady() then
-		self.RoundCooldown:Use()
-
-		self.Trove:AddPromise(Promise.all({
-			Promise.all(Sift.Array.map(self.Battlers, function(battler)
-				return battler.DeckPlayer:ChooseCard():andThen(function(card)
-					return { Battler = battler, Card = card }
-				end)
-			end)),
-			Promise.delay(ChooseDuration),
-		}):andThen(function(results)
-			if self.State ~= "Active" then return end
-
-			for _, cardChoice in results[1] do
-				self:PlayCard(cardChoice.Battler, cardChoice.Card.Id, cardChoice.Card.Count)
-			end
-		end))
-	end
 
 	for object in self.Field do
 		object:Update(dt)
@@ -353,6 +308,10 @@ function Battle.Update(self: Battle, dt: number)
 			object:Destroy()
 			self:Remove(object)
 		end
+	end
+
+	for _, battler in self.Battlers do
+		battler.Supplies += battler.SuppliesGain * dt
 	end
 
 	local victor = self:GetVictor()
@@ -542,12 +501,6 @@ end
 function Battle.Damage(self: Battle, damage: Damage.Damage)
 	local source, target = damage.Source, damage.Target
 
-	local attackPower = if Battler.Is(source) then source.Power else source.Battler.Power
-	local defendPower = if Battler.Is(target) then target.Power else target.Battler.Power
-
-	local advantage = math.sqrt(attackPower / defendPower)
-	damage:SetRaw(damage.Amount * advantage)
-
 	if source.WillDealDamage then source.WillDealDamage:Fire(damage) end
 	if target.WillTakeDamage then target.WillTakeDamage:Fire(damage) end
 
@@ -591,10 +544,6 @@ function Battle.End(self: Battle, victor: Battler.Battler)
 				object:DefeatAnimation()
 			end
 		end
-	end
-
-	for _, battler in self.Battlers do
-		battler.DeckPlayer:Destroy()
 	end
 
 	Promise.all(Sift.Array.map(

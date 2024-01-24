@@ -8,17 +8,22 @@ Cooldown.__index = Cooldown
 
 local CooldownUpdater = Updater.new()
 
-export type Cooldown = typeof(setmetatable({} :: {
-	Time: number,
-	TimeMax: number,
-	Completed: any,
-}, Cooldown))
+export type Cooldown = typeof(setmetatable(
+	{} :: {
+		Time: number,
+		TimeMax: number,
+		Completed: any,
+		Used: any,
+	},
+	Cooldown
+))
 
 function Cooldown.new(timeMax: number): Cooldown
 	local self: Cooldown = setmetatable({
 		TimeMax = timeMax,
 		Time = 0,
 		Completed = Signal.new(),
+		Used = Signal.new(),
 	}, Cooldown)
 
 	return self
@@ -34,6 +39,7 @@ end
 
 function Cooldown.Use(self: Cooldown)
 	self:SetTime(self.TimeMax)
+	self.Used:Fire()
 end
 
 function Cooldown.IsReady(self: Cooldown)

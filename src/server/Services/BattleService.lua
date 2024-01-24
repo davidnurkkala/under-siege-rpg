@@ -5,6 +5,7 @@ local PlayerLeaving = require(ReplicatedStorage.Shared.Util.PlayerLeaving)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local t = require(ReplicatedStorage.Packages.t)
+
 local BattleService = {
 	Priority = 0,
 }
@@ -29,28 +30,30 @@ function BattleService.PrepareBlocking(self: BattleService)
 		end
 	end)
 
-	self.CardPlayed = self.Comm:CreateSignal("CardPlayed")
-	self.MessageSent = self.Comm:CreateSignal("MessageSent")
-	self.CardPromptInterface = self.Comm:CreateSignal("CardPromptInterface")
-end
+	self.Comm:CreateSignal("CardPlayed"):Connect(function(player, cardId)
+		if not t.string(cardId) then return end
 
-function BattleService.PromptCard(self: BattleService, player: Player, choices: { any })
-	self.CardPromptInterface:Fire(player, choices)
+		local battle = self:Get(player)
+		if not battle then return end
 
-	return Promise.new(function(resolve, _, onCancel)
-		local connection
-		connection = self.CardPromptInterface:Connect(function(respondingPlayer, index)
-			if respondingPlayer ~= player then return end
-			if not t.integer(index) then return end
-			resolve(choices[index])
-			connection:Disconnect()
-		end)
-
-		onCancel(function()
-			self.CardPromptInterface:Fire(player, false)
-			connection:Disconnect()
-		end)
+		-- TODO: better way to find the player's battler?
+		for _, battler in battle.Battlers do
+			if battler.CharModel == player.Character then battle:PlayCard(battler, cardId) end
+		end
 	end)
+
+	self.Comm:CreateSignal("SuppliesUpgraded"):Connect(function(player)
+		local battle = self:Get(player)
+		if not battle then return end
+
+		-- TODO: better way to find the player's battler?
+		for _, battler in battle.Battlers do
+			if battler.CharModel == player.Character then battler:UpgradeSupplies() end
+		end
+	end)
+
+	self.MessageSent = self.Comm:CreateSignal("MessageSent")
+	self.RewardsDisplayed = self.Comm:CreateSignal("RewardsDisplayed")
 end
 
 function BattleService.Get(_self: BattleService, player: Player)

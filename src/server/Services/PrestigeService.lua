@@ -31,12 +31,6 @@ function PrestigeService.PrepareBlocking(self: PrestigeService)
 
 	self.PointsRemote = self.Comm:CreateProperty("Points")
 
-	Observers.observePlayer(function(player)
-		return DataService:ObserveKey(player, "PrestigePoints", function(points)
-			self.PointsRemote:SetFor(player, points)
-		end)
-	end)
-
 	self.Comm:BindFunction("Prestige", function(player, prestigeType)
 		if not t.string(prestigeType) then return end
 		if not PrestigeTypes[prestigeType] then return end

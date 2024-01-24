@@ -1,3 +1,4 @@
 return {
-	DataStoreVersion = 33,
+	DataStoreVersion = 35,
+	DeckSizeMax = 10,
 }
