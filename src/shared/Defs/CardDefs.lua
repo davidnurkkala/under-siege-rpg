@@ -15,7 +15,22 @@ local Cards = {
 		Upgrades = {
 			{
 				Coins = 10,
-				Gems = 5,
+				SimpleFood = 5,
+			},
+			{
+				Coins = 50,
+				SimpleFood = 10,
+				SimpleMaterials = 5,
+			},
+			{
+				Coins = 200,
+				SimpleFood = 50,
+				SimpleMaterials = 25,
+			},
+			{
+				Coins = 1000,
+				SimpleFood = 100,
+				SimpleMaterials = 50,
 			},
 		},
 	},

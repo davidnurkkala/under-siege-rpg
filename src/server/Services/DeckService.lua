@@ -32,16 +32,14 @@ function DeckService.PrepareBlocking(self: DeckService)
 	self.Comm:CreateSignal("CardEquipToggleRequested"):Connect(function(player, cardId)
 		if not t.string(cardId) then return end
 
-		return self:GetDeck(player)
-			:andThen(function(deck)
-				if not deck.Owned[cardId] then return end
+		self:GetDeck(player):andThen(function(deck)
+			if not deck.Owned[cardId] then return end
 
-				return self:SetCardEquipped(player, cardId, deck.Equipped[cardId] == nil)
-			end)
-			:expect()
+			return self:SetCardEquipped(player, cardId, deck.Equipped[cardId] == nil)
+		end)
 	end)
 
-	self.Comm:CreateSignal("CardUpgradeRequested"):Connect(function(player, cardId)
+	self.Comm:BindFunction("UpgradeCard", function(player, cardId)
 		if not t.string(cardId) then return end
 
 		return self:UpgradeCard(player, cardId):expect()

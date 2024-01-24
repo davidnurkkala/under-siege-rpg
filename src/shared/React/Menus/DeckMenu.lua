@@ -4,6 +4,7 @@ local Aspect = require(ReplicatedStorage.Shared.React.Common.Aspect)
 local Button = require(ReplicatedStorage.Shared.React.Common.Button)
 local CardContents = require(ReplicatedStorage.Shared.React.Cards.CardContents)
 local CardHelper = require(ReplicatedStorage.Shared.Util.CardHelper)
+local CardUpgradeResult = require(ReplicatedStorage.Shared.React.CardUpgrade.CardUpgradeResult)
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local Configuration = require(ReplicatedStorage.Shared.Configuration)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
@@ -32,6 +33,7 @@ function cardUpgradeReq(props: {
 	Amount: number,
 })
 	local owned = UseCurrency(props.CurrencyType)
+	local name = CurrencyDefs[props.CurrencyType].Name
 
 	return React.createElement(Container, {
 		LayoutOrder = props.LayoutOrder,
@@ -40,6 +42,7 @@ function cardUpgradeReq(props: {
 	}, {
 		Layout = React.createElement(ListLayout, {
 			FillDirection = Enum.FillDirection.Horizontal,
+			VerticalAlignment = Enum.VerticalAlignment.Center,
 			Padding = UDim.new(0, 12),
 		}),
 
@@ -57,8 +60,8 @@ function cardUpgradeReq(props: {
 		Text = React.createElement(Label, {
 			LayoutOrder = 2,
 			TextXAlignment = Enum.TextXAlignment.Left,
-			Size = UDim2.fromScale(0.6, 1),
-			Text = TextStroke(`{owned} / {props.Amount}`),
+			Size = UDim2.fromScale(0.8, 0.7),
+			Text = TextStroke(`{owned} / {props.Amount} {name}`),
 			TextColor3 = if owned < props.Amount then ColorDefs.PaleRed else nil,
 		}),
 	})
@@ -223,13 +226,21 @@ return function(props: {
 	},
 })
 	local selectedId, setSelectedId = React.useState(nil)
-	local promptingUpgrade, setPromptingUpgrade = React.useState(false)
 	local equippedCount = Sift.Set.count(props.Deck.Equipped)
 	local deckIsFull = equippedCount >= Configuration.DeckSizeMax
+	local state, setState = React.useState("Menu")
 
-	return React.createElement(React.Fragment, nil, {
+	return React.createElement(Container, nil, {
+		UpgradeResult = (state == "ShowingUpgrade") and React.createElement(CardUpgradeResult, {
+			CardId = selectedId,
+			Level = props.Deck.Owned[selectedId],
+			Close = function()
+				setState("Menu")
+			end,
+		}),
+
 		UpgradePrompt = React.createElement(PromptWindow, {
-			Visible = promptingUpgrade,
+			Visible = state == "PromptingUpgrade",
 
 			HeaderText = TextStroke("Upgrade"),
 			Text = TextStroke(`Are you sure you want to upgrade {CardHelper.GetName(selectedId)}?`),
@@ -237,24 +248,30 @@ return function(props: {
 				{
 					Text = TextStroke("Yes"),
 					Select = function()
-						setPromptingUpgrade(false)
-						DeckController.CardUpgradeRequested:Fire(selectedId)
+						setState("Waiting")
+						DeckController.UpgradeCard(selectedId):andThen(function(result)
+							if not result then return end
+
+							setState("ShowingUpgrade")
+						end, function()
+							setState("Menu")
+						end)
 					end,
 				},
 				{
 					Text = TextStroke("No"),
 					Select = function()
-						setPromptingUpgrade(false)
+						setState("Menu")
 					end,
 				},
 			},
 			[React.Event.Activated] = function()
-				setPromptingUpgrade(false)
+				setState("Menu")
 			end,
 		}),
 
 		MainWindow = React.createElement(SystemWindow, {
-			Visible = (not promptingUpgrade) and props.Visible,
+			Visible = props.Visible and (state == "Menu"),
 			HeaderText = TextStroke(`Deck ({equippedCount} / {Configuration.DeckSizeMax})`),
 			[React.Event.Activated] = props.Close,
 			RatioDisabled = true,
@@ -273,7 +290,7 @@ return function(props: {
 					DeckController.CardEquipToggleRequested:Fire(selectedId)
 				end,
 				Upgrade = function()
-					setPromptingUpgrade(true)
+					setState("PromptingUpgrade")
 				end,
 			}),
 
