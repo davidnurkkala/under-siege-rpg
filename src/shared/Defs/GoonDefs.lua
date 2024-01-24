@@ -746,6 +746,213 @@ local Goons = {
 			end,
 		},
 	},
+
+	RoyalRanger = {
+		Name = "Royal Ranger",
+		Description = "An legendary archer sworn to serve the crown.",
+		ModelName = "RoyalRanger",
+		Brain = {
+			Id = "BasicRanged",
+			ProjectileOffset = CFrame.new(0, 0.75, -2),
+			ProjectileName = "Arrow1",
+		},
+		Tags = { "Ranged" },
+		Animations = {
+			Idle = "HunterIdle",
+			Walk = "HunterWalk",
+			Attack = "RoyalRangerAttack",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Shoot = { "BowShoot1", "BowShoot2", "BowShoot3", "BowShoot4" },
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.55
+			end,
+			Speed = function()
+				return 0.05
+			end,
+			Range = function()
+				return 0.375
+			end,
+			AttackRate = function()
+				return 1.25
+			end,
+			Damage = function(level)
+				return scaling(3, 0.5, level)
+			end,
+			HealthMax = function(level)
+				return scaling(18, 1, level)
+			end,
+		},
+	},
+
+	RoyalGuard = {
+		Name = "Royal Guard",
+		Description = `A plate armor clad knight and a master of martial combat.`,
+		ModelName = "RoyalGuard",
+		Brain = {
+			Id = "BasicMelee",
+		},
+		Tags = { "Armored" },
+		Animations = {
+			Walk = "RoyalGuardWalk",
+			Attack = "RoyalGuardAttack",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.43
+			end,
+			Speed = function()
+				return 0.07
+			end,
+			Range = function()
+				return 0.1
+			end,
+			AttackRate = function()
+				return 1.25
+			end,
+			Damage = function(level)
+				return scaling(2, 0.5, level)
+			end,
+			HealthMax = function(level)
+				return scaling(25, 2, level)
+			end,
+		},
+	},
+
+	MasterMage = {
+		Name = "MasterMage",
+		Description = "A master of the arcane arts.",
+		ModelName = "MasterMage",
+		Brain = {
+			Id = "BasicRanged",
+			ProjectileOffset = CFrame.new(0, 0.75, -0.25),
+			ProjectileName = "MagicStar1",
+		},
+		Tags = { "Ranged" },
+		Animations = {
+			Walk = "MageWalk",
+			Attack = "MasterMageAttack",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Shoot = { "WandCast1", "WandCast2", "WandCast3" },
+			Hit = { "MagicImpact1", "MagicImpact2", "MagicImpact3" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.3
+			end,
+			Speed = function()
+				return 0.05
+			end,
+			Range = function()
+				return 0.45
+			end,
+			AttackRate = function()
+				return 0.3
+			end,
+			Damage = function(level)
+				return scaling(4, 0.75, level)
+			end,
+			HealthMax = function(level)
+				return scaling(7, 1, level)
+			end,
+		},
+	},
+
+	RoyalCavalry = {
+		Name = "Royal Cavalry",
+		Description = `A mounted knight armed with a deadly lance and a thirst for battle.`,
+		ModelName = "RoyalCavalry",
+		Brain = {
+			Id = "BasicMelee",
+		},
+		Tags = { "Armored", "Charger", "Brutal" },
+		Animations = {
+			Walk = "RoyalCavalryWalk",
+			Attack = "RoyalCavalryAttack",
+			Die = "RoyalCavalryDie",
+		},
+		Sounds = {
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.43
+			end,
+			Speed = function()
+				return 0.1
+			end,
+			Range = function()
+				return 0.1
+			end,
+			AttackRate = function()
+				return 1.25
+			end,
+			Damage = function(level)
+				return scaling(4, 0.5, level)
+			end,
+			HealthMax = function(level)
+				return scaling(30, 2, level)
+			end,
+		},
+	},
+
+	Draugr = {
+		Name = "Draugr",
+		Description = `A fallen viking warrior held together by cursed magicks.`,
+		ModelName = "Draugr",
+		Brain = {
+			Id = "BasicMelee",
+		},
+		Tags = { "Light", "Evasive" },
+		Animations = {
+			Walk = "DraugrWalk",
+			Attack = "DraugrAttack",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.43
+			end,
+			Speed = function()
+				return 0.1
+			end,
+			Range = function()
+				return 0.1
+			end,
+			AttackRate = function()
+				return 1.25
+			end,
+			Damage = function(level)
+				return scaling(2, 0.5, level)
+			end,
+			HealthMax = function(level)
+				return scaling(7, 2, level)
+			end,
+		},
+	},
 }
 
 return Sift.Dictionary.map(Goons, function(goon, id)

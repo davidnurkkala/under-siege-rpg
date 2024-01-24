@@ -44,6 +44,19 @@ local Ids = {
 	HunterWalk = 15484942080,
 	HunterAttack = 15484935063,
 
+	RoyalGuardIdle = 16100566459,
+	RoyalGuardWalk = 16100561481,
+	RoyalGuardAttack = 16100557476,
+	RoyalRangerAttack = 16100912623,
+	MasterMageAttack = 16100902591,
+	RoyalCavalryDie = 16101355448,
+	RoyalCavalryWalk = 16101345270,
+	RoyalCavalryAttack = 16101349164,
+
+	DraugrIdle = 16101394195,
+	DraugrWalk = 16101391991,
+	DraugrAttack = 16101390099,
+
 	DemolitionistThrow = 15933526512,
 
 	GenericPetIdle = 15421734157,

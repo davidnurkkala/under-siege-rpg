@@ -122,6 +122,36 @@ local Cards = {
 		Rank = 1,
 		Cooldown = 5,
 	},
+	RoyalGuard = {
+		GoonId = "RoyalGuard",
+		Type = "Goon",
+		Rank = 1,
+		Cooldown = 5,
+	},
+	RoyalRanger = {
+		GoonId = "RoyalRanger",
+		Type = "Goon",
+		Rank = 1,
+		Cooldown = 3,
+	},
+	MasterMage = {
+		GoonId = "MasterMage",
+		Type = "Goon",
+		Rank = 1,
+		Cooldown = 4,
+	},
+	RoyalCavalry = {
+		GoonId = "RoyalCavalry",
+		Type = "Goon",
+		Rank = 1,
+		Cooldown = 6,
+	},
+	Draugr = {
+		GoonId = "Draugr",
+		Type = "Goon",
+		Rank = 1,
+		Cooldown = 2,
+	},
 
 	-- ABILITIES
 	Heal = {
