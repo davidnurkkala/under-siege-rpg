@@ -8,12 +8,22 @@ local Battlers = {
 		Name = "Peasant",
 		BattlegroundName = "World1",
 		BaseName = "Tower",
-		Reward = 5,
+		Rewards = {
+			{ Type = "Currency", CurrencyType = "Coins", Amount = 10 },
+			{ Type = "Currency", CurrencyType = "Gems", Amount = 1 },
+			{ Type = "Card", CardId = "Peasant" },
+		},
 		WeaponId = "WoodenBow",
-		Power = 10,
 		Deck = {
 			Peasant = 1,
-			Recruit = 1,
+			Heal = 1,
+		},
+		Brain = {
+			Id = "NaiveOrder",
+			Order = {
+				{ CardId = "Peasant", Count = 3 },
+				{ CardId = "Heal", Count = 1 },
+			},
 		},
 	},
 	Noble = {
@@ -22,12 +32,14 @@ local Battlers = {
 		BaseName = "Tower",
 		Reward = 25,
 		WeaponId = "SimpleWand",
-		Power = 1000,
 		Deck = {
-			Peasant = 4,
+			Peasant = 2,
 			Recruit = 1,
 			Hunter = 1,
 			RainOfArrows = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
 		},
 	},
 	Knight = {
@@ -36,11 +48,13 @@ local Battlers = {
 		BaseName = "Tower",
 		Reward = 50,
 		WeaponId = "Crossbow",
-		Power = 4100,
 		Deck = {
-			Footman = 2,
-			Heal = 2,
-			RainOfArrows = 2,
+			Footman = 1,
+			Heal = 1,
+			RainOfArrows = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
 		},
 	},
 	King = {
@@ -49,12 +63,14 @@ local Battlers = {
 		BaseName = "Tower",
 		Reward = 100,
 		WeaponId = "ArcaneRod",
-		Power = 13000,
 		Deck = {
-			Footman = 2,
-			Hunter = 8,
-			Mob = 2,
-			Recruitment = 8,
+			Footman = 1,
+			Hunter = 1,
+			Peasant = 2,
+			Recruitment = 3,
+		},
+		Brain = {
+			Id = "WeightedCost",
 		},
 	},
 	MinerBoss = {
@@ -63,11 +79,13 @@ local Battlers = {
 		BaseName = "Tower",
 		Reward = 300,
 		WeaponId = "Crossbow",
-		Power = 50000,
 		Deck = {
-			Miner = 32,
-			Demolitionist = 64,
-			PickaxeThrower = 32,
+			Miner = 1,
+			Demolitionist = 1,
+			PickaxeThrower = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
 		},
 	},
 
@@ -77,14 +95,14 @@ local Battlers = {
 		BaseName = "Tower",
 		Reward = 500,
 		WeaponId = "Crossbow",
-		Power = 75000,
 		Deck = {
-			Peasant = 32,
-			Recruit = 64,
-			Footman = 32,
-			Hunter = 32,
-			Mob = 24,
-			Recruitment = 8,
+			Peasant = 1,
+			Recruit = 1,
+			Hunter = 1,
+			Recruitment = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
 		},
 	},
 
@@ -95,11 +113,13 @@ local Battlers = {
 		BaseName = "VikingBase",
 		Reward = 150,
 		WeaponId = "WoodenBow",
-		Power = 33000,
 		Deck = {
 			Berserker = 1,
 			Recruit = 1,
 			VikingWarrior = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
 		},
 	},
 	VikingWarrior = {
@@ -108,12 +128,14 @@ local Battlers = {
 		BaseName = "VikingBase",
 		Reward = 250,
 		WeaponId = "CrudeThrownAxe",
-		Power = 75000,
 		Deck = {
 			Berserker = 1,
-			Recruit = 4,
-			VikingWarrior = 4,
+			Recruit = 1,
+			VikingWarrior = 1,
 			RainOfArrows = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
 		},
 	},
 	VikingChief = {
@@ -122,14 +144,16 @@ local Battlers = {
 		BaseName = "VikingBase",
 		Reward = 375,
 		WeaponId = "CrudeThrownAxe",
-		Power = 150000,
 		Deck = {
-			Recruit = 8,
-			VikingWarrior = 8,
-			Hunter = 16,
-			Berserker = 4,
+			Recruit = 1,
+			VikingWarrior = 1,
+			Hunter = 1,
+			Berserker = 1,
 			Heal = 1,
-			RainOfArrows = 4,
+			RainOfArrows = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
 		},
 	},
 	VikingKing = {
@@ -138,15 +162,17 @@ local Battlers = {
 		BaseName = "VikingBase",
 		Reward = 500,
 		WeaponId = "CrudeThrownAxe",
-		Power = 300000,
 		Deck = {
-			Recruit = 32,
-			Footman = 4,
-			VikingWarrior = 16,
-			Hunter = 32,
-			Berserker = 16,
-			Heal = 4,
-			RainOfArrows = 8,
+			Recruit = 1,
+			Footman = 1,
+			VikingWarrior = 1,
+			Hunter = 1,
+			Berserker = 1,
+			Heal = 1,
+			RainOfArrows = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
 		},
 	},
 
@@ -157,12 +183,14 @@ local Battlers = {
 		BaseName = "ElfBase",
 		Reward = 750,
 		WeaponId = "ElvenBow",
-		Power = 520000,
 		Deck = {
-			ElfBrawler = 12,
-			ElfRanger = 8,
-			Heal = 16,
-			RainOfArrows = 8,
+			ElfBrawler = 1,
+			ElfRanger = 1,
+			Heal = 1,
+			RainOfArrows = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
 		},
 	},
 	ElfHunter = {
@@ -171,11 +199,13 @@ local Battlers = {
 		BaseName = "ElfBase",
 		Reward = 1000,
 		WeaponId = "ElvenBow",
-		Power = 880000,
 		Deck = {
-			ElfBrawler = 16,
-			ElfRanger = 12,
-			RainOfArrows = 32,
+			ElfBrawler = 1,
+			ElfRanger = 1,
+			RainOfArrows = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
 		},
 	},
 	ElfWarrior = {
@@ -184,11 +214,13 @@ local Battlers = {
 		BaseName = "ElfBase",
 		Reward = 1300,
 		WeaponId = "ThrowingKnife",
-		Power = 1400000,
 		Deck = {
-			ElfBrawler = 18,
-			ElfRanger = 16,
-			Heal = 32,
+			ElfBrawler = 1,
+			ElfRanger = 1,
+			Heal = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
 		},
 	},
 	ElfKing = {
@@ -197,12 +229,14 @@ local Battlers = {
 		BaseName = "ElfBase",
 		Reward = 1750,
 		WeaponId = "ElvenBow",
-		Power = 2200000,
 		Deck = {
-			ElfBrawler = 32,
-			ElfRanger = 18,
-			Heal = 16,
-			RainOfArrows = 16,
+			ElfBrawler = 1,
+			ElfRanger = 1,
+			Heal = 1,
+			RainOfArrows = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
 		},
 	},
 
@@ -213,11 +247,14 @@ local Battlers = {
 		Reward = 3000,
 		WeaponId = "FairyBow",
 		Deck = {
-			BanditRogue = 64,
-			BanditDuelist = 64,
-			BanditScout = 64,
-			BanditOfficer = 32,
-			Mob = 24,
+			BanditRogue = 1,
+			BanditDuelist = 1,
+			BanditScout = 1,
+			BanditOfficer = 1,
+			Mob = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
 		},
 	},
 
@@ -228,11 +265,13 @@ local Battlers = {
 		BaseName = "VikingBase",
 		Reward = 2000,
 		WeaponId = "CrudeThrownAxe",
-		Power = 3300000,
 		Deck = {
-			OrcWarrior = 32,
-			OrcChampion = 16,
-			RainOfArrows = 64,
+			OrcWarrior = 1,
+			OrcChampion = 1,
+			RainOfArrows = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
 		},
 	},
 	OrcBrute = {
@@ -241,12 +280,14 @@ local Battlers = {
 		BaseName = "VikingBase",
 		Reward = 2500,
 		WeaponId = "SpellBook",
-		Power = 4700000,
 		Deck = {
-			OrcWarrior = 32,
-			OrcChampion = 16,
-			Heal = 32,
-			RainOfArrows = 64,
+			OrcWarrior = 1,
+			OrcChampion = 1,
+			Heal = 1,
+			RainOfArrows = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
 		},
 	},
 	OrcFighter = {
@@ -255,12 +296,14 @@ local Battlers = {
 		BaseName = "VikingBase",
 		Reward = 3250,
 		WeaponId = "Javelin",
-		Power = 6700000,
 		Deck = {
-			OrcWarrior = 32,
-			OrcChampion = 32,
-			Heal = 32,
-			RainOfArrows = 64,
+			OrcWarrior = 1,
+			OrcChampion = 1,
+			Heal = 1,
+			RainOfArrows = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
 		},
 	},
 	OrcGeneral = {
@@ -269,12 +312,14 @@ local Battlers = {
 		BaseName = "VikingBase",
 		Reward = 4500,
 		WeaponId = "Javelin",
-		Power = 9250000,
 		Deck = {
-			OrcWarrior = 64,
-			OrcChampion = 32,
-			Heal = 64,
-			RainOfArrows = 128,
+			OrcWarrior = 1,
+			OrcChampion = 1,
+			Heal = 1,
+			RainOfArrows = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
 		},
 	},
 }
