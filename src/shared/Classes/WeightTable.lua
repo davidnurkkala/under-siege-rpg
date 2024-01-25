@@ -18,11 +18,14 @@ type WeightTableEntry = WeightTableEntryDef & {
 	Chance: number,
 }
 
-export type WeightTable = typeof(setmetatable({} :: {
-	Entries: { WeightTableEntry },
-	Weight: number,
-	Random: Random,
-}, WeightTable))
+export type WeightTable = typeof(setmetatable(
+	{} :: {
+		Entries: { WeightTableEntry },
+		Weight: number,
+		Random: Random,
+	},
+	WeightTable
+))
 
 function WeightTable.new(entries: { WeightTableEntryDef }, random: Random?): WeightTable
 	entries = Sift.Dictionary.copyDeep(entries)
@@ -47,6 +50,10 @@ function WeightTable.new(entries: { WeightTableEntryDef }, random: Random?): Wei
 	}, WeightTable)
 
 	return self
+end
+
+function WeightTable.Is(object)
+	return getmetatable(object) == WeightTable
 end
 
 function WeightTable.GetEntries(self: WeightTable)

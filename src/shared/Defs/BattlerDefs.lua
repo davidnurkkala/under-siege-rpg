@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Sift = require(ReplicatedStorage.Packages.Sift)
+local WeightTable = require(ReplicatedStorage.Shared.Classes.WeightTable)
 
 local Battlers = {
 	-- world 1
@@ -9,9 +10,32 @@ local Battlers = {
 		BattlegroundName = "World1",
 		BaseName = "Tower",
 		Rewards = {
-			{ Type = "Currency", CurrencyType = "Coins", Amount = 10 },
-			{ Type = "Currency", CurrencyType = "Gems", Amount = 1 },
-			{ Type = "Card", CardId = "Peasant" },
+			{
+				Chance = 1,
+				Result = {
+					Type = "Currency",
+					CurrencyType = "Coins",
+					Amount = WeightTable.new({
+						{ Weight = 5, Result = 10 },
+						{ Weight = 3, Result = 20 },
+						{ Weight = 1, Result = 50 },
+					}),
+				},
+			},
+			{
+				Chance = 1,
+				Result = {
+					Type = "Currency",
+					CurrencyType = "SimpleFood",
+					Amount = WeightTable.new({
+						{ Weight = 5, Result = 5 },
+						{ Weight = 3, Result = 10 },
+						{ Weight = 1, Result = 20 },
+					}),
+				},
+			},
+			{ Chance = 0.5, Result = { Type = "Currency", CurrencyType = "Gems", Amount = 1 } },
+			{ Chance = 0.1, Result = { Type = "Card", CardId = "Peasant" } },
 		},
 		WeaponId = "WoodenBow",
 		Deck = {

@@ -305,6 +305,17 @@ return function(props)
 					end,
 					[React.Event.SelectionGained] = onButtonSelectedCallback,
 				}),
+				InventoryButton = React.createElement(lobbyButton, {
+					LayoutOrder = 9,
+					Text = TextStroke("Bag"),
+					Color = ColorDefs.DarkBlue,
+					Image = "rbxassetid://16113464491",
+					Activate = function()
+						menu.Set("Inventory")
+						return Promise.resolve()
+					end,
+					[React.Event.SelectionGained] = onButtonSelectedCallback,
+				}),
 			}),
 
 			GamepadHint = React.createElement(RoundButtonWithImage, {
