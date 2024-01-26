@@ -286,14 +286,17 @@ return function(props)
 				GiftsButton = React.createElement(giftButton, {
 					[React.Event.SelectionGained] = onButtonSelectedCallback,
 				}),
-				--[[ShopButton = React.createElement(lobbyButton, {
+				ShopButton = React.createElement(lobbyButton, {
 					LayoutOrder = 6,
 					Text = TextStroke("Shop"),
 					Color = ColorDefs.Yellow,
 					Image = "rbxassetid://15308000036",
-					Activate = function() end,
+					Activate = function()
+						menu.Set("Shop")
+						return Promise.resolve()
+					end,
 					[React.Event.SelectionGained] = onButtonSelectedCallback,
-				}),]]
+				}),
 				DeckButton = React.createElement(lobbyButton, {
 					LayoutOrder = 8,
 					Text = TextStroke("Deck"),

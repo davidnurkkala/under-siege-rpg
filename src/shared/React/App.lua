@@ -16,6 +16,7 @@ local PaddingAll = require(ReplicatedStorage.Shared.React.Common.PaddingAll)
 local PlatformProvider = require(ReplicatedStorage.Shared.React.PlatformContext.PlatformProvider)
 local React = require(ReplicatedStorage.Packages.React)
 local SessionRewardsMenuBridge = require(ReplicatedStorage.Shared.React.Menus.SessionRewardsMenuBridge)
+local ShopMenuBridge = require(ReplicatedStorage.Shared.React.Menus.ShopMenuBridge)
 local ShoplikeBridge = require(ReplicatedStorage.Shared.React.ShoplikeBridge)
 local TeleportMenuBridge = require(ReplicatedStorage.Shared.React.Teleport.TeleportMenuBridge)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
@@ -54,6 +55,7 @@ return function()
 				TeleportMenu = React.createElement(TeleportMenuBridge),
 				DeckMenu = React.createElement(DeckMenuBridge),
 				InventoryMenu = React.createElement(InventoryMenuBridge),
+				ShopMenu = React.createElement(ShopMenuBridge),
 				SessionRewardsMenu = React.createElement(SessionRewardsMenuBridge),
 				LoginStreakRewardsMenu = React.createElement(LoginStreakRewardsMenuBridge),
 				VipMenu = React.createElement(VipMenuBridge),

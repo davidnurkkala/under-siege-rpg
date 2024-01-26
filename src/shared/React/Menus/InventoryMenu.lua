@@ -52,6 +52,7 @@ return function(props: {
 						local amount = wallet[currencyType]
 						local def = CurrencyDefs[currencyType]
 						if def.NotShownInInventory then return end
+						if amount < 1 then return end
 
 						return React.createElement(LayoutContainer, {
 							LayoutOrder = index,

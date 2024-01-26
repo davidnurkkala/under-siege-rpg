@@ -53,6 +53,46 @@ local Goons = {
 		},
 	},
 
+	Militia = {
+		Name = "Militia",
+		Description = "A peasant with minimal combat training and jury-rigged protective gear.",
+		ModelName = "Militia",
+		Brain = {
+			Id = "BasicMelee",
+		},
+		Tags = { "Armored" },
+		Animations = {
+			Walk = "SwordsmanWalk",
+			Attack = "GenericGoon1hMelee",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.27
+			end,
+			Speed = function()
+				return 0.04
+			end,
+			Range = function()
+				return 0.1
+			end,
+			AttackRate = function()
+				return 0.75
+			end,
+			Damage = function(level)
+				return lerped(1.5, 2.25, level)
+			end,
+			HealthMax = function(level)
+				return lerped(7.5, 12, level)
+			end,
+		},
+	},
+
 	Recruit = {
 		Name = "Recruit",
 		Description = "A regular soldier with a cheap sword and salvaged armor.",
@@ -60,7 +100,7 @@ local Goons = {
 		Brain = {
 			Id = "BasicMelee",
 		},
-		Tags = { "Armored", "Light" },
+		Tags = { "Armored" },
 		Animations = {
 			Walk = "SwordsmanWalk",
 			Attack = "GenericGoon1hMelee",

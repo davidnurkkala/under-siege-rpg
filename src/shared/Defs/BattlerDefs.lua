@@ -35,11 +35,11 @@ local Battlers = {
 				},
 			},
 			{ Chance = 0.5, Result = { Type = "Currency", CurrencyType = "Gems", Amount = 1 } },
-			{ Chance = 0.1, Result = { Type = "Card", CardId = "Peasant" } },
 		},
 		WeaponId = "WoodenBow",
 		Deck = {
 			Peasant = 1,
+			Militia = 1,
 			Heal = 1,
 		},
 		Brain = {
@@ -47,6 +47,8 @@ local Battlers = {
 			Order = {
 				{ CardId = "Peasant", Count = 3 },
 				{ CardId = "Heal", Count = 1 },
+				{ CardId = "Peasant", Count = 1 },
+				{ CardId = "Militia", Count = 1 },
 			},
 		},
 	},
