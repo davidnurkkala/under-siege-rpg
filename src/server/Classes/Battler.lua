@@ -260,11 +260,11 @@ function Battler.IsActive(self: Battler)
 end
 
 function Battler.Attack(self: Battler)
-	if not self.AttackCooldown:IsReady() then return end
+	if not self.AttackCooldown:IsReady() then return false end
 
 	local battle = self.Battle
-	if not battle then return end
-	if battle.State == "Ended" then return end
+	if not battle then return false end
+	if battle.State == "Ended" then return false end
 
 	local target = battle:TargetNearest({
 		Position = self.Position,
@@ -272,7 +272,7 @@ function Battler.Attack(self: Battler)
 		Filter = battle:EnemyFilter(self.TeamId),
 	})
 
-	if not target then return end
+	if not target then return false end
 
 	local root = target:GetRoot()
 
@@ -324,7 +324,9 @@ function Battler.Attack(self: Battler)
 		self.AttackCooldown:Reset()
 	end)
 
-	return Promise.race({ attackPromise, cancelPromise })
+	Promise.race({ attackPromise, cancelPromise })
+
+	return true
 end
 
 function Battler.Destroy(self: Battler)

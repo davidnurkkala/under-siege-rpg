@@ -198,6 +198,8 @@ function Battle.fromPlayerVersusBattler(player: Player, battlerId: string)
 				opponentBrain:Destroy()
 			end)
 
+			EventStream.Event({ Kind = "BattleStarted", Player = player, BattlerId = battlerId })
+
 			return battle
 		end)
 	end)

@@ -47,7 +47,9 @@ local Battlers = {
 		Name = "Noble",
 		BattlegroundName = "World1",
 		BaseName = "Tower",
-		Reward = 25,
+		Rewards = {
+			{ Chance = 1, Result = { Type = "Currency", CurrencyType = "Coins", Amount = quickCurrency(25, 50, 100) } },
+		},
 		WeaponId = "SimpleWand",
 		Deck = {
 			Peasant = 2,
