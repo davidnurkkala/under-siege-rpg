@@ -158,30 +158,35 @@ local Cards = {
 		Type = "Goon",
 		Rank = 1,
 		Cooldown = 5,
+		Cost = 25,
 	},
 	RoyalRanger = {
 		GoonId = "RoyalRanger",
 		Type = "Goon",
 		Rank = 1,
 		Cooldown = 3,
+		Cost = 25,
 	},
 	MasterMage = {
 		GoonId = "MasterMage",
 		Type = "Goon",
 		Rank = 1,
 		Cooldown = 4,
+		Cost = 25,
 	},
 	RoyalCavalry = {
 		GoonId = "RoyalCavalry",
 		Type = "Goon",
 		Rank = 1,
 		Cooldown = 6,
+		Cost = 25,
 	},
 	Draugr = {
 		GoonId = "Draugr",
 		Type = "Goon",
 		Rank = 1,
 		Cooldown = 2,
+		Cost = 25,
 	},
 
 	-- ABILITIES
