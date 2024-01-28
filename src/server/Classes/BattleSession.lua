@@ -6,6 +6,7 @@ local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
 local Battler = require(ServerScriptService.Server.Classes.Battler)
 local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local DeckService = require(ServerScriptService.Server.Services.DeckService)
+local EventStream = require(ReplicatedStorage.Shared.Util.EventStream)
 local PlayerLeaving = require(ReplicatedStorage.Shared.Util.PlayerLeaving)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Sift = require(ReplicatedStorage.Packages.Sift)
@@ -54,7 +55,7 @@ function BattleSession.new(args: {
 	end)
 
 	self.Trove:Add(ActionService:Subscribe(self.Player, "Primary", function()
-		self.Battler:Attack()
+		if self.Battler:Attack() then EventStream.Event({ Kind = "UsedInBattleAttack", Player = self.Player }) end
 	end))
 
 	return self

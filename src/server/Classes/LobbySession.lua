@@ -53,16 +53,19 @@ function LobbySession.new(args: {
 		AutoRunTimer = 0,
 	}, LobbySession)
 
-	LobbySessions.Add(self.Player, self)
-	trove:Add(function()
-		LobbySessions.Remove(self.Player)
-	end)
-
 	trove:AddPromise(PlayerLeaving(self.Player)):andThenCall(self.Destroy, self)
 
 	LobbySessionUpdater:Add(self)
 	self.Trove:Add(function()
 		LobbySessionUpdater:Remove(self)
+	end)
+
+	self.Human.MaxSlopeAngle = 55
+
+	-- do last
+	LobbySessions.Add(self.Player, self)
+	trove:Add(function()
+		LobbySessions.Remove(self.Player)
 	end)
 
 	return self

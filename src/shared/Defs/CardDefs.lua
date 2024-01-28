@@ -34,6 +34,13 @@ local Cards = {
 			},
 		},
 	},
+	Militia = {
+		GoonId = "Militia",
+		Type = "Goon",
+		Rank = 1,
+		Cooldown = 2,
+		Cost = 20,
+	},
 	Recruit = {
 		GoonId = "Recruit",
 		Type = "Goon",

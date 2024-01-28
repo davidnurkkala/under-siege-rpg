@@ -234,14 +234,20 @@ function Badger.with(condition: Condition, prerequisite: Condition): Condition
 			condition:load(data[1])
 			prerequisite:load(data[2])
 		end,
+		getState = function(_)
+			return {
+				condition = condition:getState(),
+				prerequisite = prerequisite:getState(),
+			}
+		end,
 		getFilter = function(_self)
 			return Sift.Set.merge(condition:getFilter(), prerequisite:getFilter())
 		end,
 		process = function(_self, ...)
 			if prerequisite:isComplete() then
-				condition:process(...)
+				Badger.processFiltered(condition, ...)
 			else
-				prerequisite:process(...)
+				Badger.processFiltered(prerequisite, ...)
 			end
 		end,
 		reset = function(_self)
@@ -304,12 +310,18 @@ function Badger.without(condition: Condition, prerequisite: Condition): Conditio
 		getFilter = function(_self)
 			return Sift.Set.merge(condition:getFilter(), prerequisite:getFilter())
 		end,
+		getState = function(_)
+			return {
+				condition = condition:getState(),
+				prerequisite = prerequisite:getState(),
+			}
+		end,
 		process = function(self, ...)
-			prerequisite:process(...)
+			Badger.processFiltered(prerequisite, ...)
 			if prerequisite:isComplete() then
 				self:reset()
 			else
-				condition:process(...)
+				Badger.processFiltered(condition, ...)
 			end
 		end,
 		reset = function(_self)

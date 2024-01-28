@@ -6,8 +6,10 @@ local BattlerPromptBridge = require(ReplicatedStorage.Shared.React.BattlerPrompt
 local ChangeLogBoard = require(ReplicatedStorage.Shared.React.ChangeLog.ChangeLogBoard)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local DeckMenuBridge = require(ReplicatedStorage.Shared.React.Menus.DeckMenuBridge)
+local DialogueBridge = require(ReplicatedStorage.Shared.React.Dialogue.DialogueBridge)
 local Hud = require(ReplicatedStorage.Shared.React.Hud.Hud)
 local IndicatorBridge = require(ReplicatedStorage.Shared.React.NumberPopups.IndicatorBridge)
+local InventoryMenuBridge = require(ReplicatedStorage.Shared.React.Menus.InventoryMenuBridge)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local LoginStreakRewardsMenuBridge = require(ReplicatedStorage.Shared.React.Menus.LoginStreakRewardsMenuBridge)
 local MenuProvider = require(ReplicatedStorage.Shared.React.MenuContext.MenuProvider)
@@ -15,6 +17,7 @@ local PaddingAll = require(ReplicatedStorage.Shared.React.Common.PaddingAll)
 local PlatformProvider = require(ReplicatedStorage.Shared.React.PlatformContext.PlatformProvider)
 local React = require(ReplicatedStorage.Packages.React)
 local SessionRewardsMenuBridge = require(ReplicatedStorage.Shared.React.Menus.SessionRewardsMenuBridge)
+local ShopMenuBridge = require(ReplicatedStorage.Shared.React.Menus.ShopMenuBridge)
 local ShoplikeBridge = require(ReplicatedStorage.Shared.React.ShoplikeBridge)
 local TeleportMenuBridge = require(ReplicatedStorage.Shared.React.Teleport.TeleportMenuBridge)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
@@ -52,10 +55,13 @@ return function()
 				WeaponShop = React.createElement(WeaponShopBridge),
 				TeleportMenu = React.createElement(TeleportMenuBridge),
 				DeckMenu = React.createElement(DeckMenuBridge),
+				InventoryMenu = React.createElement(InventoryMenuBridge),
+				ShopMenu = React.createElement(ShopMenuBridge),
 				SessionRewardsMenu = React.createElement(SessionRewardsMenuBridge),
 				LoginStreakRewardsMenu = React.createElement(LoginStreakRewardsMenuBridge),
 				VipMenu = React.createElement(VipMenuBridge),
 				BattleResult = React.createElement(BattleResultBridge),
+				Dialogue = React.createElement(DialogueBridge),
 
 				AlphaMessage = React.createElement(alphaMessage),
 			}),

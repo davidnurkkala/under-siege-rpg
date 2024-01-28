@@ -5,6 +5,7 @@ local Badger = require(ReplicatedStorage.Shared.Util.Badger)
 local Comm = require(ReplicatedStorage.Packages.Comm)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local Observers = require(ReplicatedStorage.Packages.Observers)
+local Promise = require(ReplicatedStorage.Packages.Promise)
 local Property = require(ReplicatedStorage.Shared.Classes.Property)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local Trove = require(ReplicatedStorage.Packages.Trove)
@@ -66,7 +67,14 @@ function QuestService.PrepareBlocking(self: QuestService)
 					end
 				))
 
-				if questData[id] then condition:load(questData[id]) end
+				if questData[id] then
+					Promise.try(function()
+						condition:load(questData[id])
+					end):catch(function()
+						print(`Something went wrong loading quest {id}, resetting`)
+						condition:reset()
+					end)
+				end
 
 				trove:Add(function()
 					Badger.stop(condition)

@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local Battle = require(ServerScriptService.Server.Classes.Battle)
+local BattleHelper = require(ServerScriptService.Server.Util.BattleHelper)
 local BattlerDefs = require(ReplicatedStorage.Shared.Defs.BattlerDefs)
 local LobbySession = require(ServerScriptService.Server.Classes.LobbySession)
 local LobbySessions = require(ServerScriptService.Server.Singletons.LobbySessions)
@@ -46,37 +47,7 @@ function BattlerPrompt.new(model: Model): BattlerPrompt
 	prompt.RequiresLineOfSight = false
 	prompt.MaxActivationDistance = 8
 	prompt.Triggered:Connect(function(player)
-		local session = LobbySessions.Get(player)
-		if not session then return end
-
-		local cframe = TryNow(function()
-			return player.Character.PrimaryPart.CFrame
-		end, model:GetPivot() + Vector3.new(0, 4, 0))
-
-		session:Destroy()
-
-		local function restoreSession()
-			return LobbySession.promised(player):andThenCall(Promise.delay, 0.5):andThen(function()
-				TryNow(function()
-					player.Character.PrimaryPart.CFrame = cframe
-				end)
-			end)
-		end
-
-		ServerFade(player, nil, function()
-				return Battle.fromPlayerVersusBattler(player, self.Id):catch(warn)
-			end)
-			:andThen(function(battle)
-				return Promise.fromEvent(battle.Finished):andThenReturn(battle)
-			end)
-			:andThen(function(battle)
-				return ServerFade(player, nil, function()
-					battle:Destroy()
-
-					return restoreSession()
-				end)
-			end)
-			:catch(restoreSession)
+		BattleHelper.FadeToBattle(player, self.Id, model:GetPivot() + Vector3.new(0, 4, 0))
 	end)
 	prompt.Parent = self.Model.PrimaryPart
 

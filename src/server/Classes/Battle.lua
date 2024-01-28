@@ -181,8 +181,7 @@ function Battle.fromPlayerVersusBattler(player: Player, battlerId: string)
 				end
 
 				local def = BattlerDefs[battlerId]
-				-- TODO: random chance some rewards or whatever
-				local rewards = def.Rewards
+				local rewards = RewardHelper.ProcessChanceTable(player, def.Rewards)
 
 				Promise.all(Sift.Array.map(rewards, function(reward)
 					return RewardHelper.GiveReward(player, reward)
@@ -198,6 +197,8 @@ function Battle.fromPlayerVersusBattler(player: Player, battlerId: string)
 				BattleService:Remove(player)
 				opponentBrain:Destroy()
 			end)
+
+			EventStream.Event({ Kind = "BattleStarted", Player = player, BattlerId = battlerId })
 
 			return battle
 		end)

@@ -30,8 +30,16 @@ local DataService = {
 		},
 		Boosts = {},
 		Deck = {
-			Equipped = { Peasant = true },
-			Owned = { Peasant = 1 },
+			Equipped = {
+				Peasant = true,
+				Hunter = true,
+				Militia = true,
+			},
+			Owned = {
+				Peasant = 1,
+				Hunter = 1,
+				Militia = 1,
+			},
 		},
 		Options = {
 			AutoEquipCards = true,

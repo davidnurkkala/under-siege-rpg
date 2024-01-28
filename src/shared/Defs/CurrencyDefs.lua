@@ -22,6 +22,7 @@ local Currencies = {
 			Primary = ColorDefs.LightYellow,
 			Secondary = ColorDefs.Yellow,
 		},
+		NotShownInInventory = true,
 	},
 	Gems = {
 		Name = "Gems",
@@ -30,6 +31,7 @@ local Currencies = {
 			Primary = ColorDefs.LightPurple,
 			Secondary = ColorDefs.Purple,
 		},
+		NotShownInInventory = true,
 	},
 	Supplies = {
 		Name = "Supplies",
@@ -38,6 +40,7 @@ local Currencies = {
 			Primary = ColorDefs.White,
 			Secondary = ColorDefs.White,
 		},
+		NotShownInInventory = true,
 	},
 
 	-- REGULAR
@@ -49,10 +52,17 @@ local Currencies = {
 			Secondary = ColorDefs.White,
 		},
 	},
-
 	SimpleMaterials = {
 		Name = "Simple Materials",
 		Image = "rbxassetid://16076031410",
+		Colors = {
+			Primary = ColorDefs.White,
+			Secondary = ColorDefs.White,
+		},
+	},
+	CommonOre = {
+		Name = "Common Ore",
+		Image = "rbxassetid://16113724382",
 		Colors = {
 			Primary = ColorDefs.White,
 			Secondary = ColorDefs.White,
