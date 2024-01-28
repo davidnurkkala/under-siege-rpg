@@ -6,6 +6,7 @@ local BattlerPromptBridge = require(ReplicatedStorage.Shared.React.BattlerPrompt
 local ChangeLogBoard = require(ReplicatedStorage.Shared.React.ChangeLog.ChangeLogBoard)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local DeckMenuBridge = require(ReplicatedStorage.Shared.React.Menus.DeckMenuBridge)
+local DialogueBridge = require(ReplicatedStorage.Shared.React.Dialogue.DialogueBridge)
 local Hud = require(ReplicatedStorage.Shared.React.Hud.Hud)
 local IndicatorBridge = require(ReplicatedStorage.Shared.React.NumberPopups.IndicatorBridge)
 local InventoryMenuBridge = require(ReplicatedStorage.Shared.React.Menus.InventoryMenuBridge)
@@ -60,6 +61,7 @@ return function()
 				LoginStreakRewardsMenu = React.createElement(LoginStreakRewardsMenuBridge),
 				VipMenu = React.createElement(VipMenuBridge),
 				BattleResult = React.createElement(BattleResultBridge),
+				Dialogue = React.createElement(DialogueBridge),
 
 				AlphaMessage = React.createElement(alphaMessage),
 			}),
