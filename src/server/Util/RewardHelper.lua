@@ -6,6 +6,7 @@ local CurrencyService = require(ServerScriptService.Server.Services.CurrencyServ
 local DeckService = require(ServerScriptService.Server.Services.DeckService)
 local ProductHelper = require(ReplicatedStorage.Shared.Util.ProductHelper)
 local Sift = require(ReplicatedStorage.Packages.Sift)
+local WeaponService = require(ServerScriptService.Server.Services.WeaponService)
 local WeightTable = require(ReplicatedStorage.Shared.Classes.WeightTable)
 
 local Rand = Random.new()
@@ -27,6 +28,8 @@ function RewardHelper.GiveReward(player: Player, reward: any)
 		end)
 	elseif reward.Type == "Boost" then
 		return BoostService:AddBoost(player, reward.Boost):andThenReturn(reward)
+	elseif reward.Type == "Weapon" then
+		return WeaponService:OwnWeapon(player, reward.WeaponId):andThenReturn(reward)
 	else
 		error(`Unrecognized reward type {reward.Type}`)
 	end

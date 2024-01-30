@@ -11,7 +11,9 @@ local GoonDefs = require(ReplicatedStorage.Shared.Defs.GoonDefs)
 local GoonPreview = require(ReplicatedStorage.Shared.React.Goons.GoonPreview)
 local Image = require(ReplicatedStorage.Shared.React.Common.Image)
 local React = require(ReplicatedStorage.Packages.React)
+local WeaponDefs = require(ReplicatedStorage.Shared.Defs.WeaponDefs)
 local WeaponPreview = require(ReplicatedStorage.Shared.React.Weapons.WeaponPreview)
+local WeaponTypeDefs = require(ReplicatedStorage.Shared.Defs.WeaponTypeDefs)
 local RewardDisplayHelper = {}
 
 function RewardDisplayHelper.GetRewardImage(reward: any)
@@ -67,6 +69,8 @@ function RewardDisplayHelper.GetRewardColor(reward: any)
 		elseif cardDef.Type == "Goon" then
 			return ColorDefs.PaleGreen
 		end
+	elseif reward.Type == "Weapon" then
+		return ColorDefs.White
 	end
 
 	return ColorDefs.PaleBlue
@@ -81,6 +85,10 @@ function RewardDisplayHelper.GetRewardDetails(reward: any)
 		text = CurrencyDefs[reward.CurrencyType].Description
 	elseif reward.Type == "Card" then
 		text = CardHelper.GetDescription(reward.CardId, 1)
+	elseif reward.Type == "Weapon" then
+		local def = WeaponDefs[reward.WeaponId]
+		local typeDef = WeaponTypeDefs[def.WeaponType]
+		text = `{def.Description}\n\n{typeDef.Description}\n\nWeapons are mostly cosmetic and all have roughly the same damage per second.`
 	else
 		error(`Unrecognized reward type {reward.Type}`)
 	end
@@ -109,6 +117,9 @@ function RewardDisplayHelper.GetRewardText(reward: any, excitementDisabled: bool
 		else
 			error(`Unrecognized card type {cardDef.Type}`)
 		end
+	elseif reward.Type == "Weapon" then
+		local weaponDef = WeaponDefs[reward.WeaponId]
+		return `{if excitementDisabled then "" else "New weapon! "}{weaponDef.Name}`
 	else
 		error(`Unrecognized reward type {reward.Type}`)
 	end

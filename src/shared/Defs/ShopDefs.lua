@@ -8,16 +8,28 @@ local Shops = {
 		OverheadLabel = "Shop",
 		Products = {
 			{
-				Price = { Coins = 25 },
 				Reward = { Type = "Currency", CurrencyType = "SimpleFood", Amount = 5 },
+				Price = { Coins = 25 },
 			},
 			{
-				Price = { Coins = 50 },
 				Reward = { Type = "Currency", CurrencyType = "SimpleMaterials", Amount = 5 },
+				Price = { Coins = 50 },
 			},
 			{
-				Price = { Coins = 100, Gems = 25 },
 				Reward = { Type = "Card", CardId = "RainOfArrows" },
+				Price = { Coins = 100, Gems = 25 },
+			},
+			{
+				Reward = { Type = "Weapon", WeaponId = "HuntersBow" },
+				Price = { Coins = 1000 },
+			},
+			{
+				Reward = { Type = "Weapon", WeaponId = "Crossbow" },
+				Price = { Coins = 1000 },
+			},
+			{
+				Reward = { Type = "Weapon", WeaponId = "SimpleWand" },
+				Price = { Coins = 1000 },
 			},
 		},
 	},
@@ -26,8 +38,8 @@ local Shops = {
 		OverheadLabel = "Shop",
 		Products = {
 			{
-				Price = { Coins = 1000 },
 				Reward = { Type = "Currency", CurrencyType = "Gems", Amount = 1 },
+				Price = { Coins = 1000 },
 			},
 		},
 	},

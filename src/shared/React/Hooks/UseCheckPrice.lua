@@ -14,6 +14,7 @@ return function(price: CurrencyHelper.Price?)
 			end)
 		else
 			setCanAfford(false)
+			return
 		end
 	end, { price })
 
