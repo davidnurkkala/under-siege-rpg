@@ -107,7 +107,11 @@ return function()
 		end
 	end, {})
 
-	return React.createElement(Container, nil, {
+	local inConflictWithDialogue = (not menu.Is(nil)) and menu.GetInDialogue()
+
+	return React.createElement(Container, {
+		Visible = not inConflictWithDialogue,
+	}, {
 		Layout = React.createElement(ListLayout, {
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
 			VerticalAlignment = if menu.Is(nil) then Enum.VerticalAlignment.Top else Enum.VerticalAlignment.Bottom,

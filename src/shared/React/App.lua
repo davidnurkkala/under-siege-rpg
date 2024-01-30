@@ -2,17 +2,18 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local BattleController = require(ReplicatedStorage.Shared.Controllers.BattleController)
 local BattleResultBridge = require(ReplicatedStorage.Shared.React.BattleResult.BattleResultBridge)
-local BattlerPromptBridge = require(ReplicatedStorage.Shared.React.BattlerPromptBridge)
 local ChangeLogBoard = require(ReplicatedStorage.Shared.React.ChangeLog.ChangeLogBoard)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local DeckMenuBridge = require(ReplicatedStorage.Shared.React.Menus.DeckMenuBridge)
 local DialogueBridge = require(ReplicatedStorage.Shared.React.Dialogue.DialogueBridge)
+local GenericShopBridge = require(ReplicatedStorage.Shared.React.GenericShop.GenericShopBridge)
 local Hud = require(ReplicatedStorage.Shared.React.Hud.Hud)
 local IndicatorBridge = require(ReplicatedStorage.Shared.React.NumberPopups.IndicatorBridge)
 local InventoryMenuBridge = require(ReplicatedStorage.Shared.React.Menus.InventoryMenuBridge)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local LoginStreakRewardsMenuBridge = require(ReplicatedStorage.Shared.React.Menus.LoginStreakRewardsMenuBridge)
 local MenuProvider = require(ReplicatedStorage.Shared.React.MenuContext.MenuProvider)
+local OverheadLabeledBridge = require(ReplicatedStorage.Shared.React.OverheadLabeledBridge)
 local PaddingAll = require(ReplicatedStorage.Shared.React.Common.PaddingAll)
 local PlatformProvider = require(ReplicatedStorage.Shared.React.PlatformContext.PlatformProvider)
 local React = require(ReplicatedStorage.Packages.React)
@@ -52,7 +53,7 @@ return function()
 
 				TutorialHud = React.createElement(TutorialHud),
 
-				WeaponShop = React.createElement(WeaponShopBridge),
+				GenericShop = React.createElement(GenericShopBridge),
 				TeleportMenu = React.createElement(TeleportMenuBridge),
 				DeckMenu = React.createElement(DeckMenuBridge),
 				InventoryMenu = React.createElement(InventoryMenuBridge),
@@ -67,7 +68,7 @@ return function()
 			}),
 
 			Indicators = React.createElement(IndicatorBridge),
-			BattlerPrompts = React.createElement(BattlerPromptBridge),
+			OverheadLabels = React.createElement(OverheadLabeledBridge),
 			Shoplikes = React.createElement(ShoplikeBridge),
 			ChangeLogBoard = React.createElement(ChangeLogBoard),
 		}),

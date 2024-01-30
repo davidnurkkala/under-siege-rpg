@@ -4,6 +4,7 @@ local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local QuestController = require(ReplicatedStorage.Shared.Controllers.QuestController)
 local React = require(ReplicatedStorage.Packages.React)
+local ShopDefs = require(ReplicatedStorage.Shared.Defs.ShopDefs)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 local Trove = require(ReplicatedStorage.Packages.Trove)
@@ -14,6 +15,7 @@ local function overhead(props: {
 	Text: string?,
 })
 	return React.createElement("BillboardGui", {
+		LightInfluence = 0,
 		Size = UDim2.fromScale(16, 9),
 		StudsOffsetWorldSpace = Vector3.new(0, 14, 0),
 		Adornee = props.Adornee,
@@ -36,10 +38,10 @@ return function()
 	React.useEffect(function()
 		local trove = Trove.new()
 
-		trove:Add(Observers.observeTag("WeaponShopZone", function(part)
+		trove:Add(Observers.observeTag("ShopZone", function(part)
 			setShoplikes(function(oldShoplikes)
 				return Sift.Dictionary.set(oldShoplikes, part, {
-					Name = "Weapons",
+					Name = ShopDefs[part:GetAttribute("ShopId")].OverheadLabel,
 				})
 			end)
 
