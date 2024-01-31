@@ -22,7 +22,24 @@ local Shops = {
 	PremiumBases = {
 		Name = "Premium Bases",
 		Overhead = "Shop",
-		Products = {},
+		Products = {
+			{
+				Reward = { Type = "Cosmetic", CategoryName = "Bases", Id = "VikingPalisade" },
+				Price = { Gems = 250 },
+			},
+			{
+				Reward = { Type = "Cosmetic", CategoryName = "Bases", Id = "ElvenKeep" },
+				Price = { Gems = 250 },
+			},
+		},
+	},
+
+	PremiumGems = {
+		Name = "Gems",
+		Overhead = "Shop",
+		Products = {
+			-- defined in ProductDefs, this def is here for automation
+		},
 	},
 
 	-- IN-GAME

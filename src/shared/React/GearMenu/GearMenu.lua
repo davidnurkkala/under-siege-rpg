@@ -4,6 +4,7 @@ local Aspect = require(ReplicatedStorage.Shared.React.Common.Aspect)
 local Button = require(ReplicatedStorage.Shared.React.Common.Button)
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
+local CosmeticController = require(ReplicatedStorage.Shared.Controllers.CosmeticController)
 local GridLayout = require(ReplicatedStorage.Shared.React.Common.GridLayout)
 local HeightText = require(ReplicatedStorage.Shared.React.Common.HeightText)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
@@ -19,6 +20,7 @@ local Sift = require(ReplicatedStorage.Packages.Sift)
 local SystemWindow = require(ReplicatedStorage.Shared.React.Common.SystemWindow)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 local TryNow = require(ReplicatedStorage.Shared.Util.TryNow)
+local UseCosmetics = require(ReplicatedStorage.Shared.React.Hooks.UseCosmetics)
 local UseWeapons = require(ReplicatedStorage.Shared.React.Hooks.UseWeapons)
 local WeaponController = require(ReplicatedStorage.Shared.Controllers.WeaponController)
 
@@ -160,6 +162,7 @@ return function(props: {
 	local selectedItem, setSelectedItem = React.useState(nil)
 
 	local weapons = UseWeapons()
+	local cosmetics = UseCosmetics()
 
 	local items = {}
 	if category == "Weapons" then
@@ -172,17 +175,30 @@ return function(props: {
 				}
 			end)
 		end, {})
+	elseif category == "Bases" then
+		items = TryNow(function()
+			return Sift.Array.map(Sift.Array.sort(Sift.Dictionary.keys(cosmetics.Bases.Owned)), function(baseId)
+				return {
+					Type = "Cosmetic",
+					CategoryName = "Bases",
+					Id = baseId,
+					Equipped = cosmetics.Bases.Equipped == baseId,
+				}
+			end)
+		end, {})
 	end
 
 	local getIsEquipped = React.useCallback(function(item)
 		return TryNow(function()
 			if category == "Weapons" then
 				return weapons.Equipped == item.WeaponId
+			elseif category == "Bases" then
+				return cosmetics[item.CategoryName].Equipped == item.Id
 			else
 				return false
 			end
 		end, false)
-	end, { category, weapons })
+	end, { category, weapons, cosmetics })
 
 	return React.createElement(SystemWindow, {
 		Visible = props.Visible,
@@ -200,7 +216,11 @@ return function(props: {
 				setState("Inventory")
 			end,
 			Equip = function()
-				if category == "Weapons" then WeaponController:EquipWeapon(selectedItem.WeaponId) end
+				if category == "Weapons" then
+					WeaponController:EquipWeapon(selectedItem.WeaponId)
+				elseif category == "Bases" then
+					CosmeticController.EquipCosmetic(selectedItem.CategoryName, selectedItem.Id)
+				end
 			end,
 		}),
 
@@ -255,12 +275,14 @@ return function(props: {
 					React.Fragment,
 					nil,
 					Sift.Array.map(items, function(item, index)
+						local isEquipped = getIsEquipped(item)
+
 						return React.createElement(LayoutContainer, {
 							Padding = 8,
 							LayoutOrder = index,
 						}, {
 							Panel = React.createElement(Panel, {
-								ImageColor3 = ColorDefs.PaleRed,
+								ImageColor3 = if isEquipped then ColorDefs.PaleRed else ColorDefs.PaleBlue,
 							}, {
 								Left = React.createElement(Container, nil, {
 									Layout = React.createElement(ListLayout, {
@@ -294,7 +316,7 @@ return function(props: {
 											AutomaticSize = Enum.AutomaticSize.X,
 										}),
 
-										Equipped = getIsEquipped(item) and React.createElement(HeightText, {
+										Equipped = isEquipped and React.createElement(HeightText, {
 											LayoutOrder = 2,
 											Size = UDim2.fromScale(0, 1 / 3),
 											Text = TextStroke("Equipped"),

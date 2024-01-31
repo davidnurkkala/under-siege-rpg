@@ -292,7 +292,7 @@ return function(props)
 					Color = ColorDefs.Yellow,
 					Image = "rbxassetid://15308000036",
 					Activate = function()
-						menu.Set("Shop")
+						menu.Set("PremiumShop")
 						return Promise.resolve()
 					end,
 					[React.Event.SelectionGained] = onButtonSelectedCallback,

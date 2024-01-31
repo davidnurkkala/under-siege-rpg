@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local BoostService = require(ServerScriptService.Server.Services.BoostService)
+local CosmeticService = require(ServerScriptService.Server.Services.CosmeticService)
 local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local DeckService = require(ServerScriptService.Server.Services.DeckService)
 local ProductHelper = require(ReplicatedStorage.Shared.Util.ProductHelper)
@@ -30,6 +31,8 @@ function RewardHelper.GiveReward(player: Player, reward: any)
 		return BoostService:AddBoost(player, reward.Boost):andThenReturn(reward)
 	elseif reward.Type == "Weapon" then
 		return WeaponService:OwnWeapon(player, reward.WeaponId):andThenReturn(reward)
+	elseif reward.Type == "Cosmetic" then
+		return CosmeticService:OwnCosmetic(player, reward.CategoryName, reward.Id):andThenReturn(reward)
 	else
 		error(`Unrecognized reward type {reward.Type}`)
 	end

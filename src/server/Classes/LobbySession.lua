@@ -3,11 +3,14 @@ local ServerScriptService = game:GetService("ServerScriptService")
 
 local ActionService = require(ServerScriptService.Server.Services.ActionService)
 local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
+local CardDefs = require(ReplicatedStorage.Shared.Defs.CardDefs)
+local DataService = require(ServerScriptService.Server.Services.DataService)
 local EffectDizzy = require(ReplicatedStorage.Shared.Effects.EffectDizzy)
 local EffectService = require(ServerScriptService.Server.Services.EffectService)
 local LobbySessions = require(ServerScriptService.Server.Singletons.LobbySessions)
 local PlayerLeaving = require(ReplicatedStorage.Shared.Util.PlayerLeaving)
 local Promise = require(ReplicatedStorage.Packages.Promise)
+local Sift = require(ReplicatedStorage.Packages.Sift)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local Updater = require(ReplicatedStorage.Shared.Classes.Updater)
 
@@ -54,6 +57,40 @@ function LobbySession.new(args: {
 	}, LobbySession)
 
 	trove:AddPromise(PlayerLeaving(self.Player)):andThenCall(self.Destroy, self)
+
+	trove:Add(DataService:ObserveKey(self.Player, "Deck", function(deck)
+		local ids = Sift.Array.map(
+			Sift.Array.sort(
+				Sift.Array.filter(Sift.Set.toArray(deck.Equipped), function(cardId)
+					local def = CardDefs[cardId]
+					return def.Type == "Goon"
+				end),
+				function(idA, idB)
+					local a, b = CardDefs[idA], CardDefs[idB]
+					if a.Cost == b.Cost then
+						return a.Id > b.Id
+					else
+						return a.Cost > b.Cost
+					end
+				end
+			),
+			function(cardId)
+				local def = CardDefs[cardId]
+				return def.GoonId
+			end
+		)
+
+		self.Character:SetAttribute("EscortGoonIds", table.concat(Sift.Array.slice(ids, 1, 3), ","))
+
+		return function()
+			self.Character:SetAttribute("EscortGoonIds", nil)
+		end
+	end))
+
+	self.Character:AddTag("GoonEscorted")
+	trove:Add(function()
+		self.Character:RemoveTag("GoonEscorted")
+	end)
 
 	LobbySessionUpdater:Add(self)
 	self.Trove:Add(function()

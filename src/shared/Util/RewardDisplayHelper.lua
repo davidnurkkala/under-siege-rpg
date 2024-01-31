@@ -1,11 +1,12 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local AbilityDefs = require(ReplicatedStorage.Shared.Defs.AbilityDefs)
+local BaseDefs = require(ReplicatedStorage.Shared.Defs.BaseDefs)
+local BasePreview = require(ReplicatedStorage.Shared.React.Weapons.BasePreview)
 local CardDefs = require(ReplicatedStorage.Shared.Defs.CardDefs)
 local CardHelper = require(ReplicatedStorage.Shared.Util.CardHelper)
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
-local Default = require(ReplicatedStorage.Shared.Util.Default)
 local FormatBigNumber = require(ReplicatedStorage.Shared.Util.FormatBigNumber)
 local GoonDefs = require(ReplicatedStorage.Shared.Defs.GoonDefs)
 local GoonPreview = require(ReplicatedStorage.Shared.React.Goons.GoonPreview)
@@ -54,6 +55,14 @@ function RewardDisplayHelper.CreateRewardElement(reward: any)
 		return React.createElement(WeaponPreview, {
 			WeaponId = reward.WeaponId,
 		})
+	elseif reward.Type == "Cosmetic" then
+		if reward.CategoryName == "Bases" then
+			return React.createElement(BasePreview, {
+				BaseId = reward.Id,
+			})
+		else
+			error(`Unimplemented cosmetic {reward.CategoryName}`)
+		end
 	else
 		error(`Unimplemented reward type {reward.Type}`)
 	end
@@ -89,6 +98,13 @@ function RewardDisplayHelper.GetRewardDetails(reward: any)
 		local def = WeaponDefs[reward.WeaponId]
 		local typeDef = WeaponTypeDefs[def.WeaponType]
 		text = `{def.Description}\n\n{typeDef.Description}\n\nWeapons are mostly cosmetic and all have roughly the same damage per second.`
+	elseif reward.Type == "Cosmetic" then
+		if reward.CategoryName == "Bases" then
+			local def = BaseDefs[reward.Id]
+			return `{def.Description}\n\nBases are purely cosmetic and do not change gameplay.`
+		else
+			error(`Unimplemented cosmetic {reward.CategoryName}`)
+		end
 	else
 		error(`Unrecognized reward type {reward.Type}`)
 	end
@@ -120,6 +136,13 @@ function RewardDisplayHelper.GetRewardText(reward: any, excitementDisabled: bool
 	elseif reward.Type == "Weapon" then
 		local weaponDef = WeaponDefs[reward.WeaponId]
 		return `{if excitementDisabled then "" else "New weapon! "}{weaponDef.Name}`
+	elseif reward.Type == "Cosmetic" then
+		if reward.CategoryName == "Bases" then
+			local def = BaseDefs[reward.Id]
+			return `{if excitementDisabled then "" else "New base! "}{def.Name}`
+		else
+			error(`Unimplemented cosmetic {reward.CategoryName}`)
+		end
 	else
 		error(`Unrecognized reward type {reward.Type}`)
 	end

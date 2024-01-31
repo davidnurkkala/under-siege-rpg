@@ -3,6 +3,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 
 local ActionService = require(ServerScriptService.Server.Services.ActionService)
 local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
+local BaseDefs = require(ReplicatedStorage.Shared.Defs.BaseDefs)
 local BattlerDefs = require(ReplicatedStorage.Shared.Defs.BattlerDefs)
 local CardDefs = require(ReplicatedStorage.Shared.Defs.CardDefs)
 local Cooldown = require(ReplicatedStorage.Shared.Classes.Cooldown)
@@ -150,7 +151,8 @@ function Battler.fromBattlerId(battlerId: string, position: number, direction: n
 	local def = BattlerDefs[battlerId]
 	assert(def, `No def found for battler id {battlerId}`)
 
-	local base = ReplicatedStorage.Assets.Models.Bases[def.BaseName]:Clone()
+	local baseDef = BaseDefs[def.BaseId]
+	local base = baseDef.Model:Clone()
 
 	local char = def.Model:Clone()
 	char.Parent = workspace

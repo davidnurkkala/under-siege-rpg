@@ -6,6 +6,7 @@ local Lapis = require(ServerScriptService.ServerPackages.Lapis)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local SaveFile = require(ServerScriptService.Server.Classes.SaveFile)
+local Sift = require(ReplicatedStorage.Packages.Sift)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
 local COLLECTION_NAME = "DataService" .. Configuration.DataStoreVersion
@@ -18,6 +19,14 @@ local DataService = {
 			Equipped = "WoodenBow",
 			Owned = {
 				WoodenBow = true,
+			},
+		},
+		Cosmetics = {
+			Bases = {
+				Equipped = "Tower",
+				Owned = {
+					Tower = true,
+				},
 			},
 		},
 		Worlds = {
@@ -75,7 +84,11 @@ function DataService.PrepareBlocking(self: DataService)
 
 		defaultData = self.DefaultData,
 
-		migrations = {},
+		migrations = {
+			function(oldData)
+				return Sift.Dictionary.set(oldData, "Cosmetics", self.DefaultData.Cosmetics)
+			end,
+		},
 	})
 
 	Observers.observePlayer(function(player: Player)
