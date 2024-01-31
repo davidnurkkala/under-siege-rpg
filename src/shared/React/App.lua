@@ -6,6 +6,7 @@ local ChangeLogBoard = require(ReplicatedStorage.Shared.React.ChangeLog.ChangeLo
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local DeckMenuBridge = require(ReplicatedStorage.Shared.React.Menus.DeckMenuBridge)
 local DialogueBridge = require(ReplicatedStorage.Shared.React.Dialogue.DialogueBridge)
+local GearMenuBridge = require(ReplicatedStorage.Shared.React.GearMenu.GearMenuBridge)
 local GenericShopBridge = require(ReplicatedStorage.Shared.React.GenericShop.GenericShopBridge)
 local Hud = require(ReplicatedStorage.Shared.React.Hud.Hud)
 local IndicatorBridge = require(ReplicatedStorage.Shared.React.NumberPopups.IndicatorBridge)
@@ -54,6 +55,7 @@ return function()
 				TutorialHud = React.createElement(TutorialHud),
 
 				GenericShop = React.createElement(GenericShopBridge),
+				GearMenu = React.createElement(GearMenuBridge),
 				TeleportMenu = React.createElement(TeleportMenuBridge),
 				DeckMenu = React.createElement(DeckMenuBridge),
 				InventoryMenu = React.createElement(InventoryMenuBridge),

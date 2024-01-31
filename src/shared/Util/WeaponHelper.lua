@@ -13,6 +13,7 @@ function WeaponHelper.AttachModel(def: any, parent: Instance, holdPart: BasePart
 end
 
 function WeaponHelper.OwnsWeapon(weapons: any, weaponId: string)
+	if not weapons then return false end
 	if not weapons.Owned then return false end
 
 	return weapons.Owned[weaponId]

@@ -40,7 +40,6 @@ return function()
 		GenericShop = isDataReady and React.createElement(GenericShop, {
 			Visible = menu.Is("GenericShop"),
 			ShopId = shopId,
-			Select = function() end,
 			Close = function()
 				menu.Unset("GenericShop")
 			end,

@@ -172,6 +172,7 @@ local Weapons = {
 	ArcaneRod = {
 		Name = "Arcane Rod",
 		WeaponType = "Magic",
+		Description = "An immaculate enchanted rod brimming with arcane power.",
 		HoldPartName = "RightHand",
 		ProjectileName = "MagicStar2",
 		Animations = {

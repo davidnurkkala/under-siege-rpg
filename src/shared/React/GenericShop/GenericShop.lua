@@ -1,13 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Aspect = require(ReplicatedStorage.Shared.React.Common.Aspect)
 local Button = require(ReplicatedStorage.Shared.React.Common.Button)
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
 local DeckHelper = require(ReplicatedStorage.Shared.Util.DeckHelper)
 local Flipper = require(ReplicatedStorage.Packages.Flipper)
-local FormatBigNumber = require(ReplicatedStorage.Shared.Util.FormatBigNumber)
 local GenericShopController = require(ReplicatedStorage.Shared.Controllers.GenericShopController)
 local HeightText = require(ReplicatedStorage.Shared.React.Common.HeightText)
 local Image = require(ReplicatedStorage.Shared.React.Common.Image)
@@ -293,7 +291,6 @@ end
 return function(props: {
 	Visible: boolean,
 	ShopId: string,
-	Buy: (string) -> (),
 	Close: () -> (),
 })
 	local def = ShopDefs[props.ShopId]

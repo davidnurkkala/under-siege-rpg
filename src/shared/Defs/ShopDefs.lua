@@ -3,6 +3,29 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Sift = require(ReplicatedStorage.Packages.Sift)
 
 local Shops = {
+	-- PREMIUM
+	PremiumWeapons = {
+		Name = "Premium Weapons",
+		OverheadLabel = "Shop",
+		Products = {
+			{
+				Reward = { Type = "Weapon", WeaponId = "ArcaneRod" },
+				Price = { Gems = 150 },
+			},
+			{
+				Reward = { Type = "Weapon", WeaponId = "WillowCrossbow" },
+				Price = { Gems = 50 },
+			},
+		},
+	},
+
+	PremiumBases = {
+		Name = "Premium Bases",
+		Overhead = "Shop",
+		Products = {},
+	},
+
+	-- IN-GAME
 	World1Merchant = {
 		Name = "Jim's Wares",
 		OverheadLabel = "Shop",
