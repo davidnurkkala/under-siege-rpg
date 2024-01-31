@@ -13,6 +13,7 @@ local Ids = {
 	WandShoot = 15330801847,
 	BookIdle = 15861515795,
 	BookShoot = 15861496585,
+	ShipWobble = 16190011729,
 
 	GenericGoonDie = 15152357009,
 	GenericGoon1hMelee = 15340578529,

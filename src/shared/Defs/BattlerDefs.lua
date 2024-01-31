@@ -124,6 +124,21 @@ local Battlers = {
 			Id = "WeightedCost",
 		},
 	},
+	VikingSailor = {
+		Name = "Viking Sailor",
+		BattlegroundName = "World1",
+		BaseId = "VikingPalisade",
+		Reward = 600,
+		WeaponId = "CrudeThrownAxe",
+		Deck = {
+			Berserker = 1,
+			VikingWarrior = 1,
+			RainOfArrows = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
+		},
+	},
 
 	-- world 2
 	VikingRunt = {
