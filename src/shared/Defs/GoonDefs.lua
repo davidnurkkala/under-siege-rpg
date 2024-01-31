@@ -173,6 +173,86 @@ local Goons = {
 		},
 	},
 
+	Spearman = {
+		Name = "Spearman",
+		Description = "A fresh recruit with a sharpened spear and a thirst for action",
+		ModelName = "Spearman",
+		Brain = {
+			Id = "BasicMelee",
+		},
+		Tags = { "Light" },
+		Animations = {
+			Walk = "PeasantWalk",
+			Attack = "PeasantAttack",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 1
+			end,
+			Speed = function()
+				return 0.05
+			end,
+			Range = function()
+				return 0.1
+			end,
+			AttackRate = function()
+				return 0.75
+			end,
+			Damage = function(level)
+				return lerped(2, 2, level)
+			end,
+			HealthMax = function(level)
+				return lerped(8, 7.5, level)
+			end,
+		},
+	},
+
+	Pikeman = {
+		Name = "Pikeman",
+		Description = "An experienced warrior armed with a deadly polearm",
+		ModelName = "Pikeman",
+		Brain = {
+			Id = "BasicMelee",
+		},
+		Tags = { "Light" },
+		Animations = {
+			Walk = "PeasantWalk",
+			Attack = "PeasantAttack",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.27
+			end,
+			Speed = function()
+				return 0.05
+			end,
+			Range = function()
+				return 0.1
+			end,
+			AttackRate = function()
+				return 0.75
+			end,
+			Damage = function(level)
+				return scaling(4, 1, level)
+			end,
+			HealthMax = function(level)
+				return scaling(15, 1, level)
+			end,
+		},
+	},
+
 	Hunter = {
 		Name = "Hunter",
 		Description = "A villager with a bow, now hunting a very different kind of prey.",
@@ -213,6 +293,94 @@ local Goons = {
 			end,
 			HealthMax = function(level)
 				return scaling(10, 1, level)
+			end,
+		},
+	},
+
+	Archer = {
+		Name = "Archer",
+		Description = "An young scout eager to prove his worth with a bow",
+		ModelName = "Archer",
+		Brain = {
+			Id = "BasicRanged",
+			ProjectileOffset = CFrame.new(0, 0.75, -2),
+			ProjectileName = "Arrow1",
+		},
+		Tags = { "Ranged" },
+		Animations = {
+			Idle = "HunterIdle",
+			Walk = "HunterWalk",
+			Attack = "HunterAttack",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Shoot = { "BowShoot1", "BowShoot2", "BowShoot3", "BowShoot4" },
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.55
+			end,
+			Speed = function()
+				return 0.05
+			end,
+			Range = function()
+				return 0.35
+			end,
+			AttackRate = function()
+				return 1
+			end,
+			Damage = function(level)
+				return scaling(3, 0.5, level)
+			end,
+			HealthMax = function(level)
+				return scaling(14, 1, level)
+			end,
+		},
+	},
+
+	Crossbowman = {
+		Name = "Crossbowman",
+		Description = "An expert marskman weilding a powerful crossbow.",
+		ModelName = "Crossbowman",
+		Brain = {
+			Id = "BasicRanged",
+			ProjectileOffset = CFrame.new(0, 0.75, -2),
+			ProjectileName = "Arrow1",
+		},
+		Tags = { "Ranged" },
+		Animations = {
+			Idle = "HunterIdle",
+			Walk = "HunterWalk",
+			Attack = "HunterAttack",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Shoot = { "BowShoot1", "BowShoot2", "BowShoot3", "BowShoot4" },
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.55
+			end,
+			Speed = function()
+				return 0.05
+			end,
+			Range = function()
+				return 0.35
+			end,
+			AttackRate = function()
+				return 1.1
+			end,
+			Damage = function(level)
+				return scaling(9, 0.5, level)
+			end,
+			HealthMax = function(level)
+				return scaling(20, 1, level)
 			end,
 		},
 	},
