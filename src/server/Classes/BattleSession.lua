@@ -3,7 +3,9 @@ local ServerScriptService = game:GetService("ServerScriptService")
 
 local ActionService = require(ServerScriptService.Server.Services.ActionService)
 local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
+local BaseDefs = require(ReplicatedStorage.Shared.Defs.BaseDefs)
 local Battler = require(ServerScriptService.Server.Classes.Battler)
+local CosmeticService = require(ServerScriptService.Server.Services.CosmeticService)
 local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local DeckService = require(ServerScriptService.Server.Services.DeckService)
 local EventStream = require(ReplicatedStorage.Shared.Util.EventStream)
@@ -103,7 +105,10 @@ function BattleSession.promised(player: Player, position: number, direction: num
 			local deck = DeckService:GetDeckForBattle(player):expect()
 			if onCancel() then return end
 
-			local base = ReplicatedStorage.Assets.Models.Bases.Tower:Clone()
+			local baseId = CosmeticService:GetEquipped(player, "Bases"):expect()
+			if onCancel() then return end
+			local baseDef = BaseDefs[baseId]
+			local base = baseDef.Model:Clone()
 
 			resolve(BattleSession.new({
 				Player = player,

@@ -21,9 +21,12 @@ local RewardDisplayHelper = require(ReplicatedStorage.Shared.Util.RewardDisplayH
 local ScrollingFrame = require(ReplicatedStorage.Shared.React.Common.ScrollingFrame)
 local ShopDefs = require(ReplicatedStorage.Shared.Defs.ShopDefs)
 local Sift = require(ReplicatedStorage.Packages.Sift)
+local ProductController = require(ReplicatedStorage.Shared.Controllers.ProductController)
+local PromptWindow = require(ReplicatedStorage.Shared.React.Common.PromptWindow)
 local SystemWindow = require(ReplicatedStorage.Shared.React.Common.SystemWindow)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 local UseCheckPrice = require(ReplicatedStorage.Shared.React.Hooks.UseCheckPrice)
+local UseCosmetics = require(ReplicatedStorage.Shared.React.Hooks.UseCosmetics)
 local UseDeck = require(ReplicatedStorage.Shared.React.Hooks.UseDeck)
 local UseMotor = require(ReplicatedStorage.Shared.React.Hooks.UseMotor)
 local UseWallet = require(ReplicatedStorage.Shared.React.Hooks.UseWallet)
@@ -315,6 +318,67 @@ local function categoryButton(props: {
 	})
 end
 
+local function gemButton(props: {
+	ProductId: string,
+	Amount: number,
+	Price: number,
+})
+	return React.createElement(Button, {
+		ImageColor3 = ColorDefs.DarkPurple,
+		BorderColor3 = ColorDefs.LightPurple,
+		Padding = UDim.new(0, 10),
+
+		[React.Event.Activated] = function()
+			ProductController.PurchaseProduct(props.ProductId)
+		end,
+	}, {
+		Top = React.createElement(LayoutContainer, {
+			Padding = 2,
+			Size = UDim2.fromScale(1, 0.6),
+		}, {
+			Layout = React.createElement(ListLayout, {
+				FillDirection = Enum.FillDirection.Horizontal,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				Padding = UDim.new(0, 4),
+			}),
+
+			Icon = React.createElement(Image, {
+				Image = CurrencyDefs.Gems.Image,
+				Size = UDim2.fromScale(1, 1),
+				SizeConstraint = Enum.SizeConstraint.RelativeYY,
+				LayoutOrder = 1,
+			}),
+
+			Text = React.createElement(HeightText, {
+				LayoutOrder = 2,
+				Text = `{props.Amount}`,
+				AutomaticSize = Enum.AutomaticSize.X,
+				Size = UDim2.fromScale(0, 1)
+			})
+		}),
+
+		Bottom = React.createElement(LayoutContainer, {
+			Padding = 2,
+			Size = UDim2.fromScale(1, 0.4),
+			Position = UDim2.fromScale(0, 0.6),
+		}, {
+			Layout = React.createElement(ListLayout, {
+				FillDirection = Enum.FillDirection.Horizontal,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+			}),
+
+			Text = React.createElement(HeightText, {
+				LayoutOrder = 2,
+				Text = `\u{E002} {props.Price}`,
+				AutomaticSize = Enum.AutomaticSize.X,
+				Size = UDim2.fromScale(0, 1)
+			})
+		}),
+	})
+end
+
 return function(props: {
 	Visible: boolean,
 	Close: () -> (),
@@ -329,6 +393,7 @@ return function(props: {
 
 	local deck = UseDeck()
 	local weapons = UseWeapons()
+	local cosmetics = UseCosmetics()
 
 	return React.createElement(SystemWindow, {
 		Visible = props.Visible,
@@ -338,15 +403,45 @@ return function(props: {
 		Size = UDim2.fromScale(1.2, 0.8),
 		HeaderSize = 0.075,
 	}, {
+		ConfirmPrompt = React.createElement(PromptWindow, {
+			Visible = state == "Confirming",
+
+			HeaderText = TextStroke("Confirm Purchase"),
+			Text = TextStroke(`Are you sure you want to purchase {if selectedProduct ~= nil then RewardDisplayHelper.GetRewardText(selectedProduct.Reward, true) else ""}?`),
+			Options = {
+				{
+					Text = TextStroke("Yes"),
+					Select = function()
+						setState("Waiting")
+
+						GenericShopController.BuyProduct(shopId, selectedProduct.Index):andThen(function(success)
+							if success then
+								setReceivedReward(selectedProduct.Reward)
+								setState("Reception")
+							else
+								setState("Details")
+							end
+						end, function()
+							setState("Details")
+						end)
+					end,
+				},
+				{
+					Text = TextStroke("No"),
+					Select = function()
+						setState("Details")
+					end,
+				},
+			},
+			[React.Event.Activated] = function()
+				setState("Menu")
+			end,
+		}),
+
 		Reception = (state == "Reception") and React.createElement(productSuccess, {
 			Reward = receivedReward,
 			Close = function()
-				if receivedReward.Type == "Card" or receivedReward.Type == "Weapon" then
-					setState("Shop")
-				else
-					setState("Details")
-				end
-
+				setState("Shop")
 				setReceivedReward(nil)
 			end,
 		}),
@@ -358,18 +453,7 @@ return function(props: {
 				setState("Shop")
 			end,
 			Buy = function()
-				setState("Waiting")
-
-				GenericShopController.BuyProduct(shopId, selectedProduct.Index):andThen(function(success)
-					if success then
-						setReceivedReward(selectedProduct.Reward)
-						setState("Reception")
-					else
-						setState("Details")
-					end
-				end, function()
-					setState("Details")
-				end)
+				setState("Confirming")
 			end,
 		}),
 
@@ -402,9 +486,85 @@ return function(props: {
 					end,
 					Active = category ~= "Bases",
 				}),
+
+				Gems = React.createElement(categoryButton, {
+					Text = "Gems",
+					Color = ColorDefs.DarkPurple,
+					Activate = function()
+						setCategory("Gems")
+					end,
+					Active = category ~= "Gems",
+				}),
+			}),
+
+			Gems = React.createElement(Container, {
+				Visible = category == "Gems",
+				Size = UDim2.fromScale(0.7, 0.85),
+				Position = UDim2.fromScale(0.5, 0.15),
+				AnchorPoint = Vector2.new(0.5, 0),
+			}, {
+				Button50 = React.createElement(LayoutContainer, {
+					Padding = 6,
+					Size = UDim2.fromScale(0.5, 0.25),
+				}, {
+					Button = React.createElement(gemButton, {
+						Amount = 50,
+						Price = 50,
+						ProductId = "Gems50",
+					})
+				}),
+
+				Button110 = React.createElement(LayoutContainer, {
+					Padding = 6,
+					Size = UDim2.fromScale(0.5, 0.25),
+					Position = UDim2.fromScale(0.5, 0),
+				}, {
+					Button = React.createElement(gemButton, {
+						Amount = 110,
+						Price = 100,
+						ProductId = "Gems110",
+					})
+				}),
+
+				Button300 = React.createElement(LayoutContainer, {
+					Padding = 6,
+					Size = UDim2.fromScale(0.5, 0.35),
+					Position = UDim2.fromScale(0, 0.25),
+				}, {
+					Button = React.createElement(gemButton, {
+						Amount = 300,
+						Price = 250,
+						ProductId = "Gems300",
+					})
+				}),
+
+				Button650 = React.createElement(LayoutContainer, {
+					Padding = 6,
+					Size = UDim2.fromScale(0.5, 0.35),
+					Position = UDim2.fromScale(0.5, 0.25),
+				}, {
+					Button = React.createElement(gemButton, {
+						Amount = 650,
+						Price = 500,
+						ProductId = "Gems650",
+					})
+				}),
+
+				Button1400 = React.createElement(LayoutContainer, {
+					Padding = 6,
+					Size = UDim2.fromScale(1, 0.4),
+					Position = UDim2.fromScale(0, 0.6),
+				}, {
+					Button = React.createElement(gemButton, {
+						Amount = 1400,
+						Price = 1000,
+						ProductId = "Gems1400",
+					})
+				}),
 			}),
 
 			Products = React.createElement(ScrollingFrame, {
+				Visible = category ~= "Gems",
 				Size = UDim2.fromScale(1, 0.85),
 				Position = UDim2.fromScale(0, 0.15),
 				RenderLayout = function(setCanvasSize)
@@ -424,6 +584,11 @@ return function(props: {
 
 						if reward.Type == "Card" and DeckHelper.OwnsCard(deck, reward.CardId) then return end
 						if reward.Type == "Weapon" and WeaponHelper.OwnsWeapon(weapons, reward.WeaponId) then return end
+						if reward.Type == "Cosmetic" and cosmetics then
+							local cosmeticsCategory = cosmetics[reward.CategoryName]
+							local owned = cosmeticsCategory and cosmeticsCategory.Owned
+							if owned and owned[reward.Id] then return end
+						end
 
 						return React.createElement(LayoutContainer, {
 							Size = UDim2.fromScale(1, 0.16),

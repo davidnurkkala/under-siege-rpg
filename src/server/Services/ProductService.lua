@@ -1,16 +1,23 @@
 local MarketplaceService = game:GetService("MarketplaceService")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local ServerScriptService = game:GetService("ServerScriptService")
 
 local Comm = require(ReplicatedStorage.Packages.Comm)
+local DictionaryFind = require(ReplicatedStorage.Shared.Util.DictionaryFind)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local ProductDefs = require(ReplicatedStorage.Shared.Defs.ProductDefs)
 local ProductHelper = require(ReplicatedStorage.Shared.Util.ProductHelper)
 local Promise = require(ReplicatedStorage.Packages.Promise)
+local RewardHelper = require(ServerScriptService.Server.Util.RewardHelper)
+local Sift = require(ReplicatedStorage.Packages.Sift)
+local Signal = require(ReplicatedStorage.Packages.Signal)
 local t = require(ReplicatedStorage.Packages.t)
 
 local ProductService = {
 	Priority = 0,
+	ProductPurchaseCompleted = Signal.new(),
 }
 
 type ProductService = typeof(ProductService)
@@ -28,6 +35,12 @@ function ProductService.PrepareBlocking(self: ProductService)
 			MarketplaceService:PromptGamePassPurchase(player, def.AssetId)
 
 			return Promise.fromEvent(MarketplaceService.PromptGamePassPurchaseFinished):expect()
+		elseif def.Type == "DeveloperProduct" then
+			MarketplaceService:PromptProductPurchase(player, def.AssetId)
+
+			return Promise.fromEvent(self.ProductPurchaseCompleted, function(completingPlayer, completingId)
+				return completingPlayer == player and completingId == id
+			end):expect()
 		else
 			error(`Unimplemented product type {def.Type}`)
 		end
@@ -59,6 +72,25 @@ function ProductService.PrepareBlocking(self: ProductService)
 			promise:cancel()
 		end
 	end)
+
+	MarketplaceService.ProcessReceipt = function(receipt)
+		local player = Players:GetPlayerByUserId(receipt.PlayerId)
+		local assetId = receipt.ProductId
+
+		local def = DictionaryFind(ProductDefs, function(productDef)
+			return productDef.AssetId == assetId
+		end)
+
+		if not def then return Enum.ProductPurchaseDecision.NotProcessedYet end
+
+		Promise.all(Sift.Array.map(def.Rewards, function(reward)
+			return RewardHelper.GiveReward(player, reward)
+		end)):expect()
+
+		self.ProductPurchaseCompleted:Fire(player, def.Id)
+
+		return Enum.ProductPurchaseDecision.PurchaseGranted
+	end
 end
 
 function ProductService.GetVipBoostedSecondary(self: ProductService, player: Player, amount: number)
