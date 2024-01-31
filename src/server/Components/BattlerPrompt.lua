@@ -51,6 +51,11 @@ function BattlerPrompt.new(model: Model): BattlerPrompt
 	end)
 	prompt.Parent = self.Model.PrimaryPart
 
+	if not model:HasTag("OverheadLabeled") then
+		model:SetAttribute("OverheadLabel", self.Def.Name)
+		model:AddTag("OverheadLabeled")
+	end
+
 	return self
 end
 

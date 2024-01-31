@@ -35,13 +35,18 @@ function BattleHelper.FadeToBattle(player, battlerId, defaultCFrame)
 			return Promise.fromEvent(battle.Finished):andThenReturn(battle)
 		end)
 		:andThen(function(battle)
+			local playerWon = battle:GetVictor().CharModel == player.Character
+
 			return ServerFade(player, nil, function()
 				battle:Destroy()
 
-				return restoreSession()
+				return restoreSession():andThenReturn(playerWon)
 			end)
 		end)
-		:catch(restoreSession)
+		:catch(function()
+			restoreSession()
+			return false
+		end)
 end
 
 return BattleHelper

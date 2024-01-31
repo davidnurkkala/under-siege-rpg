@@ -22,7 +22,10 @@ return function(props: {
 		Description = React.createElement(Label, {
 			Size = UDim2.fromScale(1, 0.7),
 			Text = TextStroke(
-				`• Special {TextColor("chat tag", ColorDefs.PaleGreen)}\n• Premium {TextColor("dummy", ColorDefs.PaleRed)} (25% more)\n• 10% more {TextColor("gold", ColorDefs.PaleYellow)}\n• <i>Double</i> {TextColor("crit", ColorDefs.Red)} charge speed`
+				`• Special {TextColor("chat tag", ColorDefs.PaleGreen)}\n• 10% more {TextColor("coins", ColorDefs.PaleYellow)}\n• 25% higher {TextColor(
+					"luck",
+					ColorDefs.Green
+				)} on loot rolls`
 			),
 			TextXAlignment = Enum.TextXAlignment.Left,
 		}),

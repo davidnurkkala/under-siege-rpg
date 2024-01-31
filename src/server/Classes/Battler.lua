@@ -20,6 +20,7 @@ local Signal = require(ReplicatedStorage.Packages.Signal)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local WeaponDefs = require(ReplicatedStorage.Shared.Defs.WeaponDefs)
 local WeaponHelper = require(ReplicatedStorage.Shared.Util.WeaponHelper)
+local WeaponTypeDefs = require(ReplicatedStorage.Shared.Defs.WeaponTypeDefs)
 
 local Battler = {}
 Battler.__index = Battler
@@ -34,6 +35,7 @@ export type Battler = typeof(setmetatable(
 		WeaponModel: Model,
 		WeaponDef: any,
 		Destroyed: any,
+		WillDealDamage: any,
 		Battle: any?,
 		TeamId: string,
 		Active: boolean,
@@ -62,9 +64,10 @@ function Battler.new(args: {
 }): Battler
 	local trove = Trove.new()
 
-	local weaponModel = trove:Add(WeaponHelper.attachModel(args.WeaponDef, args.CharModel, args.WeaponHoldPart))
+	local weaponModel = trove:Add(WeaponHelper.AttachModel(args.WeaponDef, args.CharModel, args.WeaponHoldPart))
 
-	local attackDamage = 10
+	local weaponType = args.WeaponDef.WeaponType
+	local weaponTypeDef = WeaponTypeDefs[weaponType]
 
 	local self: Battler = setmetatable({
 		Health = Health.new(args.HealthMax),
@@ -78,10 +81,11 @@ function Battler.new(args: {
 		Animator = args.Animator,
 		Destroyed = Signal.new(),
 		Changed = Signal.new(),
+		WillDealDamage = Signal.new(),
 		Active = true,
 		AttackCooldown = Cooldown.new(5),
 		Trove = trove,
-		AttackDamage = attackDamage,
+		AttackDamage = weaponTypeDef.Damage,
 		Deck = args.Deck,
 		DeckCooldowns = Sift.Dictionary.map(args.Deck, function(_, cardId)
 			local def = CardDefs[cardId]
@@ -129,6 +133,16 @@ function Battler.new(args: {
 		end
 	end))
 
+	if weaponType == "Magic" then
+		self.WillDealDamage:Connect(function(damage)
+			if damage.Target:HasTag("Armored") then
+				damage.Amount *= 1.1
+			else
+				damage.Amount *= 0.95
+			end
+		end)
+	end
+
 	return self
 end
 
@@ -171,7 +185,13 @@ function Battler.Is(object)
 end
 
 function Battler.HasTag(self: Battler, tagId: string)
-	return tagId == "Ranged"
+	local weaponType = self.WeaponDef.WeaponType
+
+	if weaponType == "Magic" or weaponType == "Crossbow" then
+		return false
+	else
+		return tagId == "Ranged"
+	end
 end
 
 function Battler.GetCooldowns(self: Battler)

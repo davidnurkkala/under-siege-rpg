@@ -8,6 +8,7 @@ local CurrencyHelper = require(ReplicatedStorage.Shared.Util.CurrencyHelper)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local EventStream = require(ReplicatedStorage.Shared.Util.EventStream)
 local Observers = require(ReplicatedStorage.Packages.Observers)
+local ProductHelper = require(ReplicatedStorage.Shared.Util.ProductHelper)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 
 local CurrencyService = {
@@ -71,6 +72,10 @@ function CurrencyService.GetBoosted(_self: CurrencyService, player: Player, curr
 	return BoostService:GetMultiplier(player, function(boost)
 		return (boost.Type == "Currency") and (boost.CurrencyType == currencyType)
 	end):andThen(function(multiplier)
+		if (currencyType == "Coins") and ProductHelper.IsVip(player) then
+			multiplier += 0.1
+		end
+
 		return amount * multiplier
 	end)
 end

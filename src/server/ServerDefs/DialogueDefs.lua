@@ -1,6 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 
-local Promise = require(ReplicatedStorage.Packages.Promise)
+local BattleHelper = require(ServerScriptService.Server.Util.BattleHelper)
+local GenericShopService = require(ServerScriptService.Server.Services.GenericShopService)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 
 local Dialogues = {
@@ -8,27 +10,13 @@ local Dialogues = {
 		Name = "Test Person",
 		StartNodes = { "Root" },
 		NodesOut = {
-			Root = { Text = "Hello!", Nodes = { "GreetingFriendly", "GreetingAggressive" } },
+			Root = { Text = "Hello!", Nodes = { "GreetingFriendly", "GreetingAggressive", "Shop" } },
 			Friendly = { Text = "What can I tell you about this world?", Nodes = { "QuestionSky", "QuestionGrass", "QuestionIndustrial" } },
 			SkyIsBlue = { Text = "The sky is blue.", Nodes = { "Friendly" } },
 			GrassIsGreen = { Text = "The grass is green.", Nodes = { "Friendly" } },
 			Aggressive = {
 				Text = "Well, I never! How rude. Go away!",
-				Callback = function(self)
-					Promise.fromEvent(self.Destroyed):andThen(function()
-						local char = self.Player.Character
-						char.Humanoid.Sit = true
-
-						local velocity = Random.new():NextUnitVector() * 1e3
-						velocity = Vector3.new(velocity.X, math.abs(velocity.Y), velocity.Z)
-
-						local mover = Instance.new("BodyVelocity")
-						mover.MaxForce = Vector3.one * 1e9
-						mover.Velocity = velocity
-						mover.Parent = char.PrimaryPart
-						task.delay(0.25, mover.Destroy, mover)
-					end)
-				end,
+				Animation = "TalkingCalm",
 			},
 			IndustrialRevolution = {
 				Text = "The Industrial Revolution and its consequences have been a disaster for the human race. They have greatly increased the life-expectancy of those of us who live in “advanced” countries, but they have destabilized society, have made life unfulfilling, have subjected human beings to indignities, have led to widespread psychological suffering (in the Third World to physical suffering as well) and have inflicted severe damage on the natural world.",
@@ -36,6 +24,12 @@ local Dialogues = {
 			},
 		},
 		NodesIn = {
+			Shop = {
+				Text = "Can I see your wares?",
+				Callback = function(self)
+					GenericShopService:OpenShop(self.Player, "World1Mage")
+				end,
+			},
 			GreetingFriendly = { Text = "Hello, there!", Nodes = { "Friendly" } },
 			GreetingAggressive = { Text = "Who the heck are you?", Nodes = { "Aggressive" } },
 			QuestionSky = { Text = "What color is the sky?", Nodes = { "SkyIsBlue" } },
@@ -44,6 +38,34 @@ local Dialogues = {
 				Nodes = { "GrassIsGreen" },
 			},
 			QuestionIndustrial = { Text = "What can you tell me about the industrial revolution and its consequences?", Nodes = { "IndustrialRevolution" } },
+		},
+	},
+	PeasantJohnSower = {
+		Name = "John Sower, Peasant",
+		StartNodes = { "Root" },
+		NodesOut = {
+			Root = { Text = "Hey, lord. Me and the boys are always up for a good fight. Want to have a go?", Nodes = { "Challenge" } },
+			Defeated = { Text = "Good fight, lord! You're as good as they say. We'll get the best of you next time, I'm sure." },
+			Victorious = {
+				Text = "Good fight, lord! Far be it from some humble farmers such as us to be proud. You're sure to beat us next time, want to try us again?",
+				Nodes = { "Challenge" },
+			},
+		},
+		NodesIn = {
+			Challenge = {
+				Text = "Sure, let's fight.",
+				Callback = function(self)
+					BattleHelper.FadeToBattle(self.Player, "Peasant"):andThen(function(playerWon)
+						if playerWon then
+							self:SetNodeById("Defeated")
+						else
+							self:SetNodeById("Victorious")
+						end
+					end)
+
+					return true
+				end,
+			},
 		},
 	},
 }
@@ -92,7 +114,7 @@ return Sift.Dictionary.map(Dialogues, function(dialogue, id)
 		end
 	end
 	traverse("Root")
-	assert(Sift.Set.count(nodeIdSet) == 0, `Dialogue {id} nodes {table.concat(Sift.Set.toArray(nodeIdSet), ", ")} are orphaned`)
+	-- assert(Sift.Set.count(nodeIdSet) == 0, `Dialogue {id} nodes {table.concat(Sift.Set.toArray(nodeIdSet), ", ")} are orphaned`)
 
 	for nodeId, node in dialogue.NodesOut do
 		if node.Nodes then

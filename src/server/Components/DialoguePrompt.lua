@@ -3,6 +3,7 @@ local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local DialogueService = require(ServerScriptService.Server.Services.DialogueService)
+local LobbySessions = require(ServerScriptService.Server.Singletons.LobbySessions)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
@@ -41,13 +42,27 @@ function DialoguePrompt.new(model: Model): DialoguePrompt
 		local dialogue = DialogueService:StartDialogue(player, self.Id)
 		if not dialogue then return end
 
+		dialogue:SetModel(self.Model)
+
 		prompt.Enabled = false
+
+		local timeAway = 0
 
 		Promise.race({
 			Promise.fromEvent(dialogue.Destroyed),
-			Promise.fromEvent(RunService.Heartbeat, function()
+			Promise.fromEvent(RunService.Heartbeat, function(dt)
+				local inLobby = LobbySessions.Get(player) ~= nil
+
 				local cframe = model:GetBoundingBox()
-				return player:DistanceFromCharacter(cframe.Position) > prompt.MaxActivationDistance
+				local inRange = player:DistanceFromCharacter(cframe.Position) < prompt.MaxActivationDistance
+
+				if inRange or not inLobby then
+					timeAway = 0
+					return false
+				else
+					timeAway += dt
+					return timeAway > 1
+				end
 			end):andThen(function()
 				dialogue:Destroy()
 			end),

@@ -1,6 +1,6 @@
 local WeaponHelper = {}
 
-function WeaponHelper.attachModel(def: any, parent: Instance, holdPart: BasePart)
+function WeaponHelper.AttachModel(def: any, parent: Instance, holdPart: BasePart)
 	local model = def.Model:Clone()
 	local part1 = model.Weapon
 	local part0 = holdPart
@@ -10,6 +10,13 @@ function WeaponHelper.attachModel(def: any, parent: Instance, holdPart: BasePart
 	model.Parent = parent
 
 	return model
+end
+
+function WeaponHelper.OwnsWeapon(weapons: any, weaponId: string)
+	if not weapons then return false end
+	if not weapons.Owned then return false end
+
+	return weapons.Owned[weaponId]
 end
 
 return WeaponHelper

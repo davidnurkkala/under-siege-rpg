@@ -1,14 +1,13 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Sift = require(ReplicatedStorage.Packages.Sift)
+local WeaponTypeDefs = require(ReplicatedStorage.Shared.Defs.WeaponTypeDefs)
 
 local Weapons = {
-	-- world 1
 	WoodenBow = {
 		Name = "Wooden Bow",
-		Power = 1,
-		Price = 0,
-		AttackCooldownTime = 0.4,
+		WeaponType = "Bow",
+		Description = "A simple wooden bow.",
 		HoldPartName = "LeftHand",
 		ProjectileName = "Arrow1",
 		Animations = {
@@ -22,9 +21,8 @@ local Weapons = {
 	},
 	HuntersBow = {
 		Name = "Hunter's Bow",
-		Power = 10.5,
-		Price = 300,
-		AttackCooldownTime = 0.4,
+		WeaponType = "Bow",
+		Description = "A somewhat honed bow favored by hunters for its light weight and accuracy.",
 		HoldPartName = "LeftHand",
 		ProjectileName = "Arrow1",
 		Animations = {
@@ -38,9 +36,8 @@ local Weapons = {
 	},
 	Crossbow = {
 		Name = "Crossbow",
-		Power = 35.9,
-		Price = 6600,
-		AttackCooldownTime = 0.4,
+		WeaponType = "Crossbow",
+		Description = "A simple crossbow with basic mechanisms.",
 		HoldPartName = "RightHand",
 		ProjectileName = "Arrow1",
 		Animations = {
@@ -54,9 +51,8 @@ local Weapons = {
 	},
 	SimpleWand = {
 		Name = "Apprentice Wand",
-		Power = 85.3,
-		Price = 38900,
-		AttackCooldownTime = 0.4,
+		WeaponType = "Magic",
+		Description = "One of the simplest implements one can use to cast magic.",
 		HoldPartName = "RightHand",
 		ProjectileName = "MagicStar1",
 		Animations = {
@@ -68,13 +64,10 @@ local Weapons = {
 			Hit = { "MagicImpact1", "MagicImpact2", "MagicImpact3" },
 		},
 	},
-
-	-- world 2
 	RecurveBow = {
 		Name = "Recurve Bow",
-		Power = 166.6,
-		Price = 141200,
-		AttackCooldownTime = 0.4,
+		WeaponType = "Bow",
+		Description = "A somewhat rare, compact bow with a peculiar shape. Powerful despite its smaller size.",
 		HoldPartName = "LeftHand",
 		ProjectileName = "Arrow1",
 		Animations = {
@@ -88,9 +81,8 @@ local Weapons = {
 	},
 	BluesteelCrossbow = {
 		Name = "Bluesteel Crossbow",
-		Power = 287.9,
-		Price = 391100,
-		AttackCooldownTime = 0.4,
+		WeaponType = "Crossbow",
+		Description = "A crossbow incorporating the Vikings' infamous bluesteel. It is a ferocious weapon.",
 		HoldPartName = "RightHand",
 		ProjectileName = "Arrow1",
 		Animations = {
@@ -104,9 +96,8 @@ local Weapons = {
 	},
 	ReinforcedBow = {
 		Name = "Reinforced Bow",
-		Power = 457.3,
-		Price = 909400,
-		AttackCooldownTime = 0.4,
+		WeaponType = "Bow",
+		Description = "A bow laden with metal reinforcements. It takes tremendous strength to draw, and only trained soldiers dare try.",
 		HoldPartName = "LeftHand",
 		ProjectileName = "Arrow1",
 		Animations = {
@@ -120,9 +111,8 @@ local Weapons = {
 	},
 	RoughwoodStaff = {
 		Name = "Roughwood Staff",
-		Power = 682.6,
-		Price = 1869700,
-		AttackCooldownTime = 0.4,
+		WeaponType = "Magic",
+		Description = "A staff suffused with the natural magic of the elves. A powerful magical tool.",
 		HoldPartName = "RightHand",
 		ProjectileName = "MagicStar1",
 		Animations = {
@@ -134,13 +124,10 @@ local Weapons = {
 			Hit = { "MagicImpact1", "MagicImpact2", "MagicImpact3" },
 		},
 	},
-
-	-- world 3
 	ElvenBow = {
 		Name = "Elven Bow",
-		Power = 972,
-		Price = 3508000,
-		AttackCooldownTime = 0.4,
+		WeaponType = "Bow",
+		Description = "An unbelievably perfect wooden bow. Some say the elves grow wood into the exact shape using magic, never putting knife to bark, but the truth is a closely guarded secret.",
 		HoldPartName = "LeftHand",
 		ProjectileName = "Arrow1",
 		Animations = {
@@ -154,9 +141,8 @@ local Weapons = {
 	},
 	FairyBow = {
 		Name = "Fairy Bow",
-		Power = 1333.3,
-		Price = 6132300,
-		AttackCooldownTime = 0.4,
+		WeaponType = "Bow",
+		Description = "An elven bow that has been enhanced with fairy magic. Mysterious creatures, fairies seem to have no rhyme or reason for their behavior, and this bow is just one of many examples of their mischief.",
 		HoldPartName = "LeftHand",
 		ProjectileName = "Arrow1",
 		Animations = {
@@ -170,9 +156,8 @@ local Weapons = {
 	},
 	WillowCrossbow = {
 		Name = "Willow Crossbow",
-		Power = 1774.6,
-		Price = 10132200,
-		AttackCooldownTime = 0.4,
+		WeaponType = "Crossbow",
+		Description = "A simple crossbow crafted carefully from a limb of willow. It is finely crafted and meticulously balanced.",
 		HoldPartName = "RightHand",
 		ProjectileName = "Arrow1",
 		Animations = {
@@ -186,9 +171,8 @@ local Weapons = {
 	},
 	ArcaneRod = {
 		Name = "Arcane Rod",
-		Power = 2304,
-		Price = 15988500,
-		AttackCooldownTime = 0.4,
+		WeaponType = "Magic",
+		Description = "An immaculate enchanted rod brimming with arcane power.",
 		HoldPartName = "RightHand",
 		ProjectileName = "MagicStar2",
 		Animations = {
@@ -200,13 +184,10 @@ local Weapons = {
 			Hit = { "MagicImpact1", "MagicImpact2", "MagicImpact3" },
 		},
 	},
-
-	-- world 4
 	ThrowingKnife = {
 		Name = "Throwing Knife",
-		Power = 2929.3,
-		Price = 24282800,
-		AttackCooldownTime = 0.4,
+		WeaponType = "Thrown",
+		Description = "A devious weapon that's tricky to use well. Favored by ne'er-do-wells that prefer to keep their weapons hidden from view.",
 		HoldPartName = "RightHand",
 		ProjectileName = "ThrowingKnife",
 		Animations = {
@@ -220,9 +201,8 @@ local Weapons = {
 	},
 	Javelin = {
 		Name = "Javelin",
-		Power = 3658.6,
-		Price = 35707100,
-		AttackCooldownTime = 0.4,
+		WeaponType = "Thrown",
+		Description = "Javelins are among the oldest ranged weapons in history, and the simplicity and power of these thrown spears is not to be underestimated.",
 		HoldPartName = "RightHand",
 		ProjectileName = "Javelin1",
 		Animations = {
@@ -236,9 +216,8 @@ local Weapons = {
 	},
 	CrudeThrownAxe = {
 		Name = "Crude Throwing Axe",
-		Power = 4500,
-		Price = 51073400,
-		AttackCooldownTime = 0.4,
+		WeaponType = "Thrown",
+		Description = "A cruel stone axe of orcish design. They're mass-produced by orcish peons and deployed en masse by their fearsome horde.",
 		HoldPartName = "RightHand",
 		ProjectileName = "ThrownAxeCrude",
 		Animations = {
@@ -250,11 +229,10 @@ local Weapons = {
 			Hit = { "MediumProjectileImpact1", "MediumProjectileImpact2", "MediumProjectileImpact3", "MediumProjectileImpact4" },
 		},
 	},
-	SpellBook = {
-		Name = "Spell Book",
-		Power = 5461.3,
-		Price = 71323300,
-		AttackCooldownTime = 0.6,
+	OrcishGrimoire = {
+		Name = "Orcish Grimoire",
+		WeaponType = "Magic",
+		Description = "The grimoire of an orcish warlock, filled with scratched runes that emanate malice.",
 		HoldPartName = "RightHand",
 		ProjectileName = "MagicStar2",
 		Animations = {
@@ -271,6 +249,8 @@ local Weapons = {
 return Sift.Dictionary.map(Weapons, function(def, id)
 	local model = ReplicatedStorage.Assets.Weapons:FindFirstChild(id)
 	assert(model, `Missing model for weapon {id}`)
+
+	assert(WeaponTypeDefs[def.WeaponType], `Bad or missing weapon type for weapon {id}`)
 
 	return Sift.Dictionary.merge(def, {
 		Id = id,

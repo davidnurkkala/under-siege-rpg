@@ -2,13 +2,16 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local Animate = require(ReplicatedStorage.Shared.Util.Animate)
+local BattleController = require(ReplicatedStorage.Shared.Controllers.BattleController)
 local Button = require(ReplicatedStorage.Shared.React.Common.Button)
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local DialogueController = require(ReplicatedStorage.Shared.Controllers.DialogueController)
 local Flipper = require(ReplicatedStorage.Packages.Flipper)
+local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local Lerp = require(ReplicatedStorage.Shared.Util.Lerp)
 local ListLayout = require(ReplicatedStorage.Shared.React.Common.ListLayout)
+local MenuContext = require(ReplicatedStorage.Shared.React.MenuContext.MenuContext)
 local PaddingAll = require(ReplicatedStorage.Shared.React.Common.PaddingAll)
 local Panel = require(ReplicatedStorage.Shared.React.Common.Panel)
 local Promise = require(ReplicatedStorage.Packages.Promise)
@@ -18,6 +21,7 @@ local React = require(ReplicatedStorage.Packages.React)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 local UseMotor = require(ReplicatedStorage.Shared.React.Hooks.UseMotor)
+local UseProperty = require(ReplicatedStorage.Shared.React.Hooks.UseProperty)
 
 local function outputText(props: {
 	Text: string,
@@ -106,6 +110,8 @@ local function inputButton(props: {
 end
 
 return function()
+	local inBattle = UseProperty(BattleController.InBattle)
+	local menu = React.useContext(MenuContext)
 	local active, setActive = React.useState(false)
 	local dialogue, setDialogue = React.useState(nil)
 	local inputsVisible, setInputsVisible = React.useState(false)
@@ -118,6 +124,10 @@ return function()
 			setInputsVisible(false)
 		end)
 	end, {})
+
+	React.useEffect(function()
+		menu.SetInDialogue(dialogue ~= nil)
+	end, { menu, dialogue })
 
 	React.useEffect(function()
 		if active then
@@ -139,6 +149,7 @@ return function()
 
 	return (dialogue ~= nil)
 		and React.createElement(Container, {
+			Visible = not inBattle,
 			Size = UDim2.fromScale(0.5, 1),
 			AnchorPoint = Vector2.new(0.5, 1),
 			Position = slide:map(function(value)
@@ -149,6 +160,14 @@ return function()
 				Padding = UDim.new(0, 2),
 				HorizontalAlignment = Enum.HorizontalAlignment.Center,
 				VerticalAlignment = Enum.VerticalAlignment.Bottom,
+			}),
+
+			Name = React.createElement(Label, {
+				Size = UDim2.fromScale(1, 0.05),
+				SizeConstraint = Enum.SizeConstraint.RelativeXX,
+				Text = TextStroke(dialogue.Name),
+				TextXAlignment = Enum.TextXAlignment.Left,
+				LayoutOrder = 0,
 			}),
 
 			Message = React.createElement(Container, {

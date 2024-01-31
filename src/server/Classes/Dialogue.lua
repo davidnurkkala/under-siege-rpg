@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
 local DialogueDefs = require(ServerScriptService.Server.ServerDefs.DialogueDefs)
 local PlayerLeaving = require(ReplicatedStorage.Shared.Util.PlayerLeaving)
 local Promise = require(ReplicatedStorage.Packages.Promise)
@@ -14,6 +15,7 @@ Dialogue.__index = Dialogue
 
 type Node = {
 	Text: string,
+	Animation: string?,
 	Nodes: { string },
 	Conditions: { (Dialogue) -> boolean }?,
 	Callback: ((Dialogue) -> boolean)?,
@@ -31,6 +33,9 @@ export type Dialogue = typeof(setmetatable(
 		Node: Node,
 		Destroyed: any,
 		Trove: any,
+
+		Model: Model?,
+		Animator: Animator.Animator?,
 	},
 	Dialogue
 ))
@@ -66,8 +71,32 @@ function Dialogue.new(player: Player, dialogueId: string): Dialogue
 	return self
 end
 
+function Dialogue.SetModel(self: Dialogue, model: Model)
+	assert(self.Model == nil, `Cannot set model multiple times`)
+
+	self.Model = model
+
+	local controller = model:FindFirstChildWhichIsA("AnimationController") or model:FindFirstChildWhichIsA("Humanoid")
+	if not controller then return end
+
+	self.Animator = self.Trove:Construct(Animator, controller)
+end
+
+function Dialogue.WithAnimator(self: Dialogue, callback: (Animator.Animator) -> ())
+	if self.Animator ~= nil then callback(self.Animator) end
+end
+
+function Dialogue.SetNodeById(self: Dialogue, nodeId: string)
+	self:SetNode(self.Def.NodesOut[nodeId])
+end
+
 function Dialogue.SetNode(self: Dialogue, node: Node)
 	if self.Node == node then return end
+
+	self:WithAnimator(function(animator)
+		animator:StopHardAll()
+		if node.Animation then animator:Play(node.Animation) end
+	end)
 
 	Promise.try(function()
 		if node.Callback then
@@ -106,6 +135,7 @@ function Dialogue.SetNode(self: Dialogue, node: Node)
 			end
 
 			self.State:Set({
+				Name = self.Def.Name,
 				Node = node,
 				Inputs = inputs,
 			})

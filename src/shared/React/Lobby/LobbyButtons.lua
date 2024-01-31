@@ -319,6 +319,16 @@ return function(props)
 					end,
 					[React.Event.SelectionGained] = onButtonSelectedCallback,
 				}),
+				GearButton = React.createElement(lobbyButton, {
+					LayoutOrder = 10,
+					Text = TextStroke("Gear"),
+					Color = ColorDefs.DarkGreen,
+					Image = "rbxassetid://16179407400",
+					Activate = function()
+						menu.Set("Gear")
+						return Promise.resolve()
+					end,
+				}),
 			}),
 
 			GamepadHint = React.createElement(RoundButtonWithImage, {
