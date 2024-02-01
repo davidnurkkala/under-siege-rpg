@@ -82,3 +82,53 @@ for _, name in fs.readDir("LightingExports") do
 
 	fs.writeFile(`Assets/Lightings/{name}`, roblox.serializeModel({ configuration }))
 end
+
+do
+	local directory = `Assets/Worlds`
+
+	local worlds = {}
+	local nodes = {}
+
+	for _, name in fs.readDir(directory) do
+		local filePath = `{directory}/{name}`
+		if fs.isFile(filePath) then
+			local model = roblox.deserializeModel(fs.readFile(filePath))[1]
+
+			for _, object in model:GetDescendants() do
+				if object:HasTag("ResourceNode") then table.insert(nodes, object) end
+			end
+
+			table.insert(worlds, {
+				Model = model,
+				Save = function()
+					fs.writeFile(filePath, roblox.serializeModel({ model }))
+				end,
+			})
+		end
+	end
+
+	local usedIndices = {}
+
+	for index = #nodes, 1, -1 do
+		local node = nodes[index]
+		local nodeIndex = node:GetAttribute("NodeIndex")
+		if nodeIndex and not usedIndices[nodeIndex] then
+			usedIndices[nodeIndex] = true
+			table.remove(nodes, index)
+		end
+	end
+
+	for _, node in nodes do
+		local index = 1
+		while usedIndices[index] do
+			index += 1
+		end
+		usedIndices[index] = true
+
+		node:SetAttribute("NodeIndex", index)
+	end
+
+	for _, world in worlds do
+		world.Save()
+	end
+end
