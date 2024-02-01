@@ -1167,6 +1167,129 @@ local Goons = {
 			end,
 		},
 	},
+
+	UndeadWarrior = {
+		Name = "UndeadWarrior",
+		Description = `What remains of a knight who has long since passed.`,
+		ModelName = "UndeadWarrior",
+		Brain = {
+			Id = "BasicMelee",
+		},
+		Tags = { "Armored" },
+		Animations = {
+			Walk = "DraugrWalk",
+			Attack = "DraugrAttack",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.43
+			end,
+			Speed = function()
+				return 0.1
+			end,
+			Range = function()
+				return 0.1
+			end,
+			AttackRate = function()
+				return 1.25
+			end,
+			Damage = function(level)
+				return scaling(1.7, 0.5, level)
+			end,
+			HealthMax = function(level)
+				return scaling(76, 2, level)
+			end,
+		},
+	},
+
+	Cultist = {
+		Name = "Cultist",
+		Description = `A fanatic worshiper of the dark arts, bound to his masters will.`,
+		ModelName = "Cultist",
+		Brain = {
+			Id = "BasicRanged",
+			ProjectileOffset = CFrame.new(0, 0.75, -0.25),
+			ProjectileName = "MagicStar1",
+		},
+		Tags = { "Ranged" },
+		Animations = {
+			Walk = "MageWalk",
+			Attack = "MasterMageAttack",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Shoot = { "WandCast1", "WandCast2", "WandCast3" },
+			Hit = { "MagicImpact1", "MagicImpact2", "MagicImpact3" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.12
+			end,
+			Speed = function()
+				return 0.1
+			end,
+			Range = function()
+				return 0.5
+			end,
+			AttackRate = function()
+				return 1.7
+			end,
+			Damage = function(level)
+				return scaling(3, 0.5, level)
+			end,
+			HealthMax = function(level)
+				return scaling(9, 2, level)
+			end,
+		},
+	},
+
+	FrostGiant = {
+		Name = "Frost Giant",
+		Description = `Dwelling high in the mountains, the world trembles in the wake of these massive titans.`,
+		ModelName = "FrostGiant",
+		Brain = {
+			Id = "BasicMelee",
+		},
+		Tags = { "Armored", "Brutal" },
+		Animations = {
+			Walk = "DraugrWalk",
+			Attack = "DraugrAttack",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Stats = {
+			Size = 0.04,
+			AttackWindupTime = function()
+				return 0.43
+			end,
+			Speed = function()
+				return 0.05
+			end,
+			Range = function()
+				return 0.1
+			end,
+			AttackRate = function()
+				return 2
+			end,
+			Damage = function(level)
+				return scaling(7, 0.7, level)
+			end,
+			HealthMax = function(level)
+				return scaling(25, 2, level)
+			end,
+		},
+	},
 }
 
 return Sift.Dictionary.map(Goons, function(goon, id)

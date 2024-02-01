@@ -124,6 +124,23 @@ local Battlers = {
 			Id = "WeightedCost",
 		},
 	},
+
+	CultLeader = {
+		Name = "Cult Leader",
+		BattlegroundName = "World1",
+		BaseId = "Grim",
+		Reward = 500,
+		WeaponId = "Crossbow",
+		Deck = {
+			Peasant = 1,
+			Recruit = 1,
+			Hunter = 1,
+			Recruitment = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
+		},
+	},
 	VikingSailor = {
 		Name = "Viking Sailor",
 		BattlegroundName = "World1",
