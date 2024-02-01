@@ -88,6 +88,9 @@ function DataService.PrepareBlocking(self: DataService)
 			function(oldData)
 				return Sift.Dictionary.set(oldData, "Cosmetics", self.DefaultData.Cosmetics)
 			end,
+			function(oldData)
+				return Sift.Dictionary.removeKey(oldData, "ResourceNodeStates")
+			end,
 		},
 	})
 
