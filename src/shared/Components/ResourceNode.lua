@@ -1,11 +1,8 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local FormatTime = require(ReplicatedStorage.Shared.Util.FormatTime)
-local Property = require(ReplicatedStorage.Shared.Classes.Property)
 local ResourceNodeController = require(ReplicatedStorage.Shared.Controllers.ResourceNodeController)
 local ResourceNodeDefs = require(ReplicatedStorage.Shared.Defs.ResourceNodeDefs)
-local Timestamp = require(ReplicatedStorage.Shared.Util.Timestamp)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
 local ResourceNode = {}
@@ -18,8 +15,7 @@ function ResourceNode.new(model: Model): ResourceNode
 	assert(nodeType, `No node type on ResourceNode {model:GetFullName()}`)
 
 	local nodeIndex = model:GetAttribute("NodeIndex")
-	print(typeof(nodeIndex))
-	assert(nodeIndex, `ResourceNode {model:GetFullName()} has no NodeIndex (how?)`)
+	assert(nodeIndex, `ResourceNode {model:GetFullName()} has no NodeIndex (you must rebuild)`)
 	local indexString = tostring(nodeIndex)
 
 	local def = ResourceNodeDefs[nodeType]
@@ -36,7 +32,12 @@ function ResourceNode.new(model: Model): ResourceNode
 	prompt.Triggered:Connect(function(player)
 		if player ~= Players.LocalPlayer then return end
 
-		ResourceNodeController.UseNode(nodeIndex)
+		prompt.Enabled = false
+		ResourceNodeController.UseNode(nodeIndex):andThen(function(success)
+			if not success then prompt.Enabled = true end
+		end, function()
+			prompt.Enabled = true
+		end)
 	end)
 	prompt.Parent = model.PrimaryPart
 
@@ -48,11 +49,11 @@ function ResourceNode.new(model: Model): ResourceNode
 		def.VisualCallback(model, exhausted)
 
 		if exhausted then
-			model:SetAttribute("OverheadLabel", FormatTime(timestamp - Timestamp()))
-			if not model:HasTag("OverheadLabeled") then model:AddTag("OverheadLabeled") end
-		elseif model:HasTag("OverheadLabeled") then
-			model:RemoveTag("OverheadLabeled")
-			model:SetAttribute("OverheadLabel", nil)
+			model:SetAttribute("RegenTimestamp", timestamp)
+			if not model:HasTag("RegenTimestamped") then model:AddTag("RegenTimestamped") end
+		elseif model:HasTag("RegenTimestamped") then
+			model:RemoveTag("RegenTimestamped")
+			model:SetAttribute("RegenTimestamp", nil)
 		end
 	end))
 

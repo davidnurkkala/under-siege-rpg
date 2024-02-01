@@ -19,6 +19,7 @@ local PaddingAll = require(ReplicatedStorage.Shared.React.Common.PaddingAll)
 local PlatformProvider = require(ReplicatedStorage.Shared.React.PlatformContext.PlatformProvider)
 local PremiumShopMenuBridge = require(ReplicatedStorage.Shared.React.Menus.PremiumShopMenuBridge)
 local React = require(ReplicatedStorage.Packages.React)
+local RegenTimestampedBridge = require(ReplicatedStorage.Shared.React.RegenTimestampedBridge)
 local SessionRewardsMenuBridge = require(ReplicatedStorage.Shared.React.Menus.SessionRewardsMenuBridge)
 local ShoplikeBridge = require(ReplicatedStorage.Shared.React.ShoplikeBridge)
 local TeleportMenuBridge = require(ReplicatedStorage.Shared.React.Teleport.TeleportMenuBridge)
@@ -71,6 +72,7 @@ return function()
 
 			Indicators = React.createElement(IndicatorBridge),
 			OverheadLabels = React.createElement(OverheadLabeledBridge),
+			RegenLabels = React.createElement(RegenTimestampedBridge),
 			Shoplikes = React.createElement(ShoplikeBridge),
 			ChangeLogBoard = React.createElement(ChangeLogBoard),
 		}),

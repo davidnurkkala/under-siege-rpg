@@ -3,7 +3,9 @@ local ServerScriptService = game:GetService("ServerScriptService")
 
 local Comm = require(ReplicatedStorage.Packages.Comm)
 local DataService = require(ServerScriptService.Server.Services.DataService)
+local LobbySessions = require(ServerScriptService.Server.Singletons.LobbySessions)
 local Observers = require(ReplicatedStorage.Packages.Observers)
+local Promise = require(ReplicatedStorage.Packages.Promise)
 local Property = require(ReplicatedStorage.Shared.Classes.Property)
 local ResourceNodeDefs = require(ReplicatedStorage.Shared.Defs.ResourceNodeDefs)
 local Sift = require(ReplicatedStorage.Packages.Sift)
@@ -12,7 +14,8 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 local t = require(ReplicatedStorage.Packages.t)
 
 local NodeStatesPropertiesByPlayer: { [Player]: Property.Property } = {}
-local NodeTypesByIndexString: { [string]: string } = {}
+local NodesByIndexString: { [string]: Model } = {}
+local UsePromisesByPlayer: { [Player]: any } = {}
 
 local ResourceNodeService = {
 	Priority = 0,
@@ -26,10 +29,9 @@ function ResourceNodeService.PrepareBlocking(self: ResourceNodeService)
 	self.StatesRemote = self.Comm:CreateProperty("States", {})
 
 	self.Comm:BindFunction("UseNode", function(player, nodeIndex)
-		print(typeof(nodeIndex))
 		if not t.integer(nodeIndex) then return end
 
-		return self:UseNode(player, nodeIndex)
+		return self:UseNode(player, nodeIndex):expect()
 	end)
 
 	Observers.observePlayer(function(player)
@@ -39,7 +41,7 @@ function ResourceNodeService.PrepareBlocking(self: ResourceNodeService)
 			local now = Timestamp()
 
 			local save = Sift.Dictionary.filter(saveFile:Get("ResourceNodeStates") or {}, function(timestamp)
-				return now > timestamp
+				return timestamp > now
 			end)
 
 			local property = trove:Construct(Property, save, Sift.Dictionary.equals)
@@ -63,14 +65,12 @@ function ResourceNodeService.PrepareBlocking(self: ResourceNodeService)
 	Observers.observeTag("ResourceNode", function(model: Model)
 		return Observers.observeAttribute(model, "NodeIndex", function(nodeIndex)
 			local indexString = tostring(nodeIndex)
-			return Observers.observeAttribute(model, "NodeType", function(nodeType)
-				NodeTypesByIndexString[indexString] = nodeType
-				return function()
-					NodeTypesByIndexString[indexString] = nil
-				end
-			end)
+			NodesByIndexString[indexString] = model
+			return function()
+				NodesByIndexString[indexString] = nil
+			end
 		end)
-	end)
+	end, { workspace })
 end
 
 function ResourceNodeService.Start(self: ResourceNodeService)
@@ -80,32 +80,46 @@ function ResourceNodeService.Start(self: ResourceNodeService)
 		for _, property in NodeStatesPropertiesByPlayer do
 			property:Update(function(states)
 				return Sift.Dictionary.filter(states, function(timestamp)
-					return now > timestamp
+					return timestamp > now
 				end)
 			end)
 		end
 
-		task.wait(5)
+		task.wait(0.5)
 	end
 end
 
-function ResourceNodeService.UseNode(self: ResourceNodeService, player: Player, nodeIndex: number): boolean
+function ResourceNodeService.UseNode(self: ResourceNodeService, player: Player, nodeIndex: number)
+	if UsePromisesByPlayer[player] then return Promise.resolve(false) end
+
 	local indexString = tostring(nodeIndex)
 	local property = NodeStatesPropertiesByPlayer[player]
 
-	if property:Get()[indexString] then return false end
+	if property:Get()[indexString] then return Promise.resolve(false) end
 
-	local nodeType = NodeTypesByIndexString[indexString]
-	if nodeType == nil then return false end
+	local node = NodesByIndexString[indexString]
+	local nodeType = node and node:GetAttribute("NodeType")
+	if nodeType == nil then return Promise.resolve(false) end
+
+	local session = LobbySessions.Get(player)
+	if session == nil then return Promise.resolve(false) end
 
 	local def = ResourceNodeDefs[nodeType]
-	local timestamp = Timestamp() + def.RegenTime
 
-	property:Update(function(states)
-		return Sift.Dictionary.set(states, indexString, timestamp)
-	end)
+	UsePromisesByPlayer[player] = def.ServerCallback(session, node)
+		:andThen(function()
+			local timestamp = Timestamp() + def.RegenTime
 
-	return true
+			property:Update(function(states)
+				return Sift.Dictionary.set(states, indexString, timestamp)
+			end)
+		end)
+		:finally(function()
+			UsePromisesByPlayer[player] = nil
+		end)
+		:andThenReturn(true)
+
+	return UsePromisesByPlayer[player] or Promise.resolve(true)
 end
 
 return ResourceNodeService
