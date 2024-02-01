@@ -1,8 +1,11 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local FormatTime = require(ReplicatedStorage.Shared.Util.FormatTime)
+local Property = require(ReplicatedStorage.Shared.Classes.Property)
 local ResourceNodeController = require(ReplicatedStorage.Shared.Controllers.ResourceNodeController)
 local ResourceNodeDefs = require(ReplicatedStorage.Shared.Defs.ResourceNodeDefs)
+local Timestamp = require(ReplicatedStorage.Shared.Util.Timestamp)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
 local ResourceNode = {}
@@ -38,7 +41,19 @@ function ResourceNode.new(model: Model): ResourceNode
 	prompt.Parent = model.PrimaryPart
 
 	trove:Add(ResourceNodeController:ObserveStates(function(states)
-		def.VisualCallback(model, states[indexString])
+		local timestamp = states[indexString]
+		local exhausted = timestamp ~= nil
+
+		prompt.Enabled = not exhausted
+		def.VisualCallback(model, exhausted)
+
+		if exhausted then
+			model:SetAttribute("OverheadLabel", FormatTime(timestamp - Timestamp()))
+			if not model:HasTag("OverheadLabeled") then model:AddTag("OverheadLabeled") end
+		elseif model:HasTag("OverheadLabeled") then
+			model:RemoveTag("OverheadLabeled")
+			model:SetAttribute("OverheadLabel", nil)
+		end
 	end))
 
 	trove:Add(function()

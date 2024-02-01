@@ -5,45 +5,20 @@ local Comm = require(ReplicatedStorage.Packages.Comm)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local Property = require(ReplicatedStorage.Shared.Classes.Property)
+local ResourceNodeDefs = require(ReplicatedStorage.Shared.Defs.ResourceNodeDefs)
 local Sift = require(ReplicatedStorage.Packages.Sift)
+local Timestamp = require(ReplicatedStorage.Shared.Util.Timestamp)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local t = require(ReplicatedStorage.Packages.t)
 
-local NodeStatesPropertyByPlayer: { [Player]: Property.Property } = {}
+local NodeStatesPropertiesByPlayer: { [Player]: Property.Property } = {}
+local NodeTypesByIndexString: { [string]: string } = {}
 
 local ResourceNodeService = {
 	Priority = 0,
 }
 
 type ResourceNodeService = typeof(ResourceNodeService)
-
-local function loadStates(save: string): { [string]: boolean }
-	local states = {}
-	for index, char in string.split(save, "") do
-		states[tostring(index)] = (char == "1")
-	end
-	return states
-end
-
-local function saveStates(states: { [string]: boolean }): string
-	local len = 0
-	for indexString in states do
-		len = math.max(tonumber(indexString) or 0, len)
-	end
-
-	if len == 0 then return "" end
-
-	local save = ""
-	for index = 1, len do
-		if states[tostring(index)] then
-			save ..= "1"
-		else
-			save ..= "0"
-		end
-	end
-
-	return save
-end
 
 function ResourceNodeService.PrepareBlocking(self: ResourceNodeService)
 	self.Comm = Comm.ServerComm.new(ReplicatedStorage, "ResourceNodeService")
@@ -61,14 +36,21 @@ function ResourceNodeService.PrepareBlocking(self: ResourceNodeService)
 		local trove = Trove.new()
 
 		trove:AddPromise(DataService:GetSaveFile(player)):andThen(function(saveFile)
-			local save = saveFile:Get("ResourceNodeStates")
-			local property = trove:Construct(Property, if save then loadStates(save) else {}, Sift.Dictionary.equals)
-			NodeStatesPropertyByPlayer[player] = property
+			local now = Timestamp()
+
+			local save = Sift.Dictionary.filter(saveFile:Get("ResourceNodeStates") or {}, function(timestamp)
+				return now > timestamp
+			end)
+
+			local property = trove:Construct(Property, save, Sift.Dictionary.equals)
+
+			NodeStatesPropertiesByPlayer[player] = property
+			trove:Add(function()
+				NodeStatesPropertiesByPlayer[player] = nil
+			end)
 
 			property:Observe(function(states)
-				print(states)
-				print(saveStates(states))
-				saveFile:Set("ResourceNodeStates", saveStates(states))
+				saveFile:Set("ResourceNodeStates", states)
 				self.StatesRemote:SetFor(player, states)
 			end)
 		end)
@@ -77,20 +59,50 @@ function ResourceNodeService.PrepareBlocking(self: ResourceNodeService)
 			trove:Clean()
 		end
 	end)
+
+	Observers.observeTag("ResourceNode", function(model: Model)
+		return Observers.observeAttribute(model, "NodeIndex", function(nodeIndex)
+			local indexString = tostring(nodeIndex)
+			return Observers.observeAttribute(model, "NodeType", function(nodeType)
+				NodeTypesByIndexString[indexString] = nodeType
+				return function()
+					NodeTypesByIndexString[indexString] = nil
+				end
+			end)
+		end)
+	end)
+end
+
+function ResourceNodeService.Start(self: ResourceNodeService)
+	while true do
+		local now = Timestamp()
+
+		for _, property in NodeStatesPropertiesByPlayer do
+			property:Update(function(states)
+				return Sift.Dictionary.filter(states, function(timestamp)
+					return now > timestamp
+				end)
+			end)
+		end
+
+		task.wait(5)
+	end
 end
 
 function ResourceNodeService.UseNode(self: ResourceNodeService, player: Player, nodeIndex: number): boolean
 	local indexString = tostring(nodeIndex)
-	local property = NodeStatesPropertyByPlayer[player]
-
-	print(indexString, property:Get())
+	local property = NodeStatesPropertiesByPlayer[player]
 
 	if property:Get()[indexString] then return false end
 
-	print("USING!")
+	local nodeType = NodeTypesByIndexString[indexString]
+	if nodeType == nil then return false end
+
+	local def = ResourceNodeDefs[nodeType]
+	local timestamp = Timestamp() + def.RegenTime
 
 	property:Update(function(states)
-		return Sift.Dictionary.set(states, indexString, true)
+		return Sift.Dictionary.set(states, indexString, timestamp)
 	end)
 
 	return true
