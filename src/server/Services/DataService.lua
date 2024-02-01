@@ -23,9 +23,9 @@ local DataService = {
 		},
 		Cosmetics = {
 			Bases = {
-				Equipped = "Tower",
+				Equipped = "Camp",
 				Owned = {
-					Tower = true,
+					Camp = true,
 				},
 			},
 		},

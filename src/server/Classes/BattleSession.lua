@@ -19,15 +19,12 @@ local WeaponService = require(ServerScriptService.Server.Services.WeaponService)
 local BattleSession = {}
 BattleSession.__index = BattleSession
 
-export type BattleSession = typeof(setmetatable(
-	{} :: {
-		Player: Player,
-		Battler: Battler.Battler,
-		Animator: any,
-		Model: Model,
-	},
-	BattleSession
-))
+export type BattleSession = typeof(setmetatable({} :: {
+	Player: Player,
+	Battler: Battler.Battler,
+	Animator: any,
+	Model: Model,
+}, BattleSession))
 
 function BattleSession.new(args: {
 	Player: Player,
@@ -108,6 +105,7 @@ function BattleSession.promised(player: Player, position: number, direction: num
 			local baseId = CosmeticService:GetEquipped(player, "Bases"):expect()
 			if onCancel() then return end
 			local baseDef = BaseDefs[baseId]
+			print(baseId)
 			local base = baseDef.Model:Clone()
 
 			resolve(BattleSession.new({
