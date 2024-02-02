@@ -195,6 +195,20 @@ local Cards = {
 		Cooldown = 4,
 		Cost = 60,
 	},
+	UndeadWarrior = {
+		GoonId = "UndeadWarrior",
+		Type = "Goon",
+		Rank = 1,
+		Cooldown = 4,
+		Cost = 40,
+	},
+	Cultist = {
+		GoonId = "Cultist",
+		Type = "Goon",
+		Rank = 1,
+		Cooldown = 6,
+		Cost = 80,
+	},
 
 	-- ABILITIES
 	Heal = {

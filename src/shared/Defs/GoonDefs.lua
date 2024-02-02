@@ -1191,19 +1191,19 @@ local Goons = {
 				return 0.43
 			end,
 			Speed = function()
-				return 0.1
+				return 0.2
 			end,
 			Range = function()
 				return 0.1
 			end,
 			AttackRate = function()
-				return 1.25
+				return 1.2
 			end,
 			Damage = function(level)
 				return scaling(1.7, 0.5, level)
 			end,
 			HealthMax = function(level)
-				return scaling(76, 2, level)
+				return scaling(6, 2, level)
 			end,
 		},
 	},
@@ -1214,39 +1214,40 @@ local Goons = {
 		ModelName = "Cultist",
 		Brain = {
 			Id = "BasicRanged",
-			ProjectileOffset = CFrame.new(0, 0.75, -0.25),
-			ProjectileName = "MagicStar1",
+			ProjectileOffset = CFrame.new(0, 0, -0.25),
+			ProjectileName = "DarkEnergy",
+			ProjectileSpeed = 12,
 		},
 		Tags = { "Ranged" },
 		Animations = {
-			Walk = "MageWalk",
-			Attack = "MasterMageAttack",
+			Walk = "CultistWalk",
+			Attack = "CultistAttack",
 			Die = "GenericGoonDie",
 		},
 		Sounds = {
-			Shoot = { "WandCast1", "WandCast2", "WandCast3" },
-			Hit = { "MagicImpact1", "MagicImpact2", "MagicImpact3" },
+			Shoot = { "WandCast4", "WandCast4", "WandCast4" },
+			Hit = { "MagicImpact4", "MagicImpact4", "MagicImpact4" },
 			Death = { "MaleUgh1", "MaleUgh2" },
 		},
 		Stats = {
 			Size = 0.03,
 			AttackWindupTime = function()
-				return 0.12
+				return 1
 			end,
 			Speed = function()
 				return 0.1
 			end,
 			Range = function()
-				return 0.5
+				return 0.6
 			end,
 			AttackRate = function()
-				return 1.7
+				return 0.4
 			end,
 			Damage = function(level)
-				return scaling(3, 0.5, level)
+				return scaling(4, 0.5, level)
 			end,
 			HealthMax = function(level)
-				return scaling(9, 2, level)
+				return scaling(13, 2, level)
 			end,
 		},
 	},

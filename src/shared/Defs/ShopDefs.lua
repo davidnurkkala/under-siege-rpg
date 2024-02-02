@@ -31,6 +31,31 @@ local Shops = {
 				Reward = { Type = "Cosmetic", CategoryName = "Bases", Id = "ElvenKeep" },
 				Price = { Gems = 250 },
 			},
+
+			{
+				Reward = { Type = "Cosmetic", CategoryName = "Bases", Id = "Grim" },
+				Price = { Gems = 300 },
+			},
+
+			{
+				Reward = { Type = "Cosmetic", CategoryName = "Bases", Id = "Sandstone" },
+				Price = { Gems = 250 },
+			},
+
+			{
+				Reward = { Type = "Cosmetic", CategoryName = "Bases", Id = "Peaked" },
+				Price = { Gems = 250 },
+			},
+
+			{
+				Reward = { Type = "Cosmetic", CategoryName = "Bases", Id = "OldCastle" },
+				Price = { Gems = 250 },
+			},
+
+			{
+				Reward = { Type = "Cosmetic", CategoryName = "Bases", Id = "ClassicReborn" },
+				Price = { Gems = 250 },
+			},
 		},
 	},
 

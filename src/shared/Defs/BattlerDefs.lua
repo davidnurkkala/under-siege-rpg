@@ -130,15 +130,19 @@ local Battlers = {
 		BattlegroundName = "World1",
 		BaseId = "Grim",
 		Reward = 500,
-		WeaponId = "Crossbow",
+		WeaponId = "OrcishGrimoire",
 		Deck = {
-			Peasant = 1,
-			Recruit = 1,
-			Hunter = 1,
-			Recruitment = 1,
+			Cultist = 1,
+			UndeadWarrior = 1,
+			Heal = 1,
 		},
 		Brain = {
-			Id = "WeightedCost",
+			Id = "NaiveOrder",
+			Order = {
+				{ CardId = "UndeadWarrior", Count = 3 },
+				{ CardId = "Heal", Count = 1 },
+				{ CardId = "Cultist", Count = 3 },
+			},
 		},
 	},
 	VikingSailor = {
