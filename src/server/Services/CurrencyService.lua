@@ -76,7 +76,7 @@ function CurrencyService.GetBoosted(_self: CurrencyService, player: Player, curr
 			multiplier += 0.1
 		end
 
-		return amount * multiplier
+		return math.round(amount * multiplier)
 	end)
 end
 

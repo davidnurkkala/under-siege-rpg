@@ -28,7 +28,7 @@ function ResourceNode.new(model: Model): ResourceNode
 	prompt.ActionText = def.Action
 	prompt.Exclusivity = Enum.ProximityPromptExclusivity.OneGlobally
 	prompt.RequiresLineOfSight = false
-	prompt.MaxActivationDistance = 8
+	prompt.MaxActivationDistance = 6
 	prompt.Triggered:Connect(function(player)
 		if player ~= Players.LocalPlayer then return end
 

@@ -47,6 +47,16 @@ local Ids = {
 		SoundId = "rbxassetid://15941227202",
 		Volume = 3,
 	},
+	PickaxeHit1 = "rbxassetid://16200141490",
+	PickaxeHit2 = "rbxassetid://16200141368",
+	PickaxeHit3 = "rbxassetid://16200140744",
+	PickaxeHit4 = "rbxassetid://16200141259",
+	PickaxeHit5 = "rbxassetid://16200146438",
+	RockCrumble1 = "rbxassetid://16200140849",
+	RockCrumble2 = "rbxassetid://16200141150",
+	RockCrumble3 = "rbxassetid://16200141041",
+	RockCrumble4 = "rbxassetid://16200140616",
+	RockCrumble5 = "rbxassetid://16200140965",
 }
 
 return Sift.Dictionary.map(Ids, function(entry, name)

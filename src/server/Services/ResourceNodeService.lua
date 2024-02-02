@@ -2,15 +2,21 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local Comm = require(ReplicatedStorage.Packages.Comm)
+local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
 local DataService = require(ServerScriptService.Server.Services.DataService)
+local GetPlayerPosition = require(ReplicatedStorage.Shared.Util.GetPlayerPosition)
+local GuiEffectService = require(ServerScriptService.Server.Services.GuiEffectService)
 local LobbySessions = require(ServerScriptService.Server.Singletons.LobbySessions)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Property = require(ReplicatedStorage.Shared.Classes.Property)
+local ResourceNodeCallbacks = require(ServerScriptService.Server.ServerDefs.ResourceNodeCallbacks)
 local ResourceNodeDefs = require(ReplicatedStorage.Shared.Defs.ResourceNodeDefs)
+local RewardHelper = require(ServerScriptService.Server.Util.RewardHelper)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local Timestamp = require(ReplicatedStorage.Shared.Util.Timestamp)
 local Trove = require(ReplicatedStorage.Packages.Trove)
+local TryNow = require(ReplicatedStorage.Shared.Util.TryNow)
 local t = require(ReplicatedStorage.Packages.t)
 
 local NodeStatesPropertiesByPlayer: { [Player]: Property.Property } = {}
@@ -105,13 +111,31 @@ function ResourceNodeService.UseNode(self: ResourceNodeService, player: Player, 
 	if session == nil then return Promise.resolve(false) end
 
 	local def = ResourceNodeDefs[nodeType]
+	local callback = ResourceNodeCallbacks[def.ServerCallbackId]
 
-	UsePromisesByPlayer[player] = def.ServerCallback(session, node)
+	UsePromisesByPlayer[player] = callback(session, node)
 		:andThen(function()
 			local timestamp = Timestamp() + def.RegenTime
 
 			property:Update(function(states)
 				return Sift.Dictionary.set(states, indexString, timestamp)
+			end)
+
+			local rewards = RewardHelper.ProcessChanceTable(player, def.Rewards)
+
+			Promise.all(Sift.Array.map(rewards, function(reward)
+				return RewardHelper.GiveReward(player, reward)
+			end)):andThen(function(givenRewards)
+				for _, reward in givenRewards do
+					if reward.Type == "Currency" then
+						GuiEffectService.IndicatorRequestedRemote:Fire(player, {
+							Text = `+{reward.Amount}`,
+							Image = CurrencyDefs[reward.CurrencyType].Image,
+							Start = node:GetPivot().Position,
+							Finish = GetPlayerPosition(player),
+						})
+					end
+				end
 			end)
 		end)
 		:finally(function()
