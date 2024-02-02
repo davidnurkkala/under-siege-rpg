@@ -28,7 +28,10 @@ local Ids = {
 	MagicImpact1 = "rbxassetid://15508125606",
 	MagicImpact2 = "rbxassetid://15508125693",
 	MagicImpact3 = "rbxassetid://15508125432",
-	MagicImpact4 = "rbxassetid://16199853187",
+	MagicImpact4 = {
+		SoundId = "rbxassetid://16199853187",
+		Volume = 3,
+	},
 	WhooshMedium1 = "rbxassetid://15508156465",
 	WhooshMedium2 = "rbxassetid://15508156532",
 	WhooshMedium3 = "rbxassetid://15508156396",
