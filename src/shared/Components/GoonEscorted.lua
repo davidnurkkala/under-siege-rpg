@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
+local CutsceneController = require(ReplicatedStorage.Shared.Controllers.CutsceneController)
 local GoonDefs = require(ReplicatedStorage.Shared.Defs.GoonDefs)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local Property = require(ReplicatedStorage.Shared.Classes.Property)
@@ -91,6 +92,8 @@ function GoonEscorted.new(model: Model): GoonEscorted
 end
 
 function GoonEscorted.Update(self: GoonEscorted, dt: number)
+	if CutsceneController.InCutscene:Get() then return end
+
 	local filter = Sift.Array.append(
 		Sift.Array.map(self.Goons, function(goon)
 			return goon.Model

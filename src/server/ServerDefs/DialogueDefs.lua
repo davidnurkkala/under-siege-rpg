@@ -2,10 +2,60 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local BattleHelper = require(ServerScriptService.Server.Util.BattleHelper)
+local CutsceneService = require(ServerScriptService.Server.Services.CutsceneService)
 local GenericShopService = require(ServerScriptService.Server.Services.GenericShopService)
+local ServerFade = require(ServerScriptService.Server.Util.ServerFade)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 
 local Dialogues = {
+	OpeningCutscene = {
+		Name = "",
+		StartNodes = { "Start" },
+		NodesOut = {
+			Start = {
+				Text = "",
+				Nodes = { "Line1" },
+				Callback = function(self)
+					ServerFade(self.Player, nil, function()
+						CutsceneService:Begin(self.Player)
+						self:SetNodeById("Line1")
+					end)
+
+					return true
+				end,
+			},
+			Line1 = {
+				Text = "The kingdom has fallen before the might of the orcish armies.",
+				Args = {
+					TextSpeed = 0.1,
+				},
+				Nodes = { "Line2" },
+			},
+			Line2 = {
+				Text = "You must make your last stand. The final battle is now.",
+				Args = {
+					TextSpeed = 0.1,
+				},
+				Callback = function(self)
+					CutsceneService:Step(self.Player)
+				end,
+
+				PostCallback = function(self)
+					CutsceneService:OnFinish(self.Player):andThen(function()
+						ServerFade(self.Player, nil, function()
+							CutsceneService:Step(self.Player)
+							self:Destroy()
+						end)
+					end)
+
+					CutsceneService:Step(self.Player)
+
+					return true
+				end,
+			},
+		},
+		NodesIn = {},
+	},
 	TestDialogue = {
 		Name = "Test Person",
 		StartNodes = { "Root" },
@@ -73,8 +123,8 @@ local Dialogues = {
 return Sift.Dictionary.map(Dialogues, function(dialogue, id)
 	assert(dialogue.Name, `Dialogue {id} has no name`)
 	assert(dialogue.NodesOut, `Dialogue {id} has no output nodes`)
-	assert(dialogue.NodesOut.Root, `Dialogue {id} has no output node with id "Root"`)
 	assert(dialogue.NodesIn, `Dialogue {id} has no input nodes`)
+	assert(dialogue.StartNodes, `Dialogue {id} has no start nodes`)
 
 	for nodeId in dialogue.NodesOut do
 		assert(dialogue.NodesIn[nodeId] == nil, `Dialogue {id} has non-unique node id {nodeId} (this id is both an input and an output node)`)

@@ -15,10 +15,12 @@ Dialogue.__index = Dialogue
 
 type Node = {
 	Text: string,
+	Args: any,
 	Animation: string?,
 	Nodes: { string },
 	Conditions: { (Dialogue) -> boolean }?,
 	Callback: ((Dialogue) -> boolean)?,
+	PostCallback: ((Dialogue) -> boolean)?,
 }
 
 type DialogueState = {
@@ -131,7 +133,11 @@ function Dialogue.SetNode(self: Dialogue, node: Node)
 					)
 				end
 			else
-				inputs = { { Text = "<i>End</i>" } }
+				if node.PostCallback then
+					inputs = { { Text = "<i>Continue</i>", Callback = node.PostCallback } }
+				else
+					inputs = { { Text = "<i>End</i>" } }
+				end
 			end
 
 			self.State:Set({

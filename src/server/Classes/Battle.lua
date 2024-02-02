@@ -22,6 +22,7 @@ local RewardHelper = require(ServerScriptService.Server.Util.RewardHelper)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local Trove = require(ReplicatedStorage.Packages.Trove)
+local TryNow = require(ReplicatedStorage.Shared.Util.TryNow)
 local Updater = require(ReplicatedStorage.Shared.Classes.Updater)
 
 local Battle = {}
@@ -99,9 +100,13 @@ function Battle.new(args: {
 		base:PivotTo(part.CFrame)
 		base.Parent = self.Model
 
-		local cframe, size = char:GetBoundingBox()
-		local dy = char:GetPivot().Y - (cframe.Y - size.Y / 2)
-		char:PivotTo(base.Spawn.CFrame + Vector3.new(0, dy, 0))
+		local delta = if Players:GetPlayerFromCharacter(char) ~= nil
+			then TryNow(function()
+				return Vector3.new(0, char.Humanoid.HipHeight + char.PrimaryPart.Size.Y / 2, 0)
+			end, Vector3.zero)
+			else Vector3.zero
+
+		char:PivotTo(base.Spawn.CFrame + delta)
 		base.Spawn.Transparency = 1
 
 		battler:Observe(function()

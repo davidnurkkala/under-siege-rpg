@@ -6,6 +6,7 @@ local BattleController = require(ReplicatedStorage.Shared.Controllers.BattleCont
 local Button = require(ReplicatedStorage.Shared.React.Common.Button)
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
+local Default = require(ReplicatedStorage.Shared.Util.Default)
 local DialogueController = require(ReplicatedStorage.Shared.Controllers.DialogueController)
 local Flipper = require(ReplicatedStorage.Packages.Flipper)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
@@ -25,8 +26,11 @@ local UseProperty = require(ReplicatedStorage.Shared.React.Hooks.UseProperty)
 
 local function outputText(props: {
 	Text: string,
+	Args: any,
 	OnFinished: () -> (),
 })
+	local textSpeed = Default(props.Args.TextSpeed, 1)
+
 	local graphemes, setGraphemes = React.useState(0)
 	local labelRef = React.useRef(nil)
 
@@ -41,8 +45,8 @@ local function outputText(props: {
 
 		local current = 0
 		local promise = Promise.fromEvent(RunService.Heartbeat, function()
-			current += 2
-			setGraphemes(current)
+			current = math.clamp(current + 2 * textSpeed, 0, count)
+			setGraphemes(math.round(current))
 			return current >= count
 		end):andThen(function()
 			props.OnFinished()
@@ -187,6 +191,7 @@ return function()
 				}, {
 					Text = React.createElement(outputText, {
 						Text = TextStroke(dialogue.Node.Text),
+						Args = dialogue.Node.Args or {},
 						OnFinished = function()
 							setInputsVisible(true)
 						end,

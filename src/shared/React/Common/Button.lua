@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local Flipper = require(ReplicatedStorage.Packages.Flipper)
 local PaddingAll = require(ReplicatedStorage.Shared.React.Common.PaddingAll)
+local PlatformContext = require(ReplicatedStorage.Shared.React.PlatformContext.PlatformContext)
 local React = require(ReplicatedStorage.Packages.React)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local UseMotor = require(ReplicatedStorage.Shared.React.Hooks.UseMotor)
@@ -22,9 +23,11 @@ local SizeDefault = UDim2.fromScale(1, 1)
 local SizeHovered = UDim2.new(1, 2, 1, 2)
 
 return React.memo(function(props)
+	local platform = React.useContext(PlatformContext)
+
 	local hoverBinding, hoverMotor = UseMotor(0)
-	local borderThickness = props.BorderSizePixel or 4
-	local corner = props.Corner or UDim.new(0, 4)
+	local borderThickness = props.BorderSizePixel or if platform == "Mobile" then 2 else 4
+	local corner = props.Corner or UDim.new(0, if platform == "Mobile" then 2 else 4)
 	local padding = props.Padding or corner
 	local active = if props.Active ~= nil then props.Active else true
 	local buttonRef = props.buttonRef

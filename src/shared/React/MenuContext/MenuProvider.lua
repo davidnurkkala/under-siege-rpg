@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local CutsceneController = require(ReplicatedStorage.Shared.Controllers.CutsceneController)
 local MenuContext = require(ReplicatedStorage.Shared.React.MenuContext.MenuContext)
 local React = require(ReplicatedStorage.Packages.React)
 
@@ -37,6 +38,22 @@ return function(props)
 			setInDialogue(state)
 		end,
 	}
+
+	React.useEffect(function()
+		return CutsceneController.InCutscene:Observe(function(inCutscene)
+			setOpenMenu(function(oldMenu)
+				if inCutscene then
+					return "Cutscene"
+				else
+					if oldMenu == "Cutscene" then
+						return nil
+					else
+						return oldMenu
+					end
+				end
+			end)
+		end)
+	end, {})
 
 	return React.createElement(MenuContext.Provider, {
 		value = interface,
