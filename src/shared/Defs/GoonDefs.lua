@@ -53,6 +53,50 @@ local Goons = {
 		},
 	},
 
+	Hunter = {
+		Name = "Hunter",
+		Description = "A villager with a bow, now hunting a very different kind of prey.",
+		ModelName = "Hunter",
+		Brain = {
+			Id = "BasicRanged",
+			ProjectileOffset = CFrame.new(0, 0.75, -2),
+			ProjectileName = "Arrow1",
+		},
+		Tags = { "Ranged" },
+		Animations = {
+			Idle = "HunterIdle",
+			Walk = "HunterWalk",
+			Attack = "HunterAttack",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Shoot = { "BowShoot1", "BowShoot2", "BowShoot3", "BowShoot4" },
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.55
+			end,
+			Speed = function()
+				return 0.05
+			end,
+			Range = function()
+				return 0.35
+			end,
+			AttackRate = function()
+				return 0.75
+			end,
+			Damage = function(level)
+				return lerped(1, 1.5, level)
+			end,
+			HealthMax = function(level)
+				return lerped(5, 7.5, level)
+			end,
+		},
+	},
+
 	Militia = {
 		Name = "Militia",
 		Description = "A peasant with minimal combat training and jury-rigged protective gear.",
@@ -93,89 +137,9 @@ local Goons = {
 		},
 	},
 
-	Recruit = {
-		Name = "Recruit",
-		Description = "A regular soldier with a cheap sword and salvaged armor.",
-		ModelName = "Recruit",
-		Brain = {
-			Id = "BasicMelee",
-		},
-		Tags = { "Armored" },
-		Animations = {
-			Walk = "SwordsmanWalk",
-			Attack = "GenericGoon1hMelee",
-			Die = "GenericGoonDie",
-		},
-		Sounds = {
-			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
-			Death = { "MaleUgh1", "MaleUgh2" },
-		},
-		Stats = {
-			Size = 0.03,
-			AttackWindupTime = function()
-				return 0.27
-			end,
-			Speed = function()
-				return 0.05
-			end,
-			Range = function()
-				return 0.1
-			end,
-			AttackRate = function()
-				return 0.75
-			end,
-			Damage = function(level)
-				return lerped(2, 3, level)
-			end,
-			HealthMax = function(level)
-				return lerped(10, 15, level)
-			end,
-		},
-	},
-
-	Footman = {
-		Name = "Footman",
-		Description = "A trained soldier with standard issue weapons and armor.",
-		ModelName = "Footman",
-		Brain = {
-			Id = "BasicMelee",
-		},
-		Tags = { "Armored" },
-		Animations = {
-			Walk = "SwordsmanWalk",
-			Attack = "GenericGoon1hMelee",
-			Die = "GenericGoonDie",
-		},
-		Sounds = {
-			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
-			Death = { "MaleUgh1", "MaleUgh2" },
-		},
-		Stats = {
-			Size = 0.03,
-			AttackWindupTime = function()
-				return 0.27
-			end,
-			Speed = function()
-				return 0.05
-			end,
-			Range = function()
-				return 0.1
-			end,
-			AttackRate = function()
-				return 0.75
-			end,
-			Damage = function(level)
-				return scaling(2.5, 1, level)
-			end,
-			HealthMax = function(level)
-				return scaling(20, 1, level)
-			end,
-		},
-	},
-
 	Spearman = {
 		Name = "Spearman",
-		Description = "A fresh recruit with a sharpened spear and a thirst for action",
+		Description = "A levied soldier with a cheap spear and little training.",
 		ModelName = "Spearman",
 		Brain = {
 			Id = "BasicMelee",
@@ -205,101 +169,17 @@ local Goons = {
 				return 0.75
 			end,
 			Damage = function(level)
-				return lerped(2, 2, level)
+				return lerped(1.5, 2.5, level)
 			end,
 			HealthMax = function(level)
-				return lerped(8, 7.5, level)
-			end,
-		},
-	},
-
-	Pikeman = {
-		Name = "Pikeman",
-		Description = "An experienced warrior armed with a deadly polearm",
-		ModelName = "Pikeman",
-		Brain = {
-			Id = "BasicMelee",
-		},
-		Tags = { "Light" },
-		Animations = {
-			Walk = "PeasantWalk",
-			Attack = "PeasantAttack",
-			Die = "GenericGoonDie",
-		},
-		Sounds = {
-			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
-			Death = { "MaleUgh1", "MaleUgh2" },
-		},
-		Stats = {
-			Size = 0.03,
-			AttackWindupTime = function()
-				return 0.27
-			end,
-			Speed = function()
-				return 0.05
-			end,
-			Range = function()
-				return 0.1
-			end,
-			AttackRate = function()
-				return 0.75
-			end,
-			Damage = function(level)
-				return scaling(4, 1, level)
-			end,
-			HealthMax = function(level)
-				return scaling(15, 1, level)
-			end,
-		},
-	},
-
-	Hunter = {
-		Name = "Hunter",
-		Description = "A villager with a bow, now hunting a very different kind of prey.",
-		ModelName = "Hunter",
-		Brain = {
-			Id = "BasicRanged",
-			ProjectileOffset = CFrame.new(0, 0.75, -2),
-			ProjectileName = "Arrow1",
-		},
-		Tags = { "Ranged" },
-		Animations = {
-			Idle = "HunterIdle",
-			Walk = "HunterWalk",
-			Attack = "HunterAttack",
-			Die = "GenericGoonDie",
-		},
-		Sounds = {
-			Shoot = { "BowShoot1", "BowShoot2", "BowShoot3", "BowShoot4" },
-			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
-			Death = { "MaleUgh1", "MaleUgh2" },
-		},
-		Stats = {
-			Size = 0.03,
-			AttackWindupTime = function()
-				return 0.55
-			end,
-			Speed = function()
-				return 0.05
-			end,
-			Range = function()
-				return 0.35
-			end,
-			AttackRate = function()
-				return 1.1
-			end,
-			Damage = function(level)
-				return scaling(1, 0.5, level)
-			end,
-			HealthMax = function(level)
-				return scaling(10, 1, level)
+				return lerped(7.5, 10, level)
 			end,
 		},
 	},
 
 	Archer = {
 		Name = "Archer",
-		Description = "An young scout eager to prove his worth with a bow",
+		Description = "A levied soldier with simple arrows and basic archery training.",
 		ModelName = "Archer",
 		Brain = {
 			Id = "BasicRanged",
@@ -330,20 +210,100 @@ local Goons = {
 				return 0.35
 			end,
 			AttackRate = function()
-				return 1
+				return 0.75
 			end,
 			Damage = function(level)
-				return scaling(3, 0.5, level)
+				return lerped(1.5, 2, level)
 			end,
 			HealthMax = function(level)
-				return scaling(14, 1, level)
+				return lerped(7.5, 10, level)
+			end,
+		},
+	},
+
+	Recruit = {
+		Name = "Recruit",
+		Description = "A levied soldier with a cheap sword and salvaged armor.",
+		ModelName = "Recruit",
+		Brain = {
+			Id = "BasicMelee",
+		},
+		Tags = { "Armored" },
+		Animations = {
+			Walk = "SwordsmanWalk",
+			Attack = "GenericGoon1hMelee",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.27
+			end,
+			Speed = function()
+				return 0.04
+			end,
+			Range = function()
+				return 0.1
+			end,
+			AttackRate = function()
+				return 0.75
+			end,
+			Damage = function(level)
+				return lerped(2, 2.75, level)
+			end,
+			HealthMax = function(level)
+				return lerped(10, 15.5, level)
+			end,
+		},
+	},
+
+	Pikeman = {
+		Name = "Pikeman",
+		Description = "An experienced, professional soldier with a standard polearm.",
+		ModelName = "Pikeman",
+		Brain = {
+			Id = "BasicMelee",
+		},
+		Tags = { "Light" },
+		Animations = {
+			Walk = "PeasantWalk",
+			Attack = "PeasantAttack",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 1
+			end,
+			Speed = function()
+				return 0.05
+			end,
+			Range = function()
+				return 0.1
+			end,
+			AttackRate = function()
+				return 0.75
+			end,
+			Damage = function(level)
+				return lerped(2, 3, level)
+			end,
+			HealthMax = function(level)
+				return lerped(10, 12.5, level)
 			end,
 		},
 	},
 
 	Crossbowman = {
 		Name = "Crossbowman",
-		Description = "An expert marskman weilding a powerful crossbow.",
+		Description = "A professional soldier with standard gear including a well-made crossbow.",
 		ModelName = "Crossbowman",
 		Brain = {
 			Id = "BasicRanged",
@@ -374,13 +334,177 @@ local Goons = {
 				return 0.35
 			end,
 			AttackRate = function()
-				return 1.1
+				return 0.75
 			end,
 			Damage = function(level)
-				return scaling(9, 0.5, level)
+				return lerped(2, 2.5, level)
 			end,
 			HealthMax = function(level)
-				return scaling(20, 1, level)
+				return lerped(10, 12.5, level)
+			end,
+		},
+	},
+
+	Footman = {
+		Name = "Footman",
+		Description = "A trained professional soldier with standard issue weapons and armor.",
+		ModelName = "Footman",
+		Brain = {
+			Id = "BasicMelee",
+		},
+		Tags = { "Armored" },
+		Animations = {
+			Walk = "SwordsmanWalk",
+			Attack = "GenericGoon1hMelee",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.27
+			end,
+			Speed = function()
+				return 0.04
+			end,
+			Range = function()
+				return 0.1
+			end,
+			AttackRate = function()
+				return 0.75
+			end,
+			Damage = function(level)
+				return lerped(2.5, 3.25, level)
+			end,
+			HealthMax = function(level)
+				return lerped(12.5, 17, level)
+			end,
+		},
+	},
+
+	RoyalGuard = {
+		Name = "Royal Guard",
+		Description = "A veteran knight clad in fine platemail. Sworn to serve the crown with considerable martial expertise.",
+		ModelName = "RoyalGuard",
+		Brain = {
+			Id = "BasicMelee",
+		},
+		Tags = { "Armored" },
+		Animations = {
+			Walk = "RoyalGuardWalk",
+			Attack = "RoyalGuardAttack",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.27
+			end,
+			Speed = function()
+				return 0.04
+			end,
+			Range = function()
+				return 0.1
+			end,
+			AttackRate = function()
+				return 0.75
+			end,
+			Damage = function(level)
+				return lerped(3, 3.75, level)
+			end,
+			HealthMax = function(level)
+				return lerped(15, 19.5, level)
+			end,
+		},
+	},
+
+	RoyalRanger = {
+		Name = "Royal Ranger",
+		Description = "A veteran archer with hawk-like eyes. Sworn to serve the crown with unerring accuracy.",
+		ModelName = "RoyalRanger",
+		Brain = {
+			Id = "BasicRanged",
+			ProjectileOffset = CFrame.new(0, 0.75, -2),
+			ProjectileName = "Arrow1",
+		},
+		Tags = { "Ranged" },
+		Animations = {
+			Idle = "HunterIdle",
+			Walk = "HunterWalk",
+			Attack = "RoyalRangerAttack",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Shoot = { "BowShoot1", "BowShoot2", "BowShoot3", "BowShoot4" },
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.55
+			end,
+			Speed = function()
+				return 0.05
+			end,
+			Range = function()
+				return 0.35
+			end,
+			AttackRate = function()
+				return 0.75
+			end,
+			Damage = function(level)
+				return lerped(2.5, 3, level)
+			end,
+			HealthMax = function(level)
+				return lerped(12.5, 15, level)
+			end,
+		},
+	},
+
+	RoyalCavalry = {
+		Name = "Royal Cavalry",
+		Description = "A mounted knight ready to charge into battle. Sworn to trample the enemies of the crown under thundering hooves.",
+		ModelName = "RoyalCavalry",
+		Brain = {
+			Id = "BasicMelee",
+		},
+		Tags = { "Armored", "Charger", "Brutal" },
+		Animations = {
+			Walk = "RoyalCavalryWalk",
+			Attack = "RoyalCavalryAttack",
+			Die = "RoyalCavalryDie",
+		},
+		Sounds = {
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.27
+			end,
+			Speed = function()
+				return 0.06
+			end,
+			Range = function()
+				return 0.1
+			end,
+			AttackRate = function()
+				return 0.75
+			end,
+			Damage = function(level)
+				return lerped(3, 4, level)
+			end,
+			HealthMax = function(level)
+				return lerped(15, 20, level)
 			end,
 		},
 	},
@@ -660,25 +784,27 @@ local Goons = {
 			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
 			Death = { "MaleUgh1", "MaleUgh2" },
 		},
-		Size = 0.03,
-		AttackWindupTime = function()
-			return 0.5
-		end,
-		Speed = function()
-			return 0.05
-		end,
-		Range = function()
-			return 0.4
-		end,
-		AttackRate = function()
-			return 1
-		end,
-		Damage = function(level)
-			return scaling(2, 0.5, level)
-		end,
-		HealthMax = function(level)
-			return scaling(8, 1, level)
-		end,
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.5
+			end,
+			Speed = function()
+				return 0.05
+			end,
+			Range = function()
+				return 0.4
+			end,
+			AttackRate = function()
+				return 1
+			end,
+			Damage = function(level)
+				return scaling(2, 0.5, level)
+			end,
+			HealthMax = function(level)
+				return scaling(8, 1, level)
+			end,
+		},
 	},
 
 	BanditRogue = {
@@ -688,8 +814,7 @@ local Goons = {
 		Brain = {
 			Id = "BasicMelee",
 		},
-		Tags = { "Light" },
-		{ "Charger" },
+		Tags = { "Light", "Charger" },
 		Animations = {
 			Walk = "SwordsmanWalk",
 			Attack = "RogueAttack",
@@ -699,25 +824,27 @@ local Goons = {
 			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
 			Death = { "MaleUgh1", "MaleUgh2" },
 		},
-		Size = 0.03,
-		AttackWindupTime = function()
-			return 0.2
-		end,
-		Speed = function()
-			return 0.3
-		end,
-		Range = function()
-			return 0.1
-		end,
-		AttackRate = function()
-			return 0.4
-		end,
-		Damage = function(level)
-			return scaling(6, 2, level)
-		end,
-		HealthMax = function(level)
-			return scaling(3, 1, level)
-		end,
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.2
+			end,
+			Speed = function()
+				return 0.3
+			end,
+			Range = function()
+				return 0.1
+			end,
+			AttackRate = function()
+				return 0.4
+			end,
+			Damage = function(level)
+				return scaling(6, 2, level)
+			end,
+			HealthMax = function(level)
+				return scaling(3, 1, level)
+			end,
+		},
 	},
 
 	BanditDuelist = {
@@ -737,25 +864,27 @@ local Goons = {
 			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
 			Death = { "MaleUgh1", "MaleUgh2" },
 		},
-		Size = 0.03,
-		AttackWindupTime = function()
-			return 0.43
-		end,
-		Speed = function()
-			return 0.2
-		end,
-		Range = function()
-			return 0.15
-		end,
-		AttackRate = function()
-			return 0.55
-		end,
-		Damage = function(level)
-			return scaling(8, 2, level)
-		end,
-		HealthMax = function(level)
-			return scaling(10, 1, level)
-		end,
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.43
+			end,
+			Speed = function()
+				return 0.2
+			end,
+			Range = function()
+				return 0.15
+			end,
+			AttackRate = function()
+				return 0.55
+			end,
+			Damage = function(level)
+				return scaling(8, 2, level)
+			end,
+			HealthMax = function(level)
+				return scaling(10, 1, level)
+			end,
+		},
 	},
 
 	BanditOfficer = {
@@ -765,8 +894,7 @@ local Goons = {
 		Brain = {
 			Id = "BasicMelee",
 		},
-		Tags = { "Armored" },
-		{ "Brutal" },
+		Tags = { "Armored", "Brutal" },
 		Animations = {
 			Walk = "SwordsmanWalk",
 			Attack = "DualSwordsAttack",
@@ -776,25 +904,27 @@ local Goons = {
 			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
 			Death = { "MaleUgh1", "MaleUgh2" },
 		},
-		Size = 0.03,
-		AttackWindupTime = function()
-			return 0.3
-		end,
-		Speed = function()
-			return 0.15
-		end,
-		Range = function()
-			return 0.1
-		end,
-		AttackRate = function()
-			return 0.75
-		end,
-		Damage = function(level)
-			return scaling(10, 2, level)
-		end,
-		HealthMax = function(level)
-			return scaling(12, 1, level)
-		end,
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.3
+			end,
+			Speed = function()
+				return 0.15
+			end,
+			Range = function()
+				return 0.1
+			end,
+			AttackRate = function()
+				return 0.75
+			end,
+			Damage = function(level)
+				return scaling(10, 2, level)
+			end,
+			HealthMax = function(level)
+				return scaling(12, 1, level)
+			end,
+		},
 	},
 
 	OrcWarrior = {
@@ -961,90 +1091,6 @@ local Goons = {
 		},
 	},
 
-	RoyalRanger = {
-		Name = "Royal Ranger",
-		Description = "An legendary archer sworn to serve the crown.",
-		ModelName = "RoyalRanger",
-		Brain = {
-			Id = "BasicRanged",
-			ProjectileOffset = CFrame.new(0, 0.75, -2),
-			ProjectileName = "Arrow1",
-		},
-		Tags = { "Ranged" },
-		Animations = {
-			Idle = "HunterIdle",
-			Walk = "HunterWalk",
-			Attack = "RoyalRangerAttack",
-			Die = "GenericGoonDie",
-		},
-		Sounds = {
-			Shoot = { "BowShoot1", "BowShoot2", "BowShoot3", "BowShoot4" },
-			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
-			Death = { "MaleUgh1", "MaleUgh2" },
-		},
-		Stats = {
-			Size = 0.03,
-			AttackWindupTime = function()
-				return 0.55
-			end,
-			Speed = function()
-				return 0.05
-			end,
-			Range = function()
-				return 0.375
-			end,
-			AttackRate = function()
-				return 1.25
-			end,
-			Damage = function(level)
-				return scaling(3, 0.5, level)
-			end,
-			HealthMax = function(level)
-				return scaling(18, 1, level)
-			end,
-		},
-	},
-
-	RoyalGuard = {
-		Name = "Royal Guard",
-		Description = `A plate armor clad knight and a master of martial combat.`,
-		ModelName = "RoyalGuard",
-		Brain = {
-			Id = "BasicMelee",
-		},
-		Tags = { "Armored" },
-		Animations = {
-			Walk = "RoyalGuardWalk",
-			Attack = "RoyalGuardAttack",
-			Die = "GenericGoonDie",
-		},
-		Sounds = {
-			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
-			Death = { "MaleUgh1", "MaleUgh2" },
-		},
-		Stats = {
-			Size = 0.03,
-			AttackWindupTime = function()
-				return 0.43
-			end,
-			Speed = function()
-				return 0.07
-			end,
-			Range = function()
-				return 0.1
-			end,
-			AttackRate = function()
-				return 1.25
-			end,
-			Damage = function(level)
-				return scaling(2, 0.5, level)
-			end,
-			HealthMax = function(level)
-				return scaling(25, 2, level)
-			end,
-		},
-	},
-
 	MasterMage = {
 		Name = "MasterMage",
 		Description = "A master of the arcane arts.",
@@ -1084,46 +1130,6 @@ local Goons = {
 			end,
 			HealthMax = function(level)
 				return scaling(7, 1, level)
-			end,
-		},
-	},
-
-	RoyalCavalry = {
-		Name = "Royal Cavalry",
-		Description = `A mounted knight armed with a deadly lance and a thirst for battle.`,
-		ModelName = "RoyalCavalry",
-		Brain = {
-			Id = "BasicMelee",
-		},
-		Tags = { "Armored", "Charger", "Brutal" },
-		Animations = {
-			Walk = "RoyalCavalryWalk",
-			Attack = "RoyalCavalryAttack",
-			Die = "RoyalCavalryDie",
-		},
-		Sounds = {
-			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
-			Death = { "MaleUgh1", "MaleUgh2" },
-		},
-		Stats = {
-			Size = 0.03,
-			AttackWindupTime = function()
-				return 0.43
-			end,
-			Speed = function()
-				return 0.1
-			end,
-			Range = function()
-				return 0.1
-			end,
-			AttackRate = function()
-				return 1.25
-			end,
-			Damage = function(level)
-				return scaling(4, 0.5, level)
-			end,
-			HealthMax = function(level)
-				return scaling(30, 2, level)
 			end,
 		},
 	},

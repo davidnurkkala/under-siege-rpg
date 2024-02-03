@@ -10,18 +10,17 @@ local BattlerDefs = require(ReplicatedStorage.Shared.Defs.BattlerDefs)
 local BattlerHelper = require(ServerScriptService.Server.Util.BattlerHelper)
 local CardDefs = require(ReplicatedStorage.Shared.Defs.CardDefs)
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
-local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local Damage = require(ServerScriptService.Server.Classes.Damage)
 local EventStream = require(ReplicatedStorage.Shared.Util.EventStream)
 local Goon = require(ServerScriptService.Server.Classes.Goon)
 local GuiEffectService = require(ServerScriptService.Server.Services.GuiEffectService)
 local PartPath = require(ReplicatedStorage.Shared.Classes.PartPath)
-local ProductService = require(ServerScriptService.Server.Services.ProductService)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local RewardHelper = require(ServerScriptService.Server.Util.RewardHelper)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local Trove = require(ReplicatedStorage.Packages.Trove)
+local TryNow = require(ReplicatedStorage.Shared.Util.TryNow)
 local Updater = require(ReplicatedStorage.Shared.Classes.Updater)
 
 local Battle = {}
@@ -99,9 +98,13 @@ function Battle.new(args: {
 		base:PivotTo(part.CFrame)
 		base.Parent = self.Model
 
-		local cframe, size = char:GetBoundingBox()
-		local dy = char:GetPivot().Y - (cframe.Y - size.Y / 2)
-		char:PivotTo(base.Spawn.CFrame + Vector3.new(0, dy, 0))
+		local delta = if Players:GetPlayerFromCharacter(char) ~= nil
+			then TryNow(function()
+				return Vector3.new(0, char.Humanoid.HipHeight + char.PrimaryPart.Size.Y / 2, 0)
+			end, Vector3.zero)
+			else Vector3.zero
+
+		char:PivotTo(base.Spawn.CFrame + delta)
 		base.Spawn.Transparency = 1
 
 		battler:Observe(function()
@@ -149,7 +152,7 @@ function Battle.new(args: {
 	return self
 end
 
-function Battle.fromPlayerVersusBattler(player: Player, battlerId: string)
+function Battle.fromPlayerVersusBattler(player: Player, battlerId: string, playerBattlerOverrides: any)
 	return BattleService:Promise(player, function()
 		return Promise.new(function(resolve, reject)
 			if BattleService:Get(player) then
@@ -157,7 +160,7 @@ function Battle.fromPlayerVersusBattler(player: Player, battlerId: string)
 				return
 			end
 
-			resolve(BattleSession.promised(player, 0, 1))
+			resolve(BattleSession.promised(player, 0, 1, playerBattlerOverrides))
 		end):andThen(function(battleSession)
 			local battlerDef = BattlerDefs[battlerId]
 			assert(battlerDef, `No battler found for id {battlerId}`)

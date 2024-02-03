@@ -4,6 +4,7 @@ local BattleController = require(ReplicatedStorage.Shared.Controllers.BattleCont
 local BattleResultBridge = require(ReplicatedStorage.Shared.React.BattleResult.BattleResultBridge)
 local ChangeLogBoard = require(ReplicatedStorage.Shared.React.ChangeLog.ChangeLogBoard)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
+local CutsceneController = require(ReplicatedStorage.Shared.Controllers.CutsceneController)
 local DeckMenuBridge = require(ReplicatedStorage.Shared.React.Menus.DeckMenuBridge)
 local DialogueBridge = require(ReplicatedStorage.Shared.React.Dialogue.DialogueBridge)
 local GearMenuBridge = require(ReplicatedStorage.Shared.React.GearMenu.GearMenuBridge)
@@ -13,12 +14,14 @@ local IndicatorBridge = require(ReplicatedStorage.Shared.React.NumberPopups.Indi
 local InventoryMenuBridge = require(ReplicatedStorage.Shared.React.Menus.InventoryMenuBridge)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local LoginStreakRewardsMenuBridge = require(ReplicatedStorage.Shared.React.Menus.LoginStreakRewardsMenuBridge)
+local MenuContext = require(ReplicatedStorage.Shared.React.MenuContext.MenuContext)
 local MenuProvider = require(ReplicatedStorage.Shared.React.MenuContext.MenuProvider)
 local OverheadLabeledBridge = require(ReplicatedStorage.Shared.React.OverheadLabeledBridge)
 local PaddingAll = require(ReplicatedStorage.Shared.React.Common.PaddingAll)
 local PlatformProvider = require(ReplicatedStorage.Shared.React.PlatformContext.PlatformProvider)
 local PremiumShopMenuBridge = require(ReplicatedStorage.Shared.React.Menus.PremiumShopMenuBridge)
 local React = require(ReplicatedStorage.Packages.React)
+local RegenTimestampedBridge = require(ReplicatedStorage.Shared.React.RegenTimestampedBridge)
 local SessionRewardsMenuBridge = require(ReplicatedStorage.Shared.React.Menus.SessionRewardsMenuBridge)
 local ShoplikeBridge = require(ReplicatedStorage.Shared.React.ShoplikeBridge)
 local TeleportMenuBridge = require(ReplicatedStorage.Shared.React.Teleport.TeleportMenuBridge)
@@ -26,7 +29,6 @@ local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 local TutorialHud = require(ReplicatedStorage.Shared.React.Tutorial.TutorialHud)
 local UseProperty = require(ReplicatedStorage.Shared.React.Hooks.UseProperty)
 local VipMenuBridge = require(ReplicatedStorage.Shared.React.Menus.VipMenuBridge)
-local WeaponShopBridge = require(ReplicatedStorage.Shared.React.WeaponShop.WeaponShopBridge)
 
 local function alphaMessage()
 	local inBattle = UseProperty(BattleController.InBattle)
@@ -71,6 +73,7 @@ return function()
 
 			Indicators = React.createElement(IndicatorBridge),
 			OverheadLabels = React.createElement(OverheadLabeledBridge),
+			RegenLabels = React.createElement(RegenTimestampedBridge),
 			Shoplikes = React.createElement(ShoplikeBridge),
 			ChangeLogBoard = React.createElement(ChangeLogBoard),
 		}),

@@ -1,7 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
-local ActionService = require(ServerScriptService.Server.Services.ActionService)
 local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
 local CardDefs = require(ReplicatedStorage.Shared.Defs.CardDefs)
 local DataService = require(ServerScriptService.Server.Services.DataService)
@@ -26,8 +25,9 @@ type LobbySession = typeof(setmetatable(
 		Player: Player,
 		Trove: any,
 		Character: Model,
+		Root: BasePart,
 		Animator: Animator.Animator,
-		ActiveStun: any,
+		ActiveLockdown: any,
 		Human: Humanoid,
 		AutoRunTimer: number,
 	},
@@ -49,10 +49,11 @@ function LobbySession.new(args: {
 		Player = args.Player,
 		Trove = trove,
 		Character = args.Character,
+		Root = args.Character.PrimaryPart,
 		Human = args.Human,
 		Animator = animator,
 		Attacks = {},
-		ActiveStun = nil,
+		ActiveLockdown = nil,
 		AutoRunTimer = 0,
 	}, LobbySession)
 
@@ -149,7 +150,7 @@ function LobbySession.promised(player: Player)
 end
 
 function LobbySession.BeStunned(self: LobbySession)
-	if self.ActiveStun then self.ActiveStun:cancel() end
+	if self.ActiveLockdown then self.ActiveLockdown:cancel() end
 
 	EffectService:All(EffectDizzy({
 		Head = self.Character:FindFirstChild("Head") :: BasePart,
@@ -157,10 +158,18 @@ function LobbySession.BeStunned(self: LobbySession)
 	}))
 	self.Animator:Play("Dizzy", 0)
 
-	self.ActiveStun = Promise.delay(3):finally(function()
+	self.ActiveLockdown = Promise.delay(3):finally(function()
 		self.Animator:StopHard("Dizzy")
-		self.ActiveStun = nil
+		self.ActiveLockdown = nil
 	end)
+end
+
+function LobbySession.LockDown(self: LobbySession, duration: number)
+	self.ActiveLockdown = Promise.delay(duration):finally(function()
+		self.ActiveLockdown = nil
+	end)
+
+	return self.ActiveLockdown
 end
 
 function LobbySession.Update(self: LobbySession, dt: number)
@@ -172,7 +181,7 @@ function LobbySession.Update(self: LobbySession, dt: number)
 	end
 	local isRunning = self.AutoRunTimer >= AutoRunTime
 
-	if self:IsStunned() then
+	if self:IsLockedDown() then
 		self.AutoRunTimer = 0
 		self.Human.WalkSpeed = 0
 	else
@@ -184,8 +193,8 @@ function LobbySession.Update(self: LobbySession, dt: number)
 	end
 end
 
-function LobbySession.IsStunned(self: LobbySession)
-	return self.ActiveStun ~= nil
+function LobbySession.IsLockedDown(self: LobbySession)
+	return self.ActiveLockdown ~= nil
 end
 
 function LobbySession.Destroy(self: LobbySession)

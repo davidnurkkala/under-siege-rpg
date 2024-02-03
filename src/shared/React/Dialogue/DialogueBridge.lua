@@ -6,6 +6,7 @@ local BattleController = require(ReplicatedStorage.Shared.Controllers.BattleCont
 local Button = require(ReplicatedStorage.Shared.React.Common.Button)
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
+local Default = require(ReplicatedStorage.Shared.Util.Default)
 local DialogueController = require(ReplicatedStorage.Shared.Controllers.DialogueController)
 local Flipper = require(ReplicatedStorage.Packages.Flipper)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
@@ -14,6 +15,7 @@ local ListLayout = require(ReplicatedStorage.Shared.React.Common.ListLayout)
 local MenuContext = require(ReplicatedStorage.Shared.React.MenuContext.MenuContext)
 local PaddingAll = require(ReplicatedStorage.Shared.React.Common.PaddingAll)
 local Panel = require(ReplicatedStorage.Shared.React.Common.Panel)
+local PlatformContext = require(ReplicatedStorage.Shared.React.PlatformContext.PlatformContext)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local PromiseMotor = require(ReplicatedStorage.Shared.Util.PromiseMotor)
 local RatioText = require(ReplicatedStorage.Shared.React.Common.RatioText)
@@ -25,10 +27,14 @@ local UseProperty = require(ReplicatedStorage.Shared.React.Hooks.UseProperty)
 
 local function outputText(props: {
 	Text: string,
+	Args: any,
 	OnFinished: () -> (),
 })
+	local textSpeed = Default(props.Args.TextSpeed, 1)
+
 	local graphemes, setGraphemes = React.useState(0)
 	local labelRef = React.useRef(nil)
+	local platform = React.useContext(PlatformContext)
 
 	React.useEffect(function()
 		if labelRef.current == nil then return end
@@ -41,8 +47,8 @@ local function outputText(props: {
 
 		local current = 0
 		local promise = Promise.fromEvent(RunService.Heartbeat, function()
-			current += 2
-			setGraphemes(current)
+			current = math.clamp(current + 2 * textSpeed, 0, count)
+			setGraphemes(math.round(current))
 			return current >= count
 		end):andThen(function()
 			props.OnFinished()
@@ -55,7 +61,7 @@ local function outputText(props: {
 
 	return React.createElement(RatioText, {
 		ref = labelRef,
-		Ratio = 1 / 22,
+		Ratio = if platform == "Mobile" then 1 / 15 else 1 / 22,
 		MaxVisibleGraphemes = graphemes,
 		Text = TextStroke(props.Text),
 	})
@@ -68,6 +74,7 @@ local function inputButton(props: {
 	Visible: boolean,
 })
 	local trans, transMotor = UseMotor(1)
+	local platform = React.useContext(PlatformContext)
 
 	React.useEffect(function()
 		if not props.Visible then return end
@@ -102,7 +109,7 @@ local function inputButton(props: {
 			[React.Event.Activated] = props.Select,
 		}, {
 			Text = React.createElement(RatioText, {
-				Ratio = 1 / 24,
+				Ratio = if platform == "Mobile" then 1 / 16 else 1 / 24,
 				Text = TextStroke(props.Text),
 			}),
 		}),
@@ -187,6 +194,7 @@ return function()
 				}, {
 					Text = React.createElement(outputText, {
 						Text = TextStroke(dialogue.Node.Text),
+						Args = dialogue.Node.Args or {},
 						OnFinished = function()
 							setInputsVisible(true)
 						end,

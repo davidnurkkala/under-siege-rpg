@@ -1,29 +1,48 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local QuickCurrency = require(ReplicatedStorage.Shared.Util.QuickCurrency)
 local Sift = require(ReplicatedStorage.Packages.Sift)
-local WeightTable = require(ReplicatedStorage.Shared.Classes.WeightTable)
-
-local function quickCurrency(...)
-	local amounts = { ... }
-	local count = #amounts
-	local entries = {}
-	for index, amount in amounts do
-		local step = count - (index - 1)
-		local weight = 2 ^ step
-		table.insert(entries, { Weight = weight, Result = amount })
-	end
-	return WeightTable.new(entries)
-end
 
 local Battlers = {
+	OpeningCutsceneOrcishGeneral = {
+		ModelName = "OrcGeneral",
+		Name = "Orcish General",
+		BattlegroundName = "World0",
+		BaseId = "Camp",
+		Rewards = {},
+		WeaponId = "OrcishGrimoire",
+		Deck = {
+			OrcWarrior = 5,
+			OrcChampion = 5,
+			Draugr = 5,
+			Berserker = 5,
+			BanditRogue = 5,
+			RainOfArrows = 5,
+		},
+		Brain = {
+			Id = "NaiveOrder",
+			Order = {
+				{ CardId = "OrcWarrior", Count = 1 },
+				{ CardId = "OrcChampion", Count = 1 },
+				{ CardId = "OrcWarrior", Count = 1 },
+				{ CardId = "RainOfArrows", Count = 1 },
+				{ CardId = "OrcWarrior", Count = 1 },
+				{ CardId = "Draugr", Count = 1 },
+				{ CardId = "Berserker", Count = 1 },
+				{ CardId = "OrcWarrior", Count = 1 },
+				{ CardId = "RainOfArrows", Count = 1 },
+				{ CardId = "BanditRogue", Count = 1 },
+			},
+		},
+	},
 	-- world 1
 	Peasant = {
 		Name = "Peasant",
 		BattlegroundName = "World1",
 		BaseId = "Camp",
 		Rewards = {
-			{ Chance = 1, Result = { Type = "Currency", CurrencyType = "Coins", Amount = quickCurrency(10, 20, 50) } },
-			{ Chance = 1, Result = { Type = "Currency", CurrencyType = "SimpleFood", Amount = quickCurrency(5, 10, 20) } },
+			{ Chance = 1, Result = { Type = "Currency", CurrencyType = "Coins", Amount = QuickCurrency(10, 20, 50) } },
+			{ Chance = 1, Result = { Type = "Currency", CurrencyType = "SimpleFood", Amount = QuickCurrency(5, 10, 20) } },
 			{ Chance = 0.5, Result = { Type = "Currency", CurrencyType = "Gems", Amount = 1 } },
 			{ Chance = 0.01, Result = { Type = "Card", CardId = "Heal" } },
 		},
@@ -48,7 +67,7 @@ local Battlers = {
 		BattlegroundName = "World1",
 		BaseId = "ClassicReborn",
 		Rewards = {
-			{ Chance = 1, Result = { Type = "Currency", CurrencyType = "Coins", Amount = quickCurrency(25, 50, 100) } },
+			{ Chance = 1, Result = { Type = "Currency", CurrencyType = "Coins", Amount = QuickCurrency(25, 50, 100) } },
 		},
 		WeaponId = "SimpleWand",
 		Deck = {
@@ -380,7 +399,8 @@ local Battlers = {
 }
 
 return Sift.Dictionary.map(Battlers, function(battler, id)
-	local model = ReplicatedStorage.Assets.Models.Battlers:FindFirstChild(id)
+	local modelName = battler.ModelName or id
+	local model = ReplicatedStorage.Assets.Models.Battlers:FindFirstChild(modelName)
 	assert(model, `Battler {id} missing model`)
 
 	return Sift.Dictionary.merge(battler, {
