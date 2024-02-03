@@ -23,6 +23,9 @@ local WeaponDefs = require(ReplicatedStorage.Shared.Defs.WeaponDefs)
 local WeaponHelper = require(ReplicatedStorage.Shared.Util.WeaponHelper)
 local WeaponTypeDefs = require(ReplicatedStorage.Shared.Defs.WeaponTypeDefs)
 
+local StartingSuppliesGain = 7
+local SuppliesGainPerLevel = 2
+
 local Battler = {}
 Battler.__index = Battler
 
@@ -97,7 +100,7 @@ function Battler.new(args: {
 			return cooldown, cardId
 		end),
 		Supplies = 0,
-		SuppliesGain = 5,
+		SuppliesGain = StartingSuppliesGain,
 	}, Battler)
 
 	self.AttackCooldown:Use()
@@ -256,7 +259,7 @@ function Battler.GetStatus(self: Battler)
 end
 
 function Battler.GetSuppliesUpgradeCost(self: Battler)
-	return 50 + 30 * (self.SuppliesGain - 5)
+	return 50 + 30 * (self.SuppliesGain - StartingSuppliesGain)
 end
 
 function Battler.UpgradeSupplies(self: Battler)
@@ -264,7 +267,7 @@ function Battler.UpgradeSupplies(self: Battler)
 	if self.Supplies < cost then return end
 
 	self.Supplies -= cost
-	self.SuppliesGain += 1
+	self.SuppliesGain += SuppliesGainPerLevel
 
 	self.Changed:Fire(self:GetStatus())
 end

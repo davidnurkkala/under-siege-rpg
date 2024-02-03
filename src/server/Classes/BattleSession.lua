@@ -19,12 +19,15 @@ local WeaponService = require(ServerScriptService.Server.Services.WeaponService)
 local BattleSession = {}
 BattleSession.__index = BattleSession
 
-export type BattleSession = typeof(setmetatable({} :: {
-	Player: Player,
-	Battler: Battler.Battler,
-	Animator: any,
-	Model: Model,
-}, BattleSession))
+export type BattleSession = typeof(setmetatable(
+	{} :: {
+		Player: Player,
+		Battler: Battler.Battler,
+		Animator: any,
+		Model: Model,
+	},
+	BattleSession
+))
 
 function BattleSession.new(args: {
 	Player: Player,
@@ -60,7 +63,7 @@ function BattleSession.new(args: {
 	return self
 end
 
-function BattleSession.promised(player: Player, position: number, direction: number)
+function BattleSession.promised(player: Player, position: number, direction: number, battlerOverrides: any)
 	return Promise.new(function(resolve, reject, onCancel)
 		local char = player.Character
 
@@ -102,10 +105,11 @@ function BattleSession.promised(player: Player, position: number, direction: num
 			local deck = DeckService:GetDeckForBattle(player):expect()
 			if onCancel() then return end
 
-			local baseId = CosmeticService:GetEquipped(player, "Bases"):expect()
+			local baseId = if battlerOverrides and battlerOverrides.BaseId
+				then battlerOverrides.BaseId
+				else CosmeticService:GetEquipped(player, "Bases"):expect()
 			if onCancel() then return end
 			local baseDef = BaseDefs[baseId]
-			print(baseId)
 			local base = baseDef.Model:Clone()
 
 			resolve(BattleSession.new({
@@ -113,7 +117,7 @@ function BattleSession.promised(player: Player, position: number, direction: num
 				Root = root,
 				Character = char,
 				Human = human,
-				BattlerArgs = {
+				BattlerArgs = Sift.Dictionary.merge({
 					BaseModel = base,
 					CharModel = char,
 					Position = position,
@@ -123,7 +127,7 @@ function BattleSession.promised(player: Player, position: number, direction: num
 					TeamId = `PLAYER_{player.Name}`,
 					Deck = deck,
 					HealthMax = 50,
-				},
+				}, battlerOverrides or {}),
 			}))
 		end)
 	end)

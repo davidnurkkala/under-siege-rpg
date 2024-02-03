@@ -10,13 +10,11 @@ local BattlerDefs = require(ReplicatedStorage.Shared.Defs.BattlerDefs)
 local BattlerHelper = require(ServerScriptService.Server.Util.BattlerHelper)
 local CardDefs = require(ReplicatedStorage.Shared.Defs.CardDefs)
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
-local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local Damage = require(ServerScriptService.Server.Classes.Damage)
 local EventStream = require(ReplicatedStorage.Shared.Util.EventStream)
 local Goon = require(ServerScriptService.Server.Classes.Goon)
 local GuiEffectService = require(ServerScriptService.Server.Services.GuiEffectService)
 local PartPath = require(ReplicatedStorage.Shared.Classes.PartPath)
-local ProductService = require(ServerScriptService.Server.Services.ProductService)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local RewardHelper = require(ServerScriptService.Server.Util.RewardHelper)
 local Sift = require(ReplicatedStorage.Packages.Sift)
@@ -154,7 +152,7 @@ function Battle.new(args: {
 	return self
 end
 
-function Battle.fromPlayerVersusBattler(player: Player, battlerId: string)
+function Battle.fromPlayerVersusBattler(player: Player, battlerId: string, playerBattlerOverrides: any)
 	return BattleService:Promise(player, function()
 		return Promise.new(function(resolve, reject)
 			if BattleService:Get(player) then
@@ -162,7 +160,7 @@ function Battle.fromPlayerVersusBattler(player: Player, battlerId: string)
 				return
 			end
 
-			resolve(BattleSession.promised(player, 0, 1))
+			resolve(BattleSession.promised(player, 0, 1, playerBattlerOverrides))
 		end):andThen(function(battleSession)
 			local battlerDef = BattlerDefs[battlerId]
 			assert(battlerDef, `No battler found for id {battlerId}`)

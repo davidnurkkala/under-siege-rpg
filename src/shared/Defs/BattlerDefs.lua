@@ -4,6 +4,37 @@ local QuickCurrency = require(ReplicatedStorage.Shared.Util.QuickCurrency)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 
 local Battlers = {
+	OpeningCutsceneOrcishGeneral = {
+		ModelName = "OrcGeneral",
+		Name = "Orcish General",
+		BattlegroundName = "World0",
+		BaseId = "Camp",
+		Rewards = {},
+		WeaponId = "OrcishGrimoire",
+		Deck = {
+			OrcWarrior = 5,
+			OrcChampion = 5,
+			Draugr = 5,
+			Berserker = 5,
+			BanditRogue = 5,
+			RainOfArrows = 5,
+		},
+		Brain = {
+			Id = "NaiveOrder",
+			Order = {
+				{ CardId = "OrcWarrior", Count = 1 },
+				{ CardId = "OrcChampion", Count = 1 },
+				{ CardId = "OrcWarrior", Count = 1 },
+				{ CardId = "RainOfArrows", Count = 1 },
+				{ CardId = "OrcWarrior", Count = 1 },
+				{ CardId = "Draugr", Count = 1 },
+				{ CardId = "Berserker", Count = 1 },
+				{ CardId = "OrcWarrior", Count = 1 },
+				{ CardId = "RainOfArrows", Count = 1 },
+				{ CardId = "BanditRogue", Count = 1 },
+			},
+		},
+	},
 	-- world 1
 	Peasant = {
 		Name = "Peasant",
@@ -347,7 +378,8 @@ local Battlers = {
 }
 
 return Sift.Dictionary.map(Battlers, function(battler, id)
-	local model = ReplicatedStorage.Assets.Models.Battlers:FindFirstChild(id)
+	local modelName = battler.ModelName or id
+	local model = ReplicatedStorage.Assets.Models.Battlers:FindFirstChild(modelName)
 	assert(model, `Battler {id} missing model`)
 
 	return Sift.Dictionary.merge(battler, {

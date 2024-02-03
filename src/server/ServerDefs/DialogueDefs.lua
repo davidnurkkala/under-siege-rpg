@@ -1,9 +1,13 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local Battle = require(ServerScriptService.Server.Classes.Battle)
 local BattleHelper = require(ServerScriptService.Server.Util.BattleHelper)
 local CutsceneService = require(ServerScriptService.Server.Services.CutsceneService)
 local GenericShopService = require(ServerScriptService.Server.Services.GenericShopService)
+local LobbySession = require(ServerScriptService.Server.Classes.LobbySession)
+local LobbySessions = require(ServerScriptService.Server.Singletons.LobbySessions)
+local Promise = require(ReplicatedStorage.Packages.Promise)
 local ServerFade = require(ServerScriptService.Server.Util.ServerFade)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 
@@ -44,7 +48,31 @@ local Dialogues = {
 					CutsceneService:OnFinish(self.Player):andThen(function()
 						ServerFade(self.Player, nil, function()
 							CutsceneService:Step(self.Player)
-							self:Destroy()
+
+							local session = LobbySessions.Get(self.Player)
+							session:Destroy()
+
+							return Promise.delay(0.5):andThenCall(Battle.fromPlayerVersusBattler, self.Player, "OpeningCutsceneOrcishGeneral", {
+								Deck = {
+									Pikeman = 3,
+									Crossbowman = 3,
+									Footman = 3,
+									RoyalGuard = 2,
+									RoyalRanger = 2,
+									RoyalCavalry = 1,
+									MasterMage = 1,
+								},
+								BaseId = "OldCastle",
+							})
+						end):andThen(function(battle)
+							return Promise.fromEvent(battle.Finished):andThenReturn(battle)
+						end):andThen(function(battle)
+							return ServerFade(self.Player, nil, function()
+								battle:Destroy()
+								self:Destroy()
+
+								return LobbySession.promised(self.Player)
+							end)
 						end)
 					end)
 
