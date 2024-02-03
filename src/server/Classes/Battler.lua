@@ -23,7 +23,7 @@ local WeaponDefs = require(ReplicatedStorage.Shared.Defs.WeaponDefs)
 local WeaponHelper = require(ReplicatedStorage.Shared.Util.WeaponHelper)
 local WeaponTypeDefs = require(ReplicatedStorage.Shared.Defs.WeaponTypeDefs)
 
-local StartingSuppliesGain = 7
+local StartingSuppliesGain = 8
 local SuppliesGainPerLevel = 2
 
 local Battler = {}
