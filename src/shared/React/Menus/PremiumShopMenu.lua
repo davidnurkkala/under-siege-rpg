@@ -31,6 +31,7 @@ local UseDeck = require(ReplicatedStorage.Shared.React.Hooks.UseDeck)
 local UseMotor = require(ReplicatedStorage.Shared.React.Hooks.UseMotor)
 local UseWallet = require(ReplicatedStorage.Shared.React.Hooks.UseWallet)
 local UseWeapons = require(ReplicatedStorage.Shared.React.Hooks.UseWeapons)
+local PlatformContext = require(ReplicatedStorage.Shared.React.PlatformContext.PlatformContext)
 local WeaponHelper = require(ReplicatedStorage.Shared.Util.WeaponHelper)
 
 local function productDetails(props: {
@@ -323,10 +324,12 @@ local function gemButton(props: {
 	Amount: number,
 	Price: number,
 })
+	local platform = React.useContext(PlatformContext)
+
 	return React.createElement(Button, {
 		ImageColor3 = ColorDefs.DarkPurple,
 		BorderColor3 = ColorDefs.LightPurple,
-		Padding = UDim.new(0, 10),
+		Padding = UDim.new(0, if platform == "Mobile" then 2 else 10),
 
 		[React.Event.Activated] = function()
 			ProductController.PurchaseProduct(props.ProductId)
