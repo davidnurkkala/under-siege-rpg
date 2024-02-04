@@ -1297,6 +1297,51 @@ local Goons = {
 			end,
 		},
 	},
+
+	Dragon = {
+		Name = "Dragon",
+		Description = `This giant scaly beast is a creature of legend, striking fear into the hearts of all those unfortunate enough to cross its path.`,
+		ModelName = "Dragon",
+		Brain = {
+			Id = "BasicRanged",
+			ProjectileOffset = CFrame.new(0, 7, -3.25),
+			ProjectileName = "Fireball",
+			ProjectileSpeed = 15,
+		},
+		Tags = { "Armored", "Ranged" },
+		Animations = {
+			Idle = "DragonIdle",
+			Walk = "DragonFly",
+			Attack = "DragonAttack",
+			Die = "DragonDie",
+		},
+		Sounds = {
+			Shoot = { "DragonRoar1" },
+			Hit = { "MagicImpact4" },
+			Death = { "DragonRoar2" },
+		},
+		Stats = {
+			Size = 0.04,
+			AttackWindupTime = function()
+				return 0.8
+			end,
+			Speed = function()
+				return 0.14
+			end,
+			Range = function()
+				return 0.65
+			end,
+			AttackRate = function()
+				return 0.5
+			end,
+			Damage = function(level)
+				return scaling(15, 0.7, level)
+			end,
+			HealthMax = function(level)
+				return scaling(30, 2, level)
+			end,
+		},
+	},
 }
 
 return Sift.Dictionary.map(Goons, function(goon, id)

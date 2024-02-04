@@ -231,6 +231,13 @@ local Cards = {
 		Cooldown = 6,
 		Cost = 80,
 	},
+	Dragon = {
+		GoonId = "Dragon",
+		Type = "Goon",
+		Rank = 1,
+		Cooldown = 5,
+		Cost = 65,
+	},
 
 	-- ABILITIES
 	Heal = {

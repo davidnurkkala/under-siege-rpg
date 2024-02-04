@@ -32,6 +32,14 @@ local Ids = {
 		SoundId = "rbxassetid://16199853187",
 		Volume = 3,
 	},
+	DragonRoar1 = {
+		SoundId = "rbxassetid://16233736136",
+		Volume = 3,
+	},
+	DragonRoar2 = {
+		SoundId = "rbxassetid://16233736406",
+		Volume = 3,
+	},
 	WhooshMedium1 = "rbxassetid://15508156465",
 	WhooshMedium2 = "rbxassetid://15508156532",
 	WhooshMedium3 = "rbxassetid://15508156396",
