@@ -314,7 +314,7 @@ local Goons = {
 		Animations = {
 			Idle = "HunterIdle",
 			Walk = "HunterWalk",
-			Attack = "HunterAttack",
+			Attack = "CrossbowmanAttack",
 			Die = "GenericGoonDie",
 		},
 		Sounds = {
@@ -730,7 +730,7 @@ local Goons = {
 		Brain = {
 			Id = "BasicMelee",
 		},
-		Tags = { "Charger", "Brutal" },
+		Tags = { "Light", "Charger", "Brutal" },
 		Animations = {
 			Walk = "SwordsmanWalk",
 			Attack = "BerserkerAttack",
@@ -755,10 +755,10 @@ local Goons = {
 				return 0.75
 			end,
 			Damage = function(level)
-				return scaling(4, 2, level)
+				return lerped(2, 3, level)
 			end,
 			HealthMax = function(level)
-				return scaling(5, 1, level)
+				return lerped(10, 12.5, level)
 			end,
 		},
 	},
@@ -934,7 +934,7 @@ local Goons = {
 		Brain = {
 			Id = "BasicMelee",
 		},
-		Tags = { "Light" },
+		Tags = { "Light", "Brutal" },
 		Animations = {
 			Walk = "SwordsmanWalk",
 			Attack = "BerserkerAttack",
@@ -947,10 +947,10 @@ local Goons = {
 		Stats = {
 			Size = 0.03,
 			AttackWindupTime = function()
-				return 0.43
+				return 0.27
 			end,
 			Speed = function()
-				return 0.1
+				return 0.04
 			end,
 			Range = function()
 				return 0.1
@@ -959,10 +959,10 @@ local Goons = {
 				return 0.75
 			end,
 			Damage = function(level)
-				return scaling(5, 1, level)
+				return lerped(2, 2.75, level)
 			end,
 			HealthMax = function(level)
-				return scaling(15, 2, level)
+				return lerped(10, 15.5, level)
 			end,
 		},
 	},
@@ -974,7 +974,7 @@ local Goons = {
 		Brain = {
 			Id = "BasicMelee",
 		},
-		Tags = { "Armored" },
+		Tags = { "Armored", "Brutal" },
 		Animations = {
 			Walk = "SwordsmanWalk",
 			Attack = "BerserkerAttack",
@@ -987,22 +987,22 @@ local Goons = {
 		Stats = {
 			Size = 0.03,
 			AttackWindupTime = function()
-				return 0.43
+				return 0.27
 			end,
 			Speed = function()
-				return 0.05
+				return 0.04
 			end,
 			Range = function()
 				return 0.1
 			end,
 			AttackRate = function()
-				return 0.25
+				return 0.75
 			end,
 			Damage = function(level)
-				return scaling(8, 2, level)
+				return lerped(2.5, 3.25, level)
 			end,
 			HealthMax = function(level)
-				return scaling(20, 3, level)
+				return lerped(12.5, 17, level)
 			end,
 		},
 	},
@@ -1120,23 +1120,23 @@ local Goons = {
 				return 0.05
 			end,
 			Range = function()
-				return 0.45
+				return 0.5
 			end,
 			AttackRate = function()
-				return 0.3
+				return 0.5
 			end,
 			Damage = function(level)
-				return scaling(4, 0.75, level)
+				return lerped(3, 3.75, level)
 			end,
 			HealthMax = function(level)
-				return scaling(7, 1, level)
+				return lerped(10, 12.5, level)
 			end,
 		},
 	},
 
 	Draugr = {
 		Name = "Draugr",
-		Description = `A fallen viking warrior held together by cursed magicks.`,
+		Description = "A fallen viking warrior held together by cursed magic.",
 		ModelName = "Draugr",
 		Brain = {
 			Id = "BasicMelee",
@@ -1157,19 +1157,19 @@ local Goons = {
 				return 0.43
 			end,
 			Speed = function()
-				return 0.1
+				return 0.05
 			end,
 			Range = function()
 				return 0.1
 			end,
 			AttackRate = function()
-				return 1.25
+				return 0.75
 			end,
 			Damage = function(level)
-				return scaling(2, 0.5, level)
+				return lerped(2, 3, level)
 			end,
 			HealthMax = function(level)
-				return scaling(7, 2, level)
+				return lerped(10, 12.5, level)
 			end,
 		},
 	},

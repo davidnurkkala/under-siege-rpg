@@ -57,34 +57,6 @@ function WorldService.PrepareBlocking(self: WorldService)
 		end
 	end)
 
-	Observers.observePlayer(function(player)
-		local promise = Promise.new(function(resolve, _, onCancel)
-			repeat
-				local success = (player.Character ~= nil)
-					and (player.Character:IsDescendantOf(workspace))
-					and (player.Character.PrimaryPart ~= nil)
-					and (player.Character.PrimaryPart:IsDescendantOf(workspace))
-
-				if not success then
-					task.wait()
-					if onCancel() then return end
-				end
-			until success
-
-			resolve()
-		end)
-			:andThen(function()
-				return DataService:GetSaveFile(player)
-			end)
-			:andThen(function(saveFile)
-				return self:TeleportToWorld(player, saveFile:Get("WorldCurrent"))
-			end)
-
-		return function()
-			promise:cancel()
-		end
-	end)
-
 	self.Comm:CreateSignal("WorldTeleportRequested"):Connect(function(player: Player, worldId: string)
 		if not t.string(worldId) then return end
 
@@ -165,7 +137,7 @@ function WorldService.BuildOcean(self: WorldService)
 	end
 end
 
-function WorldService.TeleportToWorld(self: WorldService, player: Player, worldId: string, callback)
+function WorldService.TeleportToWorldRaw(self: WorldService, player: Player, worldId: string)
 	local def = WorldDefs[worldId]
 	assert(def, `No def for id {worldId}`)
 
@@ -176,12 +148,16 @@ function WorldService.TeleportToWorld(self: WorldService, player: Player, worldI
 	return DataService:GetSaveFile(player):andThen(function(saveFile)
 		if not saveFile:Get("Worlds")[worldId] then return end
 
-		return ServerFade(player, nil, function()
-			if callback then callback() end
-			saveFile:Set("WorldCurrent", worldId)
-			LightingService.LightingChangeRequested:Fire(player, def.LightingName)
-			char:PivotTo(model:GetPivot() + Vector3.new(0, 4, 0))
-		end)
+		saveFile:Set("WorldCurrent", worldId)
+		LightingService.LightingChangeRequested:Fire(player, def.LightingName)
+		char:PivotTo(model:GetPivot() + Vector3.new(0, 4, 0))
+	end)
+end
+
+function WorldService.TeleportToWorld(self: WorldService, player: Player, worldId: string, callback)
+	return ServerFade(player, nil, function()
+		if callback then callback() end
+		return self:TeleportToWorldRaw(player, worldId)
 	end)
 end
 

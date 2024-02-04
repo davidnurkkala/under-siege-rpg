@@ -45,6 +45,8 @@ local Ids = {
 	HunterWalk = 15484942080,
 	HunterAttack = 15484935063,
 
+	CrossbowmanAttack = 16231882432,
+
 	RoyalGuardIdle = 16100566459,
 	RoyalGuardWalk = 16100561481,
 	RoyalGuardAttack = 16100557476,

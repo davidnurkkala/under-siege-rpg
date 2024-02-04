@@ -29,11 +29,18 @@ function GuiController.Start(_self: GuiController)
 	gui.Name = "GameGui"
 	gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	gui.ResetOnSpawn = false
-	gui.Parent = Players.LocalPlayer.PlayerGui
 	gui.IgnoreGuiInset = true
+	gui.Parent = Players.LocalPlayer.PlayerGui
+
+	local dialogue = gui:Clone()
+	dialogue.Name = "DialogueGui"
+	dialogue.DisplayOrder = 512
+	dialogue.Parent = gui.Parent
 
 	local root = ReactRoblox.createRoot(gui)
-	root:render(React.createElement(App))
+	root:render(React.createElement(App, {
+		DialogueContainer = dialogue,
+	}))
 end
 
 return GuiController

@@ -10,30 +10,22 @@ local LobbySessions = require(ServerScriptService.Server.Singletons.LobbySession
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local ServerFade = require(ServerScriptService.Server.Util.ServerFade)
 local Sift = require(ReplicatedStorage.Packages.Sift)
+local WorldService = require(ServerScriptService.Server.Services.WorldService)
 
 local Dialogues = {
 	OpeningCutscene = {
 		Name = "",
-		StartNodes = { "Start" },
+		StartNodes = { "Line1" },
 		NodesOut = {
-			Start = {
-				Text = "",
-				Nodes = { "Line1" },
-				Callback = function(self)
-					ServerFade(self.Player, nil, function()
-						CutsceneService:Begin(self.Player)
-						self:SetNodeById("Line1")
-					end)
-
-					return true
-				end,
-			},
 			Line1 = {
 				Text = "The kingdom has fallen before the might of the orcish armies.",
 				Args = {
 					TextSpeed = 0.1,
 				},
 				Nodes = { "Line2" },
+				Callback = function(self)
+					CutsceneService:Begin(self.Player)
+				end,
 			},
 			Line2 = {
 				Text = "You must make your last stand. The final battle is now.",
@@ -43,7 +35,6 @@ local Dialogues = {
 				Callback = function(self)
 					CutsceneService:Step(self.Player)
 				end,
-
 				PostCallback = function(self)
 					CutsceneService:OnFinish(self.Player):andThen(function()
 						ServerFade(self.Player, nil, function()
@@ -54,24 +45,26 @@ local Dialogues = {
 
 							return Promise.delay(0.5):andThenCall(Battle.fromPlayerVersusBattler, self.Player, "OpeningCutsceneOrcishGeneral", {
 								Deck = {
-									Pikeman = 3,
-									Crossbowman = 3,
-									Footman = 3,
-									RoyalGuard = 2,
-									RoyalRanger = 2,
-									RoyalCavalry = 1,
-									MasterMage = 1,
+									Pikeman = 5,
+									Crossbowman = 5,
+									Footman = 5,
+									RoyalGuard = 3,
+									RoyalRanger = 3,
+									RoyalCavalry = 3,
+									MasterMage = 3,
 								},
 								BaseId = "OldCastle",
 							})
 						end):andThen(function(battle)
 							return Promise.fromEvent(battle.Finished):andThenReturn(battle)
 						end):andThen(function(battle)
-							return ServerFade(self.Player, nil, function()
+							return ServerFade(self.Player, {
+								DisplayOrder = 256,
+							}, function()
+								self:SetNodeById("Line3")
 								battle:Destroy()
-								self:Destroy()
-
-								return LobbySession.promised(self.Player)
+								WorldService:TeleportToWorldRaw(self.Player, "World1")
+								return Promise.fromEvent(self.Destroyed):andThenCall(LobbySession.promised, self.Player)
 							end)
 						end)
 					end)
@@ -80,6 +73,26 @@ local Dialogues = {
 
 					return true
 				end,
+			},
+			Line3 = {
+				Text = "You flee your castle in disgrace. Your army is shattered. Some loyal peasants join you in exile, swearing to fight for you.",
+				Args = {
+					TextSpeed = 0.5,
+				},
+				Nodes = { "Line4" },
+			},
+			Line4 = {
+				Text = "You must rebuild your strength and retake your castle.",
+				Args = {
+					TextSpeed = 0.5,
+				},
+				Nodes = { "Line5" },
+			},
+			Line5 = {
+				Text = "This is your destiny.",
+				Args = {
+					TextSpeed = 0.1,
+				},
 			},
 		},
 		NodesIn = {},

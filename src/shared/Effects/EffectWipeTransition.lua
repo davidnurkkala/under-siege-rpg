@@ -9,17 +9,19 @@ local SmoothStep = require(ReplicatedStorage.Shared.Util.SmoothStep)
 return function(args: {
 	Duration: number?,
 	Color: Color3?,
+	DisplayOrder: number?,
 	Guid: string,
 })
 	local duration = args.Duration or 0.5
 	local color = args.Color or Color3.new(0, 0, 0)
+	local displayOrder = args.DisplayOrder or 1024
 
 	return function()
 		return script.Name, args, Promise.delay(duration)
 	end, function()
 		local sg = Instance.new("ScreenGui")
 		sg.Name = "WipeTransition"
-		sg.DisplayOrder = 1024
+		sg.DisplayOrder = displayOrder
 		sg.IgnoreGuiInset = true
 
 		local frame = Instance.new("Frame")

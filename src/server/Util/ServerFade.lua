@@ -8,6 +8,7 @@ local Guid = require(ReplicatedStorage.Shared.Util.Guid)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 
 return function(players: Player | { Player }, args: { [string]: any }?, promiseFunc: () -> any)
+	print(debug.traceback())
 	local func = if typeof(players) == "table"
 		then function(...)
 			return EffectService:EffectPlayers(...)

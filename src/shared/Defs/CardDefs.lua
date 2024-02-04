@@ -240,6 +240,13 @@ local Cards = {
 		Cooldown = 6,
 		Cost = 50,
 	},
+	CheatMoreSupplies = {
+		Type = "Ability",
+		AbilityId = "CheatMoreSupplies",
+		Rank = 69,
+		Cooldown = 1,
+		Cost = 0,
+	},
 }
 
 return Sift.Dictionary.map(Cards, function(card, id)

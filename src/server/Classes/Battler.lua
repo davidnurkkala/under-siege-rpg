@@ -95,7 +95,7 @@ function Battler.new(args: {
 			local def = CardDefs[cardId]
 
 			local cooldown = Cooldown.new(def.Cooldown)
-			cooldown:Use()
+			if def.Cooldown >= 10 then cooldown:Use() end
 
 			return cooldown, cardId
 		end),

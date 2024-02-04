@@ -1,3 +1,12 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Lerp = require(ReplicatedStorage.Shared.Util.Lerp)
+
+local function lerped(level1, level5, level)
+	local scalar = (level - 1) / 4
+	return Lerp(level1, level5, scalar)
+end
+
 local Abilities = {
 	Heal = {
 		Name = "Heal",
@@ -7,7 +16,7 @@ local Abilities = {
 			return `Restore {self.Amount(level) // 0.01} health to your front soldier.`
 		end,
 		Amount = function(level)
-			return 10 + level * 3
+			return lerped(10, 20, level)
 		end,
 	},
 
@@ -19,10 +28,10 @@ local Abilities = {
 			return `{self.Count(level)} arrows that deal {self.Damage(level) // 0.01} damage fall from the sky to hit enemies.\n\nEach arrow will hit a different target, starting from the front-most enemy soldier and moving backwards.\n\nDeals 10% damage to the enemy leader.`
 		end,
 		Count = function(level)
-			return 5 + level * 2
+			return math.round(lerped(5, 10, level))
 		end,
 		Damage = function(level)
-			return 3 + 0.25 * level
+			return lerped(1, 3, level)
 		end,
 	},
 
@@ -32,6 +41,15 @@ local Abilities = {
 		Summary = "Transform Peasants into Recruits.",
 		Description = function(self, level)
 			return `Of your Peasants, the {level} front-most will be transformed into Recruits.`
+		end,
+	},
+
+	CheatMoreSupplies = {
+		Name = "Cheat More Supplies",
+		Image = "",
+		Summary = "Gain more supplies.",
+		Description = function()
+			return `A cheat ability not accessible to players. Gives a large amount of Supplies for free.`
 		end,
 	},
 }
