@@ -1173,6 +1173,175 @@ local Goons = {
 			end,
 		},
 	},
+
+	UndeadWarrior = {
+		Name = "UndeadWarrior",
+		Description = `What remains of a knight who has long since passed.`,
+		ModelName = "UndeadWarrior",
+		Brain = {
+			Id = "BasicMelee",
+		},
+		Tags = { "Armored" },
+		Animations = {
+			Walk = "DraugrWalk",
+			Attack = "DraugrAttack",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.43
+			end,
+			Speed = function()
+				return 0.2
+			end,
+			Range = function()
+				return 0.1
+			end,
+			AttackRate = function()
+				return 1.2
+			end,
+			Damage = function(level)
+				return scaling(1.7, 0.5, level)
+			end,
+			HealthMax = function(level)
+				return scaling(6, 2, level)
+			end,
+		},
+	},
+
+	Cultist = {
+		Name = "Cultist",
+		Description = `A fanatic worshiper of the dark arts, bound to his masters will.`,
+		ModelName = "Cultist",
+		Brain = {
+			Id = "BasicRanged",
+			ProjectileOffset = CFrame.new(0, 0, -0.25),
+			ProjectileName = "DarkEnergy",
+			ProjectileSpeed = 12,
+		},
+		Tags = { "Ranged" },
+		Animations = {
+			Walk = "CultistWalk",
+			Attack = "CultistAttack",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Shoot = { "WandCast4", "WandCast4", "WandCast4" },
+			Hit = { "MagicImpact4", "MagicImpact4", "MagicImpact4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 1
+			end,
+			Speed = function()
+				return 0.1
+			end,
+			Range = function()
+				return 0.6
+			end,
+			AttackRate = function()
+				return 0.4
+			end,
+			Damage = function(level)
+				return scaling(4, 0.5, level)
+			end,
+			HealthMax = function(level)
+				return scaling(13, 2, level)
+			end,
+		},
+	},
+
+	FrostGiant = {
+		Name = "Frost Giant",
+		Description = `Dwelling high in the mountains, the world trembles in the wake of these massive titans.`,
+		ModelName = "FrostGiant",
+		Brain = {
+			Id = "BasicMelee",
+		},
+		Tags = { "Armored", "Brutal" },
+		Animations = {
+			Walk = "DraugrWalk",
+			Attack = "DraugrAttack",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Stats = {
+			Size = 0.04,
+			AttackWindupTime = function()
+				return 0.43
+			end,
+			Speed = function()
+				return 0.05
+			end,
+			Range = function()
+				return 0.1
+			end,
+			AttackRate = function()
+				return 2
+			end,
+			Damage = function(level)
+				return scaling(7, 0.7, level)
+			end,
+			HealthMax = function(level)
+				return scaling(25, 2, level)
+			end,
+		},
+	},
+
+	Dragon = {
+		Name = "Dragon",
+		Description = `This giant scaly beast is a creature of legend, striking fear into the hearts of all those unfortunate enough to cross its path.`,
+		ModelName = "Dragon",
+		Brain = {
+			Id = "BasicRanged",
+			ProjectileOffset = CFrame.new(0, 7, -3.25),
+			ProjectileName = "Fireball",
+			ProjectileSpeed = 15,
+		},
+		Tags = { "Armored", "Ranged" },
+		Animations = {
+			Idle = "DragonIdle",
+			Walk = "DragonFly",
+			Attack = "DragonAttack",
+			Die = "DragonDie",
+		},
+		Sounds = {
+			Shoot = { "DragonRoar1" },
+			Hit = { "MagicImpact4" },
+			Death = { "DragonRoar2" },
+		},
+		Stats = {
+			Size = 0.04,
+			AttackWindupTime = function()
+				return 0.8
+			end,
+			Speed = function()
+				return 0.14
+			end,
+			Range = function()
+				return 0.65
+			end,
+			AttackRate = function()
+				return 0.5
+			end,
+			Damage = function(level)
+				return scaling(15, 0.7, level)
+			end,
+			HealthMax = function(level)
+				return scaling(30, 2, level)
+			end,
+		},
+	},
 }
 
 return Sift.Dictionary.map(Goons, function(goon, id)

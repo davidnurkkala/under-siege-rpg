@@ -143,6 +143,27 @@ local Battlers = {
 			Id = "WeightedCost",
 		},
 	},
+
+	CultLeader = {
+		Name = "Cult Leader",
+		BattlegroundName = "World1",
+		BaseId = "Grim",
+		Reward = 500,
+		WeaponId = "OrcishGrimoire",
+		Deck = {
+			Cultist = 1,
+			UndeadWarrior = 1,
+			Heal = 1,
+		},
+		Brain = {
+			Id = "NaiveOrder",
+			Order = {
+				{ CardId = "UndeadWarrior", Count = 3 },
+				{ CardId = "Heal", Count = 1 },
+				{ CardId = "Cultist", Count = 3 },
+			},
+		},
+	},
 	VikingSailor = {
 		Name = "Viking Sailor",
 		BattlegroundName = "World1",
