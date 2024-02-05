@@ -138,6 +138,8 @@ function Goon.new(args: {
 		end)
 	end
 
+	if self.Def.Animations and self.Def.Animations.Idle then self.Animator:Play(self.Def.Animations.Idle) end
+
 	return self
 end
 

@@ -142,7 +142,7 @@ function Battler.new(args: {
 			if damage.Target:HasTag("Armored") then
 				damage.Amount *= 1.1
 			else
-				damage.Amount *= 0.95
+				damage.Amount *= 0.6
 			end
 		end)
 	end

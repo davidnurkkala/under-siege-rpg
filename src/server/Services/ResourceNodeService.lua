@@ -132,7 +132,7 @@ function ResourceNodeService.UseNode(self: ResourceNodeService, player: Player, 
 							Text = `+{reward.Amount}`,
 							Image = CurrencyDefs[reward.CurrencyType].Image,
 							Start = node:GetPivot().Position,
-							Finish = GetPlayerPosition(player),
+							EndGui = "GuiInventoryButton",
 						})
 					end
 				end

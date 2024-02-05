@@ -9,6 +9,7 @@ local DialogueBridge = require(ReplicatedStorage.Shared.React.Dialogue.DialogueB
 local GameController = require(ReplicatedStorage.Shared.Controllers.GameController)
 local GearMenuBridge = require(ReplicatedStorage.Shared.React.GearMenu.GearMenuBridge)
 local GenericShopBridge = require(ReplicatedStorage.Shared.React.GenericShop.GenericShopBridge)
+local GuideBridge = require(ReplicatedStorage.Shared.React.GuideBridge)
 local Hud = require(ReplicatedStorage.Shared.React.Hud.Hud)
 local IndicatorBridge = require(ReplicatedStorage.Shared.React.NumberPopups.IndicatorBridge)
 local InventoryMenuBridge = require(ReplicatedStorage.Shared.React.Menus.InventoryMenuBridge)
@@ -52,6 +53,8 @@ return function(props: {
 
 	return React.createElement(MenuProvider, nil, {
 		React.createElement(PlatformProvider, nil, {
+			GuiGuide = React.createElement(GuideBridge),
+
 			Dialogue = props.DialogueContainer and ReactRoblox.createPortal({
 				Padding = React.createElement(PaddingAll, {
 					Padding = UDim.new(0.05, 0),

@@ -4,6 +4,7 @@ local BattleController = require(ReplicatedStorage.Shared.Controllers.BattleCont
 local Button = require(ReplicatedStorage.Shared.React.Common.Button)
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
+local GuideController = require(ReplicatedStorage.Shared.Controllers.GuideController)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local ListLayout = require(ReplicatedStorage.Shared.React.Common.ListLayout)
 local PlatformContext = require(ReplicatedStorage.Shared.React.PlatformContext.PlatformContext)
@@ -11,18 +12,17 @@ local React = require(ReplicatedStorage.Packages.React)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local TextColor = require(ReplicatedStorage.Shared.React.Util.TextColor)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
-local TutorialController = require(ReplicatedStorage.Shared.Controllers.TutorialController)
 local UseProperty = require(ReplicatedStorage.Shared.React.Hooks.UseProperty)
 
 return function()
 	local text, setText = React.useState(nil)
 	local platform = React.useContext(PlatformContext)
 
-	local beamEnabled = UseProperty(TutorialController.BeamEnabled)
+	local beamEnabled = UseProperty(GuideController.BeamEnabled)
 	local inBattle = UseProperty(BattleController.InBattle)
 
 	React.useEffect(function()
-		return TutorialController.Message:Observe(function(data)
+		return GuideController.Message:Observe(function(data)
 			if data == nil then
 				setText(nil)
 				return
@@ -69,7 +69,7 @@ return function()
 					Size = UDim2.fromScale(1, 1),
 					SizeConstraint = Enum.SizeConstraint.RelativeYY,
 					[React.Event.Activated] = function()
-						TutorialController:ToggleBeam()
+						GuideController:ToggleBeam()
 					end,
 				}, {
 					Text = beamEnabled and React.createElement(Label, {
@@ -82,7 +82,7 @@ return function()
 					Image = "",
 					Size = UDim2.fromScale(0.5, 1),
 					[React.Event.Activated] = function()
-						TutorialController:ToggleBeam()
+						GuideController:ToggleBeam()
 					end,
 					Selectable = false,
 				}, {

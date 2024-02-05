@@ -272,7 +272,7 @@ return function(props: {
 
 		MainWindow = React.createElement(SystemWindow, {
 			Visible = props.Visible and (state == "Menu"),
-			HeaderText = TextStroke(`Deck ({equippedCount} / {Configuration.DeckSizeMax})`),
+			HeaderText = TextStroke(`Army ({equippedCount} / {Configuration.DeckSizeMax})`),
 			[React.Event.Activated] = props.Close,
 			RatioDisabled = true,
 			Size = UDim2.fromScale(1.2, 0.8),

@@ -12,15 +12,16 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 local WeaponDefs = require(ReplicatedStorage.Shared.Defs.WeaponDefs)
 local WorldDefs = require(ReplicatedStorage.Shared.Defs.WorldDefs)
 
-local TutorialController = {
+local GuideController = {
 	Priority = 0,
 }
 
-type TutorialController = typeof(TutorialController)
+type GuideController = typeof(GuideController)
 
-function TutorialController.PrepareBlocking(self: TutorialController)
-	self.Comm = Comm.ClientComm.new(ReplicatedStorage, true, "TutorialService")
+function GuideController.PrepareBlocking(self: GuideController)
+	self.Comm = Comm.ClientComm.new(ReplicatedStorage, true, "GuideService")
 	self.StatusRemote = self.Comm:GetProperty("Status")
+	self.GuiGuideRemote = self.Comm:GetProperty("GuiGuide")
 
 	self.Message = Property.new(nil, Sift.Dictionary.equalsDeep)
 	self.Target = Property.new(nil)
@@ -102,11 +103,11 @@ function TutorialController.PrepareBlocking(self: TutorialController)
 	end)
 end
 
-function TutorialController.ToggleBeam(self: TutorialController)
+function GuideController.ToggleBeam(self: GuideController)
 	self.BeamEnabled:Set(not self.BeamEnabled:Get())
 end
 
-function TutorialController.GetNearestTag(_self: TutorialController, tag: string, predicate: ((any) -> boolean)?)
+function GuideController.GetNearestTag(_self: GuideController, tag: string, predicate: ((any) -> boolean)?)
 	local nearest = nil
 	local bestDistance = math.huge
 
@@ -124,7 +125,7 @@ function TutorialController.GetNearestTag(_self: TutorialController, tag: string
 	return nearest
 end
 
-function TutorialController.Update(self: TutorialController, status)
+function GuideController.Update(self: GuideController, status)
 	if status == nil then
 		self.Message:Set(nil)
 		self.Target:Set(nil)
@@ -166,4 +167,4 @@ function TutorialController.Update(self: TutorialController, status)
 	end
 end
 
-return TutorialController
+return GuideController

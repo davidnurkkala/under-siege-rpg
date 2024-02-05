@@ -8,6 +8,7 @@ local Image = require(ReplicatedStorage.Shared.React.Common.Image)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local ListLayout = require(ReplicatedStorage.Shared.React.Common.ListLayout)
 local React = require(ReplicatedStorage.Packages.React)
+local Sift = require(ReplicatedStorage.Packages.Sift)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 
 return function(props: {
@@ -45,13 +46,22 @@ return function(props: {
 				Size = UDim2.fromScale(1, 0.1),
 				SizeConstraint = Enum.SizeConstraint.RelativeXX,
 				Text = TextStroke("Under Siege RPG"),
+				Font = Enum.Font.Fantasy,
 				LayoutOrder = 1,
 			}),
 
-			Button = React.createElement(Button, {
-				Size = UDim2.fromScale(0.2, 0.2 * 0.2),
+			Subtitle = React.createElement(Label, {
+				Size = UDim2.fromScale(1, 0.1 * 0.2),
 				SizeConstraint = Enum.SizeConstraint.RelativeXX,
+				Text = TextStroke(`Co-created by {table.concat(Sift.Array.shuffle({ "Davidii", "Chronomad" }), " and ")}`),
+				Font = Enum.Font.Gotham,
 				LayoutOrder = 2,
+			}),
+
+			Button = React.createElement(Button, {
+				Size = UDim2.fromScale(0.2, 0.2 * 0.3),
+				SizeConstraint = Enum.SizeConstraint.RelativeXX,
+				LayoutOrder = 3,
 				ImageColor3 = ColorDefs.PalePurple,
 				[React.Event.Activated] = props.Close,
 			}, {
