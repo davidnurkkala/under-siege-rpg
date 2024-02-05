@@ -40,6 +40,7 @@ export type Battler = typeof(setmetatable(
 		WeaponDef: any,
 		Destroyed: any,
 		WillDealDamage: any,
+		Attacked: any,
 		Battle: any?,
 		TeamId: string,
 		Active: boolean,
@@ -86,6 +87,7 @@ function Battler.new(args: {
 		Destroyed = Signal.new(),
 		Changed = Signal.new(),
 		WillDealDamage = Signal.new(),
+		Attacked = Signal.new(),
 		Active = true,
 		AttackCooldown = Cooldown.new(5),
 		Trove = trove,
@@ -350,6 +352,8 @@ function Battler.Attack(self: Battler)
 	end)
 
 	Promise.race({ attackPromise, cancelPromise })
+
+	self.Attacked:Fire()
 
 	return true
 end

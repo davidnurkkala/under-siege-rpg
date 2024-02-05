@@ -26,6 +26,11 @@ function GuideService.PrepareBlocking(self: GuideService)
 	self.Comm = Comm.ServerComm.new(ReplicatedStorage, "GuideService")
 	self.StatusRemote = self.Comm:CreateProperty("Status")
 	self.GuiGuideRemote = self.Comm:CreateProperty("GuiGuide", {})
+	self.GuiActionDone = self.Comm:CreateSignal("GuiActionDone")
+end
+
+function GuideService.SetGuiGuide(self: GuideService, player: Player, ...)
+	self.GuiGuideRemote:SetFor(player, Sift.Dictionary.set(self.GuiGuideRemote:GetFor(player) or {}, ...))
 end
 
 return GuideService

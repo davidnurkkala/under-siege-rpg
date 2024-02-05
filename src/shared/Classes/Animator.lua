@@ -8,10 +8,13 @@ Animator.__index = Animator
 
 type Animatable = Humanoid | AnimationController
 
-export type Animator = typeof(setmetatable({} :: {
-	Controller: any,
-	Tracks: { [string]: AnimationTrack },
-}, Animator))
+export type Animator = typeof(setmetatable(
+	{} :: {
+		Controller: any,
+		Tracks: { [string]: AnimationTrack },
+	},
+	Animator
+))
 
 function Animator.new(controller: Animatable): Animator
 	local self: Animator = setmetatable({
@@ -20,6 +23,13 @@ function Animator.new(controller: Animatable): Animator
 	}, Animator)
 
 	return self
+end
+
+function Animator.fromModel(model: Model): Animator?
+	local controller = model:FindFirstChildWhichIsA("Humanoid") or model:FindFirstChildWhichIsA("AnimationController")
+	if not controller then return end
+
+	return Animator.new(controller)
 end
 
 function Animator.Play(self: Animator, name: string, fadeTime, weight, speed, looping)

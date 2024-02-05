@@ -42,9 +42,7 @@ export type Dialogue = typeof(setmetatable(
 	Dialogue
 ))
 
-function Dialogue.new(player: Player, dialogueId: string): Dialogue
-	local def = DialogueDefs[dialogueId]
-
+function Dialogue.new(player: Player, def: any): Dialogue
 	local self = setmetatable({
 		Def = def,
 		Player = player,
@@ -71,6 +69,21 @@ function Dialogue.new(player: Player, dialogueId: string): Dialogue
 	end)
 
 	return self
+end
+
+function Dialogue.fromId(player: Player, dialogueId: string)
+	return Dialogue.new(player, DialogueDefs[dialogueId])
+end
+
+function Dialogue.fromOneOff(player: Player, node: Node, name: string?)
+	return Dialogue.new(player, {
+		Name = name or "",
+		StartNodes = { "Root" },
+		NodesOut = {
+			Root = node,
+		},
+		NodesIn = {},
+	})
 end
 
 function Dialogue.SetModel(self: Dialogue, model: Model)

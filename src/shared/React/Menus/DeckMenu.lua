@@ -11,6 +11,7 @@ local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
 local DeckController = require(ReplicatedStorage.Shared.Controllers.DeckController)
 local GridLayout = require(ReplicatedStorage.Shared.React.Common.GridLayout)
+local GuideController = require(ReplicatedStorage.Shared.Controllers.GuideController)
 local Image = require(ReplicatedStorage.Shared.React.Common.Image)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local LayoutContainer = require(ReplicatedStorage.Shared.React.Common.LayoutContainer)
@@ -185,6 +186,7 @@ function cardDetails(props: {
 			}),
 
 			Upgrade = (upgrade ~= nil) and React.createElement(Button, {
+				[React.Tag] = "GuiDeckCardDetailsUpgrade",
 				LayoutOrder = -2,
 				Size = UDim2.fromScale(0.3, 1),
 				[React.Event.Activated] = props.Upgrade,
@@ -230,12 +232,25 @@ return function(props: {
 	local deckIsFull = equippedCount >= Configuration.DeckSizeMax
 	local state, setState = React.useState("Menu")
 
+	local upgrade = React.useCallback(function(id)
+		setState("Waiting")
+		DeckController.UpgradeCard(id):andThen(function(result)
+			if not result then return end
+			setState("ShowingUpgrade")
+		end, function()
+			setState("Menu")
+		end)
+	end, {})
+
 	return React.createElement(Container, nil, {
 		UpgradeResult = (state == "ShowingUpgrade") and React.createElement(CardUpgradeResult, {
 			CardId = selectedId,
 			Level = props.Deck.Owned[selectedId],
 			Close = function()
 				setState("Menu")
+
+				-- hard code close when upgrading peasant from 1 to 2 for tutorial
+				if selectedId == "Peasant" and props.Deck.Owned[selectedId] == 2 then props.Close() end
 			end,
 		}),
 
@@ -248,14 +263,7 @@ return function(props: {
 				{
 					Text = TextStroke("Yes"),
 					Select = function()
-						setState("Waiting")
-						DeckController.UpgradeCard(selectedId):andThen(function(result)
-							if not result then return end
-
-							setState("ShowingUpgrade")
-						end, function()
-							setState("Menu")
-						end)
+						upgrade(selectedId)
 					end,
 				},
 				{
@@ -290,6 +298,12 @@ return function(props: {
 					DeckController.CardEquipToggleRequested:Fire(selectedId)
 				end,
 				Upgrade = function()
+					-- hard code skip the prompt for level 1 peasant for the tutorial
+					if selectedId == "Peasant" and props.Deck.Owned[selectedId] == 1 then
+						upgrade(selectedId)
+						return
+					end
+
 					setState("PromptingUpgrade")
 				end,
 			}),
@@ -314,11 +328,13 @@ return function(props: {
 					nil,
 					Sift.Dictionary.map(props.Deck.Owned, function(level, cardId)
 						return React.createElement(LayoutContainer, {
+							[React.Tag] = `GuiDeckCardButton{cardId}`,
 							Padding = 6,
 						}, {
 							Button = React.createElement(Button, {
 								ImageColor3 = if props.Deck.Equipped[cardId] then ColorDefs.PaleGreen else ColorDefs.PaleBlue,
 								[React.Event.Activated] = function()
+									GuideController.GuiActionDone:Fire("DeckCardSelected", cardId)
 									setSelectedId(cardId)
 								end,
 								SelectionOrder = -1,

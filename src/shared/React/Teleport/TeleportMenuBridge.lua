@@ -57,7 +57,6 @@ return function()
 					Select = function()
 						setWorldBuying(nil)
 						menu.Unset("Teleport")
-						WorldController.WorldPurchaseRequested:Fire(worldBuying)
 					end,
 				},
 				{

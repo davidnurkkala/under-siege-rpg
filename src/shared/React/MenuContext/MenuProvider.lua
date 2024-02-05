@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local CutsceneController = require(ReplicatedStorage.Shared.Controllers.CutsceneController)
+local GuideController = require(ReplicatedStorage.Shared.Controllers.GuideController)
 local MenuContext = require(ReplicatedStorage.Shared.React.MenuContext.MenuContext)
 local React = require(ReplicatedStorage.Packages.React)
 
@@ -17,6 +18,7 @@ return function(props)
 				if menu == oldMenu then
 					return oldMenu
 				else
+					GuideController.GuiActionDone:Fire("MenuSet", menu)
 					return menu
 				end
 			end)
@@ -24,6 +26,7 @@ return function(props)
 		Unset = function(menu)
 			setOpenMenu(function(oldMenu)
 				if menu == oldMenu then
+					GuideController.GuiActionDone:Fire("MenuUnset", menu)
 					return nil
 				else
 					return oldMenu

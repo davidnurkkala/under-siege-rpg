@@ -32,7 +32,7 @@ local TutorialHud = require(ReplicatedStorage.Shared.React.Tutorial.TutorialHud)
 local UseProperty = require(ReplicatedStorage.Shared.React.Hooks.UseProperty)
 local VipMenuBridge = require(ReplicatedStorage.Shared.React.Menus.VipMenuBridge)
 
-local function alphaMessage()
+local function betaMessage()
 	local inBattle = UseProperty(BattleController.InBattle)
 
 	return not inBattle
@@ -42,7 +42,7 @@ local function alphaMessage()
 			Position = UDim2.fromScale(1, 1),
 			AnchorPoint = Vector2.new(1, 1),
 			ZIndex = 64,
-			Text = TextStroke("<i>This game is a WIP. Your data may be reset before full release.</i>"),
+			Text = TextStroke("<i>This game is a WIP. Content may be buggy or incomplete. Data will <b>not</b> be reset at this point.</i>"),
 		})
 end
 
@@ -91,7 +91,7 @@ return function(props: {
 				VipMenu = React.createElement(VipMenuBridge),
 				BattleResult = React.createElement(BattleResultBridge),
 
-				AlphaMessage = React.createElement(alphaMessage),
+				BetaMessage = React.createElement(betaMessage),
 			}),
 
 			Indicators = React.createElement(IndicatorBridge),

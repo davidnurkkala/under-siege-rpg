@@ -3,7 +3,11 @@ local ServerScriptService = game:GetService("ServerScriptService")
 
 local Battle = require(ServerScriptService.Server.Classes.Battle)
 local BattleHelper = require(ServerScriptService.Server.Util.BattleHelper)
+local CardDefs = require(ReplicatedStorage.Shared.Defs.CardDefs)
+local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local CutsceneService = require(ServerScriptService.Server.Services.CutsceneService)
+local DeckService = require(ServerScriptService.Server.Services.DeckService)
+local DialogueHelper = require(ServerScriptService.Server.Util.DialogueHelper)
 local GenericShopService = require(ServerScriptService.Server.Services.GenericShopService)
 local GuideService = require(ServerScriptService.Server.Services.GuideService)
 local LobbySession = require(ServerScriptService.Server.Classes.LobbySession)
@@ -57,18 +61,30 @@ local Dialogues = {
 								BaseId = "OldCastle",
 							})
 						end):andThen(function(battle)
-							GuideService.GuiGuideRemote:SetFor(self.Player, {
-								GuiBattleAttackButton = {
-									Offset = Vector2.new(50, -150),
-									Anchor = Vector2.new(0.5, 0),
-									Text = "Use this button to shoot!",
-								},
-								GuiBattleDeckButton1 = {
-									Offset = Vector2.new(200, -100),
-									Anchor = Vector2.new(1, 0),
-									Text = "Use these buttons to send soldiers!",
-								},
+							local battler = battle.Battlers[1]
+							GuideService:SetGuiGuide(self.Player, "GuiBattleAttackButton", {
+								Offset = Vector2.new(50, -150),
+								Anchor = Vector2.new(0.5, 0),
+								Text = "Use this button to shoot!",
 							})
+
+							Promise.fromEvent(battler.Attacked):timeout(10):finally(function()
+								GuideService:SetGuiGuide(self.Player, "GuiBattleAttackButton", nil)
+							end)
+
+							GuideService:SetGuiGuide(self.Player, "GuiBattleDeckButton1", {
+								Offset = Vector2.new(200, -100),
+								Anchor = Vector2.new(1, 0),
+								Text = "Use these buttons to send soldiers!",
+							})
+
+							Promise.fromEvent(battle.CardPlayed, function(playingBattler)
+								return playingBattler == battler
+							end)
+								:timeout(10)
+								:finally(function()
+									GuideService:SetGuiGuide(self.Player, "GuiBattleDeckButton1", nil)
+								end)
 
 							return Promise.fromEvent(battle.Finished):andThenReturn(battle)
 						end):andThen(function(battle)
@@ -107,9 +123,99 @@ local Dialogues = {
 				Args = {
 					TextSpeed = 0.1,
 				},
+				PostCallback = function(self)
+					GuideService:SetGuiGuide(self.Player, "GuiDeckButton", {
+						Offset = Vector2.new(350, 0),
+						Anchor = Vector2.new(1, 0.5),
+						Text = "Use this button to view your army!",
+					})
+
+					Promise.fromEvent(GuideService.GuiActionDone, function(player, action, menuName)
+						if player ~= self.Player then return false end
+						if action ~= "MenuSet" then return false end
+
+						return menuName == "Deck"
+					end)
+						:andThen(function()
+							GuideService:SetGuiGuide(self.Player, "GuiDeckButton", nil)
+							GuideService:SetGuiGuide(self.Player, "GuiDeckCardButtonPeasant", {
+								Offset = Vector2.new(0, 100),
+								Anchor = Vector2.new(0.5, 1),
+								Text = "Use this button to examine your Peasant soldier!",
+							})
+
+							return Promise.fromEvent(GuideService.GuiActionDone, function(player, action, cardId)
+								if player ~= self.Player then return false end
+								if action ~= "DeckCardSelected" then return false end
+
+								return cardId == "Peasant"
+							end)
+						end)
+						:andThen(function()
+							local upgradePrice = CardDefs.Peasant.Upgrades[1]
+
+							return Promise.all(Sift.Array.map(Sift.Dictionary.keys(upgradePrice), function(currencyType)
+								return CurrencyService:AddCurrency(self.Player, currencyType, upgradePrice[currencyType])
+							end))
+						end)
+						:andThen(function()
+							GuideService:SetGuiGuide(self.Player, "GuiDeckCardButtonPeasant", nil)
+							GuideService:SetGuiGuide(self.Player, "GuiDeckCardDetailsUpgrade", {
+								Offset = Vector2.new(-100, -200),
+								Anchor = Vector2.new(0, 0),
+								Text = "Use this button to upgrade your Peasant soldier!",
+							})
+
+							return Promise.fromEvent(DeckService.CardUpgraded, function(player, cardId)
+								return player == self.Player and cardId == "Peasant"
+							end)
+						end)
+						:andThen(function()
+							GuideService:SetGuiGuide(self.Player, "GuiDeckCardDetailsUpgrade", nil)
+
+							return Promise.fromEvent(GuideService.GuiActionDone, function(player, action, menuName)
+								if player ~= self.Player then return false end
+								if action ~= "MenuUnset" then return false end
+
+								return menuName == "Deck"
+							end)
+						end)
+						:andThen(function()
+							DialogueHelper.StartDialogue(self.Player, "PostTutorial")
+						end)
+				end,
 			},
 		},
 		NodesIn = {},
+	},
+	PostTutorial = {
+		Name = "",
+		StartNodes = { "Root" },
+		NodesOut = {
+			Root = {
+				Text = "To defeat the orc general, you must become stronger. You must recruit soldiers, upgrade your army, and complete quests.",
+				Nodes = { "Recruiting", "Gathering", "Questing" },
+			},
+			HowToRecruit = {
+				Text = "To recruit new soldiers, you can:\n• Win battles against other commanders\n• Hire them at places like the mercenary guild\n• Complete quests",
+				Args = { Alignment = Enum.TextXAlignment.Left },
+				Nodes = { "Root" },
+			},
+			HowToGather = {
+				Text = "To upgrade your army, you must acquire resources to use. To do this, you can:\n• Win battles against other commanders\n• Use services like the blacksmith to convert one resource into another\n• Gather them from the world, such as from ore rocks\n• Complete quests",
+				Args = { Alignment = Enum.TextXAlignment.Left },
+				Nodes = { "Root" },
+			},
+			HowToQuest = {
+				Text = "To complete quests, you must find them first. Talk to NPCs and explore the world. Quests can give you new soldiers, abilities, resources, and more.",
+				Nodes = { "Root" },
+			},
+		},
+		NodesIn = {
+			Recruiting = { Text = "How do I recruit new soldiers?", Nodes = { "HowToRecruit" } },
+			Gathering = { Text = "How do I upgrade my army?", Nodes = { "HowToGather" } },
+			Questing = { Text = "How do I complete quests?", Nodes = { "HowToQuest" } },
+		},
 	},
 	TestDialogue = {
 		Name = "Test Person",

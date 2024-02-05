@@ -14,7 +14,6 @@ function WorldController.PrepareBlocking(self: WorldController)
 	self.WorldsRemote = self.Comm:GetProperty("Worlds")
 	self.WorldCurrentRemote = self.Comm:GetProperty("WorldCurrent")
 	self.WorldTeleportRequested = self.Comm:GetSignal("WorldTeleportRequested")
-	self.WorldPurchaseRequested = self.Comm:GetSignal("WorldPurchaseRequested")
 
 	local worldModelsById = Sift.Dictionary.map(workspace.Worlds:GetChildren(), function(model)
 		return model, model.Name

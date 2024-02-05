@@ -3,7 +3,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local Comm = require(ReplicatedStorage.Packages.Comm)
-local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local LightingService = require(ServerScriptService.Server.Services.LightingService)
 local Observers = require(ReplicatedStorage.Packages.Observers)
@@ -62,45 +61,6 @@ function WorldService.PrepareBlocking(self: WorldService)
 
 		return self:TeleportToWorld(player, worldId):expect()
 	end)
-
-	self.Comm:CreateSignal("WorldPurchaseRequested"):Connect(function(player: Player, worldId: string)
-		if not t.string(worldId) then return end
-
-		return self:PurchaseWorld(player, worldId):expect()
-	end)
-end
-
-function WorldService.ResetWorlds(self: WorldService, player: Player, callback)
-	return self:TeleportToWorld(player, DataService.DefaultData.WorldCurrent, callback)
-		:andThen(function()
-			return DataService:GetSaveFile(player)
-		end)
-		:andThen(function(saveFile)
-			saveFile:Set("Worlds", DataService.DefaultData.Worlds)
-		end)
-end
-
-function WorldService.PurchaseWorld(self: WorldService, player: Player, worldId: string)
-	local def = WorldDefs[worldId]
-	assert(def, `No def for id {worldId}`)
-
-	local price = {
-		Secondary = def.Price,
-	}
-
-	return DataService:GetSaveFile(player):andThen(function(saveFile)
-		if Sift.Set.has(saveFile:Get("Worlds"), worldId) then return end
-
-		return CurrencyService:ApplyPrice(player, price):andThen(function(success)
-			if not success then return end
-
-			saveFile:Update("Worlds", function(oldWorlds)
-				return Sift.Set.add(oldWorlds, worldId)
-			end)
-
-			return self:TeleportToWorld(player, worldId)
-		end)
-	end)
 end
 
 function WorldService.BuildOcean(self: WorldService)
@@ -146,10 +106,11 @@ function WorldService.TeleportToWorldRaw(self: WorldService, player: Player, wor
 	if (model == nil) or (char == nil) then return end
 
 	return DataService:GetSaveFile(player):andThen(function(saveFile)
-		if not saveFile:Get("Worlds")[worldId] then return end
+		if saveFile:Get("WorldCurrent") ~= worldId then
+			saveFile:Set("WorldCurrent", worldId)
+			LightingService.LightingChangeRequested:Fire(player, def.LightingName)
+		end
 
-		saveFile:Set("WorldCurrent", worldId)
-		LightingService.LightingChangeRequested:Fire(player, def.LightingName)
 		char:PivotTo(model:GetPivot() + Vector3.new(0, 4, 0))
 	end)
 end
