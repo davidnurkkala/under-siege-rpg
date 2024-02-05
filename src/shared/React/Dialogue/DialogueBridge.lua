@@ -31,6 +31,7 @@ local function outputText(props: {
 	OnFinished: () -> (),
 })
 	local textSpeed = Default(props.Args.TextSpeed, 1)
+	local alignment = Default(props.Args.Alignment, Enum.TextXAlignment.Center)
 
 	local graphemes, setGraphemes = React.useState(0)
 	local labelRef = React.useRef(nil)
@@ -64,6 +65,7 @@ local function outputText(props: {
 		Ratio = if platform == "Mobile" then 1 / 15 else 1 / 22,
 		MaxVisibleGraphemes = graphemes,
 		Text = TextStroke(props.Text),
+		TextXAlignment = alignment,
 	})
 end
 

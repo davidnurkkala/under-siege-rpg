@@ -11,10 +11,12 @@ local Observers = require(ReplicatedStorage.Packages.Observers)
 local OptionsService = require(ServerScriptService.Server.Services.OptionsService)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Sift = require(ReplicatedStorage.Packages.Sift)
+local Signal = require(ReplicatedStorage.Packages.Signal)
 local t = require(ReplicatedStorage.Packages.t)
 
 local DeckService = {
 	Priority = 0,
+	CardUpgraded = Signal.new(),
 }
 
 type DeckService = typeof(DeckService)
@@ -126,6 +128,8 @@ function DeckService.UpgradeCard(self: DeckService, player: Player, cardId: stri
 						end)
 					end)
 				end)
+
+				self.CardUpgraded:Fire(player, cardId)
 
 				return true
 			end)

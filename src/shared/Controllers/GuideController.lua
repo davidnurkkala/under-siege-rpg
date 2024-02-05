@@ -22,6 +22,7 @@ function GuideController.PrepareBlocking(self: GuideController)
 	self.Comm = Comm.ClientComm.new(ReplicatedStorage, true, "GuideService")
 	self.StatusRemote = self.Comm:GetProperty("Status")
 	self.GuiGuideRemote = self.Comm:GetProperty("GuiGuide")
+	self.GuiActionDone = self.Comm:GetSignal("GuiActionDone")
 
 	self.Message = Property.new(nil, Sift.Dictionary.equalsDeep)
 	self.Target = Property.new(nil)

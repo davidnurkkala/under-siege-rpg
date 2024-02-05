@@ -308,6 +308,7 @@ return function(props)
 						return Promise.resolve()
 					end,
 					[React.Event.SelectionGained] = onButtonSelectedCallback,
+					[React.Tag] = "GuiDeckButton",
 				}),
 				InventoryButton = React.createElement(lobbyButton, {
 					LayoutOrder = 9,
