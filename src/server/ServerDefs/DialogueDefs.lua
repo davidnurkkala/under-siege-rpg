@@ -5,6 +5,7 @@ local Battle = require(ServerScriptService.Server.Classes.Battle)
 local BattleHelper = require(ServerScriptService.Server.Util.BattleHelper)
 local CutsceneService = require(ServerScriptService.Server.Services.CutsceneService)
 local GenericShopService = require(ServerScriptService.Server.Services.GenericShopService)
+local GuideService = require(ServerScriptService.Server.Services.GuideService)
 local LobbySession = require(ServerScriptService.Server.Classes.LobbySession)
 local LobbySessions = require(ServerScriptService.Server.Singletons.LobbySessions)
 local Promise = require(ReplicatedStorage.Packages.Promise)
@@ -18,7 +19,7 @@ local Dialogues = {
 		StartNodes = { "Line1" },
 		NodesOut = {
 			Line1 = {
-				Text = "The kingdom has fallen before the might of the orcish armies.",
+				Text = "Your kingdom has fallen before the might of the orcish armies.",
 				Args = {
 					TextSpeed = 0.1,
 				},
@@ -56,6 +57,19 @@ local Dialogues = {
 								BaseId = "OldCastle",
 							})
 						end):andThen(function(battle)
+							GuideService.GuiGuideRemote:SetFor(self.Player, {
+								GuiBattleAttackButton = {
+									Offset = Vector2.new(50, -150),
+									Anchor = Vector2.new(0.5, 0),
+									Text = "Use this button to shoot!",
+								},
+								GuiBattleDeckButton1 = {
+									Offset = Vector2.new(200, -100),
+									Anchor = Vector2.new(1, 0),
+									Text = "Use these buttons to send soldiers!",
+								},
+							})
+
 							return Promise.fromEvent(battle.Finished):andThenReturn(battle)
 						end):andThen(function(battle)
 							return ServerFade(self.Player, {
@@ -75,14 +89,14 @@ local Dialogues = {
 				end,
 			},
 			Line3 = {
-				Text = "You flee your castle in disgrace. Your army is shattered. Some loyal peasants join you in exile, swearing to fight for you.",
+				Text = "Defeated, you flee in disgrace. Your army is shattered. Some loyal peasants join you in exile, swearing to fight for you.",
 				Args = {
 					TextSpeed = 0.5,
 				},
 				Nodes = { "Line4" },
 			},
 			Line4 = {
-				Text = "You must rebuild your strength and retake your castle.",
+				Text = "You must rebuild your strength, get vengeance on the orc general, and retake your kingdom.",
 				Args = {
 					TextSpeed = 0.5,
 				},

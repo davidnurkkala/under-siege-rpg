@@ -63,7 +63,9 @@ return function()
 
 	return React.createElement(
 		Container,
-		nil,
+		{
+			ZIndex = 1024,
+		},
 		Sift.Dictionary.merge(
 			Sift.Dictionary.map(indicators, function(data, guid)
 				return React.createElement(Indicator, {

@@ -43,7 +43,9 @@ function NaiveOrder.new(
 			local entry = self.Order[self.Index]
 			local cardId = entry.CardId
 			local cardDef = CardDefs[cardId]
-			if self.Battler.Supplies >= cardDef.Cost then
+			local hasSupplies = self.Battler.Supplies >= cardDef.Cost
+			local offCooldown = self.Battler.DeckCooldowns[cardId]:IsReady()
+			if hasSupplies and offCooldown then
 				self.Battler:GetBattle():PlayCard(self.Battler, cardId)
 				self.Remaining -= 1
 				if self.Remaining == 0 then

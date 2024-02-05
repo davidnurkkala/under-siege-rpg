@@ -26,7 +26,7 @@ function GameService.PrepareBlocking(self: GameService)
 				return DataService:IsFirstSession(player)
 			end)
 			:andThen(function(isFirstSession)
-				isFirstSession = true
+				--isFirstSession = true
 				if isFirstSession then
 					ServerFade(player, nil, function()
 						DialogueService:StartDialogue(player, "OpeningCutscene")

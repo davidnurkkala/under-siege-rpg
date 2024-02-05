@@ -56,7 +56,7 @@ function CutsceneController.PrepareForCutscene(self: CutsceneController)
 			camera.CFrame = cframes.Start
 
 			return Promise.race({
-				Animate(10, function(scalar)
+				Animate(7, function(scalar)
 					camera.CFrame = cframes.Start:Lerp(cframes.Mid, SmoothStep(scalar))
 					camera.FieldOfView = Lerp(70, 30, scalar)
 				end):andThenCall(Promise.fromEvent, self.CutsceneUpdated),

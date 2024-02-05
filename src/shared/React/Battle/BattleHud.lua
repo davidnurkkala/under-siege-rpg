@@ -29,6 +29,7 @@ local PromptWindow = require(ReplicatedStorage.Shared.React.Common.PromptWindow)
 local React = require(ReplicatedStorage.Packages.React)
 local RoundButtonWithImage = require(ReplicatedStorage.Shared.React.Common.RoundButtonWithImage)
 local Sift = require(ReplicatedStorage.Packages.Sift)
+local SliceArrow = require(ReplicatedStorage.Shared.React.Common.SliceArrow)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local TryNow = require(ReplicatedStorage.Shared.Util.TryNow)
@@ -191,6 +192,7 @@ local function attackButton(props: {
 	local onCooldown = (cooldown ~= nil) and (cooldown.Time > 0)
 
 	return React.createElement(Container, {
+		[React.Tag] = "GuiBattleAttackButton",
 		SizeConstraint = Enum.SizeConstraint.RelativeYY,
 		LayoutOrder = props.LayoutOrder,
 	}, {
@@ -289,6 +291,7 @@ local function hotbar(props: {
 						Padding = 6,
 					}, {
 						Button = React.createElement(Button, {
+							[React.Tag] = `GuiBattleDeckButton{index}`,
 							ImageColor3 = color,
 							Active = canAfford and not onCooldown,
 							BorderColor3 = if onCooldown then ColorDefs.PaleBlue else nil,

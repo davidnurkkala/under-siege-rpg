@@ -70,6 +70,7 @@ local function lobbyButton(props: {
 	return React.createElement(LayoutContainer, {
 		LayoutOrder = props.LayoutOrder,
 		Padding = 6,
+		[React.Tag] = props[React.Tag],
 	}, {
 		Button = React.createElement(Button, {
 			Active = active,
@@ -299,7 +300,7 @@ return function(props)
 				}),
 				DeckButton = React.createElement(lobbyButton, {
 					LayoutOrder = 8,
-					Text = TextStroke("Deck"),
+					Text = TextStroke("Army"),
 					Color = ColorDefs.PaleBlue,
 					Image = "rbxassetid://15308000608",
 					Activate = function()
@@ -318,6 +319,7 @@ return function(props)
 						return Promise.resolve()
 					end,
 					[React.Event.SelectionGained] = onButtonSelectedCallback,
+					[React.Tag] = "GuiInventoryButton",
 				}),
 				GearButton = React.createElement(lobbyButton, {
 					LayoutOrder = 10,
