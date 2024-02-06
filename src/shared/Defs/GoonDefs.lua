@@ -887,10 +887,10 @@ local Goons = {
 		},
 	},
 
-	BanditOfficer = {
-		Name = "Bandit Officer",
+	SkyPirateOfficer = {
+		Name = "SkyPirate Officer",
 		Description = `His blades dance gracefully across the battlefield, cutting down foes in his path.`,
-		ModelName = "BanditOfficer",
+		ModelName = "SkyPirateOfficer",
 		Brain = {
 			Id = "BasicMelee",
 		},

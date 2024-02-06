@@ -155,6 +155,39 @@ local Battlers = {
 		},
 	},
 
+	BanditGrunt = {
+		Name = "Bandit Grunt",
+		BattlegroundName = "World1",
+		BaseId = "Camp",
+		Reward = 500,
+		WeaponId = "RecurveBow",
+		Deck = {
+			BanditRogue = 1,
+			BanditScout = 1,
+			Mob = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
+		},
+	},
+
+	BanditLeader = {
+		Name = "Bandit Leader",
+		BattlegroundName = "World1",
+		BaseId = "Camp",
+		Reward = 750,
+		WeaponId = "RecurveBow",
+		Deck = {
+			BanditRogue = 1,
+			BanditDuelist = 1,
+			BanditScout = 1,
+			Mob = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
+		},
+	},
+
 	CultLeader = {
 		Name = "Cult Leader",
 		BattlegroundName = "World1",
@@ -319,24 +352,6 @@ local Battlers = {
 			ElfRanger = 1,
 			Heal = 1,
 			RainOfArrows = 1,
-		},
-		Brain = {
-			Id = "WeightedCost",
-		},
-	},
-
-	BanditLeader = {
-		Name = "Bandit Leader",
-		BattlegroundName = "World3",
-		BaseId = "ElvenKeep",
-		Reward = 3000,
-		WeaponId = "FairyBow",
-		Deck = {
-			BanditRogue = 1,
-			BanditDuelist = 1,
-			BanditScout = 1,
-			BanditOfficer = 1,
-			Mob = 1,
 		},
 		Brain = {
 			Id = "WeightedCost",
