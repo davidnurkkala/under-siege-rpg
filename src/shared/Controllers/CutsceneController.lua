@@ -34,7 +34,7 @@ function CutsceneController.PrepareForCutscene(self: CutsceneController)
 			camera.CameraType = Enum.CameraType.Scriptable
 
 			local model = ReplicatedStorage.Assets.Models.OpeningCutscene:Clone()
-			model:PivotTo(CFrame.new(0, 1024, 0))
+			model:PivotTo(CFrame.new(512 * Players.LocalPlayer:GetAttribute("UniqueIndex") or 0, 1024, 0))
 			model.Parent = workspace.Effects
 
 			local char = Players.LocalPlayer.Character

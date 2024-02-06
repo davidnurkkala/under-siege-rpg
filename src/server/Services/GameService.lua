@@ -5,9 +5,12 @@ local Comm = require(ReplicatedStorage.Packages.Comm)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local DialogueService = require(ServerScriptService.Server.Services.DialogueService)
 local LobbySession = require(ServerScriptService.Server.Classes.LobbySession)
+local Observers = require(ReplicatedStorage.Packages.Observers)
 local ServerFade = require(ServerScriptService.Server.Util.ServerFade)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local WorldService = require(ServerScriptService.Server.Services.WorldService)
+
+local PlayerSlots: { [Player]: boolean } = {}
 
 local GameService = {
 	Priority = 0,
@@ -17,6 +20,21 @@ type GameService = typeof(GameService)
 
 function GameService.PrepareBlocking(self: GameService)
 	self.Comm = Comm.ServerComm.new(ReplicatedStorage, "GameService")
+
+	Observers.observePlayer(function(player)
+		local index = 1
+		while PlayerSlots[index] do
+			index += 1
+		end
+
+		PlayerSlots[index] = true
+
+		player:SetAttribute("UniqueIndex", index)
+
+		return function()
+			PlayerSlots[index] = nil
+		end
+	end)
 
 	self.Comm:BindFunction("Play", function(player)
 		local done = Signal.new()
