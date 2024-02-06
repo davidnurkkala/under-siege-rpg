@@ -31,6 +31,8 @@ function CardHelper.GetDescription(id: string, level: number)
 		local goonDef = GoonDefs[cardDef.GoonId]
 		local description = goonDef.Description
 		description ..= `\n`
+		description ..= `\n{get("HealthMax") // 0.01} max health`
+		description ..= `\n{get("Damage") // 0.01} damage per attack`
 		description ..= `\n{get("AttackRate") // 0.1 / 10} attacks per second`
 		description ..= `\nRange: {get("Range") // 0.01} units`
 		description ..= `\nSpeed: {get("Speed") // 0.01} units/second`

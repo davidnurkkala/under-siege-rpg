@@ -1,3 +1,4 @@
+local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
@@ -9,6 +10,7 @@ local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local Default = require(ReplicatedStorage.Shared.Util.Default)
 local DialogueController = require(ReplicatedStorage.Shared.Controllers.DialogueController)
 local Flipper = require(ReplicatedStorage.Packages.Flipper)
+local Guid = require(ReplicatedStorage.Shared.Util.Guid)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local Lerp = require(ReplicatedStorage.Shared.Util.Lerp)
 local ListLayout = require(ReplicatedStorage.Shared.React.Common.ListLayout)
@@ -74,6 +76,7 @@ local function inputButton(props: {
 	Select: () -> (),
 	Text: string,
 	Visible: boolean,
+	OnReady: (() -> ())?,
 })
 	local trans, transMotor = UseMotor(1)
 	local platform = React.useContext(PlatformContext)
@@ -81,9 +84,14 @@ local function inputButton(props: {
 	React.useEffect(function()
 		if not props.Visible then return end
 
-		local promise = Promise.delay(0.1 * props.LayoutOrder):andThen(function()
-			transMotor:setGoal(Flipper.Spring.new(0))
-		end)
+		local promise = Promise.delay(0.1 * props.LayoutOrder)
+			:andThen(function()
+				transMotor:setGoal(Flipper.Spring.new(0))
+				return Promise.delay(0.1)
+			end)
+			:andThen(function()
+				if props.OnReady then props.OnReady() end
+			end)
 
 		return function()
 			promise:cancel()
@@ -125,12 +133,16 @@ return function()
 	local dialogue, setDialogue = React.useState(nil)
 	local inputsVisible, setInputsVisible = React.useState(false)
 	local slide, slideMotor = UseMotor(1)
+	local windowRef = React.useRef(nil)
+	local platform = React.useContext(PlatformContext)
+	local inputsReady, setInputsReady = React.useState(false)
 
 	React.useEffect(function()
 		return DialogueController:ObserveState(function(dialogueIn)
 			setActive(dialogueIn ~= nil)
 			if dialogueIn ~= nil then setDialogue(dialogueIn) end
 			setInputsVisible(false)
+			setInputsReady(false)
 		end)
 	end, {})
 
@@ -144,6 +156,8 @@ return function()
 
 			return
 		else
+			GuiService.SelectedObject = nil
+
 			local promise = PromiseMotor(slideMotor, Flipper.Spring.new(1), function(value)
 				return value > 0.95
 			end):finally(function()
@@ -156,9 +170,28 @@ return function()
 		end
 	end, { active })
 
+	local visible = not inBattle
+
+	React.useEffect(function()
+		if not (visible and inputsReady) then return end
+
+		local window = windowRef.current
+		if not window then return end
+
+		local guid = Guid()
+		GuiService:AddSelectionParent(guid, window)
+
+		if platform == "Console" then GuiService:Select(window) end
+
+		return function()
+			GuiService:RemoveSelectionGroup(guid)
+		end
+	end, { inputsReady, visible, windowRef.current })
+
 	return (dialogue ~= nil)
 		and React.createElement(Container, {
-			Visible = not inBattle,
+			containerRef = windowRef,
+			Visible = visible,
 			Size = UDim2.fromScale(0.5, 1),
 			AnchorPoint = Vector2.new(0.5, 1),
 			Position = slide:map(function(value)
@@ -215,6 +248,11 @@ return function()
 							DialogueController.InputChosen:Fire(index)
 						end,
 						Visible = inputsVisible,
+						OnReady = if index == 1
+							then function()
+								setInputsReady(true)
+							end
+							else nil,
 					})
 				end)
 			),

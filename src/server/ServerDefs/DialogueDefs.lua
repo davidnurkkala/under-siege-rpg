@@ -12,6 +12,7 @@ local GenericShopService = require(ServerScriptService.Server.Services.GenericSh
 local GuideService = require(ServerScriptService.Server.Services.GuideService)
 local LobbySession = require(ServerScriptService.Server.Classes.LobbySession)
 local LobbySessions = require(ServerScriptService.Server.Singletons.LobbySessions)
+local MusicService = require(ServerScriptService.Server.Services.MusicService)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local ServerFade = require(ServerScriptService.Server.Util.ServerFade)
 local Sift = require(ReplicatedStorage.Packages.Sift)
@@ -29,6 +30,7 @@ local Dialogues = {
 				},
 				Nodes = { "Line2" },
 				Callback = function(self)
+					MusicService:SetSoundtrack(self.Player, { "TheKingdomIsFallen" })
 					CutsceneService:Begin(self.Player)
 				end,
 			},

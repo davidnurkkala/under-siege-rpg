@@ -7,11 +7,14 @@ local DataService = require(ServerScriptService.Server.Services.DataService)
 local EffectDizzy = require(ReplicatedStorage.Shared.Effects.EffectDizzy)
 local EffectService = require(ServerScriptService.Server.Services.EffectService)
 local LobbySessions = require(ServerScriptService.Server.Singletons.LobbySessions)
+local MusicService = require(ServerScriptService.Server.Services.MusicService)
 local PlayerLeaving = require(ReplicatedStorage.Shared.Util.PlayerLeaving)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local Updater = require(ReplicatedStorage.Shared.Classes.Updater)
+local WorldDefs = require(ReplicatedStorage.Shared.Defs.WorldDefs)
+local WorldService = require(ServerScriptService.Server.Services.WorldService)
 
 local LobbySessionUpdater = Updater.new()
 
@@ -99,6 +102,11 @@ function LobbySession.new(args: {
 	end)
 
 	self.Human.MaxSlopeAngle = 55
+
+	WorldService:GetCurrentWorld(self.Player):andThen(function(worldId)
+		local def = WorldDefs[worldId]
+		MusicService:SetSoundtrack(self.Player, def.Soundtrack)
+	end)
 
 	-- do last
 	LobbySessions.Add(self.Player, self)

@@ -14,6 +14,7 @@ local Damage = require(ServerScriptService.Server.Classes.Damage)
 local EventStream = require(ReplicatedStorage.Shared.Util.EventStream)
 local Goon = require(ServerScriptService.Server.Classes.Goon)
 local GuiEffectService = require(ServerScriptService.Server.Services.GuiEffectService)
+local MusicService = require(ServerScriptService.Server.Services.MusicService)
 local PartPath = require(ReplicatedStorage.Shared.Classes.PartPath)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local RewardHelper = require(ServerScriptService.Server.Util.RewardHelper)
@@ -164,6 +165,8 @@ function Battle.fromPlayerVersusBattler(player: Player, battlerId: string, playe
 		end):andThen(function(battleSession)
 			local battlerDef = BattlerDefs[battlerId]
 			assert(battlerDef, `No battler found for id {battlerId}`)
+
+			MusicService:SetSoundtrack(player, battlerDef.Soundtrack)
 
 			local battleground = ReplicatedStorage.Assets.Models.Battlegrounds[battlerDef.BattlegroundName]:Clone()
 			local opponent = Battler.fromBattlerId(battlerId, 1, -1)
