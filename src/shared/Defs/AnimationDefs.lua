@@ -35,6 +35,9 @@ local Ids = {
 	DragonIdle = 16232829190,
 	DragonAttack = 16233086416,
 	DragonDie = 16233628665,
+	FrostGiantIdle = 16101398246,
+	FrostGiantAttack = 16244549708,
+	FrostGiantWalk = 16244484044,
 
 	PeasantWalk = 15082639586,
 	MageWalk = 15082639586,

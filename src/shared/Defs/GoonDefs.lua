@@ -887,10 +887,10 @@ local Goons = {
 		},
 	},
 
-	BanditOfficer = {
-		Name = "Bandit Officer",
+	SkyPirateOfficer = {
+		Name = "SkyPirate Officer",
 		Description = `His blades dance gracefully across the battlefield, cutting down foes in his path.`,
-		ModelName = "BanditOfficer",
+		ModelName = "SkyPirateOfficer",
 		Brain = {
 			Id = "BasicMelee",
 		},
@@ -1149,7 +1149,7 @@ local Goons = {
 		},
 		Sounds = {
 			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
-			Death = { "MaleUgh1", "MaleUgh2" },
+			Death = { "UndeadGroan2" },
 		},
 		Stats = {
 			Size = 0.03,
@@ -1189,7 +1189,7 @@ local Goons = {
 		},
 		Sounds = {
 			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
-			Death = { "MaleUgh1", "MaleUgh2" },
+			Death = { "UndeadGroan2" },
 		},
 		Stats = {
 			Size = 0.03,
@@ -1267,27 +1267,28 @@ local Goons = {
 		},
 		Tags = { "Armored", "Brutal" },
 		Animations = {
-			Walk = "DraugrWalk",
-			Attack = "DraugrAttack",
+			Idle = "FrostGiantIdle",
+			Walk = "FrostGiantWalk",
+			Attack = "FrostGiantAttack",
 			Die = "GenericGoonDie",
 		},
 		Sounds = {
-			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
-			Death = { "MaleUgh1", "MaleUgh2" },
+			Hit = { "LargeThud1", "LargeThud2" },
+			Death = { "GiantsRoar1", "GiantsRoar2", "GiantsRoar3" },
 		},
 		Stats = {
 			Size = 0.04,
 			AttackWindupTime = function()
-				return 0.43
+				return 0.7
 			end,
 			Speed = function()
 				return 0.05
 			end,
 			Range = function()
-				return 0.1
+				return 0.2
 			end,
 			AttackRate = function()
-				return 2
+				return 1.6
 			end,
 			Damage = function(level)
 				return scaling(7, 0.7, level)

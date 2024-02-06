@@ -238,6 +238,13 @@ local Cards = {
 		Cooldown = 5,
 		Cost = 65,
 	},
+	FrostGiant = {
+		GoonId = "FrostGiant",
+		Type = "Goon",
+		Rank = 1,
+		Cooldown = 5,
+		Cost = 65,
+	},
 
 	-- ABILITIES
 	Heal = {
