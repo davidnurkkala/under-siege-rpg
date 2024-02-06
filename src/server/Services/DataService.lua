@@ -29,13 +29,10 @@ local DataService = {
 				},
 			},
 		},
-		Worlds = {
-			World1 = true,
-		},
 		WorldCurrent = "World1",
 		Currency = {
 			Coins = 0,
-			Gems = 10,
+			Gems = 0,
 		},
 		Boosts = {},
 		Deck = {
@@ -84,17 +81,7 @@ function DataService.PrepareBlocking(self: DataService)
 
 		defaultData = self.DefaultData,
 
-		migrations = {
-			function(oldData)
-				return Sift.Dictionary.set(oldData, "Cosmetics", self.DefaultData.Cosmetics)
-			end,
-			function(oldData)
-				return Sift.Dictionary.removeKey(oldData, "ResourceNodeStates")
-			end,
-			function(oldData)
-				return Sift.Dictionary.set(oldData, "Cosmetics", self.DefaultData.Cosmetics)
-			end,
-		},
+		migrations = {},
 	})
 
 	Observers.observePlayer(function(player: Player)

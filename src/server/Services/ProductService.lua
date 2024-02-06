@@ -5,6 +5,8 @@ local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local Comm = require(ReplicatedStorage.Packages.Comm)
+local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
+local DataService = require(ServerScriptService.Server.Services.DataService)
 local DictionaryFind = require(ReplicatedStorage.Shared.Util.DictionaryFind)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local ProductDefs = require(ReplicatedStorage.Shared.Defs.ProductDefs)
@@ -71,6 +73,26 @@ function ProductService.PrepareBlocking(self: ProductService)
 		return function()
 			promise:cancel()
 		end
+	end)
+
+	-- convert users that had multi roll
+	local key = "AlphaConvertedMultiRoll"
+	Observers.observePlayer(function(player)
+		DataService:GetSaveFile(player):andThen(function(saveFile)
+			if saveFile:Get(key) then return end
+
+			self:GetOwnsProduct(player, "MultiRoll")
+				:andThen(function(owns)
+					if owns then
+						return CurrencyService:AddCurrency(player, "Gems", 300)
+					else
+						return Promise.resolve()
+					end
+				end)
+				:andThen(function()
+					saveFile:Set(key, true)
+				end)
+		end)
 	end)
 
 	MarketplaceService.ProcessReceipt = function(receipt)

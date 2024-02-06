@@ -75,6 +75,42 @@ local Currencies = {
 			Secondary = ColorDefs.White,
 		},
 	},
+	CommonMetal = {
+		Name = "Common Metal",
+		Image = "rbxassetid://16259854223",
+		Description = "Malleable, hardy metal found all over the world. Useful in all sorts of military equipment, though not of the highest grade.",
+		Colors = {
+			Primary = ColorDefs.White,
+			Secondary = ColorDefs.White,
+		},
+	},
+	Steel = {
+		Name = "Steel",
+		Image = "rbxassetid://16260087125",
+		Description = "A hardy, high-quality metal favored by humans.",
+		Colors = {
+			Primary = ColorDefs.White,
+			Secondary = ColorDefs.White,
+		},
+	},
+	Coal = {
+		Name = "Coal",
+		Image = "rbxassetid://16260087271",
+		Description = "A soft stone that burns with incredible heat. Useful in refining all kinds of metals.",
+		Colors = {
+			Primary = ColorDefs.White,
+			Secondary = ColorDefs.White,
+		},
+	},
+	Charcoal = {
+		Name = "Charcoal",
+		Image = "rbxassetid://16260087393",
+		Description = "Wood that has been specially processed to produce a fuel of middling quality. Can be used to refine many metals.",
+		Colors = {
+			Primary = ColorDefs.White,
+			Secondary = ColorDefs.White,
+		},
+	},
 }
 
 return Sift.Dictionary.map(Currencies, function(currency, id)

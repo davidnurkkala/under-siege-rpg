@@ -1,4 +1,4 @@
 return {
-	DataStoreVersion = 36,
+	DataStoreVersion = "UnderSiegeRPGBeta2/5/2024",
 	DeckSizeMax = 10,
 }
