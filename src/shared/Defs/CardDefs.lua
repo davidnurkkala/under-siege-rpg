@@ -134,6 +134,13 @@ local Cards = {
 		Cooldown = 5,
 		Cost = 50,
 	},
+	Bandit = {
+		Type = "Goon",
+		GoonId = "Bandit",
+		Rank = 1,
+		Cooldown = 4,
+		Cost = 20,
+	},
 	BanditScout = {
 		Type = "Goon",
 		GoonId = "BanditScout",
