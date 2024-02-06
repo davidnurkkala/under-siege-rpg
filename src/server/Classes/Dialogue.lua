@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
+local DataService = require(ServerScriptService.Server.Services.DataService)
 local DialogueDefs = require(ServerScriptService.Server.ServerDefs.DialogueDefs)
 local PlayerLeaving = require(ReplicatedStorage.Shared.Util.PlayerLeaving)
 local Promise = require(ReplicatedStorage.Packages.Promise)
@@ -52,14 +53,9 @@ function Dialogue.new(player: Player, def: any): Dialogue
 		State = Property.new(nil),
 	}, Dialogue)
 
-	self:SetNode(Sift.Array.filter(
-		Sift.Array.map(def.StartNodes, function(nodeId)
-			return def.NodesOut[nodeId]
-		end),
-		function(node)
-			return self:IsNodeAvailable(node)
-		end
-	)[1])
+	self:SetNodeByList(Sift.Array.map(def.StartNodes, function(nodeId)
+		return def.NodesOut[nodeId]
+	end))
 
 	self.Trove:AddPromise(PlayerLeaving(self.Player):andThenCall(self.Destroy, self))
 
@@ -101,6 +97,34 @@ function Dialogue.WithAnimator(self: Dialogue, callback: (Animator.Animator) -> 
 	if self.Animator ~= nil then callback(self.Animator) end
 end
 
+function Dialogue.FilterNodes(self: Dialogue, nodeList: { Node })
+	return Promise.all(Sift.Array.map(nodeList, function(node)
+		if node.Conditions then
+			return Promise.all(Sift.Array.map(node.Conditions, function(condition)
+				return condition(self)
+			end)):andThen(function(results)
+				return Sift.Array.every(results, function(result)
+					return result
+				end)
+			end)
+		else
+			return Promise.resolve(true)
+		end
+	end)):andThen(function(results)
+		local nodes = {}
+		for index, result in results do
+			if result then table.insert(nodes, nodeList[index]) end
+		end
+		return nodes
+	end)
+end
+
+function Dialogue.SetNodeByList(self: Dialogue, nodeList: { Node })
+	return self:FilterNodes(nodeList):andThen(function(nodes)
+		self:SetNode(nodes[1])
+	end)
+end
+
 function Dialogue.SetNodeById(self: Dialogue, nodeId: string)
 	self:SetNode(self.Def.NodesOut[nodeId])
 end
@@ -113,7 +137,7 @@ function Dialogue.SetNode(self: Dialogue, node: Node)
 		if node.Animation then animator:Play(node.Animation) end
 	end)
 
-	Promise.try(function()
+	return Promise.try(function()
 		if node.Callback then
 			return node.Callback(self)
 		else
@@ -126,40 +150,34 @@ function Dialogue.SetNode(self: Dialogue, node: Node)
 		:andThen(function(override)
 			if override then return end
 
-			local inputs
-
-			if node.Nodes then
-				local isContinue = self.Def.NodesOut[node.Nodes[1]] ~= nil
-				if isContinue then
-					inputs = { { Text = "<i>Continue</i>", Nodes = node.Nodes } }
+			return Promise.try(function()
+				if node.Nodes then
+					local isContinue = self.Def.NodesOut[node.Nodes[1]] ~= nil
+					if isContinue then
+						return { { Text = "<i>Continue</i>", Nodes = node.Nodes } }
+					else
+						return self:FilterNodes(Sift.Array.map(node.Nodes, function(nodeId)
+							return self.Def.NodesIn[nodeId]
+						end)):andThen(function(inputs)
+							return Sift.Array.append(inputs, { Text = "<i>End</i>" })
+						end)
+					end
 				else
-					inputs = Sift.Array.append(
-						Sift.Array.filter(
-							Sift.Array.map(node.Nodes, function(nodeId)
-								return self.Def.NodesIn[nodeId]
-							end),
-							function(nodeIn)
-								return self:IsNodeAvailable(nodeIn)
-							end
-						),
-						{ Text = "<i>End</i>" }
-					)
+					if node.PostCallback then
+						return { { Text = "<i>Continue</i>", Callback = node.PostCallback } }
+					else
+						return { { Text = "<i>End</i>" } }
+					end
 				end
-			else
-				if node.PostCallback then
-					inputs = { { Text = "<i>Continue</i>", Callback = node.PostCallback } }
-				else
-					inputs = { { Text = "<i>End</i>" } }
-				end
-			end
+			end):andThen(function(inputs)
+				self.State:Set({
+					Name = self.Def.Name,
+					Node = node,
+					Inputs = inputs,
+				})
 
-			self.State:Set({
-				Name = self.Def.Name,
-				Node = node,
-				Inputs = inputs,
-			})
-
-			self.Node = node
+				self.Node = node
+			end)
 		end)
 end
 
@@ -204,6 +222,63 @@ function Dialogue.IsNodeAvailable(self: Dialogue, node: Node)
 	return Sift.Array.every(node.Conditions, function(condition)
 		return condition(self)
 	end)
+end
+
+function Dialogue.QuickSet(self: Dialogue, key: string, value: any)
+	local id = self.Def.Id
+	assert(id, `Cannot quick set without an id (no one-offs)`)
+
+	return DataService:GetSaveFile(self.Player):andThen(function(saveFile)
+		saveFile:Update("DialogueQuickData", function(quickData)
+			if quickData == nil then quickData = {} end
+
+			if not quickData[id] then
+				quickData = Sift.Dictionary.set(quickData, id, { [key] = value })
+			else
+				quickData = Sift.Dictionary.set(quickData, id, Sift.Dictionary.set(quickData[id], key, value))
+			end
+
+			return quickData
+		end)
+	end)
+end
+
+function Dialogue.QuickGet(self: Dialogue, key: string, default: any)
+	local id = self.Def.Id
+	assert(id, `Cannot quick get without an id (no one-offs)`)
+
+	return DataService:GetSaveFile(self.Player):andThen(function(saveFile)
+		local quickData = saveFile:Get("DialogueQuickData")
+		if quickData == nil then return default end
+
+		local data = quickData[id]
+		if data == nil then return default end
+
+		local value = data[key]
+		if value == nil then return default end
+
+		return value
+	end)
+end
+
+function Dialogue.QuickFlagIsUp(self: Dialogue, key: string)
+	return self:QuickGet(key, false):andThen(function(value)
+		return value == true
+	end)
+end
+
+function Dialogue.QuickFlagIsDown(self: Dialogue, key: string)
+	return self:QuickGet(key, false):andThen(function(value)
+		return value == false
+	end)
+end
+
+function Dialogue.QuickFlagRaise(self: Dialogue, key: string)
+	return self:QuickSet(key, true)
+end
+
+function Dialogue.QuickFlagLower(self: Dialogue, key: string)
+	return self:QuickSet(key, nil)
 end
 
 function Dialogue.Destroy(self: Dialogue)

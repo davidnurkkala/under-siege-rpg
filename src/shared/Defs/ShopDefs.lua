@@ -80,20 +80,9 @@ local Shops = {
 				Reward = { Type = "Currency", CurrencyType = "SimpleMaterials", Amount = 5 },
 				Price = { Coins = 50 },
 			},
-			{
-				Reward = { Type = "Card", CardId = "RainOfArrows" },
-				Price = { Coins = 100, Gems = 25 },
-			},
+
 			{
 				Reward = { Type = "Weapon", WeaponId = "HuntersBow" },
-				Price = { Coins = 1000 },
-			},
-			{
-				Reward = { Type = "Weapon", WeaponId = "Crossbow" },
-				Price = { Coins = 1000 },
-			},
-			{
-				Reward = { Type = "Weapon", WeaponId = "SimpleWand" },
 				Price = { Coins = 1000 },
 			},
 		},
@@ -103,8 +92,56 @@ local Shops = {
 		OverheadLabel = "Shop",
 		Products = {
 			{
-				Reward = { Type = "Currency", CurrencyType = "Gems", Amount = 1 },
+				Reward = { Type = "Weapon", WeaponId = "SimpleWand" },
 				Price = { Coins = 1000 },
+			},
+			{
+				Reward = { Type = "Card", CardId = "Heal" },
+				Price = { Coins = 2500 },
+			},
+		},
+	},
+	World1Guildmaster = {
+		Name = "Kutz' Mercenary Guild",
+		OverheadLabel = "Shop",
+		Products = {
+			{
+				Reward = { Type = "Card", CardId = "Spearman" },
+				Price = { Coins = 2000 },
+			},
+			{
+				Reward = { Type = "Card", CardId = "Archer" },
+				Price = { Coins = 2500 },
+			},
+			{
+				Reward = { Type = "Card", CardId = "Recruit" },
+				Price = { Coins = 3000 },
+			},
+			{
+				Reward = { Type = "Weapon", WeaponId = "Crossbow" },
+				Price = { Coins = 1000 },
+			},
+			{
+				Reward = { Type = "Card", CardId = "RainOfArrows" },
+				Price = { Coins = 3000 },
+			},
+		},
+	},
+	World1Blacksmith = {
+		Name = "Kenny's Smithy",
+		OverheadLabel = "Blacksmith",
+		Products = {
+			{
+				Reward = { Type = "Currency", CurrencyType = "CommonMetal", Amount = 3 },
+				Price = { CommonOre = 5 },
+			},
+			{
+				Reward = { Type = "Currency", CurrencyType = "Steel", Amount = 1 },
+				Price = { CommonMetal = 3, Coal = 1 },
+			},
+			{
+				Reward = { Type = "Currency", CurrencyType = "Steel", Amount = 1 },
+				Price = { CommonMetal = 3, Charcoal = 3 },
 			},
 		},
 	},

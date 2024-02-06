@@ -217,48 +217,30 @@ local Dialogues = {
 			Questing = { Text = "How do I complete quests?", Nodes = { "HowToQuest" } },
 		},
 	},
-	TestDialogue = {
-		Name = "Test Person",
-		StartNodes = { "Root" },
-		NodesOut = {
-			Root = { Text = "Hello!", Nodes = { "GreetingFriendly", "GreetingAggressive", "Shop" } },
-			Friendly = { Text = "What can I tell you about this world?", Nodes = { "QuestionSky", "QuestionGrass", "QuestionIndustrial" } },
-			SkyIsBlue = { Text = "The sky is blue.", Nodes = { "Friendly" } },
-			GrassIsGreen = { Text = "The grass is green.", Nodes = { "Friendly" } },
-			Aggressive = {
-				Text = "Well, I never! How rude. Go away!",
-				Animation = "TalkingCalm",
-			},
-			IndustrialRevolution = {
-				Text = "The Industrial Revolution and its consequences have been a disaster for the human race. They have greatly increased the life-expectancy of those of us who live in “advanced” countries, but they have destabilized society, have made life unfulfilling, have subjected human beings to indignities, have led to widespread psychological suffering (in the Third World to physical suffering as well) and have inflicted severe damage on the natural world.",
-				Nodes = { "Friendly" },
-			},
-		},
-		NodesIn = {
-			Shop = {
-				Text = "Can I see your wares?",
-				Callback = function(self)
-					GenericShopService:OpenShop(self.Player, "World1Mage")
-				end,
-			},
-			GreetingFriendly = { Text = "Hello, there!", Nodes = { "Friendly" } },
-			GreetingAggressive = { Text = "Who the heck are you?", Nodes = { "Aggressive" } },
-			QuestionSky = { Text = "What color is the sky?", Nodes = { "SkyIsBlue" } },
-			QuestionGrass = {
-				Text = "What color is the grass?",
-				Nodes = { "GrassIsGreen" },
-			},
-			QuestionIndustrial = { Text = "What can you tell me about the industrial revolution and its consequences?", Nodes = { "IndustrialRevolution" } },
-		},
-	},
 	PeasantJohnSower = {
 		Name = "John Sower, Peasant",
-		StartNodes = { "Root" },
+		StartNodes = { "Unmet", "Root" },
 		NodesOut = {
-			Root = { Text = "Hey, lord. Me and the boys are always up for a good fight. Want to have a go?", Nodes = { "Challenge" } },
-			Defeated = { Text = "Good fight, lord! You're as good as they say. We'll get the best of you next time, I'm sure." },
+			Unmet = {
+				Text = "Hello, milord. Heard about you losing your kingdom to the orcs. Tough streak of luck that is.",
+				Conditions = {
+					function(self)
+						return self:QuickFlagIsDown("HasMet")
+					end,
+				},
+				Callback = function(self)
+					return self:QuickFlagRaise("HasMet")
+				end,
+				Nodes = { "UnmetFight" },
+			},
+			UnmetFight = {
+				Text = "If you're looking to train your army, me and the boys are always up for a good fight. Want to have a go?",
+				Nodes = { "Challenge" },
+			},
+			Root = { Text = "Hey, milord. Me and the boys are always up for a good fight. Want to have a go?", Nodes = { "Challenge" } },
+			Defeated = { Text = "Good fight, milord! You're as good as they say. We'll get the best of you next time, I'm sure." },
 			Victorious = {
-				Text = "Good fight, lord! Far be it from some humble farmers such as us to be proud. You're sure to beat us next time, want to try us again?",
+				Text = "Good fight, milord! Far be it from some humble farmers such as us to be proud. You're sure to beat us next time, want to try us again?",
 				Nodes = { "Challenge" },
 			},
 		},
@@ -275,6 +257,130 @@ local Dialogues = {
 					end)
 
 					return true
+				end,
+			},
+		},
+	},
+	MasterMageAtraeus = {
+		Name = "Atraeus, Master Mage",
+		StartNodes = { "Unmet", "Met" },
+		NodesOut = {
+			Unmet = {
+				Text = "Greetings, young lord. I know you seek power in order to retake your kingdom from your enemies. I can offer you that power... for a price.",
+				Conditions = {
+					function(self)
+						return self:QuickFlagIsDown("HasMet")
+					end,
+				},
+				Callback = function(self)
+					return self:QuickFlagRaise("HasMet")
+				end,
+				Nodes = { "Shop" },
+			},
+			Met = {
+				Text = "Greetings, young lord. Do you wish again to peruse the mystical?",
+				Nodes = { "Shop" },
+			},
+		},
+		NodesIn = {
+			Shop = {
+				Text = "Let me see what spells you have.",
+				Callback = function(self)
+					GenericShopService:OpenShop(self.Player, "World1Mage")
+				end,
+			},
+		},
+	},
+	GuildmasterKutz = {
+		Name = "Kutz, Guildmaster",
+		StartNodes = { "Unmet", "Met" },
+		NodesOut = {
+			Unmet = {
+				Text = "Hmph! Well, if it isn't the lordling that's lost his kingdom. What a sorry excuse of a warrior, you are.",
+				Conditions = {
+					function(self)
+						return self:QuickFlagIsDown("HasMet")
+					end,
+				},
+				Callback = function(self)
+					return self:QuickFlagRaise("HasMet")
+				end,
+				Nodes = { "Unmet2" },
+			},
+			Unmet2 = {
+				Text = "Lucky for weaklings like you, skill can be bought. I've got men ready to fight if you've got the coin. What'll it be?",
+				Nodes = { "Shop" },
+			},
+			Met = {
+				Text = "Welcome back, lordling. Looking for some more muscle?",
+				Nodes = { "Shop" },
+			},
+		},
+		NodesIn = {
+			Shop = {
+				Text = "Let me see what soldiers are for hire.",
+				Callback = function(self)
+					GenericShopService:OpenShop(self.Player, "World1Guildmaster")
+				end,
+			},
+		},
+	},
+	MerchantJim = {
+		Name = "Jim, Merchant",
+		StartNodes = { "Unmet", "Met" },
+		NodesOut = {
+			Unmet = {
+				Text = "Ah! A new face in town. My name's Jim! I run a little shop here. I try to stock a bit of everything. Care to see what I've got?",
+				Conditions = {
+					function(self)
+						return self:QuickFlagIsDown("HasMet")
+					end,
+				},
+				Callback = function(self)
+					return self:QuickFlagRaise("HasMet")
+				end,
+				Nodes = { "Shop" },
+			},
+			Met = {
+				Text = "Welcome back to Jim's! What are you looking for?",
+				Nodes = { "Shop" },
+			},
+		},
+		NodesIn = {
+			Shop = {
+				Text = "Let me see your wares.",
+				Callback = function(self)
+					GenericShopService:OpenShop(self.Player, "World1Merchant")
+				end,
+			},
+		},
+	},
+	KennyBlacksmith = {
+		Name = "Kenny Smivvet",
+		StartNodes = { "Unmet", "Met" },
+		NodesOut = {
+			Unmet = {
+				Text = "Oi, milord! Watch the forge. It's hotter than it looks! You need metal smelted and shaped, I'm your man. What can I do for ya?",
+				Conditions = {
+					function(self)
+						return self:QuickFlagIsDown("HasMet")
+					end,
+				},
+				Callback = function(self)
+					return self:QuickFlagRaise("HasMet")
+				end,
+				Nodes = { "Shop" },
+			},
+			Met = {
+				Text = "Hey again, milord. Need something forged?",
+				Nodes = { "Shop" },
+			},
+		},
+		NodesIn = {
+			Shop = {
+				Text = "Let me see what you can do.",
+				Callback = function(self)
+					GenericShopService:OpenShop(self.Player, "World1Blacksmith")
 				end,
 			},
 		},
