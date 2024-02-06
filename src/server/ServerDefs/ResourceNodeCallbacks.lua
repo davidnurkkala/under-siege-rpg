@@ -9,6 +9,22 @@ local Promise = require(ReplicatedStorage.Packages.Promise)
 local TryNow = require(ReplicatedStorage.Shared.Util.TryNow)
 
 return {
+	OpenChest = function(_lobbySession, model)
+		EffectService:All(EffectSound({
+			SoundId = "ChestOpen",
+			Target = model.PrimaryPart.Position,
+		}))
+
+		return Promise.delay(0.1)
+	end,
+	Forage = function(_lobbySession, model)
+		EffectService:All(EffectSound({
+			SoundId = "Forage1",
+			Target = model.PrimaryPart.Position,
+		}))
+
+		return Promise.delay(0.1)
+	end,
 	MineOre = function(lobbySession, model)
 		local position = model.PrimaryPart.Position
 		FaceCharacterTowards(lobbySession.Root, position)

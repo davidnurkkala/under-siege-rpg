@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local AbilityDefs = require(ReplicatedStorage.Shared.Defs.AbilityDefs)
 local AbilityHelper = require(ReplicatedStorage.Shared.Util.AbilityHelper)
 local GoonDefs = require(ReplicatedStorage.Shared.Defs.GoonDefs)
 local Sift = require(ReplicatedStorage.Packages.Sift)
@@ -154,13 +155,13 @@ local Cards = {
 		Cooldown = 5,
 		Cost = 25,
 	},
-	BanditOfficer = {
+	--[[BanditOfficer = {
 		Type = "Goon",
 		GoonId = "BanditOfficer",
 		Rank = 1,
 		Cooldown = 4,
 		Cost = 25,
-	},
+	},]]
 	Berserker = {
 		Type = "Goon",
 		GoonId = "Berserker",
@@ -278,8 +279,14 @@ local Cards = {
 }
 
 return Sift.Dictionary.map(Cards, function(card, id)
-	if card.Type == "Goon" then card.Name = GoonDefs[card.GoonId].Name end
-	if card.Type == "Ability" then card.Name = AbilityHelper.GetAbility(card.AbilityId).Name end
+	if card.Type == "Goon" then
+		assert(GoonDefs[card.GoonId], `{id} has bad goon id`)
+		card.Name = GoonDefs[card.GoonId].Name
+	end
+	if card.Type == "Ability" then
+		assert(AbilityDefs[card.AbilityId], `{id} has bad ability id`)
+		card.Name = AbilityHelper.GetAbility(card.AbilityId).Name
+	end
 
 	return Sift.Dictionary.merge(card, {
 		Id = id,
