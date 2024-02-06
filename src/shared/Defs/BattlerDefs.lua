@@ -163,6 +163,7 @@ local Battlers = {
 		WeaponId = "RecurveBow",
 		Deck = {
 			BanditRogue = 1,
+			Bandit = 1,
 			BanditScout = 1,
 			Mob = 1,
 		},
@@ -181,6 +182,7 @@ local Battlers = {
 			BanditRogue = 1,
 			BanditDuelist = 1,
 			BanditScout = 1,
+			Bandit = 1,
 			Mob = 1,
 		},
 		Brain = {

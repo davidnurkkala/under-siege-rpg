@@ -763,6 +763,46 @@ local Goons = {
 		},
 	},
 
+	Bandit = {
+		Name = "Bandit",
+		Description = `A dastardly ruffian armed with cheap, stolen equipment.`,
+		ModelName = "Bandit",
+		Brain = {
+			Id = "BasicMelee",
+		},
+		Tags = { "Light" },
+		Animations = {
+			Walk = "SwordsmanWalk",
+			Attack = "GenericGoon1hMelee",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.2
+			end,
+			Speed = function()
+				return 0.3
+			end,
+			Range = function()
+				return 0.1
+			end,
+			AttackRate = function()
+				return 0.3
+			end,
+			Damage = function(level)
+				return scaling(5, 2, level)
+			end,
+			HealthMax = function(level)
+				return scaling(3, 1, level)
+			end,
+		},
+	},
+
 	BanditScout = {
 		Name = "Bandit Scout",
 		Description = "An Elven marksman with a keen eye, keeping watch for the guards",
