@@ -93,6 +93,7 @@ end
 
 function GoonEscorted.Update(self: GoonEscorted, dt: number)
 	if CutsceneController.InCutscene:Get() then return end
+	if not self.Root then return end
 
 	local filter = Sift.Array.append(
 		Sift.Array.map(self.Goons, function(goon)
