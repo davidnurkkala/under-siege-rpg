@@ -165,13 +165,11 @@ local Battlers = {
 		Name = "Bandit Grunt",
 		BattlegroundName = "World1",
 		BaseId = "Camp",
-		Reward = 500,
+		Soundtrack = { "IntoDanger" },
+		Rewards = {},
 		WeaponId = "RecurveBow",
 		Deck = {
 			BanditRogue = 1,
-			Bandit = 1,
-			BanditScout = 1,
-			Mob = 1,
 		},
 		Brain = {
 			Id = "WeightedCost",

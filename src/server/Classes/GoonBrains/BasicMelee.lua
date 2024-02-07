@@ -28,7 +28,7 @@ export type BasicMelee = typeof(setmetatable(
 	BasicMelee
 ))
 
-function BasicMelee.new(): BasicMelee
+function BasicMelee.new(_args): BasicMelee
 	local self: BasicMelee = setmetatable({
 		WillAttack = Signal.new(),
 		DidAttack = Signal.new(),

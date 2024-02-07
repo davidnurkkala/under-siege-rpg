@@ -770,7 +770,7 @@ local Goons = {
 		Brain = {
 			Id = "BasicMelee",
 		},
-		Tags = { "Light" },
+		Tags = { "Charger", "Light" },
 		Animations = {
 			Walk = "SwordsmanWalk",
 			Attack = "GenericGoon1hMelee",
@@ -786,26 +786,26 @@ local Goons = {
 				return 0.2
 			end,
 			Speed = function()
-				return 0.3
+				return 0.06
 			end,
 			Range = function()
 				return 0.1
 			end,
 			AttackRate = function()
-				return 0.3
+				return 0.75
 			end,
 			Damage = function(level)
-				return scaling(5, 2, level)
+				return lerped(1.5, 2.5, level)
 			end,
 			HealthMax = function(level)
-				return scaling(3, 1, level)
+				return lerped(7.5, 10, level)
 			end,
 		},
 	},
 
 	BanditScout = {
 		Name = "Bandit Scout",
-		Description = "An Elven marksman with a keen eye, keeping watch for the guards",
+		Description = "An exiled elven criminal making nefarious use of his natural talent for archery.",
 		ModelName = "BanditScout",
 		Brain = {
 			Id = "BasicRanged",
@@ -827,34 +827,34 @@ local Goons = {
 		Stats = {
 			Size = 0.03,
 			AttackWindupTime = function()
-				return 0.5
+				return 0.55
 			end,
 			Speed = function()
-				return 0.05
+				return 0.06
 			end,
 			Range = function()
-				return 0.4
+				return 0.3
 			end,
 			AttackRate = function()
-				return 1
+				return 0.9
 			end,
 			Damage = function(level)
-				return scaling(2, 0.5, level)
+				return lerped(1.5, 2, level)
 			end,
 			HealthMax = function(level)
-				return scaling(8, 1, level)
+				return lerped(7.5, 10, level)
 			end,
 		},
 	},
 
 	BanditRogue = {
 		Name = "Bandit Rogue",
-		Description = `A sneaky fighter with a taste for ill gotten goods. Watch your pockets!`,
+		Description = "A cowardly fighter that attacks enemies when they are unprepared.",
 		ModelName = "BanditRogue",
 		Brain = {
-			Id = "BasicMelee",
+			Id = "HitAndRunMelee",
 		},
-		Tags = { "Light", "Charger" },
+		Tags = { "Light" },
 		Animations = {
 			Walk = "SwordsmanWalk",
 			Attack = "RogueAttack",
@@ -870,31 +870,31 @@ local Goons = {
 				return 0.2
 			end,
 			Speed = function()
-				return 0.3
+				return 0.1
 			end,
 			Range = function()
 				return 0.1
 			end,
 			AttackRate = function()
-				return 0.4
+				return 0.375
 			end,
 			Damage = function(level)
-				return scaling(6, 2, level)
+				return lerped(3, 5, level)
 			end,
 			HealthMax = function(level)
-				return scaling(3, 1, level)
+				return lerped(7.5, 10, level)
 			end,
 		},
 	},
 
 	BanditDuelist = {
 		Name = "Bandit Duelist",
-		Description = `A versatile and unpredictable bandit fighter.`,
+		Description = "An armored bandit that prefers violence over subterfuge.",
 		ModelName = "BanditDuelist",
 		Brain = {
 			Id = "BasicMelee",
 		},
-		Tags = { "Light" },
+		Tags = { "Armored", "Brutal" },
 		Animations = {
 			Walk = "SwordsmanWalk",
 			Attack = "DuelistAttack",
@@ -907,22 +907,22 @@ local Goons = {
 		Stats = {
 			Size = 0.03,
 			AttackWindupTime = function()
-				return 0.43
+				return 0.27
 			end,
 			Speed = function()
-				return 0.2
+				return 0.06
 			end,
 			Range = function()
-				return 0.15
+				return 0.1
 			end,
 			AttackRate = function()
-				return 0.55
+				return 0.75
 			end,
 			Damage = function(level)
-				return scaling(8, 2, level)
+				return lerped(2, 2.75, level)
 			end,
 			HealthMax = function(level)
-				return scaling(10, 1, level)
+				return lerped(10, 15.5, level)
 			end,
 		},
 	},
@@ -1049,7 +1049,7 @@ local Goons = {
 
 	ElfBrawler = {
 		Name = "Elf Brawler",
-		Description = `A lightly-armored, quick-footed soldier -- the backbone of the Elven military.`,
+		Description = `A lightly-armored, quick-footed soldier -- the backbone of the elven military.`,
 		ModelName = "ElfBrawler",
 		Brain = {
 			Id = "BasicMelee",
@@ -1089,7 +1089,7 @@ local Goons = {
 
 	ElfRanger = {
 		Name = "Elf Ranger",
-		Description = "A naturally gifted Elven archer.",
+		Description = "A naturally gifted elven archer.",
 		ModelName = "ElfRanger",
 		Brain = {
 			Id = "BasicRanged",

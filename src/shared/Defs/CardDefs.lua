@@ -105,6 +105,36 @@ local Cards = {
 		Cost = 75,
 	},
 
+	-- bandits (tier 1)
+	Bandit = {
+		Type = "Goon",
+		GoonId = "Bandit",
+		Rank = 1,
+		Cooldown = 5,
+		Cost = 15,
+	},
+	BanditScout = {
+		Type = "Goon",
+		GoonId = "BanditScout",
+		Rank = 1,
+		Cooldown = 5,
+		Cost = 20,
+	},
+	BanditDuelist = {
+		Type = "Goon",
+		GoonId = "BanditDuelist",
+		Rank = 1,
+		Cooldown = 5,
+		Cost = 25,
+	},
+	BanditRogue = {
+		Type = "Goon",
+		GoonId = "BanditRogue",
+		Rank = 1,
+		Cooldown = 5,
+		Cost = 30,
+	},
+
 	-- other units
 	Miner = {
 		Type = "Goon",
@@ -133,34 +163,6 @@ local Cards = {
 		Rank = 1,
 		Cooldown = 5,
 		Cost = 50,
-	},
-	Bandit = {
-		Type = "Goon",
-		GoonId = "Bandit",
-		Rank = 1,
-		Cooldown = 4,
-		Cost = 20,
-	},
-	BanditScout = {
-		Type = "Goon",
-		GoonId = "BanditScout",
-		Rank = 1,
-		Cooldown = 6,
-		Cost = 25,
-	},
-	BanditRogue = {
-		Type = "Goon",
-		GoonId = "Mage",
-		Rank = 1,
-		Cooldown = 6,
-		Cost = 25,
-	},
-	BanditDuelist = {
-		Type = "Goon",
-		GoonId = "BanditDuelist",
-		Rank = 1,
-		Cooldown = 5,
-		Cost = 25,
 	},
 	--[[BanditOfficer = {
 		Type = "Goon",
