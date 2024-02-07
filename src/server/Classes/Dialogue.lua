@@ -224,9 +224,8 @@ function Dialogue.IsNodeAvailable(self: Dialogue, node: Node)
 	end)
 end
 
-function Dialogue.QuickSet(self: Dialogue, key: string, value: any)
-	local id = self.Def.Id
-	assert(id, `Cannot quick set without an id (no one-offs)`)
+function Dialogue.QuickSetRaw(self: Dialogue, id: string, key: string, value: any)
+	assert(id, `Missing id`)
 
 	return DataService:GetSaveFile(self.Player):andThen(function(saveFile)
 		saveFile:Update("DialogueQuickData", function(quickData)
@@ -243,9 +242,13 @@ function Dialogue.QuickSet(self: Dialogue, key: string, value: any)
 	end)
 end
 
-function Dialogue.QuickGet(self: Dialogue, key: string, default: any)
+function Dialogue.QuickSet(self: Dialogue, key: string, value: any)
 	local id = self.Def.Id
-	assert(id, `Cannot quick get without an id (no one-offs)`)
+	return self:QuickSetRaw(id, key, value)
+end
+
+function Dialogue.QuickGetRaw(self: Dialogue, id: string, key: string, default: any)
+	assert(id, `Missing id`)
 
 	return DataService:GetSaveFile(self.Player):andThen(function(saveFile)
 		local quickData = saveFile:Get("DialogueQuickData")
@@ -259,6 +262,11 @@ function Dialogue.QuickGet(self: Dialogue, key: string, default: any)
 
 		return value
 	end)
+end
+
+function Dialogue.QuickGet(self: Dialogue, key: string, default: any)
+	local id = self.Def.Id
+	return self:QuickGetRaw(id, key, default)
 end
 
 function Dialogue.QuickFlagIsUp(self: Dialogue, key: string)
@@ -279,6 +287,14 @@ end
 
 function Dialogue.QuickFlagLower(self: Dialogue, key: string)
 	return self:QuickSet(key, nil)
+end
+
+function Dialogue.SharedSet(self: Dialogue, key: string, value: any)
+	return self:QuickSetRaw("Shared", key, value)
+end
+
+function Dialogue.SharedGet(self: Dialogue, key: string, default: any)
+	return self:QuickGetRaw("Shared", key, default)
 end
 
 function Dialogue.Destroy(self: Dialogue)

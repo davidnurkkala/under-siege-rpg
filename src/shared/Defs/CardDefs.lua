@@ -27,6 +27,11 @@ local Cards = {
 		Rank = 0,
 		Cooldown = 5,
 		Cost = 15,
+		Upgrades = {
+			{ Coins = 50, SimpleFood = 5 },
+			{ Coins = 100, SimpleFood = 10, SimpleMaterials = 10 },
+			{ Coins = 250, SimpleFood = 50, SimpleMaterials = 30 },
+		},
 	},
 	Militia = {
 		Type = "Goon",
@@ -34,6 +39,11 @@ local Cards = {
 		Rank = 0,
 		Cooldown = 5,
 		Cost = 20,
+		Upgrades = {
+			{ Coins = 100, SimpleFood = 5, SimpleMaterials = 5, CommonMetal = 5 },
+			{ Coins = 250, SimpleFood = 15, SimpleMaterials = 15, CommonMetal = 10 },
+			{ Coins = 500, SimpleFood = 50, SimpleMaterials = 50, CommonMetal = 25 },
+		},
 	},
 
 	-- tier 1
@@ -112,6 +122,11 @@ local Cards = {
 		Rank = 1,
 		Cooldown = 5,
 		Cost = 15,
+		Upgrades = {
+			{ Coins = 50, SimpleFood = 25 },
+			{ Coins = 250, SimpleFood = 50, SimpleMaterials = 25 },
+			{ Coins = 1000, SimpleFood = 100, SimpleMaterials = 100 },
+		},
 	},
 	BanditScout = {
 		Type = "Goon",
@@ -119,6 +134,11 @@ local Cards = {
 		Rank = 1,
 		Cooldown = 5,
 		Cost = 20,
+		Upgrades = {
+			{ Coins = 50, SimpleFood = 30 },
+			{ Coins = 350, SimpleFood = 60, SimpleMaterials = 40 },
+			{ Coins = 1250, SimpleFood = 150, SimpleMaterials = 150 },
+		},
 	},
 	BanditDuelist = {
 		Type = "Goon",
@@ -126,6 +146,11 @@ local Cards = {
 		Rank = 1,
 		Cooldown = 5,
 		Cost = 25,
+		Upgrades = {
+			{ Coins = 200, SimpleFood = 50, CommonMetal = 25 },
+			{ Coins = 400, SimpleFood = 100, SimpleMaterials = 25, CommonMetal = 30 },
+			{ Coins = 1600, SimpleFood = 200, SimpleMaterials = 50, CommonMetal = 50 },
+		},
 	},
 	BanditRogue = {
 		Type = "Goon",
@@ -133,6 +158,11 @@ local Cards = {
 		Rank = 1,
 		Cooldown = 5,
 		Cost = 30,
+		Upgrades = {
+			{ Coins = 50, SimpleFood = 30 },
+			{ Coins = 350, SimpleFood = 60, SimpleMaterials = 40 },
+			{ Coins = 1250, SimpleFood = 150, SimpleMaterials = 150 },
+		},
 	},
 
 	-- other units
@@ -269,7 +299,14 @@ local Cards = {
 		AbilityId = "RainOfArrows",
 		Rank = 1,
 		Cooldown = 5,
-		Cost = 20,
+		Cost = 25,
+	},
+	Fireball = {
+		Type = "Ability",
+		AbilityId = "Fireball",
+		Rank = 1,
+		Cooldown = 5,
+		Cost = 50,
 	},
 	Recruitment = {
 		Type = "Ability",

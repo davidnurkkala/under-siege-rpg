@@ -10,7 +10,7 @@ end
 local Abilities = {
 	Heal = {
 		Name = "Heal",
-		Image = "rbxassetid://15582200046",
+		Image = "rbxassetid://16270467726",
 		Summary = "Heal your front soldier.",
 		Description = function(self, level)
 			return `Restore {self.Amount(level) // 0.01} health to your front soldier.`
@@ -22,7 +22,7 @@ local Abilities = {
 
 	RainOfArrows = {
 		Name = "Rain of Arrows",
-		Image = "rbxassetid://15582199910",
+		Image = "rbxassetid://16270467630",
 		Summary = "Hit enemies with arrows.",
 		Description = function(self, level)
 			return `{self.Count(level)} arrows that deal {self.Damage(level) // 0.01} damage fall from the sky to hit enemies.\n\nEach arrow will hit a different target, starting from the front-most enemy soldier and moving backwards.\n\nDeals 10% damage to the enemy leader.`
@@ -32,6 +32,18 @@ local Abilities = {
 		end,
 		Damage = function(level)
 			return lerped(1, 3, level)
+		end,
+	},
+
+	Fireball = {
+		Name = "Fireball",
+		Image = "rbxassetid://16270467857",
+		Summary = "Launch an explosive mote of fire.",
+		Description = function(self, level)
+			return `Hurl a fireball at the nearest enemy which explodes, dealing {self.Damage(level) // 0.01} damage to all nearby enemies.`
+		end,
+		Damage = function(level)
+			return lerped(5, 10, level)
 		end,
 	},
 

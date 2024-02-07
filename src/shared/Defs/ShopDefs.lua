@@ -99,6 +99,10 @@ local Shops = {
 				Reward = { Type = "Card", CardId = "Heal" },
 				Price = { Coins = 2500 },
 			},
+			{
+				Reward = { Type = "Card", CardId = "Fireball" },
+				Price = { Coins = 10000 },
+			},
 		},
 	},
 	World1Guildmaster = {

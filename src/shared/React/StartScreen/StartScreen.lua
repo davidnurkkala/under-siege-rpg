@@ -6,6 +6,7 @@ local UserInputService = game:GetService("UserInputService")
 local Button = require(ReplicatedStorage.Shared.React.Common.Button)
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
+local Frame = require(ReplicatedStorage.Shared.React.Common.Frame)
 local Image = require(ReplicatedStorage.Shared.React.Common.Image)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local ListLayout = require(ReplicatedStorage.Shared.React.Common.ListLayout)
@@ -72,9 +73,10 @@ return function(props: {
 				LayoutOrder = 2,
 			}),
 
-			Button = React.createElement(Container, {
+			Button = React.createElement(Frame, {
 				Size = UDim2.fromScale(0.2, 0.2 * 0.3),
 				SizeConstraint = Enum.SizeConstraint.RelativeXX,
+				BackgroundColor3 = ColorDefs.Black,
 				LayoutOrder = 3,
 			}, {
 				Button = (platform ~= "Console") and React.createElement(Button, {
