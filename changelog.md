@@ -9,3 +9,4 @@
 - Fixed a bug which was causing a battle with the Knight to break indefinitely, clogging servers up over time.
 - Fixed a bug where battles you weren't participating in would still be visible if they existed before you joined the game, thus causing slowdown in the worst cases.
 - Increased performance of soldier escorts (the guys that follow you around) by just not rendering ones that are far away from you.
+- Fixed a bug where boosts for Coins (acquirable from the Gifts menu) were not working at all.

@@ -59,7 +59,7 @@ function BoostService.AddBoost(self: BoostService, player: Player, boost: any)
 
 	if boost.Type == "Currency" then
 		assert(boost.CurrencyType, `Currency boosts must have a currency type`)
-		assert(Sift.Set.has({ Primary = true, Secondary = true }, boost.CurrencyType), `Currency boosts can only be for Primary or Secondary currency`)
+		assert(Sift.Set.has({ Coins = true }, boost.CurrencyType), `Currency boosts can only be for Coins currency`)
 	elseif boost.Type ~= "Damage" then
 		error(`Unimplemented boost type {boost.Type}`)
 	end
