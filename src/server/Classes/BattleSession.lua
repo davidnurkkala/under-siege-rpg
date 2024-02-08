@@ -56,8 +56,16 @@ function BattleSession.new(args: {
 		root.Anchored = false
 	end)
 
-	self.Trove:Add(ActionService:Subscribe(self.Player, "Primary", function()
+	self.Trove:Add(ActionService:Subscribe(self.Player, "BattleAttack", function()
 		if self.Battler:Attack() then EventStream.Event({ Kind = "UsedInBattleAttack", Player = self.Player }) end
+	end))
+
+	self.Trove:Add(ActionService:Subscribe(self.Player, "BattleHalt", function()
+		self.Battler:Halt()
+	end))
+
+	self.Trove:Add(ActionService:Subscribe(self.Player, "BattleCharge", function()
+		self.Battler:Charge()
 	end))
 
 	return self

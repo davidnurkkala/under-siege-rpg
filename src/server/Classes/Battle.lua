@@ -305,11 +305,7 @@ function Battle.PlayCard(self: Battle, battler: Battler.Battler, cardId: string)
 				end
 			end)
 		elseif card.Type == "Ability" then
-			local activate = AbilityHelper.GetImplementation(card.AbilityId)
-			retVal = Promise.race({
-				activate(level, battler, self),
-				Promise.fromEvent(self.Ended),
-			})
+			retVal = self:ActivateAbility(card.AbilityId, level, battler)
 		else
 			error(`Unimplemented card type {card.Type}`)
 		end
@@ -318,6 +314,15 @@ function Battle.PlayCard(self: Battle, battler: Battler.Battler, cardId: string)
 
 		return retVal
 	end)
+end
+
+function Battle.ActivateAbility(self: Battle, abilityId: string, level: number, battler: Battler.Battler)
+	local activate = AbilityHelper.GetImplementation(abilityId)
+
+	return Promise.race({
+		activate(level, battler, self),
+		Promise.fromEvent(self.Ended),
+	})
 end
 
 function Battle.Update(self: Battle, dt: number)

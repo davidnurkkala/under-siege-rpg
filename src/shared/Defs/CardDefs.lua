@@ -288,20 +288,6 @@ local Cards = {
 	},
 
 	-- ABILITIES
-	Halt = {
-		Type = "Ability",
-		AbilityId = "Halt",
-		Rank = 1,
-		Cooldown = 5,
-		CostTime = 1,
-	},
-	Charge = {
-		Type = "Ability",
-		AbilityId = "Charge",
-		Rank = 1,
-		Cooldown = 10,
-		CostTime = 1,
-	},
 	Heal = {
 		Type = "Ability",
 		AbilityId = "Heal",

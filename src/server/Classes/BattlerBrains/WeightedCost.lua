@@ -28,7 +28,7 @@ function WeightedCost.new(battler: Battler.Battler): WeightedCost
 	local entries = Sift.Array.map(Sift.Dictionary.keys(self.Battler.Deck), function(cardId)
 		local cardDef = CardDefs[cardId]
 
-		local cost = cardDef.Cost
+		local cost = cardDef.Cost + cardDef.Cooldown * 3
 		highestCost = math.max(highestCost, cost)
 
 		return { Result = cardId, Weight = cost }

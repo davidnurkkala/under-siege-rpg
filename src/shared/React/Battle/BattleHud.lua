@@ -4,6 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 
 local AbilityDefs = require(ReplicatedStorage.Shared.Defs.AbilityDefs)
+local ActionController = require(ReplicatedStorage.Shared.Controllers.ActionController)
 local BattleController = require(ReplicatedStorage.Shared.Controllers.BattleController)
 local Button = require(ReplicatedStorage.Shared.React.Common.Button)
 local CardDefs = require(ReplicatedStorage.Shared.Defs.CardDefs)
@@ -13,6 +14,7 @@ local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
 local Flipper = require(ReplicatedStorage.Packages.Flipper)
 local Frame = require(ReplicatedStorage.Shared.React.Common.Frame)
+local GamepadEffect = require(ReplicatedStorage.Shared.React.Hooks.GamepadEffect)
 local GoonHealthBar = require(ReplicatedStorage.Shared.React.Battle.GoonHealthBar)
 local GoonPreview = require(ReplicatedStorage.Shared.React.Goons.GoonPreview)
 local HealthBar = require(ReplicatedStorage.Shared.React.Battle.HealthBar)
@@ -177,40 +179,52 @@ local function cooldownBar(props: {
 	})
 end
 
-local function attackButton(props: {
-	Status: any,
+local function tacticButton(props: {
+	Activate: () -> (),
+	Cooldown: { Time: number, TimeMax: number },
+	Color: Color3,
 	LayoutOrder: number,
+	Tag: string,
+	Image: string,
+	KeyCode: Enum.KeyCode,
+	GamepadHint: string,
 })
 	local platform = React.useContext(PlatformContext)
-	local cooldown, setCooldown = React.useState(nil)
+
+	local cooldown = props.Cooldown
+	local onCooldown = cooldown.Time > 0
 
 	React.useEffect(function()
-		if not props.Status then return end
+		if platform ~= "Console" then return end
 
-		setCooldown(props.Status.Battlers[1].AttackCooldown)
-	end, { props.Status })
-
-	local onCooldown = (cooldown ~= nil) and (cooldown.Time > 0)
+		return GamepadEffect("TacticButton" .. props.GamepadHint, function()
+			props.Activate()
+		end, props.KeyCode)
+	end, { platform })
 
 	return React.createElement(Container, {
-		[React.Tag] = "GuiBattleAttackButton",
+		[React.Tag] = props.Tag,
 		SizeConstraint = Enum.SizeConstraint.RelativeYY,
 		LayoutOrder = props.LayoutOrder,
 	}, {
-		Button = React.createElement(PrimaryButton, {
+		Button = React.createElement(Button, {
+			[React.Event.Activated] = props.Activate,
 			Active = not onCooldown,
+			ImageColor3 = if onCooldown then props.Color:Lerp(ColorDefs.Gray25, 0.5) else props.Color,
+			BorderColor3 = if onCooldown then ColorDefs.PaleBlue else ColorDefs.Black,
+			BorderSizePixel = if onCooldown then 1 else nil,
 			Selectable = false,
 		}, {
 			Icon = React.createElement(Image, {
-				Image = "rbxassetid://15243978990",
+				Image = props.Image,
 			}),
 
 			CooldownBar = onCooldown and React.createElement(cooldownBar, cooldown),
 
 			GamepadHint = React.createElement(RoundButtonWithImage, {
 				Visible = platform == "Console",
-				Image = UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonR2),
-				Text = "Shoot",
+				Image = UserInputService:GetImageForKeyCode(props.KeyCode),
+				Text = props.GamepadHint,
 				Selectable = false,
 				Position = UDim2.new(0.5, 0, 0, -4),
 				AnchorPoint = Vector2.new(0.5, 1),
@@ -354,6 +368,7 @@ return function(props: {
 	local message, setMessage = React.useState(nil)
 	local platform = React.useContext(PlatformContext)
 	local firstCardRef = React.useRef(nil)
+	local battler = status and status.Battlers and status.Battlers[1]
 
 	local clearMessage = React.useCallback(function()
 		setMessage(nil)
@@ -442,12 +457,12 @@ return function(props: {
 			Finish = clearMessage,
 		}),
 
-		HealthBars = (status and status.Battlers) and React.createElement(React.Fragment, nil, {
+		HealthBars = battler and React.createElement(React.Fragment, nil, {
 			HealthBarLeft = React.createElement("BillboardGui", {
 				Size = UDim2.fromScale(8, 1),
 				AlwaysOnTop = true,
 				Adornee = TryNow(function()
-					return status.Battlers[1].CharModel
+					return battler.CharModel
 				end),
 				ExtentsOffsetWorldSpace = Vector3.new(0, 2, 0),
 			}, {
@@ -505,13 +520,53 @@ return function(props: {
 						Padding = UDim.new(0, 16),
 					}),
 
-					AttackButton = React.createElement(attackButton, {
-						Status = status,
+					AttackButton = React.createElement(tacticButton, {
+						Activate = function()
+							ActionController:Once("BattleAttack")
+						end,
+						Cooldown = TryNow(function()
+							return battler.TacticCooldowns.Attack
+						end, { Time = 1, TimeMax = 1 }),
+						Color = ColorDefs.LightRed,
 						LayoutOrder = 1,
+						Tag = "GuiBattleAttackButton",
+						Image = "rbxassetid://15243978990",
+						KeyCode = Enum.KeyCode.ButtonR2,
+						GamepadHint = "Attack",
+					}),
+
+					HaltButton = React.createElement(tacticButton, {
+						Activate = function()
+							ActionController:Once("BattleHalt")
+						end,
+						Cooldown = TryNow(function()
+							return battler.TacticCooldowns.Halt
+						end, { Time = 1, TimeMax = 1 }),
+						Color = ColorDefs.Gray75,
+						LayoutOrder = 2,
+						Tag = "GuiBattleHaltButton",
+						Image = AbilityDefs.Halt.Image,
+						KeyCode = Enum.KeyCode.ButtonL1,
+						GamepadHint = "Halt",
+					}),
+
+					ChargeButton = React.createElement(tacticButton, {
+						Activate = function()
+							ActionController:Once("BattleCharge")
+						end,
+						Cooldown = TryNow(function()
+							return battler.TacticCooldowns.Charge
+						end, { Time = 1, TimeMax = 1 }),
+						Color = ColorDefs.Gray75,
+						LayoutOrder = 3,
+						Tag = "GuiBattleChargeButton",
+						Image = AbilityDefs.Charge.Image,
+						KeyCode = Enum.KeyCode.ButtonR1,
+						GamepadHint = "Charge",
 					}),
 
 					Supplies = React.createElement(Container, {
-						LayoutOrder = 2,
+						LayoutOrder = 4,
 						Size = UDim2.fromScale(1.75, 1),
 						SizeConstraint = Enum.SizeConstraint.RelativeYY,
 					}, {
@@ -521,7 +576,7 @@ return function(props: {
 					}),
 
 					Upgrade = React.createElement(Container, {
-						LayoutOrder = 3,
+						LayoutOrder = 5,
 						Size = UDim2.fromScale(0.75, 0.75),
 						SizeConstraint = Enum.SizeConstraint.RelativeYY,
 					}, {

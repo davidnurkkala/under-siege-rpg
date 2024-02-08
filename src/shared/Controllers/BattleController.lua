@@ -32,14 +32,18 @@ function BattleController.PrepareBlocking(self: BattleController)
 	self.SuppliesUpgraded = self.Comm:GetSignal("SuppliesUpgraded")
 	self.RewardsDisplayed = self.Comm:GetSignal("RewardsDisplayed")
 
-	workspace.Battles.ChildAdded:Connect(function(battleModel)
+	local function onChildAdded(battleModel)
 		local userIds = Sift.Array.map(string.split(battleModel:GetAttribute("UserIds"), ","), function(userIdString)
 			return tonumber(userIdString)
 		end)
 		if table.find(userIds, Players.LocalPlayer.UserId) == nil then task.defer(function()
 			battleModel.Parent = nil
 		end) end
-	end)
+	end
+	workspace.Battles.ChildAdded:Connect(onChildAdded)
+	for _, child in workspace.Battles:GetChildren() do
+		onChildAdded(child)
+	end
 end
 
 function BattleController.ObserveStatus(self: BattleController, callback: (any) -> ()): () -> ()

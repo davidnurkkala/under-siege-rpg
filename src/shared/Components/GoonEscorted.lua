@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
@@ -32,6 +33,7 @@ export type GoonEscorted = typeof(setmetatable(
 	{} :: {
 		Model: Model,
 		GoonIds: Property.Property,
+		Visible: Property.Property,
 		Trove: any,
 		Goons: { Goon },
 	},
@@ -44,6 +46,7 @@ function GoonEscorted.new(model: Model): GoonEscorted
 	local self: GoonEscorted = setmetatable({
 		Model = model,
 		GoonIds = trove:Construct(Property, {}),
+		Visible = trove:Construct(Property, false),
 		Goons = {},
 		Trove = trove,
 	}, GoonEscorted)
@@ -57,28 +60,33 @@ function GoonEscorted.new(model: Model): GoonEscorted
 	end))
 
 	self.GoonIds:Observe(function(goonIds)
-		self.Goons = Sift.Array.map(goonIds, function(goonId)
-			local def = GoonDefs[goonId]
+		return self.Visible:Observe(function(visible)
+			if not visible then return end
 
-			local goonModel = def.Model:Clone()
-			goonModel:ScaleTo(0.75)
-			goonModel.Parent = workspace.Effects
+			self.Goons = Sift.Array.map(goonIds, function(goonId)
+				local def = GoonDefs[goonId]
 
-			local animator = Animator.new(goonModel.AnimationController)
+				local goonModel = def.Model:Clone()
+				goonModel:ScaleTo(0.75)
+				goonModel.Parent = workspace.Effects
 
-			return {
-				Model = goonModel,
-				Animator = animator,
-				AnimationId = def.Animations.Walk,
-			}
-		end)
+				local animator = Animator.new(goonModel.AnimationController)
 
-		return function()
-			for _, goon in self.Goons do
-				goon.Animator:Destroy()
-				goon.Model:Destroy()
+				return {
+					Model = goonModel,
+					Animator = animator,
+					AnimationId = def.Animations.Walk,
+				}
+			end)
+
+			return function()
+				for _, goon in self.Goons do
+					goon.Animator:Destroy()
+					goon.Model:Destroy()
+				end
+				self.Goons = {}
 			end
-		end
+		end)
 	end)
 
 	GoonEscortedUpdater:Add(self)
@@ -94,6 +102,9 @@ function GoonEscorted.Update(self: GoonEscorted, dt: number)
 
 	local root = self.Model.PrimaryPart
 	if not root then return end
+
+	self.Visible:Set(Players.LocalPlayer:DistanceFromCharacter(root.Position) <= 128)
+	if not self.Visible:Get() then return end
 
 	local filter = Sift.Array.append(
 		Sift.Array.map(self.Goons, function(goon)
@@ -129,7 +140,7 @@ function GoonEscorted.Update(self: GoonEscorted, dt: number)
 		local newPosition = here + (delta / distance) * traversed
 
 		local flat = delta * Vector3.new(1, 0, 1)
-		if flat:FuzzyEq(Vector3.zero, 0.01) then flat = self.Root.CFrame.LookVector end
+		if flat:FuzzyEq(Vector3.zero, 0.01) then flat = root.CFrame.LookVector end
 
 		goon.Model:PivotTo(CFrame.lookAlong(newPosition, flat))
 	end

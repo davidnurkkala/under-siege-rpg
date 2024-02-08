@@ -86,7 +86,6 @@ function Battler.new(args: {
 		WillDealDamage = Signal.new(),
 		Attacked = Signal.new(),
 		Active = true,
-		AttackCooldown = Cooldown.new(5),
 		Trove = trove,
 		AttackDamage = weaponTypeDef.Damage,
 		Deck = args.Deck,
@@ -98,11 +97,18 @@ function Battler.new(args: {
 
 			return cooldown, cardId
 		end),
+		TacticCooldowns = {
+			Attack = Cooldown.new(5),
+			Halt = Cooldown.new(5),
+			Charge = Cooldown.new(10),
+		},
 		Supplies = Configuration.SuppliesStarting,
 		SuppliesGain = Configuration.SuppliesGain,
 	}, Battler)
 
-	self.AttackCooldown:Use(10)
+	self.TacticCooldowns.Attack:Use(10)
+	self.TacticCooldowns.Halt:Use()
+	self.TacticCooldowns.Charge:Use()
 
 	do
 		local function update()
@@ -199,7 +205,7 @@ function Battler.HasTag(self: Battler, tagId: string)
 end
 
 function Battler.GetCooldowns(self: Battler)
-	return Sift.Array.append(Sift.Dictionary.values(self.DeckCooldowns), self.AttackCooldown)
+	return Sift.Array.concat(Sift.Dictionary.values(self.DeckCooldowns), Sift.Dictionary.values(self.TacticCooldowns))
 end
 
 function Battler.DefeatAnimation(self: Battler)
@@ -247,7 +253,9 @@ function Battler.GetStatus(self: Battler)
 		CharModel = self.CharModel,
 		Health = self.Health:Get(),
 		HealthMax = self.Health.Max,
-		AttackCooldown = { Time = self.AttackCooldown.Time, TimeMax = self.AttackCooldown.TimeMax },
+		TacticCooldowns = Sift.Dictionary.map(self.TacticCooldowns, function(cooldown)
+			return { Time = cooldown.Time, TimeMax = cooldown.TimeMax }
+		end),
 		DeckCooldowns = Sift.Dictionary.map(self.DeckCooldowns, function(cooldown)
 			return { Time = cooldown.Time, TimeMax = cooldown.TimeMax }
 		end),
@@ -283,8 +291,26 @@ function Battler.IsActive(self: Battler)
 	return self.Health:Get() > 0
 end
 
+function Battler.Halt(self: Battler)
+	if not self.TacticCooldowns.Halt:IsReady() then return false end
+
+	self:GetBattle():ActivateAbility("Halt", 1, self)
+	self.TacticCooldowns.Halt:Use()
+
+	return true
+end
+
+function Battler.Charge(self: Battler)
+	if not self.TacticCooldowns.Charge:IsReady() then return false end
+
+	self:GetBattle():ActivateAbility("Charge", 1, self)
+	self.TacticCooldowns.Charge:Use()
+
+	return true
+end
+
 function Battler.Attack(self: Battler)
-	if not self.AttackCooldown:IsReady() then return false end
+	if not self.TacticCooldowns.Attack:IsReady() then return false end
 
 	local battle = self.Battle
 	if not battle then return false end
@@ -300,7 +326,7 @@ function Battler.Attack(self: Battler)
 
 	local root = target:GetRoot()
 
-	self.AttackCooldown:Use()
+	self.TacticCooldowns.Attack:Use()
 
 	self.Animator:Play(self.WeaponDef.Animations.Shoot, 0)
 
@@ -345,7 +371,7 @@ function Battler.Attack(self: Battler)
 
 	local cancelPromise = Promise.fromEvent(target.Destroyed):andThen(function()
 		self.Animator:StopHard(self.WeaponDef.Animations.Shoot)
-		self.AttackCooldown:Reset()
+		self.TacticCooldowns.Attack:Reset()
 	end)
 
 	Promise.race({ attackPromise, cancelPromise })
