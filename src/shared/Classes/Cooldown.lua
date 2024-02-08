@@ -37,8 +37,8 @@ function Cooldown.OnReady(self: Cooldown, callback)
 	end
 end
 
-function Cooldown.Use(self: Cooldown)
-	self:SetTime(self.TimeMax)
+function Cooldown.Use(self: Cooldown, override: number?)
+	self:SetTime(override or self.TimeMax)
 	self.Used:Fire()
 end
 
@@ -67,7 +67,7 @@ function Cooldown.Update(self: Cooldown, dt: number)
 end
 
 function Cooldown.GetPercent(self: Cooldown)
-	return self.Time / self.TimeMax
+	return math.clamp(self.Time / self.TimeMax, 0, 1)
 end
 
 function Cooldown.Reset(self: Cooldown)

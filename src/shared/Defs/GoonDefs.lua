@@ -48,7 +48,7 @@ local Goons = {
 				return lerped(1, 2, level)
 			end,
 			HealthMax = function(level)
-				return lerped(5, 7.5, level)
+				return lerped(10, 15, level)
 			end,
 		},
 	},
@@ -92,7 +92,7 @@ local Goons = {
 				return lerped(1, 1.5, level)
 			end,
 			HealthMax = function(level)
-				return lerped(5, 7.5, level)
+				return lerped(10, 15, level)
 			end,
 		},
 	},
@@ -132,7 +132,7 @@ local Goons = {
 				return lerped(1.5, 2.25, level)
 			end,
 			HealthMax = function(level)
-				return lerped(7.5, 12, level)
+				return lerped(15, 24, level)
 			end,
 		},
 	},
@@ -172,7 +172,7 @@ local Goons = {
 				return lerped(1.5, 2.5, level)
 			end,
 			HealthMax = function(level)
-				return lerped(7.5, 10, level)
+				return lerped(15, 20, level)
 			end,
 		},
 	},
@@ -216,7 +216,7 @@ local Goons = {
 				return lerped(1.5, 2, level)
 			end,
 			HealthMax = function(level)
-				return lerped(7.5, 10, level)
+				return lerped(15, 20, level)
 			end,
 		},
 	},
@@ -256,7 +256,7 @@ local Goons = {
 				return lerped(2, 2.75, level)
 			end,
 			HealthMax = function(level)
-				return lerped(10, 15.5, level)
+				return lerped(20, 31, level)
 			end,
 		},
 	},
@@ -296,7 +296,7 @@ local Goons = {
 				return lerped(2, 3, level)
 			end,
 			HealthMax = function(level)
-				return lerped(10, 12.5, level)
+				return lerped(20, 25, level)
 			end,
 		},
 	},
@@ -340,7 +340,7 @@ local Goons = {
 				return lerped(2, 2.5, level)
 			end,
 			HealthMax = function(level)
-				return lerped(10, 12.5, level)
+				return lerped(20, 25, level)
 			end,
 		},
 	},
@@ -380,7 +380,7 @@ local Goons = {
 				return lerped(2.5, 3.25, level)
 			end,
 			HealthMax = function(level)
-				return lerped(12.5, 17, level)
+				return lerped(25, 34, level)
 			end,
 		},
 	},
@@ -420,7 +420,7 @@ local Goons = {
 				return lerped(3, 3.75, level)
 			end,
 			HealthMax = function(level)
-				return lerped(15, 19.5, level)
+				return lerped(30, 39, level)
 			end,
 		},
 	},
@@ -464,7 +464,7 @@ local Goons = {
 				return lerped(2.5, 3, level)
 			end,
 			HealthMax = function(level)
-				return lerped(12.5, 15, level)
+				return lerped(25, 30, level)
 			end,
 		},
 	},
@@ -504,7 +504,7 @@ local Goons = {
 				return lerped(3, 4, level)
 			end,
 			HealthMax = function(level)
-				return lerped(15, 20, level)
+				return lerped(30, 40, level)
 			end,
 		},
 	},
@@ -758,7 +758,7 @@ local Goons = {
 				return lerped(2, 3, level)
 			end,
 			HealthMax = function(level)
-				return lerped(10, 12.5, level)
+				return lerped(20, 25, level)
 			end,
 		},
 	},
@@ -798,7 +798,7 @@ local Goons = {
 				return lerped(1.5, 2.5, level)
 			end,
 			HealthMax = function(level)
-				return lerped(7.5, 10, level)
+				return lerped(15, 20, level)
 			end,
 		},
 	},
@@ -842,7 +842,7 @@ local Goons = {
 				return lerped(1.5, 2, level)
 			end,
 			HealthMax = function(level)
-				return lerped(7.5, 10, level)
+				return lerped(15, 20, level)
 			end,
 		},
 	},
@@ -882,7 +882,7 @@ local Goons = {
 				return lerped(3, 5, level)
 			end,
 			HealthMax = function(level)
-				return lerped(7.5, 10, level)
+				return lerped(15, 20, level)
 			end,
 		},
 	},
@@ -922,7 +922,7 @@ local Goons = {
 				return lerped(2, 2.75, level)
 			end,
 			HealthMax = function(level)
-				return lerped(10, 15.5, level)
+				return lerped(20, 31, level)
 			end,
 		},
 	},
@@ -1002,7 +1002,7 @@ local Goons = {
 				return lerped(2, 2.75, level)
 			end,
 			HealthMax = function(level)
-				return lerped(10, 15.5, level)
+				return lerped(20, 31, level)
 			end,
 		},
 	},
@@ -1042,7 +1042,7 @@ local Goons = {
 				return lerped(2.5, 3.25, level)
 			end,
 			HealthMax = function(level)
-				return lerped(12.5, 17, level)
+				return lerped(25, 34, level)
 			end,
 		},
 	},
@@ -1169,7 +1169,7 @@ local Goons = {
 				return lerped(3, 3.75, level)
 			end,
 			HealthMax = function(level)
-				return lerped(10, 12.5, level)
+				return lerped(20, 25, level)
 			end,
 		},
 	},
@@ -1209,7 +1209,7 @@ local Goons = {
 				return lerped(2, 3, level)
 			end,
 			HealthMax = function(level)
-				return lerped(10, 12.5, level)
+				return lerped(20, 25, level)
 			end,
 		},
 	},

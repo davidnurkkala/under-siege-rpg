@@ -40,11 +40,15 @@ local DataService = {
 				Peasant = true,
 				Hunter = true,
 				Militia = true,
+				Halt = true,
+				Charge = true,
 			},
 			Owned = {
 				Peasant = 1,
 				Hunter = 1,
 				Militia = 1,
+				Halt = 1,
+				Charge = 1,
 			},
 		},
 		Options = {
@@ -81,7 +85,24 @@ function DataService.PrepareBlocking(self: DataService)
 
 		defaultData = self.DefaultData,
 
-		migrations = {},
+		migrations = {
+			function(data)
+				return Sift.Dictionary.update(data, "Deck", function(deck)
+					local owned, equipped = deck.Owned, deck.Equipped
+
+					return Sift.Dictionary.merge(deck, {
+						Owned = Sift.Dictionary.merge(owned, {
+							Halt = 1,
+							Charge = 1,
+						}),
+						Equipped = Sift.Dictionary.merge(equipped, {
+							Halt = true,
+							Charge = true,
+						}),
+					})
+				end)
+			end,
+		},
 	})
 
 	Observers.observePlayer(function(player: Player)

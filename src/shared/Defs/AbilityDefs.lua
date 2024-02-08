@@ -47,6 +47,36 @@ local Abilities = {
 		end,
 	},
 
+	Halt = {
+		Name = "Halt",
+		Image = "rbxassetid://16280487510",
+		Summary = "Order soldiers to halt.",
+		Description = function(self, level)
+			return `Slow all of your soldiers on your half of the battlefield by {self.Amount(level) // 0.01}% for {self.Duration(level)} seconds.`
+		end,
+		Amount = function()
+			return 0.9
+		end,
+		Duration = function()
+			return 5
+		end,
+	},
+
+	Charge = {
+		Name = "Charge",
+		Image = "rbxassetid://16280487639",
+		Summary = "Order soldiers to charge.",
+		Description = function(self, level)
+			return `Increase the speed of all of your soldiers on your half of the battlefield by {self.Amount(level) // 0.01}% for {self.Duration(level)} seconds.`
+		end,
+		Amount = function()
+			return 1
+		end,
+		Duration = function()
+			return 2.5
+		end,
+	},
+
 	Recruitment = {
 		Name = "Recruitment",
 		Image = "",

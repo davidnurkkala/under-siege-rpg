@@ -9,8 +9,10 @@ local Battler = require(ServerScriptService.Server.Classes.Battler)
 local BattlerDefs = require(ReplicatedStorage.Shared.Defs.BattlerDefs)
 local BattlerHelper = require(ServerScriptService.Server.Util.BattlerHelper)
 local CardDefs = require(ReplicatedStorage.Shared.Defs.CardDefs)
+local Configuration = require(ReplicatedStorage.Shared.Configuration)
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
 local Damage = require(ServerScriptService.Server.Classes.Damage)
+local EffectPart = require(ReplicatedStorage.Shared.Util.EffectPart)
 local EventStream = require(ReplicatedStorage.Shared.Util.EventStream)
 local Goon = require(ServerScriptService.Server.Classes.Goon)
 local GuiEffectService = require(ServerScriptService.Server.Services.GuiEffectService)
@@ -130,6 +132,14 @@ function Battle.new(args: {
 	)
 	self.Model.Parent = workspace.Battles
 	self.Trove:Add(self.Model)
+
+	local halfway = EffectPart()
+	halfway.Color = Color3.new(1, 1, 1)
+	halfway.Material = Enum.Material.Neon
+	halfway.Transparency = 0.5
+	halfway.Size = Vector3.new(0.5, 0.5, 8)
+	halfway.CFrame = CFrame.new(self.Path:ToWorld(0.5))
+	halfway.Parent = self.Model
 
 	BattleUpdater:Add(self)
 	self.Trove:Add(function()
@@ -273,7 +283,9 @@ function Battle.PlayCard(self: Battle, battler: Battler.Battler, cardId: string)
 			})
 
 			retVal.Died:Connect(function()
-				local bounty = math.floor(card.Cost * 0.33)
+				if Configuration.BountyDisabled then return end
+
+				local bounty = math.max(1, math.floor(card.Cost * 0.1))
 				for _, otherBattler in self.Battlers do
 					if otherBattler == battler then continue end
 					otherBattler.Supplies += bounty
@@ -345,9 +357,21 @@ function Battle.EnemyFilter(_self: Battle, teamId: string)
 	end
 end
 
+function Battle.EnemyGoonsFilter(_self: Battle, teamId: string)
+	return function(object: BattleTarget)
+		return Goon.Is(object) and object.TeamId ~= teamId
+	end
+end
+
 function Battle.AllyFilter(_self: Battle, teamId: string)
 	return function(object: BattleTarget)
 		return object.TeamId == teamId
+	end
+end
+
+function Battle.AllyGoonsFilter(_self: Battle, teamId: string)
+	return function(object: BattleTarget)
+		return Goon.Is(object) and object.TeamId == teamId
 	end
 end
 
@@ -363,6 +387,15 @@ end
 
 function Battle.FilterTargets(self: Battle, filter: (BattleTarget) -> boolean)
 	return Sift.Array.filter(Sift.Array.concat(Sift.Dictionary.keys(self.Field), self.Battlers), filter)
+end
+
+function Battle.TargetAll(
+	self: Battle,
+	args: {
+		Filter: (BattleTarget) -> boolean,
+	}
+)
+	return self:FilterTargets(args.Filter)
 end
 
 function Battle.TargetFarToClose(
