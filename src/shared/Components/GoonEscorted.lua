@@ -31,7 +31,6 @@ type Goon = {
 export type GoonEscorted = typeof(setmetatable(
 	{} :: {
 		Model: Model,
-		Root: BasePart,
 		GoonIds: Property.Property,
 		Trove: any,
 		Goons: { Goon },
@@ -44,7 +43,6 @@ function GoonEscorted.new(model: Model): GoonEscorted
 
 	local self: GoonEscorted = setmetatable({
 		Model = model,
-		Root = model.PrimaryPart,
 		GoonIds = trove:Construct(Property, {}),
 		Goons = {},
 		Trove = trove,
@@ -93,7 +91,9 @@ end
 
 function GoonEscorted.Update(self: GoonEscorted, dt: number)
 	if CutsceneController.InCutscene:Get() then return end
-	if not self.Root then return end
+
+	local root = self.Model.PrimaryPart
+	if not root then return end
 
 	local filter = Sift.Array.append(
 		Sift.Array.map(self.Goons, function(goon)
@@ -103,12 +103,12 @@ function GoonEscorted.Update(self: GoonEscorted, dt: number)
 	)
 
 	for index, goon in self.Goons do
-		local cframe = self.Root.CFrame * OffsetByIndex[index]
+		local cframe = root.CFrame * OffsetByIndex[index]
 
 		local params = RaycastParams.new()
 		params.FilterDescendantsInstances = filter
 
-		local result1 = workspace:Raycast(self.Root.Position, cframe.Position - self.Root.Position, params)
+		local result1 = workspace:Raycast(root.Position, cframe.Position - root.Position, params)
 		local result2 = workspace:Raycast(cframe.Position, Vector3.yAxis * -1024, params)
 		local point = if result1 then result1.Position else if result2 then result2.Position else cframe.Position
 

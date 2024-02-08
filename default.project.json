@@ -61,7 +61,7 @@
     "Players": {
       "$properties": {
         "CharacterAutoLoads": false,
-        "MaxPlayers": 10
+        "MaxPlayers": 20
       }
     },
 

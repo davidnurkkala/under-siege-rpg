@@ -1,3 +1,4 @@
+local DataStoreService = game:GetService("DataStoreService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
@@ -121,6 +122,22 @@ function DataService.PrepareBlocking(self: DataService)
 			FirstSessionsByPlayer[player] = nil
 		end
 	end)
+end
+
+function DataService.DeleteSaveFile(self: DataService, player: Player)
+	return self:GetSaveFile(player)
+		:andThen(function(saveFile)
+			return saveFile:Destroy()
+		end)
+		:andThen(function()
+			-- messing with internals here, very dangerous
+			return Promise.try(function()
+				DataStoreService:GetDataStore(COLLECTION_NAME):RemoveAsync(getDocumentKey(player))
+			end)
+		end)
+		:andThen(function()
+			player:Kick("Your save file has been deleted.")
+		end)
 end
 
 function DataService.GetSaveFile(self: DataService, player: Player)
