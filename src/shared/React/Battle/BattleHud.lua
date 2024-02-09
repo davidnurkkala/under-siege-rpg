@@ -181,6 +181,7 @@ local function attackButton(props: {
 	Status: any,
 	LayoutOrder: number,
 })
+	local platform = React.useContext(PlatformContext)
 	local cooldown, setCooldown = React.useState(nil)
 
 	React.useEffect(function()
@@ -205,6 +206,16 @@ local function attackButton(props: {
 			}),
 
 			CooldownBar = onCooldown and React.createElement(cooldownBar, cooldown),
+
+			GamepadHint = React.createElement(RoundButtonWithImage, {
+				Visible = platform == "Console",
+				Image = UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonR2),
+				Text = "Shoot",
+				Selectable = false,
+				Position = UDim2.new(0.5, 0, 0, -4),
+				AnchorPoint = Vector2.new(0.5, 1),
+				height = UDim.new(0.4, 0),
+			}),
 		}),
 	})
 end
@@ -246,6 +257,7 @@ end
 
 local function hotbar(props: {
 	Status: any,
+	FirstCardRef: any,
 })
 	local cooldowns, setCooldowns = React.useState({})
 	local supplies, setSupplies = React.useState(0)
@@ -299,6 +311,8 @@ local function hotbar(props: {
 							[React.Event.Activated] = function()
 								BattleController.CardPlayed:Fire(cardId)
 							end,
+
+							buttonRef = if index == 1 then props.FirstCardRef else nil,
 						}, {
 							Image = if def.Type == "Goon"
 								then React.createElement(GoonPreview, {
@@ -338,8 +352,8 @@ return function(props: {
 	local goonModels, setGoonModels = React.useState({})
 	local surrendering, setSurrendering = React.useState(false)
 	local message, setMessage = React.useState(nil)
-	local surrenderButtonRef = React.useRef(nil)
 	local platform = React.useContext(PlatformContext)
+	local firstCardRef = React.useRef(nil)
 
 	local clearMessage = React.useCallback(function()
 		setMessage(nil)
@@ -348,6 +362,8 @@ return function(props: {
 	React.useEffect(function()
 		if not props.Visible then return end
 		if surrendering then return end
+
+		if platform == "Console" then GuiService.SelectedObject = firstCardRef.current end
 
 		ContextActionService:BindActionAtPriority("SelectSurrender", function(_, inputState)
 			if inputState ~= Enum.UserInputState.Begin then return Enum.ContextActionResult.Pass end
@@ -359,7 +375,7 @@ return function(props: {
 		return function()
 			ContextActionService:UnbindAction("SelectSurrender")
 		end
-	end, { props.Visible, surrendering })
+	end, { props.Visible, surrendering, firstCardRef.current })
 
 	React.useEffect(function()
 		if not props.Visible then return end
@@ -472,6 +488,7 @@ return function(props: {
 			}, {
 				Hotbar = React.createElement(hotbar, {
 					Status = status,
+					FirstCardRef = firstCardRef,
 				}),
 			}),
 
@@ -532,7 +549,6 @@ return function(props: {
 						[React.Event.Activated] = function()
 							setSurrendering(true)
 						end,
-						buttonRef = surrenderButtonRef,
 						Selectable = false,
 					}, {
 						Image = React.createElement(Image, {
@@ -561,7 +577,6 @@ return function(props: {
 				{
 					Text = TextStroke("Yes"),
 					Select = function()
-						GuiService.SelectedObject = nil
 						setSurrendering(false)
 						BattleController.SurrenderRequested:Fire()
 					end,
@@ -569,16 +584,13 @@ return function(props: {
 				{
 					Text = TextStroke("No"),
 					Select = function()
-						GuiService.SelectedObject = nil
 						setSurrendering(false)
 					end,
 				},
 			},
 			[React.Event.Activated] = function()
-				GuiService.SelectedObject = nil
 				setSurrendering(false)
 			end,
-			buttonRef = surrenderButtonRef,
 		}),
 	})
 end

@@ -1,3 +1,4 @@
+local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Aspect = require(ReplicatedStorage.Shared.React.Common.Aspect)
@@ -10,6 +11,7 @@ local Configuration = require(ReplicatedStorage.Shared.Configuration)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local CurrencyDefs = require(ReplicatedStorage.Shared.Defs.CurrencyDefs)
 local DeckController = require(ReplicatedStorage.Shared.Controllers.DeckController)
+local GamepadEffect = require(ReplicatedStorage.Shared.React.Hooks.GamepadEffect)
 local GridLayout = require(ReplicatedStorage.Shared.React.Common.GridLayout)
 local GuideController = require(ReplicatedStorage.Shared.Controllers.GuideController)
 local Image = require(ReplicatedStorage.Shared.React.Common.Image)
@@ -18,6 +20,7 @@ local LayoutContainer = require(ReplicatedStorage.Shared.React.Common.LayoutCont
 local ListLayout = require(ReplicatedStorage.Shared.React.Common.ListLayout)
 local PaddingAll = require(ReplicatedStorage.Shared.React.Common.PaddingAll)
 local Panel = require(ReplicatedStorage.Shared.React.Common.Panel)
+local PlatformContext = require(ReplicatedStorage.Shared.React.PlatformContext.PlatformContext)
 local PromptWindow = require(ReplicatedStorage.Shared.React.Common.PromptWindow)
 local RatioText = require(ReplicatedStorage.Shared.React.Common.RatioText)
 local React = require(ReplicatedStorage.Packages.React)
@@ -105,6 +108,7 @@ function cardDetails(props: {
 			}),
 
 			ScrollingFrame = React.createElement(ScrollingFrame, {
+				Selectable = true,
 				ScrollingDirection = Enum.ScrollingDirection.Y,
 				ScrollBarThickness = 8,
 				ScrollBarImageColor3 = ColorDefs.Blue,
@@ -231,6 +235,8 @@ return function(props: {
 	local equippedCount = Sift.Set.count(props.Deck.Equipped)
 	local deckIsFull = equippedCount >= Configuration.DeckSizeMax
 	local state, setState = React.useState("Menu")
+	local containerRef = React.useRef(nil)
+	local platform = React.useContext(PlatformContext)
 
 	local upgrade = React.useCallback(function(id)
 		setState("Waiting")
@@ -241,6 +247,22 @@ return function(props: {
 			setState("Menu")
 		end)
 	end, {})
+
+	React.useEffect(function()
+		if platform ~= "Console" then return end
+
+		local frame = containerRef.current
+
+		if state == "Menu" then
+			if frame then GuiService:Select(frame) end
+
+			if selectedId ~= nil then return GamepadEffect("CloseDetails", function()
+				setSelectedId(nil)
+			end, Enum.KeyCode.ButtonB) end
+		end
+
+		return
+	end, { selectedId, state, containerRef.current, platform })
 
 	return React.createElement(Container, nil, {
 		UpgradeResult = (state == "ShowingUpgrade") and React.createElement(CardUpgradeResult, {
@@ -286,77 +308,81 @@ return function(props: {
 			Size = UDim2.fromScale(1.2, 0.8),
 			HeaderSize = 0.075,
 		}, {
-			Details = (selectedId ~= nil) and React.createElement(cardDetails, {
-				DeckIsFull = deckIsFull,
-				CardId = selectedId,
-				Level = props.Deck.Owned[selectedId],
-				Equipped = props.Deck.Equipped[selectedId] == true,
-				Close = function()
-					setSelectedId(nil)
-				end,
-				Toggle = function()
-					DeckController.CardEquipToggleRequested:Fire(selectedId)
-				end,
-				Upgrade = function()
-					-- hard code skip the prompt for level 1 peasant for the tutorial
-					if selectedId == "Peasant" and props.Deck.Owned[selectedId] == 1 then
-						upgrade(selectedId)
-						return
-					end
-
-					setState("PromptingUpgrade")
-				end,
-			}),
-
-			Cards = React.createElement(ScrollingFrame, {
-				Visible = (selectedId == nil),
-				RenderLayout = function(setCanvasSize)
-					return React.createElement(GridLayout, {
-						CellSize = UDim2.fromScale(1 / 5, 1),
-						[React.Change.AbsoluteContentSize] = function(object)
-							setCanvasSize(UDim2.fromOffset(0, object.AbsoluteContentSize.Y))
-						end,
-					}, {
-						Ratio = React.createElement(Aspect, {
-							AspectRatio = 2.5 / 3.5,
-						}),
-					})
-				end,
+			Container = React.createElement(Container, {
+				containerRef = containerRef,
 			}, {
-				Cards = React.createElement(
-					React.Fragment,
-					nil,
-					Sift.Dictionary.map(props.Deck.Owned, function(level, cardId)
-						return React.createElement(LayoutContainer, {
-							[React.Tag] = `GuiDeckCardButton{cardId}`,
-							Padding = 6,
+				Details = (selectedId ~= nil) and React.createElement(cardDetails, {
+					DeckIsFull = deckIsFull,
+					CardId = selectedId,
+					Level = props.Deck.Owned[selectedId],
+					Equipped = props.Deck.Equipped[selectedId] == true,
+					Close = function()
+						setSelectedId(nil)
+					end,
+					Toggle = function()
+						DeckController.CardEquipToggleRequested:Fire(selectedId)
+					end,
+					Upgrade = function()
+						-- hard code skip the prompt for level 1 peasant for the tutorial
+						if selectedId == "Peasant" and props.Deck.Owned[selectedId] == 1 then
+							upgrade(selectedId)
+							return
+						end
+
+						setState("PromptingUpgrade")
+					end,
+				}),
+
+				Cards = React.createElement(ScrollingFrame, {
+					Visible = (selectedId == nil),
+					RenderLayout = function(setCanvasSize)
+						return React.createElement(GridLayout, {
+							CellSize = UDim2.fromScale(1 / 5, 1),
+							[React.Change.AbsoluteContentSize] = function(object)
+								setCanvasSize(UDim2.fromOffset(0, object.AbsoluteContentSize.Y))
+							end,
 						}, {
-							Button = React.createElement(Button, {
-								ImageColor3 = if props.Deck.Equipped[cardId] then ColorDefs.PaleGreen else ColorDefs.PaleBlue,
-								[React.Event.Activated] = function()
-									GuideController.GuiActionDone:Fire("DeckCardSelected", cardId)
-									setSelectedId(cardId)
-								end,
-								SelectionOrder = -1,
-							}, {
-								Contents = React.createElement(CardContents, {
-									CardId = cardId,
-									Level = level,
-								}, {
-									Check = props.Deck.Equipped[cardId] and React.createElement(Image, {
-										Size = UDim2.fromScale(0.15, 0.15),
-										ZIndex = 8,
-										SizeConstraint = Enum.SizeConstraint.RelativeXX,
-										AnchorPoint = Vector2.new(1, 0),
-										Position = UDim2.fromScale(1, 0),
-										Image = "rbxassetid://15360109124",
-										ImageColor3 = ColorDefs.LightGreen,
-									}),
-								}),
+							Ratio = React.createElement(Aspect, {
+								AspectRatio = 2.5 / 3.5,
 							}),
 						})
-					end)
-				),
+					end,
+				}, {
+					Cards = React.createElement(
+						React.Fragment,
+						nil,
+						Sift.Dictionary.map(props.Deck.Owned, function(level, cardId)
+							return React.createElement(LayoutContainer, {
+								[React.Tag] = `GuiDeckCardButton{cardId}`,
+								Padding = 6,
+							}, {
+								Button = React.createElement(Button, {
+									ImageColor3 = if props.Deck.Equipped[cardId] then ColorDefs.PaleGreen else ColorDefs.PaleBlue,
+									[React.Event.Activated] = function()
+										GuideController.GuiActionDone:Fire("DeckCardSelected", cardId)
+										setSelectedId(cardId)
+									end,
+									SelectionOrder = -1,
+								}, {
+									Contents = React.createElement(CardContents, {
+										CardId = cardId,
+										Level = level,
+									}, {
+										Check = props.Deck.Equipped[cardId] and React.createElement(Image, {
+											Size = UDim2.fromScale(0.15, 0.15),
+											ZIndex = 8,
+											SizeConstraint = Enum.SizeConstraint.RelativeXX,
+											AnchorPoint = Vector2.new(1, 0),
+											Position = UDim2.fromScale(1, 0),
+											Image = "rbxassetid://15360109124",
+											ImageColor3 = ColorDefs.LightGreen,
+										}),
+									}),
+								}),
+							})
+						end)
+					),
+				}),
 			}),
 		}),
 	})

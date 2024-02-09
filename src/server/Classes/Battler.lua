@@ -1,11 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
-local ActionService = require(ServerScriptService.Server.Services.ActionService)
 local Animator = require(ReplicatedStorage.Shared.Classes.Animator)
 local BaseDefs = require(ReplicatedStorage.Shared.Defs.BaseDefs)
 local BattlerDefs = require(ReplicatedStorage.Shared.Defs.BattlerDefs)
 local CardDefs = require(ReplicatedStorage.Shared.Defs.CardDefs)
+local Configuration = require(ReplicatedStorage.Shared.Configuration)
 local Cooldown = require(ReplicatedStorage.Shared.Classes.Cooldown)
 local Damage = require(ServerScriptService.Server.Classes.Damage)
 local EffectBattlerCollapse = require(ReplicatedStorage.Shared.Effects.EffectBattlerCollapse)
@@ -22,9 +22,6 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 local WeaponDefs = require(ReplicatedStorage.Shared.Defs.WeaponDefs)
 local WeaponHelper = require(ReplicatedStorage.Shared.Util.WeaponHelper)
 local WeaponTypeDefs = require(ReplicatedStorage.Shared.Defs.WeaponTypeDefs)
-
-local StartingSuppliesGain = 8
-local SuppliesGainPerLevel = 2
 
 local Battler = {}
 Battler.__index = Battler
@@ -97,15 +94,15 @@ function Battler.new(args: {
 			local def = CardDefs[cardId]
 
 			local cooldown = Cooldown.new(def.Cooldown)
-			if def.Cooldown >= 10 then cooldown:Use() end
+			if def.Cooldown >= 5 then cooldown:Use() end
 
 			return cooldown, cardId
 		end),
-		Supplies = 0,
-		SuppliesGain = StartingSuppliesGain,
+		Supplies = Configuration.SuppliesStarting,
+		SuppliesGain = Configuration.SuppliesGain,
 	}, Battler)
 
-	self.AttackCooldown:Use()
+	self.AttackCooldown:Use(10)
 
 	do
 		local function update()
@@ -261,7 +258,7 @@ function Battler.GetStatus(self: Battler)
 end
 
 function Battler.GetSuppliesUpgradeCost(self: Battler)
-	return 50 + 30 * (self.SuppliesGain - StartingSuppliesGain)
+	return 50 + 30 * (self.SuppliesGain - Configuration.SuppliesGain)
 end
 
 function Battler.UpgradeSupplies(self: Battler)
@@ -269,7 +266,7 @@ function Battler.UpgradeSupplies(self: Battler)
 	if self.Supplies < cost then return end
 
 	self.Supplies -= cost
-	self.SuppliesGain += SuppliesGainPerLevel
+	self.SuppliesGain += Configuration.SuppliesUpgrade
 
 	self.Changed:Fire(self:GetStatus())
 end

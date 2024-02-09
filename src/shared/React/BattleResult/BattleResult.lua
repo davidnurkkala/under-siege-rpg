@@ -1,4 +1,6 @@
+local ContextActionService = game:GetService("ContextActionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 
 local Button = require(ReplicatedStorage.Shared.React.Common.Button)
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
@@ -9,10 +11,12 @@ local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local LayoutContainer = require(ReplicatedStorage.Shared.React.Common.LayoutContainer)
 local ListLayout = require(ReplicatedStorage.Shared.React.Common.ListLayout)
 local Panel = require(ReplicatedStorage.Shared.React.Common.Panel)
+local PlatformContext = require(ReplicatedStorage.Shared.React.PlatformContext.PlatformContext)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local PromiseMotor = require(ReplicatedStorage.Shared.Util.PromiseMotor)
 local React = require(ReplicatedStorage.Packages.React)
 local RewardDisplayHelper = require(ReplicatedStorage.Shared.Util.RewardDisplayHelper)
+local RoundButtonWithImage = require(ReplicatedStorage.Shared.React.Common.RoundButtonWithImage)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 local UseMotor = require(ReplicatedStorage.Shared.React.Hooks.UseMotor)
@@ -76,6 +80,13 @@ return function(props: {
 	Close: () -> (),
 })
 	local height, heightMotor = UseMotor(-1)
+	local platform = React.useContext(PlatformContext)
+
+	local close = React.useCallback(function()
+		PromiseMotor(heightMotor, Flipper.Spring.new(-1), function(value)
+			return value < -0.95
+		end):finallyCall(props.Close)
+	end, { heightMotor, props.Close })
 
 	React.useEffect(function()
 		heightMotor:setGoal(Flipper.Instant.new(-1))
@@ -85,10 +96,18 @@ return function(props: {
 			heightMotor:setGoal(Flipper.Spring.new(0))
 		end)
 
+		ContextActionService:BindActionAtPriority("CloseBattleResult", function(_, inputState)
+			if inputState ~= Enum.UserInputState.Begin then return Enum.ContextActionResult.Pass end
+
+			close()
+			return Enum.ContextActionResult.Sink
+		end, false, Enum.ContextActionPriority.High.Value, Enum.KeyCode.ButtonB)
+
 		return function()
 			promise:cancel()
+			ContextActionService:UnbindAction("CloseBattleResult")
 		end
-	end, {})
+	end, { close })
 
 	return React.createElement(Container, {
 		Position = height:map(function(value)
@@ -142,20 +161,29 @@ return function(props: {
 			}),
 		}),
 
-		ConfirmButton = React.createElement(Button, {
+		ConfirmButton = React.createElement(Container, {
 			Size = UDim2.fromScale(0.15, 0.15 / 3),
 			SizeConstraint = Enum.SizeConstraint.RelativeXX,
 			LayoutOrder = 4,
-			ImageColor3 = ColorDefs.PalePurple,
-
-			[React.Event.Activated] = function()
-				PromiseMotor(heightMotor, Flipper.Spring.new(-1), function(value)
-					return value < -0.95
-				end):finallyCall(props.Close)
-			end,
 		}, {
-			Label = React.createElement(Label, {
-				Text = TextStroke("Okay"),
+			Button = (platform ~= "Console") and React.createElement(Button, {
+				ImageColor3 = ColorDefs.PalePurple,
+				[React.Event.Activated] = function()
+					close()
+				end,
+			}, {
+				Label = React.createElement(Label, {
+					Text = TextStroke("Okay"),
+				}),
+			}),
+
+			GamepadHint = (platform == "Console") and React.createElement(RoundButtonWithImage, {
+				Image = UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonB),
+				Text = "Close",
+				Selectable = false,
+				Position = UDim2.new(0.5, 0, 0, 0),
+				AnchorPoint = Vector2.new(0.5, 0),
+				height = UDim.new(1, 0),
 			}),
 		}),
 	})

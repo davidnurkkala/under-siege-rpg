@@ -90,7 +90,16 @@ return {
 		VisualCallback = foragePatch,
 		RegenTime = minutes(10),
 		Rewards = {
-			{ Chance = 0.5, Result = { Type = "Currency", CurrencyType = "SimpleFood", Amount = QuickCurrency(1, 2, 4) } },
+			{ Chance = 1, Result = { Type = "Currency", CurrencyType = "SimpleFood", Amount = QuickCurrency(1, 2, 4) } },
+		},
+	},
+	TreeSimple = {
+		Name = "Tree",
+		Action = "Chop",
+		ServerCallbackId = "Forage",
+		VisualCallback = function() end,
+		Rewards = {
+			{ Chance = 1, Result = { Type = "Currency", CurrencyType = "SimpleMaterials", Amount = QuickCurrency(1, 2, 4) } },
 		},
 	},
 }

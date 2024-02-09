@@ -4,11 +4,15 @@ local Sift = require(ReplicatedStorage.Packages.Sift)
 local StateMachine = {}
 StateMachine.__index = StateMachine
 
-export type StateMachine = typeof(setmetatable({} :: {
-	States: any,
-	State: any,
-	StateData: any,
-}, StateMachine))
+export type StateMachine = typeof(setmetatable(
+	{} :: {
+		States: any,
+		State: any,
+		StateData: any,
+		StartStateName: string,
+	},
+	StateMachine
+))
 
 function StateMachine.new(states): StateMachine
 	local self: StateMachine = setmetatable({
@@ -17,11 +21,23 @@ function StateMachine.new(states): StateMachine
 		end),
 		State = nil,
 		StateData = nil,
+		StartStateName = states[1].Name,
 	}, StateMachine)
 
-	self:SetState(states[1].Name)
+	self:SetState(self.StartStateName)
 
 	return self
+end
+
+function StateMachine.RegisterStates(self: StateMachine, states: any)
+	self.States = Sift.Dictionary.merge(
+		self.States,
+		Sift.Dictionary.map(states, function(state)
+			return state, state.Name
+		end)
+	)
+
+	self:SetState(self.StartStateName)
 end
 
 function StateMachine.SetState(self: StateMachine, stateName: string, stateData: any)

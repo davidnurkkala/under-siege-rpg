@@ -10,6 +10,7 @@ local Worlds = {
 		LightingName = "World1",
 		Price = 0,
 		Position = Vector3.new(0, 0, 0),
+		Soundtrack = { "PeaceAndProsperity", "TheSimpleLife", "Pastoral" },
 	},
 	World2 = {
 		Name = "Viking Mountains",

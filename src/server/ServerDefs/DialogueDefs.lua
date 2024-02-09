@@ -4,6 +4,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local Battle = require(ServerScriptService.Server.Classes.Battle)
 local BattleHelper = require(ServerScriptService.Server.Util.BattleHelper)
 local CardDefs = require(ReplicatedStorage.Shared.Defs.CardDefs)
+local ConsequenceHelper = require(ServerScriptService.Server.Util.ConsequenceHelper)
 local CurrencyService = require(ServerScriptService.Server.Services.CurrencyService)
 local CutsceneService = require(ServerScriptService.Server.Services.CutsceneService)
 local DeckService = require(ServerScriptService.Server.Services.DeckService)
@@ -12,7 +13,9 @@ local GenericShopService = require(ServerScriptService.Server.Services.GenericSh
 local GuideService = require(ServerScriptService.Server.Services.GuideService)
 local LobbySession = require(ServerScriptService.Server.Classes.LobbySession)
 local LobbySessions = require(ServerScriptService.Server.Singletons.LobbySessions)
+local MusicService = require(ServerScriptService.Server.Services.MusicService)
 local Promise = require(ReplicatedStorage.Packages.Promise)
+local QuestService = require(ServerScriptService.Server.Services.QuestService)
 local ServerFade = require(ServerScriptService.Server.Util.ServerFade)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local WorldService = require(ServerScriptService.Server.Services.WorldService)
@@ -29,6 +32,7 @@ local Dialogues = {
 				},
 				Nodes = { "Line2" },
 				Callback = function(self)
+					MusicService:SetSoundtrack(self.Player, { "TheKingdomIsFallen" })
 					CutsceneService:Begin(self.Player)
 				end,
 			},
@@ -229,7 +233,7 @@ local Dialogues = {
 					end,
 				},
 				Callback = function(self)
-					return self:QuickFlagRaise("HasMet")
+					self:QuickFlagRaise("HasMet")
 				end,
 				Nodes = { "UnmetFight" },
 			},
@@ -273,7 +277,7 @@ local Dialogues = {
 					end,
 				},
 				Callback = function(self)
-					return self:QuickFlagRaise("HasMet")
+					self:QuickFlagRaise("HasMet")
 				end,
 				Nodes = { "Shop" },
 			},
@@ -303,7 +307,7 @@ local Dialogues = {
 					end,
 				},
 				Callback = function(self)
-					return self:QuickFlagRaise("HasMet")
+					self:QuickFlagRaise("HasMet")
 				end,
 				Nodes = { "Unmet2" },
 			},
@@ -327,8 +331,19 @@ local Dialogues = {
 	},
 	MerchantJim = {
 		Name = "Jim, Merchant",
-		StartNodes = { "Unmet", "Met" },
+		StartNodes = { "DeliveryQuestInProgress", "Unmet", "Met" },
 		NodesOut = {
+			DeliveryQuestInProgress = {
+				Text = "Hello, milord! How's finding my shipment coming along?",
+				Nodes = { "DeliveryQuestWorkingOnIt", "DeliveryQuestDone", "Shop" },
+				Conditions = {
+					function(self)
+						return self:SharedGet("JimDeliveryQuest"):andThen(function(value)
+							return value ~= nil and value ~= "Complete"
+						end)
+					end,
+				},
+			},
 			Unmet = {
 				Text = "Ah! A new face in town. My name's Jim! I run a little shop here. I try to stock a bit of everything. Care to see what I've got?",
 				Conditions = {
@@ -337,12 +352,40 @@ local Dialogues = {
 					end,
 				},
 				Callback = function(self)
-					return self:QuickFlagRaise("HasMet")
+					self:QuickFlagRaise("HasMet")
 				end,
 				Nodes = { "Shop" },
 			},
 			Met = {
 				Text = "Welcome back to Jim's! What are you looking for?",
+				Nodes = { "Shop", "Help" },
+			},
+			DeliveryQuestStart1 = {
+				Text = "As a matter of fact, I've been expecting a delivery from a town up in the mountains for weeks, now.",
+				Nodes = { "DeliveryQuestStart2" },
+			},
+			DeliveryQuestStart2 = {
+				Text = "I've heard there are bandits along the road, which is maybe why the shipment's being held up.",
+				Nodes = { "DeliveryQuestStart3" },
+			},
+			DeliveryQuestStart3 = {
+				Text = "Would you travel up into the mountain village and speak to Holden? I'll pay you well for my shipment.",
+				Nodes = { "DeliveryQuestYes", "DeliveryQuestNo" },
+			},
+			DeliveryQuestGlad = {
+				Text = "Wonderful! Best of luck, and be safe on the roads. These are dangerous times!",
+			},
+			DeliveryQuestSad = {
+				Text = "Ah, well, I understand. Just let me know if you change your mind!",
+				Nodes = { "Shop" },
+			},
+			DeliveryQuestComplete = {
+				Text = "Amazing! You've done wonderful work. Please, accept this reward with my thanks. [Jim pays you 6000 coins.]",
+				Callback = function(self)
+					self:SharedSet("JimDeliveryQuest", "Complete"):andThen(function()
+						CurrencyService:AddCurrency(self.Player, "Coins", 6000)
+					end)
+				end,
 				Nodes = { "Shop" },
 			},
 		},
@@ -351,6 +394,148 @@ local Dialogues = {
 				Text = "Let me see your wares.",
 				Callback = function(self)
 					GenericShopService:OpenShop(self.Player, "World1Merchant")
+				end,
+			},
+			Help = {
+				Text = "Got any work?",
+				Conditions = {
+					function(self)
+						return self:SharedGet("JimDeliveryQuest"):andThen(function(value)
+							return value == nil
+						end)
+					end,
+				},
+				Nodes = { "DeliveryQuestStart1" },
+			},
+			DeliveryQuestYes = {
+				Text = "Yes, I'll get your shipment.",
+				Nodes = { "DeliveryQuestGlad" },
+				Callback = function(self)
+					self:SharedSet("JimDeliveryQuest", "TalkToHolden")
+				end,
+			},
+			DeliveryQuestNo = {
+				Text = "No, I can't do that.",
+				Nodes = { "DeliveryQuestSad" },
+			},
+			DeliveryQuestWorkingOnIt = {
+				Text = "I'm still working on it.",
+				Nodes = { "DeliveryQuestGlad" },
+				Conditions = {
+					function(self)
+						return self:SharedGet("JimDeliveryQuest"):andThen(function(value)
+							return value ~= "ReturnToJim"
+						end)
+					end,
+				},
+			},
+			DeliveryQuestDone = {
+				Text = "I have your shipment right here.",
+				Nodes = { "DeliveryQuestComplete" },
+				Conditions = {
+					function(self)
+						return self:SharedGet("JimDeliveryQuest"):andThen(function(value)
+							return value == "ReturnToJim"
+						end)
+					end,
+				},
+			},
+		},
+	},
+	HoldenVillager = {
+		Name = "Holden",
+		StartNodes = { "Start" },
+		NodesOut = {
+			Start = {
+				Text = "Greetings, milord. Welcome to the village of Bilmen.",
+				Nodes = { "DeliveryQuestGetShipment" },
+			},
+			DeliveryQuestILostIt = {
+				Text = "Ah, milord, my deepest apologies, but the shipment was stolen from me by bandits on the road. I hardly escaped with my life!",
+				Nodes = { "DeliveryQuestILostIt2" },
+			},
+			DeliveryQuestILostIt2 = {
+				Text = "It was a bandit by the name of Royce. Perhaps you can find him and retrieve the shipment. I can help you no more, I'm afraid.",
+				Callback = function(self)
+					self:SharedSet("JimDeliveryQuest", "GetFromRoyce")
+				end,
+			},
+		},
+		NodesIn = {
+			DeliveryQuestGetShipment = {
+				Text = "I'm here looking for Jim's shipment.",
+				Nodes = { "DeliveryQuestILostIt" },
+				Conditions = {
+					function(self)
+						return self:SharedGet("JimDeliveryQuest"):andThen(function(value)
+							return value == "TalkToHolden"
+						end)
+					end,
+				},
+			},
+		},
+	},
+	RoyceBandit = {
+		Name = "Royce",
+		StartNodes = { "Start" },
+		NodesOut = {
+			Start = {
+				Text = "You'll walk away if you know what's good for you.",
+				Nodes = { "DeliveryQuestFight", "Fight" },
+			},
+			DeliveryQuestDefeated = {
+				Text = "I yield, I yield! Take whatever you want, just don't kill me!",
+				Callback = function(self)
+					self:SharedSet("JimDeliveryQuest", "ReturnToJim")
+				end,
+			},
+			DeliveryQuestFightMe = {
+				Text = "You want <b>MY</b> loot? You're not leaving here alive, fool!",
+				PostCallback = function(self)
+					BattleHelper.FadeToBattle(self.Player, "RoyceBandit"):andThen(function(playerWon)
+						if playerWon then
+							self:SetNodeById("DeliveryQuestDefeated")
+						else
+							self:Destroy()
+							ConsequenceHelper.Mugged(self.Player, 0.1, function(amount)
+								return `Royce's gang forced you to retreat, stealing {amount} coins from you.`
+							end)
+						end
+					end)
+
+					return true
+				end,
+			},
+		},
+		NodesIn = {
+			DeliveryQuestFight = {
+				Text = "I've come to claim the shipment you stole from Holden.",
+				Conditions = {
+					function(self)
+						return self:SharedGet("JimDeliveryQuest"):andThen(function(value)
+							return value == "GetFromRoyce"
+						end)
+					end,
+				},
+				Nodes = { "DeliveryQuestFightMe" },
+			},
+			Fight = {
+				Text = "Fight me, bandit!",
+				Conditions = {
+					function(self)
+						return self:SharedGet("JimDeliveryQuest"):andThen(function(value)
+							return value ~= "GetFromRoyce"
+						end)
+					end,
+				},
+				Callback = function(self)
+					BattleHelper.FadeToBattle(self.Player, "RoyceBandit"):andThen(function(playerWon)
+						if not playerWon then
+							ConsequenceHelper.Mugged(self.Player, 0.1, function(amount)
+								return `Royce's gang forced you to retreat, stealing {amount} coins from you.`
+							end)
+						end
+					end)
 				end,
 			},
 		},
@@ -367,7 +552,7 @@ local Dialogues = {
 					end,
 				},
 				Callback = function(self)
-					return self:QuickFlagRaise("HasMet")
+					self:QuickFlagRaise("HasMet")
 				end,
 				Nodes = { "Shop" },
 			},
@@ -381,6 +566,95 @@ local Dialogues = {
 				Text = "Let me see what you can do.",
 				Callback = function(self)
 					GenericShopService:OpenShop(self.Player, "World1Blacksmith")
+				end,
+			},
+		},
+	},
+	LyndonNoble = {
+		Name = "Lyndon Elwyne, Count of Karyston",
+		StartNodes = { "Unmet", "Met" },
+		NodesOut = {
+			Unmet = {
+				Text = "Hm? Ah, if it isn't the refugee noble newly unlanded due to the orcs. A pity. What do you want?",
+				Nodes = { "MineAccess" },
+				Conditions = {
+					function(self)
+						return self:QuickFlagIsDown("HasMet")
+					end,
+				},
+				Callback = function(self)
+					self:QuickFlagRaise("HasMet")
+				end,
+			},
+			Met = {
+				Text = "What do you want?",
+				Nodes = { "MineAccess", "Spar" },
+			},
+			FightMeForIt = {
+				Text = "[He cocks an eyebrow.] You want access to <i>my</i> mine? Very well, but you'll have to earn it.",
+				Nodes = { "FightMeForIt2" },
+			},
+			FightMeForIt2 = {
+				Text = "A true noble knows how to let his lessers do his work for him.",
+				Nodes = { "FightMeForIt3" },
+			},
+			FightMeForIt3 = {
+				Text = "Defeat me without personally attacking -- let it all be done by your soldiers. Are we agreed?",
+				Nodes = { "AcceptFight" },
+			},
+			Victorious = {
+				Text = "Ah, well, it seems that I am the better commander. Perhaps <i>I</i> would not have lost my castle to the orcs, hm?",
+			},
+			Defeated = {
+				Text = "Ah, well fought, my lord. You have earned my respect. You may enter my mine whenever you please.",
+			},
+			DefeatedWrong = {
+				Text = "Ah, well fought, my lord, but you have failed my condition. You were not to attack. My mine remains closed to you.",
+			},
+		},
+		NodesIn = {
+			MineAccess = {
+				Text = "Can I have access to your mine?",
+				Nodes = { "FightMeForIt" },
+				Conditions = {
+					function(self)
+						return QuestService:IsQuestComplete(self.Player, "DefeatNoble"):andThen(function(isComplete)
+							return not isComplete
+						end)
+					end,
+				},
+			},
+			Spar = {
+				Text = "I'd like to fight.",
+				Conditions = {
+					function(self)
+						return QuestService:IsQuestComplete(self.Player, "DefeatNoble"):andThen(function(isComplete)
+							return isComplete
+						end)
+					end,
+				},
+				Callback = function(self)
+					BattleHelper.FadeToBattle(self.Player, "Noble")
+				end,
+			},
+			AcceptFight = {
+				Text = "Okay, let's fight.",
+				Callback = function(self)
+					BattleHelper.FadeToBattle(self.Player, "Noble"):andThen(function(playerWon)
+						if playerWon then
+							QuestService:IsQuestComplete(self.Player, "DefeatNoble"):andThen(function(isComplete)
+								if isComplete then
+									self:SetNodeById("Defeated")
+								else
+									self:SetNodeById("DefeatedWrong")
+								end
+							end)
+						else
+							self:SetNodeById("Victorious")
+						end
+					end)
+
+					return true
 				end,
 			},
 		},

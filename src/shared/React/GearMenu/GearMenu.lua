@@ -1,3 +1,4 @@
+local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Aspect = require(ReplicatedStorage.Shared.React.Common.Aspect)
@@ -5,6 +6,7 @@ local Button = require(ReplicatedStorage.Shared.React.Common.Button)
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local CosmeticController = require(ReplicatedStorage.Shared.Controllers.CosmeticController)
+local GamepadEffect = require(ReplicatedStorage.Shared.React.Hooks.GamepadEffect)
 local GridLayout = require(ReplicatedStorage.Shared.React.Common.GridLayout)
 local HeightText = require(ReplicatedStorage.Shared.React.Common.HeightText)
 local Label = require(ReplicatedStorage.Shared.React.Common.Label)
@@ -12,6 +14,7 @@ local LayoutContainer = require(ReplicatedStorage.Shared.React.Common.LayoutCont
 local ListLayout = require(ReplicatedStorage.Shared.React.Common.ListLayout)
 local PaddingAll = require(ReplicatedStorage.Shared.React.Common.PaddingAll)
 local Panel = require(ReplicatedStorage.Shared.React.Common.Panel)
+local PlatformContext = require(ReplicatedStorage.Shared.React.PlatformContext.PlatformContext)
 local RatioText = require(ReplicatedStorage.Shared.React.Common.RatioText)
 local React = require(ReplicatedStorage.Packages.React)
 local RewardDisplayHelper = require(ReplicatedStorage.Shared.Util.RewardDisplayHelper)
@@ -62,6 +65,7 @@ local function itemDetails(props: {
 			}),
 
 			ScrollingFrame = React.createElement(ScrollingFrame, {
+				Selectable = true,
 				ScrollingDirection = Enum.ScrollingDirection.Y,
 				ScrollBarThickness = 8,
 				ScrollBarImageColor3 = ColorDefs.Blue,
@@ -160,6 +164,8 @@ return function(props: {
 	local category, setCategory = React.useState("Weapons")
 	local state, setState = React.useState("Inventory")
 	local selectedItem, setSelectedItem = React.useState(nil)
+	local containerRef = React.useRef(nil)
+	local platform = React.useContext(PlatformContext)
 
 	local weapons = UseWeapons()
 	local cosmetics = UseCosmetics()
@@ -200,6 +206,24 @@ return function(props: {
 		end, false)
 	end, { category, weapons, cosmetics })
 
+	React.useEffect(function()
+		if platform ~= "Console" then return end
+
+		local frame = containerRef.current
+
+		if state == "Inventory" then
+			if frame then GuiService:Select(frame) end
+		elseif state == "Details" then
+			if frame then GuiService:Select(frame) end
+
+			return GamepadEffect("CloseDetails", function()
+				setState("Inventory")
+			end, Enum.KeyCode.ButtonB)
+		end
+
+		return
+	end, { platform, state, containerRef.current })
+
 	return React.createElement(SystemWindow, {
 		Visible = props.Visible,
 		HeaderText = TextStroke("Gear"),
@@ -208,147 +232,151 @@ return function(props: {
 		Size = UDim2.fromScale(1.2, 0.8),
 		HeaderSize = 0.075,
 	}, {
-		Details = (state == "Details") and React.createElement(itemDetails, {
-			Item = selectedItem,
-			Equipped = getIsEquipped(selectedItem),
-			Close = function()
-				setSelectedItem(nil)
-				setState("Inventory")
-			end,
-			Equip = function()
-				if category == "Weapons" then
-					WeaponController:EquipWeapon(selectedItem.WeaponId)
-				elseif category == "Bases" then
-					CosmeticController.EquipCosmetic(selectedItem.CategoryName, selectedItem.Id)
-				end
-			end,
-		}),
-
-		Inventory = React.createElement(Container, {
-			Visible = state == "Inventory",
+		Container = React.createElement(Container, {
+			containerRef = containerRef,
 		}, {
-			CategoryButtons = React.createElement(Container, {
-				Size = UDim2.fromScale(1, 0.15),
-			}, {
-				Layout = React.createElement(ListLayout, {
-					FillDirection = Enum.FillDirection.Horizontal,
-					HorizontalAlignment = Enum.HorizontalAlignment.Center,
-					Padding = UDim.new(0, 4),
-				}),
-
-				Weapons = React.createElement(categoryButton, {
-					Text = "Weapons",
-					Color = ColorDefs.LightRed,
-					Activate = function()
-						setCategory("Weapons")
-					end,
-					Active = category ~= "Weapons",
-				}),
-
-				Bases = React.createElement(categoryButton, {
-					Text = "Bases",
-					Color = ColorDefs.LightPurple,
-					Activate = function()
-						setCategory("Bases")
-					end,
-					Active = category ~= "Bases",
-				}),
+			Details = (state == "Details") and React.createElement(itemDetails, {
+				Item = selectedItem,
+				Equipped = getIsEquipped(selectedItem),
+				Close = function()
+					setSelectedItem(nil)
+					setState("Inventory")
+				end,
+				Equip = function()
+					if category == "Weapons" then
+						WeaponController:EquipWeapon(selectedItem.WeaponId)
+					elseif category == "Bases" then
+						CosmeticController.EquipCosmetic(selectedItem.CategoryName, selectedItem.Id)
+					end
+				end,
 			}),
 
-			Items = React.createElement(ScrollingFrame, {
-				Size = UDim2.fromScale(1, 0.85),
-				Position = UDim2.fromScale(0, 0.15),
-				RenderLayout = function(setCanvasSize)
-					return React.createElement(GridLayout, {
-						CellSize = UDim2.fromScale(0.5, 1),
-						[React.Change.AbsoluteContentSize] = function(object)
-							setCanvasSize(UDim2.fromOffset(0, object.AbsoluteContentSize.Y))
-						end,
-					}, {
-						Ratio = React.createElement(Aspect, {
-							AspectRatio = 4.5,
-						}),
-					})
-				end,
+			Inventory = React.createElement(Container, {
+				Visible = state == "Inventory",
 			}, {
-				Panels = React.createElement(
-					React.Fragment,
-					nil,
-					Sift.Array.map(items, function(item, index)
-						local isEquipped = getIsEquipped(item)
+				CategoryButtons = React.createElement(Container, {
+					Size = UDim2.fromScale(1, 0.15),
+				}, {
+					Layout = React.createElement(ListLayout, {
+						FillDirection = Enum.FillDirection.Horizontal,
+						HorizontalAlignment = Enum.HorizontalAlignment.Center,
+						Padding = UDim.new(0, 4),
+					}),
 
-						return React.createElement(LayoutContainer, {
-							Padding = 8,
-							LayoutOrder = index,
+					Weapons = React.createElement(categoryButton, {
+						Text = "Weapons",
+						Color = ColorDefs.LightRed,
+						Activate = function()
+							setCategory("Weapons")
+						end,
+						Active = category ~= "Weapons",
+					}),
+
+					Bases = React.createElement(categoryButton, {
+						Text = "Bases",
+						Color = ColorDefs.LightPurple,
+						Activate = function()
+							setCategory("Bases")
+						end,
+						Active = category ~= "Bases",
+					}),
+				}),
+
+				Items = React.createElement(ScrollingFrame, {
+					Size = UDim2.fromScale(1, 0.85),
+					Position = UDim2.fromScale(0, 0.15),
+					RenderLayout = function(setCanvasSize)
+						return React.createElement(GridLayout, {
+							CellSize = UDim2.fromScale(0.5, 1),
+							[React.Change.AbsoluteContentSize] = function(object)
+								setCanvasSize(UDim2.fromOffset(0, object.AbsoluteContentSize.Y))
+							end,
 						}, {
-							Panel = React.createElement(Panel, {
-								ImageColor3 = if isEquipped then ColorDefs.PaleRed else ColorDefs.PaleBlue,
-							}, {
-								Left = React.createElement(Container, nil, {
-									Layout = React.createElement(ListLayout, {
-										FillDirection = Enum.FillDirection.Horizontal,
-										Padding = UDim.new(0, 6),
-									}),
-
-									PreviewContainer = React.createElement(Panel, {
-										LayoutOrder = 1,
-										Size = UDim2.fromScale(1, 1),
-										SizeConstraint = Enum.SizeConstraint.RelativeYY,
-										ImageColor3 = RewardDisplayHelper.GetRewardColor(item),
-									}, {
-										Preview = RewardDisplayHelper.CreateRewardElement(item),
-									}),
-
-									Right = React.createElement(Container, {
-										LayoutOrder = 2,
-										Size = UDim2.fromScale(0, 1),
-										AutomaticSize = Enum.AutomaticSize.X,
-									}, {
-										Layout = React.createElement(ListLayout, {
-											VerticalAlignment = Enum.VerticalAlignment.Center,
-										}),
-
-										Name = React.createElement(HeightText, {
-											LayoutOrder = 1,
-											Size = UDim2.fromScale(0, 1 / 3),
-											Text = TextStroke(RewardDisplayHelper.GetRewardText(item, true)),
-											TextXAlignment = Enum.TextXAlignment.Left,
-											AutomaticSize = Enum.AutomaticSize.X,
-										}),
-
-										Equipped = isEquipped and React.createElement(HeightText, {
-											LayoutOrder = 2,
-											Size = UDim2.fromScale(0, 1 / 3),
-											Text = TextStroke("Equipped"),
-											TextXAlignment = Enum.TextXAlignment.Left,
-											AutomaticSize = Enum.AutomaticSize.X,
-										}),
-									}),
-								}),
-
-								Button = React.createElement(LayoutContainer, {
-									Padding = 5,
-									Size = UDim2.fromScale(0.25, 1),
-									AnchorPoint = Vector2.new(1, 0),
-									Position = UDim2.fromScale(1, 0),
-								}, {
-									Button = React.createElement(Button, {
-										ImageColor3 = ColorDefs.DarkRed,
-										BorderSizePixel = 2,
-										[React.Event.Activated] = function()
-											setSelectedItem(item)
-											setState("Details")
-										end,
-									}, {
-										Label = React.createElement(Label, {
-											Text = "Select",
-										}),
-									}),
-								}),
+							Ratio = React.createElement(Aspect, {
+								AspectRatio = 4.5,
 							}),
 						})
-					end)
-				),
+					end,
+				}, {
+					Panels = React.createElement(
+						React.Fragment,
+						nil,
+						Sift.Array.map(items, function(item, index)
+							local isEquipped = getIsEquipped(item)
+
+							return React.createElement(LayoutContainer, {
+								Padding = 8,
+								LayoutOrder = index,
+							}, {
+								Panel = React.createElement(Panel, {
+									ImageColor3 = if isEquipped then ColorDefs.PaleRed else ColorDefs.PaleBlue,
+								}, {
+									Left = React.createElement(Container, nil, {
+										Layout = React.createElement(ListLayout, {
+											FillDirection = Enum.FillDirection.Horizontal,
+											Padding = UDim.new(0, 6),
+										}),
+
+										PreviewContainer = React.createElement(Panel, {
+											LayoutOrder = 1,
+											Size = UDim2.fromScale(1, 1),
+											SizeConstraint = Enum.SizeConstraint.RelativeYY,
+											ImageColor3 = RewardDisplayHelper.GetRewardColor(item),
+										}, {
+											Preview = RewardDisplayHelper.CreateRewardElement(item),
+										}),
+
+										Right = React.createElement(Container, {
+											LayoutOrder = 2,
+											Size = UDim2.fromScale(0, 1),
+											AutomaticSize = Enum.AutomaticSize.X,
+										}, {
+											Layout = React.createElement(ListLayout, {
+												VerticalAlignment = Enum.VerticalAlignment.Center,
+											}),
+
+											Name = React.createElement(HeightText, {
+												LayoutOrder = 1,
+												Size = UDim2.fromScale(0, 1 / 3),
+												Text = TextStroke(RewardDisplayHelper.GetRewardText(item, true)),
+												TextXAlignment = Enum.TextXAlignment.Left,
+												AutomaticSize = Enum.AutomaticSize.X,
+											}),
+
+											Equipped = isEquipped and React.createElement(HeightText, {
+												LayoutOrder = 2,
+												Size = UDim2.fromScale(0, 1 / 3),
+												Text = TextStroke("Equipped"),
+												TextXAlignment = Enum.TextXAlignment.Left,
+												AutomaticSize = Enum.AutomaticSize.X,
+											}),
+										}),
+									}),
+
+									Button = React.createElement(LayoutContainer, {
+										Padding = 5,
+										Size = UDim2.fromScale(0.25, 1),
+										AnchorPoint = Vector2.new(1, 0),
+										Position = UDim2.fromScale(1, 0),
+									}, {
+										Button = React.createElement(Button, {
+											ImageColor3 = ColorDefs.DarkRed,
+											BorderSizePixel = 2,
+											[React.Event.Activated] = function()
+												setSelectedItem(item)
+												setState("Details")
+											end,
+										}, {
+											Label = React.createElement(Label, {
+												Text = "Select",
+											}),
+										}),
+									}),
+								}),
+							})
+						end)
+					),
+				}),
 			}),
 		}),
 	})

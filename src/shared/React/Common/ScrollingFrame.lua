@@ -11,6 +11,7 @@ local DefaultProps = {
 	MidImage = "rbxassetid://16014422972",
 	TopImage = "rbxassetid://16014422972",
 	BorderSizePixel = 0,
+	Selectable = false,
 }
 
 return function(props: {
@@ -18,12 +19,13 @@ return function(props: {
 	[string]: any,
 })
 	local renderLayout = props.RenderLayout or function() end
+	local ref = props.FrameRef
 
 	local canvasSize, setCanvasSize = React.useState(UDim2.new())
 
-	props = Sift.Dictionary.merge(DefaultProps, Sift.Dictionary.removeKeys(props, "RenderLayout"), {
+	props = Sift.Dictionary.merge(DefaultProps, Sift.Dictionary.removeKeys(props, "RenderLayout", "FrameRef"), {
 		CanvasSize = canvasSize,
-		Selectable = false,
+		ref = ref,
 	})
 
 	return React.createElement("ScrollingFrame", props, {

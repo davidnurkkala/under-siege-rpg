@@ -178,8 +178,10 @@ return function(props)
 	local isAnythingSelected, setIsAnythingSelected = React.useState(false)
 	local containerRef = React.useRef(nil)
 
+	local gamepadAccess = props.Visible and menu.Is(nil) and not menu.GetInDialogue() and (platform == "Console")
+
 	React.useEffect(function()
-		if not props.Visible then return end
+		if not gamepadAccess then return end
 
 		ContextActionService:BindActionAtPriority("SelectLobbyMenu", function(actionName, inputState, inputObject)
 			if inputState ~= Enum.UserInputState.Begin then return Enum.ContextActionResult.Pass end
@@ -207,7 +209,7 @@ return function(props)
 			ContextActionService:UnbindAction("SelectLobbyMenu")
 			ContextActionService:UnbindAction("DeselectLobbyMenu")
 		end
-	end, { props.Visible })
+	end, { gamepadAccess })
 
 	React.useEffect(function()
 		local selectionChangedConn = GuiService:GetPropertyChangedSignal("SelectedObject"):Connect(function()
@@ -335,7 +337,7 @@ return function(props)
 			}),
 
 			GamepadHint = React.createElement(RoundButtonWithImage, {
-				Visible = platform == "Console",
+				Visible = gamepadAccess,
 				[React.Event.Activated] = function()
 					if menu.Is(nil) or isAnythingSelected then GuiService.SelectedObject = nil end
 				end,

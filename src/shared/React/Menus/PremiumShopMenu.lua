@@ -1,4 +1,6 @@
+local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 
 local Button = require(ReplicatedStorage.Shared.React.Common.Button)
 local ColorDefs = require(ReplicatedStorage.Shared.Defs.ColorDefs)
@@ -23,7 +25,9 @@ local ShopDefs = require(ReplicatedStorage.Shared.Defs.ShopDefs)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local ProductController = require(ReplicatedStorage.Shared.Controllers.ProductController)
 local PromptWindow = require(ReplicatedStorage.Shared.React.Common.PromptWindow)
+local RoundButtonWithImage = require(ReplicatedStorage.Shared.React.Common.RoundButtonWithImage)
 local SystemWindow = require(ReplicatedStorage.Shared.React.Common.SystemWindow)
+local GamepadEffect = require(ReplicatedStorage.Shared.React.Hooks.GamepadEffect)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 local UseCheckPrice = require(ReplicatedStorage.Shared.React.Hooks.UseCheckPrice)
 local UseCosmetics = require(ReplicatedStorage.Shared.React.Hooks.UseCosmetics)
@@ -146,6 +150,7 @@ local function productDetails(props: {
 			}),
 
 			ScrollingFrame = React.createElement(ScrollingFrame, {
+				Selectable = true,
 				ScrollingDirection = Enum.ScrollingDirection.Y,
 				ScrollBarThickness = 8,
 				ScrollBarImageColor3 = ColorDefs.Blue,
@@ -215,6 +220,7 @@ local function productSuccess(props: {
 	Close: () -> (),
 })
 	local slide, slideMotor = UseMotor(-1.1)
+	local platform = React.useContext(PlatformContext)
 
 	React.useEffect(function()
 		slideMotor:setGoal(Flipper.Spring.new(0))
@@ -275,7 +281,7 @@ local function productSuccess(props: {
 				Position = UDim2.fromScale(0.5, 0.6),
 				AnchorPoint = Vector2.new(0.5, 0),
 			}, {
-				Button = React.createElement(Button, {
+				Button = (platform ~= "Console") and React.createElement(Button, {
 					ImageColor3 = ColorDefs.DarkPurple,
 					[React.Event.Activated] = function()
 						PromiseMotor(slideMotor, Flipper.Spring.new(1.1), function(value)
@@ -286,6 +292,15 @@ local function productSuccess(props: {
 					Label = React.createElement(Label, {
 						Text = TextStroke("Okay"),
 					}),
+				}),
+
+				GamepadHint = (platform == "Console") and React.createElement(RoundButtonWithImage, {
+					Image = UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonB),
+					Text = "Okay",
+					Selectable = false,
+					Position = UDim2.new(0.5, 0, 0, 0),
+					AnchorPoint = Vector2.new(0.5, 0),
+					height = UDim.new(1, 0),
 				}),
 			}),
 		}),
@@ -390,6 +405,8 @@ return function(props: {
 	local state, setState = React.useState("Shop")
 	local selectedProduct, setSelectedProduct = React.useState(nil)
 	local receivedReward, setReceivedReward = React.useState(nil)
+	local containerRef = React.useRef(nil)
+	local platform = React.useContext(PlatformContext)
 
 	local shopId = `Premium{category}`
 	local def = ShopDefs[shopId]
@@ -397,6 +414,38 @@ return function(props: {
 	local deck = UseDeck()
 	local weapons = UseWeapons()
 	local cosmetics = UseCosmetics()
+
+	local closeReception = React.useCallback(function()
+		if receivedReward.Type == "Card" or receivedReward.Type == "Weapon" then
+			setState("Shop")
+		else
+			setState("Details")
+		end
+
+		setReceivedReward(nil)
+	end, { receivedReward })
+
+	React.useEffect(function()
+		if platform ~= "Console" then return end
+
+		local frame = containerRef.current
+
+		if state == "Shop" then
+			if frame then GuiService:Select(frame) end
+		elseif state == "Details" then
+			if frame then GuiService:Select(frame) end
+
+			return GamepadEffect("CloseDetails", function()
+				setState("Shop")
+			end, Enum.KeyCode.ButtonB)
+		elseif state == "Reception" then
+			return GamepadEffect("CloseReception", function()
+				closeReception()
+			end, Enum.KeyCode.ButtonB)
+		end
+
+		return
+	end, { platform, state, containerRef.current, closeReception })
 
 	return React.createElement(SystemWindow, {
 		Visible = props.Visible,
@@ -406,305 +455,309 @@ return function(props: {
 		Size = UDim2.fromScale(1.2, 0.8),
 		HeaderSize = 0.075,
 	}, {
-		ConfirmPrompt = React.createElement(PromptWindow, {
-			Visible = state == "Confirming",
-
-			HeaderText = TextStroke("Confirm Purchase"),
-			Text = TextStroke(`Are you sure you want to purchase {if selectedProduct ~= nil then RewardDisplayHelper.GetRewardText(selectedProduct.Reward, true) else ""}?`),
-			Options = {
-				{
-					Text = TextStroke("Yes"),
-					Select = function()
-						setState("Waiting")
-
-						GenericShopController.BuyProduct(shopId, selectedProduct.Index):andThen(function(success)
-							if success then
-								setReceivedReward(selectedProduct.Reward)
-								setState("Reception")
-							else
-								setState("Details")
-							end
-						end, function()
-							setState("Details")
-						end)
-					end,
-				},
-				{
-					Text = TextStroke("No"),
-					Select = function()
-						setState("Details")
-					end,
-				},
-			},
-			[React.Event.Activated] = function()
-				setState("Menu")
-			end,
-		}),
-
-		Reception = (state == "Reception") and React.createElement(productSuccess, {
-			Reward = receivedReward,
-			Close = function()
-				setState("Shop")
-				setReceivedReward(nil)
-			end,
-		}),
-
-		ProductDetails = (state == "Details") and React.createElement(productDetails, {
-			Product = selectedProduct,
-			Close = function()
-				setSelectedProduct(nil)
-				setState("Shop")
-			end,
-			Buy = function()
-				setState("Confirming")
-			end,
-		}),
-
-		Products = React.createElement(Container, {
-			Visible = state == "Shop",
+		Container = React.createElement(Container, {
+			containerRef = containerRef,
 		}, {
-			CategoryButtons = React.createElement(Container, {
-				Size = UDim2.fromScale(1, 0.15),
-			}, {
-				Layout = React.createElement(ListLayout, {
-					FillDirection = Enum.FillDirection.Horizontal,
-					HorizontalAlignment = Enum.HorizontalAlignment.Center,
-					Padding = UDim.new(0, 4),
-				}),
+			ConfirmPrompt = React.createElement(PromptWindow, {
+				Visible = state == "Confirming",
 
-				Weapons = React.createElement(categoryButton, {
-					Text = "Weapons",
-					Color = ColorDefs.LightRed,
-					Activate = function()
-						setCategory("Weapons")
-					end,
-					Active = category ~= "Weapons",
-				}),
+				HeaderText = TextStroke("Confirm Purchase"),
+				Text = TextStroke(`Are you sure you want to purchase {if selectedProduct ~= nil then RewardDisplayHelper.GetRewardText(selectedProduct.Reward, true) else ""}?`),
+				Options = {
+					{
+						Text = TextStroke("Yes"),
+						Select = function()
+							setState("Waiting")
 
-				Bases = React.createElement(categoryButton, {
-					Text = "Bases",
-					Color = ColorDefs.LightPurple,
-					Activate = function()
-						setCategory("Bases")
-					end,
-					Active = category ~= "Bases",
-				}),
-
-				Gems = React.createElement(categoryButton, {
-					Text = "Gems",
-					Color = ColorDefs.DarkPurple,
-					Activate = function()
-						setCategory("Gems")
-					end,
-					Active = category ~= "Gems",
-				}),
-			}),
-
-			Gems = React.createElement(Container, {
-				Visible = category == "Gems",
-				Size = UDim2.fromScale(0.7, 0.85),
-				Position = UDim2.fromScale(0.5, 0.15),
-				AnchorPoint = Vector2.new(0.5, 0),
-			}, {
-				Button50 = React.createElement(LayoutContainer, {
-					Padding = 6,
-					Size = UDim2.fromScale(0.5, 0.25),
-				}, {
-					Button = React.createElement(gemButton, {
-						Amount = 50,
-						Price = 50,
-						ProductId = "Gems50",
-					})
-				}),
-
-				Button110 = React.createElement(LayoutContainer, {
-					Padding = 6,
-					Size = UDim2.fromScale(0.5, 0.25),
-					Position = UDim2.fromScale(0.5, 0),
-				}, {
-					Button = React.createElement(gemButton, {
-						Amount = 110,
-						Price = 100,
-						ProductId = "Gems110",
-					})
-				}),
-
-				Button300 = React.createElement(LayoutContainer, {
-					Padding = 6,
-					Size = UDim2.fromScale(0.5, 0.35),
-					Position = UDim2.fromScale(0, 0.25),
-				}, {
-					Button = React.createElement(gemButton, {
-						Amount = 300,
-						Price = 250,
-						ProductId = "Gems300",
-					})
-				}),
-
-				Button650 = React.createElement(LayoutContainer, {
-					Padding = 6,
-					Size = UDim2.fromScale(0.5, 0.35),
-					Position = UDim2.fromScale(0.5, 0.25),
-				}, {
-					Button = React.createElement(gemButton, {
-						Amount = 650,
-						Price = 500,
-						ProductId = "Gems650",
-					})
-				}),
-
-				Button1400 = React.createElement(LayoutContainer, {
-					Padding = 6,
-					Size = UDim2.fromScale(1, 0.4),
-					Position = UDim2.fromScale(0, 0.6),
-				}, {
-					Button = React.createElement(gemButton, {
-						Amount = 1400,
-						Price = 1000,
-						ProductId = "Gems1400",
-					})
-				}),
-			}),
-
-			Products = React.createElement(ScrollingFrame, {
-				Visible = category ~= "Gems",
-				Size = UDim2.fromScale(1, 0.85),
-				Position = UDim2.fromScale(0, 0.15),
-				RenderLayout = function(setCanvasSize)
-					return React.createElement(ListLayout, {
-						[React.Change.AbsoluteContentSize] = function(object)
-							setCanvasSize(UDim2.fromOffset(0, object.AbsoluteContentSize.Y))
+							GenericShopController.BuyProduct(shopId, selectedProduct.Index):andThen(function(success)
+								if success then
+									setReceivedReward(selectedProduct.Reward)
+									setState("Reception")
+								else
+									setState("Details")
+								end
+							end, function()
+								setState("Details")
+							end)
 						end,
-					})
+					},
+					{
+						Text = TextStroke("No"),
+						Select = function()
+							setState("Details")
+						end,
+					},
+				},
+				[React.Event.Activated] = function()
+					setState("Shop")
 				end,
+			}),
+
+			Reception = (state == "Reception") and React.createElement(productSuccess, {
+				Reward = receivedReward,
+				Close = function()
+					setState("Shop")
+					setReceivedReward(nil)
+				end,
+			}),
+
+			ProductDetails = (state == "Details") and React.createElement(productDetails, {
+				Product = selectedProduct,
+				Close = function()
+					setSelectedProduct(nil)
+					setState("Shop")
+				end,
+				Buy = function()
+					setState("Confirming")
+				end,
+			}),
+
+			Products = React.createElement(Container, {
+				Visible = state == "Shop",
 			}, {
-				Panels = React.createElement(
-					React.Fragment,
-					nil,
-					Sift.Array.map(def.Products, function(product, index)
-						local price = product.Price
-						local reward = product.Reward
+				CategoryButtons = React.createElement(Container, {
+					Size = UDim2.fromScale(1, 0.15),
+				}, {
+					Layout = React.createElement(ListLayout, {
+						FillDirection = Enum.FillDirection.Horizontal,
+						HorizontalAlignment = Enum.HorizontalAlignment.Center,
+						Padding = UDim.new(0, 4),
+					}),
 
-						if reward.Type == "Card" and DeckHelper.OwnsCard(deck, reward.CardId) then return end
-						if reward.Type == "Weapon" and WeaponHelper.OwnsWeapon(weapons, reward.WeaponId) then return end
-						if reward.Type == "Cosmetic" and cosmetics then
-							local cosmeticsCategory = cosmetics[reward.CategoryName]
-							local owned = cosmeticsCategory and cosmeticsCategory.Owned
-							if owned and owned[reward.Id] then return end
-						end
+					Weapons = React.createElement(categoryButton, {
+						Text = "Weapons",
+						Color = ColorDefs.LightRed,
+						Activate = function()
+							setCategory("Weapons")
+						end,
+						Active = category ~= "Weapons",
+					}),
 
-						return React.createElement(LayoutContainer, {
-							Size = UDim2.fromScale(1, 0.16),
-							SizeConstraint = Enum.SizeConstraint.RelativeXX,
-							Padding = 8,
-							LayoutOrder = index,
-						}, {
-							Panel = React.createElement(Panel, {
-								ImageColor3 = ColorDefs.PaleRed,
+					Bases = React.createElement(categoryButton, {
+						Text = "Bases",
+						Color = ColorDefs.LightPurple,
+						Activate = function()
+							setCategory("Bases")
+						end,
+						Active = category ~= "Bases",
+					}),
+
+					Gems = React.createElement(categoryButton, {
+						Text = "Gems",
+						Color = ColorDefs.DarkPurple,
+						Activate = function()
+							setCategory("Gems")
+						end,
+						Active = category ~= "Gems",
+					}),
+				}),
+
+				Gems = React.createElement(Container, {
+					Visible = category == "Gems",
+					Size = UDim2.fromScale(0.7, 0.85),
+					Position = UDim2.fromScale(0.5, 0.15),
+					AnchorPoint = Vector2.new(0.5, 0),
+				}, {
+					Button50 = React.createElement(LayoutContainer, {
+						Padding = 6,
+						Size = UDim2.fromScale(0.5, 0.25),
+					}, {
+						Button = React.createElement(gemButton, {
+							Amount = 50,
+							Price = 50,
+							ProductId = "Gems50",
+						})
+					}),
+
+					Button110 = React.createElement(LayoutContainer, {
+						Padding = 6,
+						Size = UDim2.fromScale(0.5, 0.25),
+						Position = UDim2.fromScale(0.5, 0),
+					}, {
+						Button = React.createElement(gemButton, {
+							Amount = 110,
+							Price = 100,
+							ProductId = "Gems110",
+						})
+					}),
+
+					Button300 = React.createElement(LayoutContainer, {
+						Padding = 6,
+						Size = UDim2.fromScale(0.5, 0.35),
+						Position = UDim2.fromScale(0, 0.25),
+					}, {
+						Button = React.createElement(gemButton, {
+							Amount = 300,
+							Price = 250,
+							ProductId = "Gems300",
+						})
+					}),
+
+					Button650 = React.createElement(LayoutContainer, {
+						Padding = 6,
+						Size = UDim2.fromScale(0.5, 0.35),
+						Position = UDim2.fromScale(0.5, 0.25),
+					}, {
+						Button = React.createElement(gemButton, {
+							Amount = 650,
+							Price = 500,
+							ProductId = "Gems650",
+						})
+					}),
+
+					Button1400 = React.createElement(LayoutContainer, {
+						Padding = 6,
+						Size = UDim2.fromScale(1, 0.4),
+						Position = UDim2.fromScale(0, 0.6),
+					}, {
+						Button = React.createElement(gemButton, {
+							Amount = 1400,
+							Price = 1000,
+							ProductId = "Gems1400",
+						})
+					}),
+				}),
+
+				Products = React.createElement(ScrollingFrame, {
+					Visible = category ~= "Gems",
+					Size = UDim2.fromScale(1, 0.85),
+					Position = UDim2.fromScale(0, 0.15),
+					RenderLayout = function(setCanvasSize)
+						return React.createElement(ListLayout, {
+							[React.Change.AbsoluteContentSize] = function(object)
+								setCanvasSize(UDim2.fromOffset(0, object.AbsoluteContentSize.Y))
+							end,
+						})
+					end,
+				}, {
+					Panels = React.createElement(
+						React.Fragment,
+						nil,
+						Sift.Array.map(def.Products, function(product, index)
+							local price = product.Price
+							local reward = product.Reward
+
+							if reward.Type == "Card" and DeckHelper.OwnsCard(deck, reward.CardId) then return end
+							if reward.Type == "Weapon" and WeaponHelper.OwnsWeapon(weapons, reward.WeaponId) then return end
+							if reward.Type == "Cosmetic" and cosmetics then
+								local cosmeticsCategory = cosmetics[reward.CategoryName]
+								local owned = cosmeticsCategory and cosmeticsCategory.Owned
+								if owned and owned[reward.Id] then return end
+							end
+
+							return React.createElement(LayoutContainer, {
+								Size = UDim2.fromScale(1, 0.16),
+								SizeConstraint = Enum.SizeConstraint.RelativeXX,
+								Padding = 8,
+								LayoutOrder = index,
 							}, {
-								Left = React.createElement(Container, nil, {
-									Layout = React.createElement(ListLayout, {
-										FillDirection = Enum.FillDirection.Horizontal,
-										Padding = UDim.new(0, 6),
-									}),
-
-									PreviewContainer = React.createElement(Panel, {
-										LayoutOrder = 1,
-										Size = UDim2.fromScale(1, 1),
-										SizeConstraint = Enum.SizeConstraint.RelativeYY,
-										ImageColor3 = RewardDisplayHelper.GetRewardColor(reward),
-									}, {
-										Preview = RewardDisplayHelper.CreateRewardElement(reward),
-									}),
-
-									Right = React.createElement(Container, {
-										LayoutOrder = 2,
-										Size = UDim2.fromScale(0, 1),
-										AutomaticSize = Enum.AutomaticSize.X,
-									}, {
-										Name = React.createElement(HeightText, {
-											Size = UDim2.fromScale(0, 0.5),
-											Text = TextStroke(RewardDisplayHelper.GetRewardText(reward, true)),
-											TextXAlignment = Enum.TextXAlignment.Left,
-											AutomaticSize = Enum.AutomaticSize.X,
+								Panel = React.createElement(Panel, {
+									ImageColor3 = ColorDefs.PaleRed,
+								}, {
+									Left = React.createElement(Container, nil, {
+										Layout = React.createElement(ListLayout, {
+											FillDirection = Enum.FillDirection.Horizontal,
+											Padding = UDim.new(0, 6),
 										}),
 
-										Price = React.createElement(Container, {
-											Size = UDim2.fromScale(0, 0.5),
-											Position = UDim2.fromScale(0, 0.5),
+										PreviewContainer = React.createElement(Panel, {
+											LayoutOrder = 1,
+											Size = UDim2.fromScale(1, 1),
+											SizeConstraint = Enum.SizeConstraint.RelativeYY,
+											ImageColor3 = RewardDisplayHelper.GetRewardColor(reward),
+										}, {
+											Preview = RewardDisplayHelper.CreateRewardElement(reward),
+										}),
+
+										Right = React.createElement(Container, {
+											LayoutOrder = 2,
+											Size = UDim2.fromScale(0, 1),
 											AutomaticSize = Enum.AutomaticSize.X,
 										}, {
-											Layout = React.createElement(ListLayout, {
-												FillDirection = Enum.FillDirection.Horizontal,
-												Padding = UDim.new(0, 6),
+											Name = React.createElement(HeightText, {
+												Size = UDim2.fromScale(0, 0.5),
+												Text = TextStroke(RewardDisplayHelper.GetRewardText(reward, true)),
+												TextXAlignment = Enum.TextXAlignment.Left,
+												AutomaticSize = Enum.AutomaticSize.X,
 											}),
 
-											Prices = React.createElement(
-												React.Fragment,
-												nil,
-												Sift.Dictionary.map(
-													Sift.Array.sort(Sift.Dictionary.keys(price), function(a, b)
-														return a < b
-													end),
-													function(currencyType, currencyIndex)
-														local amount = price[currencyType]
-														local order = currencyIndex * 2
+											Price = React.createElement(Container, {
+												Size = UDim2.fromScale(0, 0.5),
+												Position = UDim2.fromScale(0, 0.5),
+												AutomaticSize = Enum.AutomaticSize.X,
+											}, {
+												Layout = React.createElement(ListLayout, {
+													FillDirection = Enum.FillDirection.Horizontal,
+													Padding = UDim.new(0, 6),
+												}),
 
-														return React.createElement(React.Fragment, nil, {
-															IconContainer = React.createElement(LayoutContainer, {
-																Padding = 3,
-																Size = UDim2.fromScale(1, 1),
-																SizeConstraint = Enum.SizeConstraint.RelativeYY,
-																LayoutOrder = order,
-															}, {
-																IconPanel = React.createElement(Panel, {
-																	ImageColor3 = CurrencyDefs[currencyType].Colors.Primary,
+												Prices = React.createElement(
+													React.Fragment,
+													nil,
+													Sift.Dictionary.map(
+														Sift.Array.sort(Sift.Dictionary.keys(price), function(a, b)
+															return a < b
+														end),
+														function(currencyType, currencyIndex)
+															local amount = price[currencyType]
+															local order = currencyIndex * 2
+
+															return React.createElement(React.Fragment, nil, {
+																IconContainer = React.createElement(LayoutContainer, {
+																	Padding = 3,
+																	Size = UDim2.fromScale(1, 1),
+																	SizeConstraint = Enum.SizeConstraint.RelativeYY,
+																	LayoutOrder = order,
 																}, {
-																	Image = React.createElement(Image, {
-																		Image = CurrencyDefs[currencyType].Image,
+																	IconPanel = React.createElement(Panel, {
+																		ImageColor3 = CurrencyDefs[currencyType].Colors.Primary,
+																	}, {
+																		Image = React.createElement(Image, {
+																			Image = CurrencyDefs[currencyType].Image,
+																		}),
 																	}),
 																}),
-															}),
 
-															Text = React.createElement(HeightText, {
-																Size = UDim2.fromScale(0, 1),
-																Text = TextStroke(`{amount}`),
-																AutomaticSize = Enum.AutomaticSize.X,
-																LayoutOrder = order + 1,
+																Text = React.createElement(HeightText, {
+																	Size = UDim2.fromScale(0, 1),
+																	Text = TextStroke(`{amount}`),
+																	AutomaticSize = Enum.AutomaticSize.X,
+																	LayoutOrder = order + 1,
+																}),
 															}),
-														}),
-															currencyType
-													end
-												)
-											),
+																currencyType
+														end
+													)
+												),
+											}),
 										}),
 									}),
-								}),
 
-								Button = React.createElement(LayoutContainer, {
-									Padding = 10,
-									Size = UDim2.fromScale(0.25, 1),
-									AnchorPoint = Vector2.new(1, 0),
-									Position = UDim2.fromScale(1, 0),
-								}, {
-									Button = React.createElement(Button, {
-										ImageColor3 = ColorDefs.DarkRed,
-										BorderSizePixel = 2,
-										[React.Event.Activated] = function()
-											setSelectedProduct(product)
-											setState("Details")
-										end,
+									Button = React.createElement(LayoutContainer, {
+										Padding = 10,
+										Size = UDim2.fromScale(0.25, 1),
+										AnchorPoint = Vector2.new(1, 0),
+										Position = UDim2.fromScale(1, 0),
 									}, {
-										Label = React.createElement(Label, {
-											Text = "Select",
+										Button = React.createElement(Button, {
+											ImageColor3 = ColorDefs.DarkRed,
+											BorderSizePixel = 2,
+											[React.Event.Activated] = function()
+												setSelectedProduct(product)
+												setState("Details")
+											end,
+										}, {
+											Label = React.createElement(Label, {
+												Text = "Select",
+											}),
 										}),
 									}),
 								}),
 							}),
-						}),
-							def.Id
-					end)
-				),
+								def.Id
+						end)
+					),
+				}),
 			}),
 		}),
 	})

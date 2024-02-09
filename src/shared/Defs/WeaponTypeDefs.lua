@@ -5,21 +5,21 @@ local Sift = require(ReplicatedStorage.Packages.Sift)
 local WeaponTypes = {
 	Bow = {
 		Description = "A simple weapon which can be used fairly often but is resisted by Armored enemies.",
-		Damage = 10,
+		Damage = 5,
 		CooldownTime = 5,
 	},
 	Crossbow = {
-		Damage = 12.5,
+		Damage = 7,
 		CooldownTime = 7.5,
 		Description = "A powerful mechanical weapon which has no weakness, but is quite slow to reload.",
 	},
 	Magic = {
-		Damage = 10,
+		Damage = 5,
 		CooldownTime = 5,
 		Description = "An arcane weapon which is especially effective against Armored enemies, but slightly weaker against others.",
 	},
 	Thrown = {
-		Damage = 10 * 0.6,
+		Damage = 5 * 0.6,
 		CooldownTime = 5 * 0.6,
 		Description = "A simple weapon which can be used more rapidly but deals proportionally less damage.",
 	},

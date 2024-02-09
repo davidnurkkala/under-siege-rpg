@@ -9,6 +9,7 @@ local Battlers = {
 		Name = "Orcish General",
 		BattlegroundName = "World0",
 		BaseId = "Camp",
+		Soundtrack = { "UnstoppableForce" },
 		Rewards = {},
 		WeaponId = "OrcishGrimoire",
 		Deck = {
@@ -19,7 +20,6 @@ local Battlers = {
 			Dragon = 5,
 			RainOfArrows = 5,
 			CheatMoreSupplies = 1,
-			Dragon = 5,
 		},
 		Brain = {
 			Id = "NaiveOrder",
@@ -42,7 +42,12 @@ local Battlers = {
 				{ CardId = "CheatMoreSupplies", Count = 3 },
 				{ CardId = "OrcChampion", Count = 3 },
 				{ CardId = "Dragon", Count = 1 },
-				{ CardId = "OrcChampion", Count = 100 },
+				{ CardId = "CheatMoreSupplies", Count = 3 },
+				{ CardId = "OrcChampion", Count = 3 },
+				{ CardId = "Dragon", Count = 1 },
+				{ CardId = "CheatMoreSupplies", Count = 3 },
+				{ CardId = "OrcChampion", Count = 3 },
+				{ CardId = "Dragon", Count = 1 },
 			},
 		},
 	},
@@ -51,11 +56,11 @@ local Battlers = {
 		Name = "Peasant",
 		BattlegroundName = "World1",
 		BaseId = "Camp",
+		Soundtrack = { "AGoodBrawl", "ASmallConflict" },
 		Rewards = {
 			{ Chance = 1, Result = { Type = "Currency", CurrencyType = "Coins", Amount = QuickCurrency(10, 20, 50) } },
 			{ Chance = 1, Result = { Type = "Currency", CurrencyType = "SimpleFood", Amount = QuickCurrency(5, 10, 20) } },
-			{ Chance = 0.5, Result = { Type = "Currency", CurrencyType = "Gems", Amount = 1 } },
-			{ Chance = 0.01, Result = { Type = "Card", CardId = "Heal" } },
+			{ Chance = 1 / 16, Result = { Type = "Card", CardId = "Heal" } },
 		},
 		WeaponId = "WoodenBow",
 		Deck = {
@@ -77,14 +82,18 @@ local Battlers = {
 		Name = "Noble",
 		BattlegroundName = "World1",
 		BaseId = "ClassicReborn",
+		Soundtrack = { "BlueBlood" },
 		Rewards = {
-			{ Chance = 1, Result = { Type = "Currency", CurrencyType = "Coins", Amount = QuickCurrency(25, 50, 100) } },
+			{ Chance = 1, Result = { Type = "Currency", CurrencyType = "Coins", Amount = QuickCurrency(50, 100, 250) } },
+			{ Chance = 0.5, Result = { Type = "Currency", CurrencyType = "SimpleMaterials", Amount = QuickCurrency(5, 10, 25) } },
+			{ Chance = 0.5, Result = { Type = "Currency", CurrencyType = "CommonMetal", Amount = QuickCurrency(2, 5, 10) } },
+			{ Chance = 1 / 16, Result = { Type = "Card", CardId = "Spearman" } },
 		},
 		WeaponId = "SimpleWand",
 		Deck = {
-			Peasant = 2,
+			Spearman = 2,
 			Recruit = 1,
-			Hunter = 1,
+			Archer = 1,
 			RainOfArrows = 1,
 		},
 		Brain = {
@@ -95,10 +104,16 @@ local Battlers = {
 		Name = "Knight",
 		BattlegroundName = "World1",
 		BaseId = "ClassicReborn",
-		Reward = 50,
+		Rewards = {
+			{ Chance = 1, Result = { Type = "Currency", CurrencyType = "Coins", Amount = QuickCurrency(100, 250, 500) } },
+			{ Chance = 0.5, Result = { Type = "Currency", CurrencyType = "SimpleMaterials", Amount = QuickCurrency(5, 10, 25) } },
+			{ Chance = 0.5, Result = { Type = "Currency", CurrencyType = "CommonMetal", Amount = QuickCurrency(2, 5, 10) } },
+			{ Chance = 0.1, Result = { Type = "Currency", CurrencyType = "Steel", Amount = QuickCurrency(1, 2, 4) } },
+			{ Chance = 1 / 16, Result = { Type = "Card", CardId = "Footman" } },
+		},
 		WeaponId = "Crossbow",
 		Deck = {
-			Footman = 1,
+			Footman = 2,
 			Heal = 1,
 			RainOfArrows = 1,
 		},
@@ -137,59 +152,94 @@ local Battlers = {
 			Id = "WeightedCost",
 		},
 	},
-
 	RebelLeader = {
 		Name = "Rebel Leader",
 		BattlegroundName = "World1",
 		BaseId = "Camp",
-		Reward = 500,
+		Rewards = {
+			{ Chance = 1, Result = { Type = "Currency", CurrencyType = "Coins", Amount = QuickCurrency(100, 200, 500) } },
+			{ Chance = 1, Result = { Type = "Currency", CurrencyType = "SimpleFood", Amount = QuickCurrency(5, 10, 20) } },
+			{ Chance = 1, Result = { Type = "Currency", CurrencyType = "SimpleMaterials", Amount = QuickCurrency(5, 10, 20) } },
+		},
 		WeaponId = "Crossbow",
 		Deck = {
-			Peasant = 1,
-			Recruit = 1,
-			Hunter = 1,
-			Recruitment = 1,
+			Peasant = 5,
+			Militia = 5,
+			Hunter = 5,
 		},
 		Brain = {
 			Id = "WeightedCost",
 		},
 	},
-
+	RoyceBandit = {
+		Name = "Royce, Bandit",
+		ModelName = "BanditGrunt",
+		BattlegroundName = "World1",
+		BaseId = "Camp",
+		Soundtrack = { "IntoDanger" },
+		Rewards = {
+			{ Chance = 1, Result = { Type = "Currency", CurrencyType = "Coins", Amount = QuickCurrency(50, 100, 250) } },
+			{ Chance = 0.5, Result = { Type = "Currency", CurrencyType = "SimpleFood", Amount = QuickCurrency(5, 10, 20) } },
+			{ Chance = 0.5, Result = { Type = "Currency", CurrencyType = "SimpleMaterials", Amount = QuickCurrency(5, 10, 20) } },
+			{ Chance = 1 / 16, Result = { Type = "Card", CardId = "BanditScout" } },
+		},
+		WeaponId = "RecurveBow",
+		Deck = {
+			Bandit = 1,
+			BanditScout = 1,
+			BanditRogue = 1,
+			BanditDuelist = 1,
+			RainOfArrows = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
+		},
+	},
 	BanditGrunt = {
 		Name = "Bandit Grunt",
 		BattlegroundName = "World1",
 		BaseId = "Camp",
-		Reward = 500,
+		Soundtrack = { "IntoDanger" },
+		Rewards = {
+			{ Chance = 1, Result = { Type = "Currency", CurrencyType = "Coins", Amount = QuickCurrency(50, 100, 250) } },
+			{ Chance = 0.5, Result = { Type = "Currency", CurrencyType = "SimpleFood", Amount = QuickCurrency(5, 10, 20) } },
+			{ Chance = 0.5, Result = { Type = "Currency", CurrencyType = "SimpleMaterials", Amount = QuickCurrency(5, 10, 20) } },
+			{ Chance = 1 / 16, Result = { Type = "Card", CardId = "Bandit" } },
+		},
 		WeaponId = "RecurveBow",
 		Deck = {
-			BanditRogue = 1,
 			Bandit = 1,
 			BanditScout = 1,
-			Mob = 1,
+			BanditRogue = 1,
+			BanditDuelist = 1,
 		},
 		Brain = {
 			Id = "WeightedCost",
 		},
 	},
-
 	BanditLeader = {
 		Name = "Bandit Leader",
 		BattlegroundName = "World1",
 		BaseId = "Camp",
-		Reward = 750,
+		Rewards = {
+			{ Chance = 1, Result = { Type = "Currency", CurrencyType = "Coins", Amount = QuickCurrency(100, 250, 500) } },
+			{ Chance = 0.5, Result = { Type = "Currency", CurrencyType = "SimpleFood", Amount = QuickCurrency(5, 10, 20) } },
+			{ Chance = 0.5, Result = { Type = "Currency", CurrencyType = "SimpleMaterials", Amount = QuickCurrency(5, 10, 20) } },
+			{ Chance = 1 / 16, Result = { Type = "Card", CardId = "BanditDuelist" } },
+			{ Chance = 1 / 16, Result = { Type = "Card", CardId = "BanditRogue" } },
+		},
 		WeaponId = "RecurveBow",
 		Deck = {
-			BanditRogue = 1,
-			BanditDuelist = 1,
-			BanditScout = 1,
-			Bandit = 1,
-			Mob = 1,
+			BanditRogue = 2,
+			BanditDuelist = 2,
+			BanditScout = 2,
+			Bandit = 3,
+			RainOfArrows = 3,
 		},
 		Brain = {
 			Id = "WeightedCost",
 		},
 	},
-
 	CultLeader = {
 		Name = "Cult Leader",
 		BattlegroundName = "World1",
@@ -219,205 +269,6 @@ local Battlers = {
 		Deck = {
 			Berserker = 1,
 			VikingWarrior = 1,
-			RainOfArrows = 1,
-		},
-		Brain = {
-			Id = "WeightedCost",
-		},
-	},
-
-	-- world 2
-	VikingRunt = {
-		Name = "Viking Runt",
-		BattlegroundName = "World2",
-		BaseId = "Camp",
-		Reward = 150,
-		WeaponId = "WoodenBow",
-		Deck = {
-			Berserker = 1,
-			Recruit = 1,
-			VikingWarrior = 1,
-		},
-		Brain = {
-			Id = "WeightedCost",
-		},
-	},
-	VikingWarrior = {
-		Name = "Viking Warrior",
-		BattlegroundName = "World2",
-		BaseId = "VikingPalisade",
-		Reward = 250,
-		WeaponId = "CrudeThrownAxe",
-		Deck = {
-			Berserker = 1,
-			Recruit = 1,
-			VikingWarrior = 1,
-			RainOfArrows = 1,
-		},
-		Brain = {
-			Id = "WeightedCost",
-		},
-	},
-	VikingChief = {
-		Name = "Viking Chief",
-		BattlegroundName = "World2",
-		BaseId = "VikingPalisade",
-		Reward = 375,
-		WeaponId = "CrudeThrownAxe",
-		Deck = {
-			Recruit = 1,
-			VikingWarrior = 1,
-			Hunter = 1,
-			Berserker = 1,
-			Heal = 1,
-			RainOfArrows = 1,
-		},
-		Brain = {
-			Id = "WeightedCost",
-		},
-	},
-	VikingKing = {
-		Name = "Viking King",
-		BattlegroundName = "World2",
-		BaseId = "VikingPalisade",
-		Reward = 500,
-		WeaponId = "CrudeThrownAxe",
-		Deck = {
-			Recruit = 1,
-			Footman = 1,
-			VikingWarrior = 1,
-			Hunter = 1,
-			Berserker = 1,
-			Heal = 1,
-			RainOfArrows = 1,
-		},
-		Brain = {
-			Id = "WeightedCost",
-		},
-	},
-
-	-- world 3
-	ElfCommoner = {
-		Name = "Elf Commoner",
-		BattlegroundName = "World3",
-		BaseId = "Camp",
-		Reward = 750,
-		WeaponId = "ElvenBow",
-		Deck = {
-			ElfBrawler = 1,
-			ElfRanger = 1,
-			Heal = 1,
-			RainOfArrows = 1,
-		},
-		Brain = {
-			Id = "WeightedCost",
-		},
-	},
-	ElfHunter = {
-		Name = "Elf Hunter",
-		BattlegroundName = "World3",
-		BaseId = "ElvenKeep",
-		Reward = 1000,
-		WeaponId = "ElvenBow",
-		Deck = {
-			ElfBrawler = 1,
-			ElfRanger = 1,
-			RainOfArrows = 1,
-		},
-		Brain = {
-			Id = "WeightedCost",
-		},
-	},
-	ElfWarrior = {
-		Name = "Elf Warrior",
-		BattlegroundName = "World3",
-		BaseId = "ElvenKeep",
-		Reward = 1300,
-		WeaponId = "ThrowingKnife",
-		Deck = {
-			ElfBrawler = 1,
-			ElfRanger = 1,
-			Heal = 1,
-		},
-		Brain = {
-			Id = "WeightedCost",
-		},
-	},
-	ElfKing = {
-		Name = "Elf King",
-		BattlegroundName = "World3",
-		BaseId = "ElvenKeep",
-		Reward = 1750,
-		WeaponId = "ElvenBow",
-		Deck = {
-			ElfBrawler = 1,
-			ElfRanger = 1,
-			Heal = 1,
-			RainOfArrows = 1,
-		},
-		Brain = {
-			Id = "WeightedCost",
-		},
-	},
-
-	-- world 4
-	OrcGrunt = {
-		Name = "Orc Grunt",
-		BattlegroundName = "World4",
-		BaseId = "Camp",
-		Reward = 2000,
-		WeaponId = "CrudeThrownAxe",
-		Deck = {
-			OrcWarrior = 1,
-			OrcChampion = 1,
-			RainOfArrows = 1,
-		},
-		Brain = {
-			Id = "WeightedCost",
-		},
-	},
-	OrcBrute = {
-		Name = "Orc Brute",
-		BattlegroundName = "World4",
-		BaseId = "VikingPalisade",
-		Reward = 2500,
-		WeaponId = "SpellBook",
-		Deck = {
-			OrcWarrior = 1,
-			OrcChampion = 1,
-			Heal = 1,
-			RainOfArrows = 1,
-		},
-		Brain = {
-			Id = "WeightedCost",
-		},
-	},
-	OrcFighter = {
-		Name = "Orc Fighter",
-		BattlegroundName = "World4",
-		BaseId = "VikingPalisade",
-		Reward = 3250,
-		WeaponId = "Javelin",
-		Deck = {
-			OrcWarrior = 1,
-			OrcChampion = 1,
-			Heal = 1,
-			RainOfArrows = 1,
-		},
-		Brain = {
-			Id = "WeightedCost",
-		},
-	},
-	OrcGeneral = {
-		Name = "Orc General",
-		BattlegroundName = "World4",
-		BaseId = "Sandstone",
-		Reward = 4500,
-		WeaponId = "Javelin",
-		Deck = {
-			OrcWarrior = 1,
-			OrcChampion = 1,
-			Heal = 1,
 			RainOfArrows = 1,
 		},
 		Brain = {

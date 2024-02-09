@@ -103,6 +103,7 @@ local Ids = {
 	Prestige = 15683543486,
 	Block = 15818501059,
 	Dizzy = 15828173646,
+	MagicCastQuick = 16270588163,
 
 	-- dialogue animations
 	TalkingCalm = 16169218121,
