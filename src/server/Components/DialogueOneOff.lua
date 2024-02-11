@@ -7,30 +7,29 @@ local LobbySessions = require(ServerScriptService.Server.Singletons.LobbySession
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
-local DialoguePrompt = {}
-DialoguePrompt.__index = DialoguePrompt
+local DialogueOneOff = {}
+DialogueOneOff.__index = DialogueOneOff
 
-export type DialoguePrompt = typeof(setmetatable(
+export type DialogueOneOff = typeof(setmetatable(
 	{} :: {
 		Model: Model,
-		Id: string,
-		Def: any,
+		Trove: any,
 	},
-	DialoguePrompt
+	DialogueOneOff
 ))
 
-function DialoguePrompt.new(model: Model): DialoguePrompt
-	local id = model:GetAttribute("DialogueId")
-	assert(id, `No id for dialogue prompt {model:GetFullName()}`)
+function DialogueOneOff.new(model: Model): DialogueOneOff
+	local text = model:GetAttribute("DialogueText")
+	assert(text, `No text for dialogue one-off {model:GetFullName()}`)
 
 	local name = model:GetAttribute("DialogueName") or model.Name
 	local action = model:GetAttribute("DialogueAction") or "Talk"
+	local animation = model:GetAttribute("DialogueAnimation")
 
-	local self: DialoguePrompt = setmetatable({
+	local self: DialogueOneOff = setmetatable({
 		Model = model,
-		Id = id,
 		Trove = Trove.new(),
-	}, DialoguePrompt)
+	}, DialogueOneOff)
 
 	local prompt: ProximityPrompt = self.Trove:Construct(Instance, "ProximityPrompt")
 	prompt.ObjectText = name
@@ -39,7 +38,11 @@ function DialoguePrompt.new(model: Model): DialoguePrompt
 	prompt.RequiresLineOfSight = false
 	prompt.MaxActivationDistance = 8
 	prompt.Triggered:Connect(function(player)
-		local dialogue = DialogueService:StartDialogue(player, self.Id)
+		local dialogue = DialogueService:OneOff(player, {
+			Text = text,
+			Animation = animation,
+			Name = name,
+		})
 		if not dialogue then return end
 
 		dialogue:SetModel(self.Model)
@@ -71,8 +74,8 @@ function DialoguePrompt.new(model: Model): DialoguePrompt
 	return self
 end
 
-function DialoguePrompt.Destroy(self: DialoguePrompt)
+function DialogueOneOff.Destroy(self: DialogueOneOff)
 	self.Trove:Clean()
 end
 
-return DialoguePrompt
+return DialogueOneOff

@@ -43,13 +43,13 @@ end
 function DialogueService.StartDialogue(self: DialogueService, player: Player, dialogueId: string)
 	if self.Dialogues[player] then return end
 
-	self:SetDialogue(player, Dialogue.fromId(player, dialogueId))
+	return self:SetDialogue(player, Dialogue.fromId(player, dialogueId))
 end
 
 function DialogueService.OneOff(self: DialogueService, player: Player, node: any)
 	if self.Dialogues[player] then return end
 
-	self:SetDialogue(player, Dialogue.fromOneOff(player, node))
+	return self:SetDialogue(player, Dialogue.fromOneOff(player, node))
 end
 
 function DialogueService.GetDialogue(self: DialogueService, player: Player)

@@ -207,7 +207,7 @@ return function()
 			Name = React.createElement(Label, {
 				Size = UDim2.fromScale(1, 0.05),
 				SizeConstraint = Enum.SizeConstraint.RelativeXX,
-				Text = TextStroke(dialogue.Name),
+				Text = TextStroke(dialogue.Node.Name or dialogue.Name),
 				TextXAlignment = Enum.TextXAlignment.Left,
 				LayoutOrder = 0,
 			}),

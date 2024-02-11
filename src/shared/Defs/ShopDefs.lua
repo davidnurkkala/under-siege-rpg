@@ -149,6 +149,16 @@ local Shops = {
 			},
 		},
 	},
+	World1Charcoaler = {
+		Name = "Bilmen Charcoaler",
+		OverheadLabel = "Charcoal",
+		Products = {
+			{
+				Reward = { Type = "Currency", CurrencyType = "Charcoal", Amount = 3 },
+				Price = { SimpleMaterials = 5, Coins = 50 },
+			},
+		},
+	},
 }
 
 return Sift.Dictionary.map(Shops, function(shop, id)

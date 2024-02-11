@@ -198,8 +198,9 @@ local Battlers = {
 			Id = "WeightedCost",
 		},
 	},
-	BanditGrunt = {
-		Name = "Bandit Grunt",
+	BanditCaptain = {
+		Name = "Bandit Captain",
+		ModelName = "BanditGrunt",
 		BattlegroundName = "World1",
 		BaseId = "Camp",
 		Soundtrack = { "IntoDanger" },
@@ -214,19 +215,18 @@ local Battlers = {
 		Deck = {
 			Bandit = 1,
 			BanditScout = 1,
-			BanditRogue = 1,
-			BanditDuelist = 1,
 		},
 		Brain = {
 			Id = "WeightedCost",
 		},
 	},
-	BanditLeader = {
-		Name = "Bandit Leader",
+	BanditKing = {
+		Name = "Bandit King",
+		ModelName = "BanditLeader",
 		BattlegroundName = "World1",
 		BaseId = "Camp",
 		Rewards = {
-			{ Chance = 1, Result = { Type = "Currency", CurrencyType = "Coins", Amount = QuickCurrency(500, 750, 1000) } },
+			{ Chance = 1, Result = { Type = "Currency", CurrencyType = "Coins", Amount = QuickCurrency(900, 1000, 1100) } },
 			{ Chance = 0.75, Result = { Type = "Currency", CurrencyType = "SimpleFood", Amount = QuickCurrency(25, 30, 35) } },
 			{ Chance = 0.75, Result = { Type = "Currency", CurrencyType = "SimpleMaterials", Amount = QuickCurrency(25, 30, 35) } },
 			{ Chance = 0.75, Result = { Type = "Currency", CurrencyType = "CommonMetal", Amount = QuickCurrency(15, 17, 20) } },

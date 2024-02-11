@@ -9,8 +9,8 @@ local WeaponTypes = {
 		CooldownTime = 5,
 	},
 	Crossbow = {
-		Damage = 7,
-		CooldownTime = 7.5,
+		Damage = 6,
+		CooldownTime = 10,
 		Description = "A powerful mechanical weapon which has no weakness, but is quite slow to reload.",
 	},
 	Magic = {

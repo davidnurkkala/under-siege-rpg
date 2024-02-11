@@ -129,6 +129,7 @@ function GoonEscorted.Update(self: GoonEscorted, dt: number)
 
 		if distance < 0.1 then
 			goon.Animator:StopHardAll()
+			goon.Model:PivotTo(cframe.Rotation + point)
 			continue
 		end
 

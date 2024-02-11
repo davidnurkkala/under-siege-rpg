@@ -98,7 +98,7 @@ function Battler.new(args: {
 			return cooldown, cardId
 		end),
 		TacticCooldowns = {
-			Attack = Cooldown.new(5),
+			Attack = Cooldown.new(weaponTypeDef.CooldownTime),
 			Halt = Cooldown.new(5),
 			Charge = Cooldown.new(10),
 		},

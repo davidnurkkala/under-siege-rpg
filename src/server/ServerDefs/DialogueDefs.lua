@@ -659,6 +659,36 @@ local Dialogues = {
 			},
 		},
 	},
+	AsherCharcoaler = {
+		Name = "Asher, Charcoaler",
+		StartNodes = { "Unmet", "Met" },
+		NodesOut = {
+			Unmet = {
+				Text = "Hello, milord. Welcome to Bilmen, our village. I'm the local charcoaler. If you've the materials, I can make charcoal for you which any blacksmith can use to make Steel.",
+				Conditions = {
+					function(self)
+						return self:QuickFlagIsDown("HasMet")
+					end,
+				},
+				Callback = function(self)
+					self:QuickFlagRaise("HasMet")
+				end,
+				Nodes = { "Shop" },
+			},
+			Met = {
+				Text = "Milord, mind the ash. Need charcoal made?",
+				Nodes = { "Shop" },
+			},
+		},
+		NodesIn = {
+			Shop = {
+				Text = "I'd like to have some charcoal made.",
+				Callback = function(self)
+					GenericShopService:OpenShop(self.Player, "World1Charcoaler")
+				end,
+			},
+		},
+	},
 }
 
 return Sift.Dictionary.map(Dialogues, function(dialogue, id)

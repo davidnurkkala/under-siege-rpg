@@ -13,7 +13,7 @@ function TagLight.new(goon): TagLight
 
 	self.Connection = goon.WillDealDamage:Connect(function(damage)
 		if damage.Target:HasTag("Armored") then
-			damage.Amount *= 1.5
+			damage.Amount *= 2
 		end
 	end)
 

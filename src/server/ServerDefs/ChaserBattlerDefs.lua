@@ -1,21 +1,34 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
-local DialogueService = require(ServerScriptService.Server.Services.DialogueService)
+local ConsequenceHelper = require(ServerScriptService.Server.Util.ConsequenceHelper)
 local Sift = require(ReplicatedStorage.Packages.Sift)
-local WorldService = require(ServerScriptService.Server.Services.WorldService)
 
 local ChaserBattlers = {
-	TestChaserBattler = {
+	BanditCaptain = {
 		Speed = 24,
-		BattlerId = "Peasant",
+		BattlerId = "BanditCaptain",
 		Animations = {
 			Idle = "ShopkeeperIdle",
 			Walk = "GenericRun",
 		},
 		OnDefeat = function(player)
-			DialogueService:OneOff(player, { Text = "You lost the battle, loser!!!" })
-			return WorldService:TeleportToWorldRaw(player, "World1")
+			return ConsequenceHelper.Mugged(player, 0.05, function(amount)
+				return `The bandit gang forced you to retreat, stealing {amount} coins from you.`
+			end)
+		end,
+	},
+	BanditKing = {
+		Speed = 32,
+		BattlerId = "BanditKing",
+		Animations = {
+			Idle = "ShopkeeperIdle",
+			Walk = "GenericRun",
+		},
+		OnDefeat = function(player)
+			return ConsequenceHelper.Mugged(player, 0.2, function(amount)
+				return `The mighty bandit king captures you, ransoming you for {amount} coins and sending you off in disgrace.`
+			end)
 		end,
 	},
 }

@@ -126,16 +126,15 @@ function ResourceNodeService.UseNode(self: ResourceNodeService, player: Player, 
 			Promise.all(Sift.Array.map(rewards, function(reward)
 				return RewardHelper.GiveReward(player, reward)
 			end)):andThen(function(givenRewards)
-				for _, reward in givenRewards do
-					if reward.Type == "Currency" then
-						GuiEffectService.IndicatorRequestedRemote:Fire(player, {
-							Text = `+{reward.Amount}`,
-							Image = CurrencyDefs[reward.CurrencyType].Image,
-							Start = node:GetPivot().Position,
-							EndGui = "GuiInventoryButton",
-						})
-					end
-				end
+				return Promise.each(givenRewards, function(reward)
+					GuiEffectService.IndicatorRequestedRemote:Fire(player, {
+						Text = `+{reward.Amount}`,
+						Image = CurrencyDefs[reward.CurrencyType].Image,
+						Start = node:GetPivot().Position,
+						EndGui = "GuiInventoryButton",
+					})
+					return Promise.delay(0.5)
+				end)
 			end)
 		end)
 		:finally(function()

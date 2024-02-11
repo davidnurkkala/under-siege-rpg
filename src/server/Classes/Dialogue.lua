@@ -16,6 +16,7 @@ Dialogue.__index = Dialogue
 
 type Node = {
 	Text: string,
+	Name: string?,
 	Args: any,
 	Animation: string?,
 	Nodes: { string },
