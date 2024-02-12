@@ -15,7 +15,7 @@ local Cards = {
 		GoonId = "Peasant",
 		Rank = 0,
 		Cooldown = 1,
-		CostTime = 7,
+		CostTime = 6,
 		Upgrades = {
 			{ Coins = 10, SimpleFood = 5 },
 			{ Coins = 50, SimpleFood = 10, SimpleMaterials = 5 },
@@ -53,7 +53,7 @@ local Cards = {
 		GoonId = "Spearman",
 		Rank = 1,
 		Cooldown = 1,
-		CostTime = 8,
+		CostTime = 7,
 	},
 	Archer = {
 		Type = "Goon",
@@ -76,7 +76,7 @@ local Cards = {
 		GoonId = "Pikeman",
 		Rank = 2,
 		Cooldown = 1,
-		CostTime = 9,
+		CostTime = 8,
 	},
 	Crossbowman = {
 		Type = "Goon",

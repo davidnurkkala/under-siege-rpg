@@ -334,6 +334,26 @@ return function(props)
 						return Promise.resolve()
 					end,
 				}),
+				JournalButton = React.createElement(lobbyButton, {
+					LayoutOrder = 11,
+					Text = TextStroke("Quests"),
+					Color = ColorDefs.LightBlue,
+					Image = "rbxassetid://16338689940",
+					Activate = function()
+						menu.Set("Journal")
+						return Promise.resolve()
+					end,
+				}),
+				ChangeLogButton = React.createElement(lobbyButton, {
+					LayoutOrder = 12,
+					Text = TextStroke("Updates"),
+					Color = ColorDefs.Gray75,
+					Image = "rbxassetid://16338689999",
+					Activate = function()
+						menu.Set("ChangeLog")
+						return Promise.resolve()
+					end,
+				}),
 			}),
 
 			GamepadHint = React.createElement(RoundButtonWithImage, {

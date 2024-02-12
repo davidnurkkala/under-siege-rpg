@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local BattleController = require(ReplicatedStorage.Shared.Controllers.BattleController)
 local BattleResultBridge = require(ReplicatedStorage.Shared.React.BattleResult.BattleResultBridge)
-local ChangeLogBoard = require(ReplicatedStorage.Shared.React.ChangeLog.ChangeLogBoard)
+local ChangeLogMenu = require(ReplicatedStorage.Shared.React.ChangeLog.ChangeLogMenu)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local DeckMenuBridge = require(ReplicatedStorage.Shared.React.Menus.DeckMenuBridge)
 local DialogueBridge = require(ReplicatedStorage.Shared.React.Dialogue.DialogueBridge)
@@ -20,6 +20,7 @@ local OverheadLabeledBridge = require(ReplicatedStorage.Shared.React.OverheadLab
 local PaddingAll = require(ReplicatedStorage.Shared.React.Common.PaddingAll)
 local PlatformProvider = require(ReplicatedStorage.Shared.React.PlatformContext.PlatformProvider)
 local PremiumShopMenuBridge = require(ReplicatedStorage.Shared.React.Menus.PremiumShopMenuBridge)
+local QuestMenu = require(ReplicatedStorage.Shared.React.QuestMenu.QuestMenu)
 local React = require(ReplicatedStorage.Packages.React)
 local ReactRoblox = require(ReplicatedStorage.Packages.ReactRoblox)
 local RegenTimestampedBridge = require(ReplicatedStorage.Shared.React.RegenTimestampedBridge)
@@ -90,6 +91,8 @@ return function(props: {
 				LoginStreakRewardsMenu = React.createElement(LoginStreakRewardsMenuBridge),
 				VipMenu = React.createElement(VipMenuBridge),
 				BattleResult = React.createElement(BattleResultBridge),
+				ChangeLogMenu = React.createElement(ChangeLogMenu),
+				QuestMenu = React.createElement(QuestMenu),
 
 				BetaMessage = React.createElement(betaMessage),
 			}),
@@ -98,7 +101,6 @@ return function(props: {
 			OverheadLabels = React.createElement(OverheadLabeledBridge),
 			RegenLabels = React.createElement(RegenTimestampedBridge),
 			Shoplikes = React.createElement(ShoplikeBridge),
-			ChangeLogBoard = React.createElement(ChangeLogBoard),
 		}),
 	})
 end

@@ -13,9 +13,11 @@ export type Condition = {
 	getDescription: (Condition) -> string,
 	getProgress: (Condition) -> number,
 	getState: (Condition) -> any,
+	getName: (Condition) -> string?,
 
 	described: (Condition, (Condition) -> string) -> Condition,
 	withState: (Condition, (Condition) -> any) -> Condition,
+	named: (Condition, string) -> Condition,
 }
 
 local Badger: any = {}
@@ -43,6 +45,9 @@ Badger.condition = {
 		getState = function()
 			return {}
 		end,
+		getName = function()
+			return nil
+		end,
 
 		described = function(self, getDescription)
 			return Badger.wrap(self, {
@@ -56,6 +61,14 @@ Badger.condition = {
 			return Badger.wrap(self, {
 				getState = function()
 					return getState(self)
+				end,
+			})
+		end,
+
+		named = function(self, name)
+			return Badger.wrap(self, {
+				getName = function()
+					return name
 				end,
 			})
 		end,
@@ -129,7 +142,7 @@ function Badger.sequence(conditionList: { Condition }): Condition
 	return Badger.create({
 		state = getState(),
 		save = function(self)
-			if self:isComplete() then return end
+			if self:isComplete() then return nil end
 
 			return {
 				index = self.state.index,
@@ -147,6 +160,11 @@ function Badger.sequence(conditionList: { Condition }): Condition
 					self.state.index += 1
 				end
 			end
+		end,
+		getName = function(self)
+			if self:isComplete() then return nil end
+
+			return conditionList[self.state.index]:getName()
 		end,
 		getFilter = function()
 			return Sift.Set.merge(unpack(Sift.Array.map(conditionList, function(condition)
