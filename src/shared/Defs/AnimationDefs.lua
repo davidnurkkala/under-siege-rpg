@@ -69,6 +69,7 @@ local Ids = {
 	RoyalCavalryDie = 16101355448,
 	RoyalCavalryWalk = 16101345270,
 	RoyalCavalryAttack = 16101349164,
+	CavalrySpearAttack = 16343825524,
 
 	DraugrIdle = 16101394195,
 	DraugrWalk = 16101391991,

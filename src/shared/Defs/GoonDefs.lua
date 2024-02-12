@@ -261,6 +261,46 @@ local Goons = {
 		},
 	},
 
+	MountedSpearman = {
+		Name = "Mounted Spearman",
+		Description = "An inexperienced lancer with limited training, charging forth with devastating impact.",
+		ModelName = "MountedSpearman",
+		Brain = {
+			Id = "BasicMelee",
+		},
+		Tags = { "Armored", "Charger", "Brutal" },
+		Animations = {
+			Walk = "RoyalCavalryWalk",
+			Attack = "CavalrySpearAttack",
+			Die = "RoyalCavalryDie",
+		},
+		Sounds = {
+			Hit = { "GenericStab1", "GenericStab2", "GenericStab3", "GenericStab4" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.27
+			end,
+			Speed = function()
+				return 0.06
+			end,
+			Range = function()
+				return 0.1
+			end,
+			AttackRate = function()
+				return 0.75
+			end,
+			Damage = function(level)
+				return lerped(2, 4, level)
+			end,
+			HealthMax = function(level)
+				return lerped(20, 30, level)
+			end,
+		},
+	},
+
 	Pikeman = {
 		Name = "Pikeman",
 		Description = "An experienced, professional soldier with a standard polearm.",

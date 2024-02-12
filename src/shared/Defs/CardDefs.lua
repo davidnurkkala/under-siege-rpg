@@ -55,6 +55,13 @@ local Cards = {
 		Cooldown = 1,
 		CostTime = 8,
 	},
+	MountedSpearman = {
+		Type = "Goon",
+		GoonId = "MountedSpearman",
+		Rank = 1,
+		Cooldown = 1,
+		CostTime = 10,
+	},
 	Archer = {
 		Type = "Goon",
 		GoonId = "Archer",
