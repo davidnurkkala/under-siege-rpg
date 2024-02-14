@@ -31,6 +31,7 @@ function BattleController.PrepareBlocking(self: BattleController)
 	self.CardPlayed = self.Comm:GetSignal("CardPlayed")
 	self.SuppliesUpgraded = self.Comm:GetSignal("SuppliesUpgraded")
 	self.RewardsDisplayed = self.Comm:GetSignal("RewardsDisplayed")
+	self.ChallengePlayer = self.Comm:GetFunction("ChallengePlayer")
 
 	local function onChildAdded(battleModel)
 		local userIds = Sift.Array.map(string.split(battleModel:GetAttribute("UserIds"), ","), function(userIdString)

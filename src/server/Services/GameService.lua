@@ -36,7 +36,11 @@ function GameService.PrepareBlocking(self: GameService)
 		end
 	end)
 
+	local playingPlayers: { [Player]: boolean } = {}
 	self.Comm:BindFunction("Play", function(player)
+		if playingPlayers[player] then return end
+		playingPlayers[player] = true
+
 		local done = Signal.new()
 
 		LobbySession.promised(player)
@@ -57,6 +61,9 @@ function GameService.PrepareBlocking(self: GameService)
 						end)
 					end)
 				end
+			end)
+			:finally(function()
+				playingPlayers[player] = nil
 			end)
 
 		done:Wait()

@@ -48,7 +48,7 @@ local Goons = {
 				return lerped(1, 2, level)
 			end,
 			HealthMax = function(level)
-				return lerped(10, 15, level)
+				return lerped(20, 25, level)
 			end,
 		},
 	},
@@ -132,7 +132,7 @@ local Goons = {
 				return lerped(1.5, 2.25, level)
 			end,
 			HealthMax = function(level)
-				return lerped(15, 24, level)
+				return lerped(25, 30, level)
 			end,
 		},
 	},
@@ -172,7 +172,7 @@ local Goons = {
 				return lerped(1.5, 2.5, level)
 			end,
 			HealthMax = function(level)
-				return lerped(15, 20, level)
+				return lerped(25, 30, level)
 			end,
 		},
 	},
@@ -256,7 +256,7 @@ local Goons = {
 				return lerped(2, 2.75, level)
 			end,
 			HealthMax = function(level)
-				return lerped(20, 31, level)
+				return lerped(30, 35, level)
 			end,
 		},
 	},
@@ -336,7 +336,7 @@ local Goons = {
 				return lerped(2, 3, level)
 			end,
 			HealthMax = function(level)
-				return lerped(20, 25, level)
+				return lerped(30, 35, level)
 			end,
 		},
 	},
@@ -420,7 +420,7 @@ local Goons = {
 				return lerped(2.5, 3.25, level)
 			end,
 			HealthMax = function(level)
-				return lerped(25, 34, level)
+				return lerped(35, 40, level)
 			end,
 		},
 	},
@@ -460,7 +460,7 @@ local Goons = {
 				return lerped(3, 3.75, level)
 			end,
 			HealthMax = function(level)
-				return lerped(30, 39, level)
+				return lerped(40, 45, level)
 			end,
 		},
 	},
@@ -544,7 +544,7 @@ local Goons = {
 				return lerped(3, 4, level)
 			end,
 			HealthMax = function(level)
-				return lerped(30, 40, level)
+				return lerped(45, 50, level)
 			end,
 		},
 	},

@@ -11,6 +11,7 @@ local DeckService = require(ServerScriptService.Server.Services.DeckService)
 local DialogueHelper = require(ServerScriptService.Server.Util.DialogueHelper)
 local GenericShopService = require(ServerScriptService.Server.Services.GenericShopService)
 local GuideService = require(ServerScriptService.Server.Services.GuideService)
+local Invert = require(ReplicatedStorage.Shared.Util.Invert)
 local LobbySession = require(ServerScriptService.Server.Classes.LobbySession)
 local LobbySessions = require(ServerScriptService.Server.Singletons.LobbySessions)
 local MusicService = require(ServerScriptService.Server.Services.MusicService)
@@ -72,7 +73,7 @@ local Dialogues = {
 								Text = "Use this button to shoot!",
 							})
 
-							Promise.fromEvent(battler.Attacked):timeout(10):finally(function()
+							Promise.fromEvent(battler.Attacked):timeout(20):catch(function() end):finally(function()
 								GuideService:SetGuiGuide(self.Player, "GuiBattleAttackButton", nil)
 							end)
 
@@ -85,7 +86,8 @@ local Dialogues = {
 							Promise.fromEvent(battle.CardPlayed, function(playingBattler)
 								return playingBattler == battler
 							end)
-								:timeout(10)
+								:timeout(20)
+								:catch(function() end)
 								:finally(function()
 									GuideService:SetGuiGuide(self.Player, "GuiBattleDeckButton1", nil)
 								end)
@@ -338,9 +340,7 @@ local Dialogues = {
 				Nodes = { "DeliveryQuestWorkingOnIt", "DeliveryQuestDone", "Shop" },
 				Conditions = {
 					function(self)
-						return self:SharedGet("JimDeliveryQuest"):andThen(function(value)
-							return value ~= nil and value ~= "Complete"
-						end)
+						return QuestService:IsQuestInProgress(self.Player, "JimDeliveryQuest")
 					end,
 				},
 			},
@@ -382,9 +382,7 @@ local Dialogues = {
 			DeliveryQuestComplete = {
 				Text = "Amazing! You've done wonderful work. Please, accept this reward with my thanks. [Jim pays you 6000 coins.]",
 				Callback = function(self)
-					self:SharedSet("JimDeliveryQuest", "Complete"):andThen(function()
-						CurrencyService:AddCurrency(self.Player, "Coins", 6000)
-					end)
+					QuestService:AdvanceQuest(self.Player, "JimDeliveryQuest")
 				end,
 				Nodes = { "Shop" },
 			},
@@ -400,9 +398,7 @@ local Dialogues = {
 				Text = "Got any work?",
 				Conditions = {
 					function(self)
-						return self:SharedGet("JimDeliveryQuest"):andThen(function(value)
-							return value == nil
-						end)
+						return QuestService:IsQuestUnstarted(self.Player, "JimDeliveryQuest")
 					end,
 				},
 				Nodes = { "DeliveryQuestStart1" },
@@ -411,7 +407,7 @@ local Dialogues = {
 				Text = "Yes, I'll get your shipment.",
 				Nodes = { "DeliveryQuestGlad" },
 				Callback = function(self)
-					self:SharedSet("JimDeliveryQuest", "TalkToHolden")
+					return QuestService:StartQuest(self.Player, "JimDeliveryQuest")
 				end,
 			},
 			DeliveryQuestNo = {
@@ -423,9 +419,7 @@ local Dialogues = {
 				Nodes = { "DeliveryQuestGlad" },
 				Conditions = {
 					function(self)
-						return self:SharedGet("JimDeliveryQuest"):andThen(function(value)
-							return value ~= "ReturnToJim"
-						end)
+						return QuestService:IsQuestAtStage(self.Player, "JimDeliveryQuest", "ReturnToJim"):andThen(Invert)
 					end,
 				},
 			},
@@ -434,9 +428,7 @@ local Dialogues = {
 				Nodes = { "DeliveryQuestComplete" },
 				Conditions = {
 					function(self)
-						return self:SharedGet("JimDeliveryQuest"):andThen(function(value)
-							return value == "ReturnToJim"
-						end)
+						return QuestService:IsQuestAtStage(self.Player, "JimDeliveryQuest", "ReturnToJim")
 					end,
 				},
 			},
@@ -457,7 +449,7 @@ local Dialogues = {
 			DeliveryQuestILostIt2 = {
 				Text = "It was a bandit by the name of Royce. Perhaps you can find him and retrieve the shipment. I can help you no more, I'm afraid.",
 				Callback = function(self)
-					self:SharedSet("JimDeliveryQuest", "GetFromRoyce")
+					QuestService:AdvanceQuest(self.Player, "JimDeliveryQuest")
 				end,
 			},
 		},
@@ -467,9 +459,7 @@ local Dialogues = {
 				Nodes = { "DeliveryQuestILostIt" },
 				Conditions = {
 					function(self)
-						return self:SharedGet("JimDeliveryQuest"):andThen(function(value)
-							return value == "TalkToHolden"
-						end)
+						return QuestService:IsQuestAtStage(self.Player, "JimDeliveryQuest", "TalkToHolden")
 					end,
 				},
 			},
@@ -486,7 +476,7 @@ local Dialogues = {
 			DeliveryQuestDefeated = {
 				Text = "I yield, I yield! Take whatever you want, just don't kill me!",
 				Callback = function(self)
-					self:SharedSet("JimDeliveryQuest", "ReturnToJim")
+					QuestService:AdvanceQuest(self.Player, "JimDeliveryQuest")
 				end,
 			},
 			DeliveryQuestFightMe = {
@@ -512,9 +502,7 @@ local Dialogues = {
 				Text = "I've come to claim the shipment you stole from Holden.",
 				Conditions = {
 					function(self)
-						return self:SharedGet("JimDeliveryQuest"):andThen(function(value)
-							return value == "GetFromRoyce"
-						end)
+						return QuestService:IsQuestAtStage(self.Player, "JimDeliveryQuest", "DefeatRoyce")
 					end,
 				},
 				Nodes = { "DeliveryQuestFightMe" },
@@ -523,9 +511,7 @@ local Dialogues = {
 				Text = "Fight me, bandit!",
 				Conditions = {
 					function(self)
-						return self:SharedGet("JimDeliveryQuest"):andThen(function(value)
-							return value ~= "GetFromRoyce"
-						end)
+						return QuestService:IsQuestAtStage(self.Player, "JimDeliveryQuest", "DefeatRoyce"):andThen(Invert)
 					end,
 				},
 				Callback = function(self)
@@ -618,19 +604,18 @@ local Dialogues = {
 				Nodes = { "FightMeForIt" },
 				Conditions = {
 					function(self)
-						return QuestService:IsQuestComplete(self.Player, "DefeatNoble"):andThen(function(isComplete)
-							return not isComplete
-						end)
+						return QuestService:IsQuestComplete(self.Player, "KarystonMineAccess"):andThen(Invert)
 					end,
 				},
+				Callback = function(self)
+					QuestService:StartQuest(self.Player, "KarystonMineAccess")
+				end,
 			},
 			Spar = {
 				Text = "I'd like to fight.",
 				Conditions = {
 					function(self)
-						return QuestService:IsQuestComplete(self.Player, "DefeatNoble"):andThen(function(isComplete)
-							return isComplete
-						end)
+						return QuestService:IsQuestComplete(self.Player, "KarystonMineAccess")
 					end,
 				},
 				Callback = function(self)
@@ -642,7 +627,7 @@ local Dialogues = {
 				Callback = function(self)
 					BattleHelper.FadeToBattle(self.Player, "Noble"):andThen(function(playerWon)
 						if playerWon then
-							QuestService:IsQuestComplete(self.Player, "DefeatNoble"):andThen(function(isComplete)
+							QuestService:IsQuestComplete(self.Player, "KarystonMineAccess"):andThen(function(isComplete)
 								if isComplete then
 									self:SetNodeById("Defeated")
 								else

@@ -6,6 +6,7 @@ return function(_context, player)
 	DataService:GetSaveFile(player):andThen(function(saveFile)
 		player:Kick("Your quest data is being reset.")
 		saveFile:Set("QuestData", {})
+		saveFile:Set("QuestTrackedId", nil)
 	end)
 
 	return "Success"

@@ -1,5 +1,6 @@
 local ContextActionService = game:GetService("ContextActionService")
 local GuiService = game:GetService("GuiService")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 
@@ -42,6 +43,13 @@ local function getHealthPercent(status, index)
 		local battler = status.Battlers[index]
 		return battler.Health / battler.HealthMax
 	end, 1)
+end
+
+local function getMyBattler(status)
+	for _, battler in status.Battlers do
+		if battler.CharModel == Players.LocalPlayer.Character then return battler end
+	end
+	return nil
 end
 
 local function goonHealthBar(props: {
@@ -120,7 +128,7 @@ local function suppliesContent(props: {
 
 	React.useEffect(function()
 		TryNow(function()
-			local battler = props.Status.Battlers[1]
+			local battler = getMyBattler(props.Status)
 			setSupplies(battler.Supplies)
 			setGain(battler.SuppliesGain)
 		end)
@@ -237,7 +245,7 @@ end
 local function upgradeButton(props: {
 	Status: any,
 })
-	local battler = props.Status and props.Status.Battlers[1]
+	local battler = props.Status and getMyBattler(props.Status)
 
 	return (battler ~= nil)
 		and React.createElement(Button, {
@@ -279,8 +287,9 @@ local function hotbar(props: {
 	React.useEffect(function()
 		if not props.Status then return end
 
-		setCooldowns(props.Status.Battlers[1].DeckCooldowns)
-		setSupplies(props.Status.Battlers[1].Supplies)
+		local battler = getMyBattler(props.Status)
+		setCooldowns(battler.DeckCooldowns)
+		setSupplies(battler.Supplies)
 	end, { props.Status })
 
 	return React.createElement(React.Fragment, nil, {
@@ -368,7 +377,7 @@ return function(props: {
 	local message, setMessage = React.useState(nil)
 	local platform = React.useContext(PlatformContext)
 	local firstCardRef = React.useRef(nil)
-	local battler = status and status.Battlers and status.Battlers[1]
+	local battler = status and status.Battlers and getMyBattler(status)
 
 	local clearMessage = React.useCallback(function()
 		setMessage(nil)
@@ -457,35 +466,25 @@ return function(props: {
 			Finish = clearMessage,
 		}),
 
-		HealthBars = battler and React.createElement(React.Fragment, nil, {
-			HealthBarLeft = React.createElement("BillboardGui", {
-				Size = UDim2.fromScale(8, 1),
-				AlwaysOnTop = true,
-				Adornee = TryNow(function()
-					return battler.CharModel
-				end),
-				ExtentsOffsetWorldSpace = Vector3.new(0, 2, 0),
-			}, {
-				Bar = React.createElement(HealthBar, {
-					Alignment = Enum.HorizontalAlignment.Left,
-					Percent = getHealthPercent(status, 1),
-				}),
-			}),
-
-			HealthBarRight = React.createElement("BillboardGui", {
-				Size = UDim2.fromScale(8, 1),
-				AlwaysOnTop = true,
-				Adornee = TryNow(function()
-					return status.Battlers[2].CharModel
-				end),
-				ExtentsOffsetWorldSpace = Vector3.new(0, 2, 0),
-			}, {
-				Bar = React.createElement(HealthBar, {
-					Alignment = Enum.HorizontalAlignment.Right,
-					Percent = getHealthPercent(status, 2),
-				}),
-			}),
-		}),
+		HealthBars = React.createElement(
+			React.Fragment,
+			nil,
+			Sift.Array.map((status and status.Battlers) or {}, function(healthBarBattler, index)
+				return React.createElement("BillboardGui", {
+					Size = UDim2.fromScale(8, 1),
+					AlwaysOnTop = true,
+					Adornee = TryNow(function()
+						return healthBarBattler.CharModel
+					end),
+					ExtentsOffsetWorldSpace = Vector3.new(0, 2, 0),
+				}, {
+					Bar = React.createElement(HealthBar, {
+						Alignment = Enum.HorizontalAlignment.Left,
+						Percent = getHealthPercent(status, index),
+					}),
+				})
+			end)
+		),
 
 		Bottom = React.createElement(Container, nil, {
 			Layout = React.createElement(ListLayout, {

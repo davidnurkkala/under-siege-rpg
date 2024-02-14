@@ -242,7 +242,7 @@ return function(props)
 				BackgroundTransparency = 1,
 			}, {
 				SizeConstraint = React.createElement("UISizeConstraint", {
-					MinSize = Vector2.new(120, 0),
+					MinSize = Vector2.new(70, 0),
 					MaxSize = Vector2.new(160, math.huge),
 				}),
 
@@ -331,6 +331,26 @@ return function(props)
 					Image = "rbxassetid://16179407400",
 					Activate = function()
 						menu.Set("Gear")
+						return Promise.resolve()
+					end,
+				}),
+				JournalButton = React.createElement(lobbyButton, {
+					LayoutOrder = 11,
+					Text = TextStroke("Quests"),
+					Color = ColorDefs.LightBlue,
+					Image = "rbxassetid://16338689940",
+					Activate = function()
+						menu.Set("Journal")
+						return Promise.resolve()
+					end,
+				}),
+				ChangeLogButton = React.createElement(lobbyButton, {
+					LayoutOrder = 12,
+					Text = TextStroke("Updates"),
+					Color = ColorDefs.Gray75,
+					Image = "rbxassetid://16338689999",
+					Activate = function()
+						menu.Set("ChangeLog")
 						return Promise.resolve()
 					end,
 				}),

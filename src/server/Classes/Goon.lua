@@ -91,7 +91,7 @@ function Goon.new(args: {
 
 	local self: Goon = setmetatable({
 		Level = args.Level,
-		Health = Health.new(args.Def.Stats.HealthMax(args.Level)),
+		Health = Health.new(args.Def.Stats.HealthMax(args.Level) * args.Battler:GetHandicap("GoonHealth")),
 		Position = args.Position,
 		Direction = args.Direction,
 		Root = root,

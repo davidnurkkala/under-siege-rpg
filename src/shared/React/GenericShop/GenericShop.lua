@@ -352,6 +352,13 @@ return function(props: {
 		return
 	end, { platform, state, containerRef.current, closeReception })
 
+	React.useEffect(function()
+		if not props.Visible then
+			setState("Shop")
+			setSelectedProduct(nil)
+		end
+	end, { props.Visible })
+
 	return React.createElement(SystemWindow, {
 		Visible = props.Visible,
 		HeaderText = TextStroke(def.Name),

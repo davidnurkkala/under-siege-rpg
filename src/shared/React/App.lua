@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local BattleController = require(ReplicatedStorage.Shared.Controllers.BattleController)
 local BattleResultBridge = require(ReplicatedStorage.Shared.React.BattleResult.BattleResultBridge)
-local ChangeLogBoard = require(ReplicatedStorage.Shared.React.ChangeLog.ChangeLogBoard)
+local ChangeLogMenu = require(ReplicatedStorage.Shared.React.ChangeLog.ChangeLogMenu)
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
 local DeckMenuBridge = require(ReplicatedStorage.Shared.React.Menus.DeckMenuBridge)
 local DialogueBridge = require(ReplicatedStorage.Shared.React.Dialogue.DialogueBridge)
@@ -20,6 +20,7 @@ local OverheadLabeledBridge = require(ReplicatedStorage.Shared.React.OverheadLab
 local PaddingAll = require(ReplicatedStorage.Shared.React.Common.PaddingAll)
 local PlatformProvider = require(ReplicatedStorage.Shared.React.PlatformContext.PlatformProvider)
 local PremiumShopMenuBridge = require(ReplicatedStorage.Shared.React.Menus.PremiumShopMenuBridge)
+local QuestMenu = require(ReplicatedStorage.Shared.React.QuestMenu.QuestMenu)
 local React = require(ReplicatedStorage.Packages.React)
 local ReactRoblox = require(ReplicatedStorage.Packages.ReactRoblox)
 local RegenTimestampedBridge = require(ReplicatedStorage.Shared.React.RegenTimestampedBridge)
@@ -37,10 +38,9 @@ local function betaMessage()
 
 	return not inBattle
 		and React.createElement(Label, {
-			Size = UDim2.fromScale(0.3, 0.1),
-			SizeConstraint = Enum.SizeConstraint.RelativeYY,
-			Position = UDim2.fromScale(1, 1),
-			AnchorPoint = Vector2.new(1, 1),
+			Size = UDim2.new(1, 0, 0, 12),
+			Position = UDim2.new(0.5, 0, 0, 4),
+			AnchorPoint = Vector2.new(0.5, 0),
 			ZIndex = 64,
 			Text = TextStroke("<i>This game is a WIP. Content may be buggy or incomplete. Data will <b>not</b> be reset at this point.</i>"),
 		})
@@ -90,15 +90,15 @@ return function(props: {
 				LoginStreakRewardsMenu = React.createElement(LoginStreakRewardsMenuBridge),
 				VipMenu = React.createElement(VipMenuBridge),
 				BattleResult = React.createElement(BattleResultBridge),
-
-				BetaMessage = React.createElement(betaMessage),
+				ChangeLogMenu = React.createElement(ChangeLogMenu),
+				QuestMenu = React.createElement(QuestMenu),
 			}),
 
+			BetaMessage = React.createElement(betaMessage),
 			Indicators = React.createElement(IndicatorBridge),
 			OverheadLabels = React.createElement(OverheadLabeledBridge),
 			RegenLabels = React.createElement(RegenTimestampedBridge),
 			Shoplikes = React.createElement(ShoplikeBridge),
-			ChangeLogBoard = React.createElement(ChangeLogBoard),
 		}),
 	})
 end

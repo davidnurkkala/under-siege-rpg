@@ -103,7 +103,7 @@ function QuestBarrier.new(part: BasePart): QuestBarrier
 			return
 		end
 
-		self.Visual.Billboard.Gui.Text.Text = TextStroke(status)
+		self.Visual.Billboard.Gui.Text.Text = TextStroke(status.Description)
 	end))
 
 	QuestBarrierUpdater:Add(self)

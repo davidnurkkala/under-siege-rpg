@@ -74,7 +74,7 @@ end
 function DataService.PrepareBlocking(self: DataService)
 	self.Collection = Lapis.createCollection(COLLECTION_NAME, {
 		disableLockInStudio = true,
-		lockExpireTime = 10 * 60,
+		lockExpireTime = 6 * 60,
 
 		validate = function()
 			return true
