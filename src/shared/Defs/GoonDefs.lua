@@ -260,6 +260,48 @@ local Goons = {
 			end,
 		},
 	},
+	Apprentice = {
+		Name = "Apprentice",
+		Description = "A student of the magical arts lacking in any real practical experience.",
+		ModelName = "Apprentice",
+		Brain = {
+			Id = "BasicRanged",
+			ProjectileOffset = CFrame.new(0, 0.75, -0.25),
+			ProjectileName = "MagicStar1",
+		},
+		Tags = { "Ranged" },
+		Animations = {
+			Walk = "ApprenticeWalk",
+			Attack = "MageAttack",
+			Die = "GenericGoonDie",
+		},
+		Sounds = {
+			Shoot = { "WandCast1", "WandCast2", "WandCast3" },
+			Hit = { "MagicImpact1", "MagicImpact2", "MagicImpact3" },
+			Death = { "MaleUgh1", "MaleUgh2" },
+		},
+		Stats = {
+			Size = 0.03,
+			AttackWindupTime = function()
+				return 0.55
+			end,
+			Speed = function()
+				return 0.05
+			end,
+			Range = function()
+				return 0.45
+			end,
+			AttackRate = function()
+				return 0.4
+			end,
+			Damage = function(level)
+				return scaling(3, 0.75, level)
+			end,
+			HealthMax = function(level)
+				return scaling(4, 1, level)
+			end,
+		},
+	},
 
 	MountedSpearman = {
 		Name = "Mounted Spearman",
@@ -682,7 +724,7 @@ local Goons = {
 
 	Mage = {
 		Name = "Mage",
-		Description = "A student of the magical arts lacking in any real practical experience.",
+		Description = "An adept caster well versed in all things mystical.",
 		ModelName = "Mage",
 		Brain = {
 			Id = "BasicRanged",

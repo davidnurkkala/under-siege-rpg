@@ -76,6 +76,13 @@ local Cards = {
 		Cooldown = 1,
 		CostTime = 9,
 	},
+	Apprentice = {
+		Type = "Goon",
+		GoonId = "Apprentice",
+		Rank = 1,
+		Cooldown = 1,
+		CostTime = 8,
+	},
 
 	-- tier 2
 	Pikeman = {

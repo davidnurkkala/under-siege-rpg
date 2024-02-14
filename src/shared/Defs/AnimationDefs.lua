@@ -44,6 +44,7 @@ local Ids = {
 
 	PeasantWalk = 15082639586,
 	MageWalk = 15082639586,
+	ApprenticeWalk = 16369193799,
 	SwordsmanWalk = 15340656262,
 	PeasantAttack = 15340591603,
 	MageAttack = 15340597447,
