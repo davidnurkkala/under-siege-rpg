@@ -11,6 +11,7 @@ local Promise = require(ReplicatedStorage.Packages.Promise)
 local Property = require(ReplicatedStorage.Shared.Classes.Property)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local Trove = require(ReplicatedStorage.Packages.Trove)
+local t = require(ReplicatedStorage.Packages.t)
 
 local QuestDefsById = Sift.Dictionary.map(ServerScriptService.Server.Quests:GetChildren(), function(source)
 	local def = Sift.Dictionary.merge(require(source), {
@@ -31,6 +32,16 @@ type QuestService = typeof(QuestService)
 function QuestService.PrepareBlocking(self: QuestService)
 	self.Comm = Comm.ServerComm.new(ReplicatedStorage, "QuestService")
 	self.QuestsRemote = self.Comm:CreateProperty("Quests", {})
+	self.TrackedIdRemote = self.Comm:CreateProperty("TrackedId", nil)
+
+	self.Comm:BindFunction("TrackId", function(player, questId)
+		if not (t.string(questId) or questId == nil) then return end
+		if self.TrackedIdRemote:GetFor(player) == questId then return end
+
+		DataService:GetSaveFile(player):andThen(function(saveFile)
+			saveFile:Set("QuestTrackedId", questId)
+		end)
+	end)
 
 	Observers.observePlayer(function(player)
 		local trove = Trove.new()
@@ -41,6 +52,10 @@ function QuestService.PrepareBlocking(self: QuestService)
 		end)
 
 		trove:AddPromise(DataService:GetSaveFile(player)):andThen(function(saveFile)
+			saveFile:Observe("QuestTrackedId", function(trackedId)
+				self.TrackedIdRemote:SetFor(player, trackedId)
+			end)
+
 			local questData = saveFile:Get("QuestData")
 			local map = {}
 
@@ -54,9 +69,16 @@ function QuestService.PrepareBlocking(self: QuestService)
 
 				local condition = Badger.start(Badger.onCompleted(
 					Badger.onProcess(questDef.Condition(player), function(processed)
-						questDescriptions:Update(function(oldDescriptions)
-							return Sift.Dictionary.set(oldDescriptions, id, processed:getDescription())
-						end)
+						if processed:getName() ~= "Unstarted" then
+							questDescriptions:Update(function(oldDescriptions)
+								return Sift.Dictionary.set(oldDescriptions, id, {
+									Name = questDef.Name,
+									Summary = questDef.Summary,
+									Description = processed:getDescription(),
+								})
+							end)
+						end
+
 						saveFile:Update("QuestData", function(oldQuestData)
 							return Sift.Dictionary.set(oldQuestData, id, processed:save())
 						end)
@@ -70,6 +92,16 @@ function QuestService.PrepareBlocking(self: QuestService)
 							end)
 							return Sift.Dictionary.set(oldQuestData, id, "Complete")
 						end)
+
+						if saveFile:Get("QuestTrackedId") == id then
+							local trackableQuestIds = Sift.Array.filter(Sift.Dictionary.keys(saveFile:Get("QuestData")), function(questId)
+								local quest = map[questId]
+								return quest and quest:getName() ~= "Unstarted"
+							end)
+
+							saveFile:Set("QuestTrackedId", trackableQuestIds[1])
+						end
+
 						questDef.OnCompleted(player)
 					end
 				))
@@ -112,6 +144,10 @@ function QuestService.StartQuest(_self: QuestService, player: Player, questId: s
 	if quest:getName() ~= "Unstarted" then return end
 
 	EventStream.Event({ Kind = "QuestAdvanced", Player = player, QuestId = questId })
+
+	DataService:GetSaveFile(player):andThen(function(saveFile)
+		if saveFile:Get("QuestTrackedId") == nil then saveFile:Set("QuestTrackedId", questId) end
+	end)
 end
 
 function QuestService.AdvanceQuest(_self: QuestService, player: Player, questId)
@@ -168,7 +204,6 @@ end
 
 function QuestService.IsQuestComplete(_self: QuestService, player: Player, questId: string)
 	return DataService:GetSaveFile(player):andThen(function(saveFile)
-		print(saveFile:Get("QuestData"))
 		return saveFile:Get("QuestData")[questId] == "Complete"
 	end)
 end

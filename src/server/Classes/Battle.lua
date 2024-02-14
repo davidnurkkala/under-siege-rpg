@@ -285,9 +285,9 @@ function Battle.PlayCard(self: Battle, battler: Battler.Battler, cardId: string)
 			})
 
 			retVal.Died:Connect(function()
-				if Configuration.BountyDisabled then return end
+				local bounty = math.round(card.Cost * Configuration.BountyFraction)
+				if bounty == 0 then return end
 
-				local bounty = math.max(1, math.floor(card.Cost * 0.1))
 				for _, otherBattler in self.Battlers do
 					if otherBattler == battler then continue end
 					otherBattler.Supplies += bounty

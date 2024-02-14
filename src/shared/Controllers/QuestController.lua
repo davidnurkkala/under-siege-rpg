@@ -10,6 +10,15 @@ type QuestController = typeof(QuestController)
 function QuestController.PrepareBlocking(self: QuestController)
 	self.Comm = Comm.ClientComm.new(ReplicatedStorage, true, "QuestService")
 	self.QuestsRemote = self.Comm:GetProperty("Quests")
+	self.TrackedIdRemote = self.Comm:GetProperty("TrackedId")
+	self.TrackId = self.Comm:GetFunction("TrackId")
+end
+
+function QuestController.ObserveTrackedId(self: QuestController, callback)
+	local connection = self.TrackedIdRemote:Observe(callback)
+	return function()
+		connection:Disconnect()
+	end
 end
 
 function QuestController.ObserveQuests(self: QuestController, callback)

@@ -41,7 +41,10 @@ function HitAndRunMelee.SetUpStateMachine(self: HitAndRunMelee)
 		},
 		{
 			Name = "Retreating",
-			Start = function()
+			Start = function(data)
+				data.RemoveSlow = self.Goon.Stats.Speed:Modify("Percent", function(amount)
+					return amount - 0.5
+				end)
 				self.Goon.Direction *= -1
 				self.Goon.Animator:Play(self.Goon.Def.Animations.Walk)
 			end,
@@ -52,7 +55,8 @@ function HitAndRunMelee.SetUpStateMachine(self: HitAndRunMelee)
 
 				return
 			end,
-			Finish = function()
+			Finish = function(data)
+				data.RemoveSlow()
 				self.Goon.Direction *= -1
 				self.Goon.Animator:StopHard(self.Goon.Def.Animations.Walk)
 			end,

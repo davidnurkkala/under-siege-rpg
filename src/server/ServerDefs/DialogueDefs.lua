@@ -73,7 +73,7 @@ local Dialogues = {
 								Text = "Use this button to shoot!",
 							})
 
-							Promise.fromEvent(battler.Attacked):timeout(10):finally(function()
+							Promise.fromEvent(battler.Attacked):timeout(20):catch(function() end):finally(function()
 								GuideService:SetGuiGuide(self.Player, "GuiBattleAttackButton", nil)
 							end)
 
@@ -86,7 +86,8 @@ local Dialogues = {
 							Promise.fromEvent(battle.CardPlayed, function(playingBattler)
 								return playingBattler == battler
 							end)
-								:timeout(10)
+								:timeout(20)
+								:catch(function() end)
 								:finally(function()
 									GuideService:SetGuiGuide(self.Player, "GuiBattleDeckButton1", nil)
 								end)
@@ -603,19 +604,18 @@ local Dialogues = {
 				Nodes = { "FightMeForIt" },
 				Conditions = {
 					function(self)
-						return QuestService:IsQuestComplete(self.Player, "DefeatNoble"):andThen(function(isComplete)
-							return not isComplete
-						end)
+						return QuestService:IsQuestComplete(self.Player, "KarystonMineAccess"):andThen(Invert)
 					end,
 				},
+				Callback = function(self)
+					QuestService:StartQuest(self.Player, "KarystonMineAccess")
+				end,
 			},
 			Spar = {
 				Text = "I'd like to fight.",
 				Conditions = {
 					function(self)
-						return QuestService:IsQuestComplete(self.Player, "DefeatNoble"):andThen(function(isComplete)
-							return isComplete
-						end)
+						return QuestService:IsQuestComplete(self.Player, "KarystonMineAccess")
 					end,
 				},
 				Callback = function(self)
@@ -627,7 +627,7 @@ local Dialogues = {
 				Callback = function(self)
 					BattleHelper.FadeToBattle(self.Player, "Noble"):andThen(function(playerWon)
 						if playerWon then
-							QuestService:IsQuestComplete(self.Player, "DefeatNoble"):andThen(function(isComplete)
+							QuestService:IsQuestComplete(self.Player, "KarystonMineAccess"):andThen(function(isComplete)
 								if isComplete then
 									self:SetNodeById("Defeated")
 								else

@@ -242,7 +242,7 @@ return function(props)
 				BackgroundTransparency = 1,
 			}, {
 				SizeConstraint = React.createElement("UISizeConstraint", {
-					MinSize = Vector2.new(120, 0),
+					MinSize = Vector2.new(70, 0),
 					MaxSize = Vector2.new(160, math.huge),
 				}),
 

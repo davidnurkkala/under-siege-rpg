@@ -15,9 +15,11 @@ export type Condition = {
 	getState: (Condition) -> any,
 	getName: (Condition) -> string?,
 
-	described: (Condition, (Condition) -> string) -> Condition,
+	described: (Condition, string | (Condition) -> string) -> Condition,
 	withState: (Condition, (Condition) -> any) -> Condition,
 	named: (Condition, string) -> Condition,
+
+	without: (Condition, Condition) -> Condition,
 }
 
 local Badger: any = {}
@@ -49,11 +51,13 @@ Badger.condition = {
 			return nil
 		end,
 
-		described = function(self, getDescription)
+		described = function(self, description)
 			return Badger.wrap(self, {
-				getDescription = function()
-					return getDescription(self)
-				end,
+				getDescription = if typeof(description) == "function"
+					then description
+					else function()
+						return description
+					end,
 			})
 		end,
 
@@ -71,6 +75,10 @@ Badger.condition = {
 					return name
 				end,
 			})
+		end,
+
+		without = function(self, prerequisite)
+			return Badger.without(self, prerequisite)
 		end,
 	},
 }
@@ -178,6 +186,11 @@ function Badger.sequence(conditionList: { Condition }): Condition
 				index = self.state.index,
 				state = conditionList[self.state.index]:getState(),
 			}
+		end,
+		getDescription = function(self)
+			if self:isComplete() then return "" end
+
+			return conditionList[self.state.index]:getDescription()
 		end,
 		process = function(self, ...)
 			if self:isComplete() then return end

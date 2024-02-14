@@ -38,10 +38,9 @@ local function betaMessage()
 
 	return not inBattle
 		and React.createElement(Label, {
-			Size = UDim2.fromScale(0.3, 0.1),
-			SizeConstraint = Enum.SizeConstraint.RelativeYY,
-			Position = UDim2.fromScale(1, 1),
-			AnchorPoint = Vector2.new(1, 1),
+			Size = UDim2.new(1, 0, 0, 12),
+			Position = UDim2.new(0.5, 0, 0, 4),
+			AnchorPoint = Vector2.new(0.5, 0),
 			ZIndex = 64,
 			Text = TextStroke("<i>This game is a WIP. Content may be buggy or incomplete. Data will <b>not</b> be reset at this point.</i>"),
 		})
@@ -93,10 +92,9 @@ return function(props: {
 				BattleResult = React.createElement(BattleResultBridge),
 				ChangeLogMenu = React.createElement(ChangeLogMenu),
 				QuestMenu = React.createElement(QuestMenu),
-
-				BetaMessage = React.createElement(betaMessage),
 			}),
 
+			BetaMessage = React.createElement(betaMessage),
 			Indicators = React.createElement(IndicatorBridge),
 			OverheadLabels = React.createElement(OverheadLabeledBridge),
 			RegenLabels = React.createElement(RegenTimestampedBridge),

@@ -8,6 +8,7 @@ local CardDefs = require(ReplicatedStorage.Shared.Defs.CardDefs)
 local Configuration = require(ReplicatedStorage.Shared.Configuration)
 local Cooldown = require(ReplicatedStorage.Shared.Classes.Cooldown)
 local Damage = require(ServerScriptService.Server.Classes.Damage)
+local Default = require(ReplicatedStorage.Shared.Util.Default)
 local EffectBattlerCollapse = require(ReplicatedStorage.Shared.Effects.EffectBattlerCollapse)
 local EffectEmission = require(ReplicatedStorage.Shared.Effects.EffectEmission)
 local EffectProjectile = require(ReplicatedStorage.Shared.Effects.EffectProjectile)
@@ -48,6 +49,7 @@ export type Battler = typeof(setmetatable(
 		Trove: any,
 		Supplies: number,
 		SuppliesGain: number,
+		Handicap: { [string]: number }?,
 	},
 	Battler
 ))
@@ -63,6 +65,7 @@ function Battler.new(args: {
 	Deck: { [string]: number },
 	Animator: Animator.Animator,
 	WeaponDef: any,
+	Handicap: { [string]: number }?,
 }): Battler
 	local trove = Trove.new()
 
@@ -104,6 +107,7 @@ function Battler.new(args: {
 		},
 		Supplies = Configuration.SuppliesStarting,
 		SuppliesGain = Configuration.SuppliesGain,
+		Handicap = args.Handicap,
 	}, Battler)
 
 	self.TacticCooldowns.Attack:Use(10)
@@ -181,6 +185,9 @@ function Battler.fromBattlerId(battlerId: string, position: number, direction: n
 		Deck = def.Deck,
 		Animator = Animator.new(char.Humanoid),
 		HealthMax = 50,
+		Handicap = Default(def.Handicap, {
+			GoonHealth = 0.7,
+		}),
 	})
 
 	battler.Destroyed:Connect(function()
@@ -192,6 +199,14 @@ end
 
 function Battler.Is(object)
 	return getmetatable(object) == Battler
+end
+
+function Battler.GetHandicap(self: Battler, key: string): number
+	if self.Handicap then
+		return self.Handicap[key]
+	else
+		return 1
+	end
 end
 
 function Battler.HasTag(self: Battler, tagId: string)
