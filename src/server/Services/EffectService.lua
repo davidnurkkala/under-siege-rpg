@@ -1,7 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
-local BattleService = require(ServerScriptService.Server.Services.BattleService)
 local Comm = require(ReplicatedStorage.Packages.Comm)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Sift = require(ReplicatedStorage.Packages.Sift)
@@ -34,6 +33,7 @@ function EffectService.All(self: EffectService, ...)
 end
 
 function EffectService.ForBattle(self: EffectService, battle, ...)
+	local BattleService = require(ServerScriptService.Server.Services.BattleService) :: any
 	return self:EffectPlayers(BattleService:GetPlayersFromBattle(battle), ...)
 end
 

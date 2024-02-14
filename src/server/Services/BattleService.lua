@@ -1,9 +1,17 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 
 local Comm = require(ReplicatedStorage.Packages.Comm)
+local DataService = require(ServerScriptService.Server.Services.DataService)
+local LobbySession = require(ServerScriptService.Server.Classes.LobbySession)
+local LobbySessions = require(ServerScriptService.Server.Singletons.LobbySessions)
 local PlayerLeaving = require(ReplicatedStorage.Shared.Util.PlayerLeaving)
 local Promise = require(ReplicatedStorage.Packages.Promise)
+local ServerFade = require(ServerScriptService.Server.Util.ServerFade)
 local Sift = require(ReplicatedStorage.Packages.Sift)
+local Signal = require(ReplicatedStorage.Packages.Signal)
+local Timestamp = require(ReplicatedStorage.Shared.Util.Timestamp)
+local TryNow = require(ReplicatedStorage.Shared.Util.TryNow)
 local t = require(ReplicatedStorage.Packages.t)
 
 local BattleService = {
@@ -54,6 +62,93 @@ function BattleService.PrepareBlocking(self: BattleService)
 
 	self.MessageSent = self.Comm:CreateSignal("MessageSent")
 	self.RewardsDisplayed = self.Comm:CreateSignal("RewardsDisplayed")
+
+	self:SetUpChallenges()
+end
+
+function BattleService.SetUpChallenges(self: BattleService)
+	local challengeSetsByPlayer: { [Player]: { [Player]: boolean } } = {}
+	local challengeAccepted = Signal.new()
+
+	self.Comm:BindFunction("ChallengePlayer", function(challenger, challenged)
+		if not t.Instance(challenged) then return end
+		if not challenged:IsA("Player") then return end
+
+		local theirChallengeSet = challengeSetsByPlayer[challenged]
+		if theirChallengeSet and theirChallengeSet[challenger] then
+			challengeAccepted:Fire(challenged, challenger)
+
+			local restoreSessions = Sift.Array.map({ challenged, challenger }, function(player)
+				local session = LobbySessions.Get(player)
+				if not session then return end
+
+				local cframe = TryNow(function()
+					return player.Character.PrimaryPart.CFrame
+				end, CFrame.new())
+
+				session:Destroy()
+
+				return function()
+					return LobbySession.promised(player):andThenCall(Promise.delay, 0.5):andThen(function()
+						TryNow(function()
+							player.Character.PrimaryPart.CFrame = cframe
+						end)
+					end)
+				end
+			end)
+
+			local startTime = Timestamp()
+
+			ServerFade({ challenged, challenger }, nil, function()
+				local Battle = require(ServerScriptService.Server.Classes.Battle) :: any
+				return Battle.fromPlayerVersusPlayer(challenged, challenger)
+			end):andThen(function(battle)
+				return Promise.fromEvent(battle.Finished):andThenReturn(battle)
+			end):andThen(function(battle)
+				return ServerFade({ challenged, challenger }, nil, function()
+					local victor = battle:GetVictor()
+					victor = if victor.CharModel == challenged.Character then challenged else challenger
+
+					local duration = Timestamp() - startTime
+					if duration >= 90 then
+						DataService:GetSaveFile(victor):andThen(function(saveFile)
+							saveFile:Update("DuelWins", function(duelWins)
+								return (duelWins or 0) + 1
+							end)
+						end)
+					end
+
+					battle:Destroy()
+
+					return Promise.all(Sift.Array.map(restoreSessions, function(restoreSession)
+						return restoreSession()
+					end))
+				end)
+			end)
+		else
+			local myChallengeSet = challengeSetsByPlayer[challenger]
+			if not myChallengeSet then
+				myChallengeSet = {}
+				challengeSetsByPlayer[challenger] = myChallengeSet
+			end
+
+			if myChallengeSet[challenged] then return end
+
+			myChallengeSet[challenged] = true
+
+			Promise.race({
+				Promise.delay(10),
+				Promise.fromEvent(challengeAccepted, function(acceptingChallenger, acceptingChallenged)
+					return acceptingChallenger == challenger and acceptingChallenged == challenged
+				end),
+			})
+				:finally(function()
+					myChallengeSet[challenged] = nil
+					if Sift.Set.count(myChallengeSet) == 0 then challengeSetsByPlayer[challenger] = nil end
+				end)
+				:expect()
+		end
+	end)
 end
 
 function BattleService.Get(_self: BattleService, player: Player)

@@ -1,4 +1,11 @@
 return {
+	"2/13/2024 Part 2",
+	{
+		"Added",
+		{
+			"You can now duel other players in the newly added PVP area! Winning a duel adds to a permanent duel win count. Leaderboard coming soon!",
+		},
+	},
 	"2/13/2024",
 	{
 		"Added",

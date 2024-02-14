@@ -163,6 +163,53 @@ function Battle.new(args: {
 	return self
 end
 
+function Battle.fromPlayerVersusPlayer(challenger: Player, challenged: Player)
+	return BattleService:Promise(challenger, function()
+		return BattleService:Promise(challenged, function()
+			return Promise.new(function(resolve, reject)
+				if BattleService:Get(challenger) or BattleService:Get(challenged) then
+					reject("One player already has a battle")
+					return
+				end
+
+				resolve(Promise.all({
+					BattleSession.promised(challenger, 0, 1),
+					BattleSession.promised(challenged, 1, -1),
+				}))
+			end):andThen(function(sessions)
+				local battleground = ReplicatedStorage.Assets.Models.Battlegrounds.World1:Clone()
+
+				local battle = Battle.new({
+					Battlers = Sift.Array.map(sessions, function(session)
+						return session.Battler
+					end),
+					Model = battleground,
+				})
+
+				BattleService:Add(challenger, battle)
+				BattleService:Add(challenged, battle)
+
+				battle.Ended:Connect(function(victor)
+					for _, session in sessions do
+						if session.Battler == victor then
+							BattleService.MessageSent:Fire(session.Player, "Victory!")
+						else
+							BattleService.MessageSent:Fire(session.Player, "Defeat...")
+						end
+					end
+				end)
+
+				battle.Destroyed:Connect(function()
+					BattleService:Remove(challenger)
+					BattleService:Remove(challenged)
+				end)
+
+				return battle
+			end)
+		end)
+	end)
+end
+
 function Battle.fromPlayerVersusBattler(player: Player, battlerId: string, playerBattlerOverrides: any)
 	return BattleService:Promise(player, function()
 		return Promise.new(function(resolve, reject)
