@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Animate = require(ReplicatedStorage.Shared.Util.Animate)
 local QuickCurrency = require(ReplicatedStorage.Shared.Util.QuickCurrency)
 
 local function oreNodules(model, state)
@@ -17,6 +18,29 @@ local function foragePatch(model, state)
 	for _, object in model:GetDescendants() do
 		if object:IsA("BasePart") then object.Transparency = if state then 1 else 0 end
 	end
+end
+
+local function tree(model, state)
+	local trunk = model.Trunk
+
+	if state then
+		local fallen = trunk:Clone()
+		fallen.CanCollide = false
+		fallen.Parent = model
+
+		local start = fallen.CFrame * CFrame.new(0, -fallen.Size.Y / 2, 0) * CFrame.Angles(0, math.pi * 2 * math.random(), 0)
+		local finish = start * CFrame.Angles(math.pi / 2, 0, 0)
+		local offset = start:ToObjectSpace(fallen.CFrame)
+
+		Animate(1, function(scalar)
+			fallen.CFrame = start:Lerp(finish, scalar ^ 2) * offset
+		end):andThenCall(Animate, 0.25, function(scalar)
+			fallen.Transparency = scalar
+		end):andThenCall(fallen.Destroy, fallen)
+	end
+
+	trunk.Transparency = if state then 1 else 0
+	trunk.CanCollide = (state == false)
 end
 
 local function minutes(count)
@@ -96,8 +120,9 @@ return {
 	TreeSimple = {
 		Name = "Tree",
 		Action = "Chop",
-		ServerCallbackId = "Forage",
-		VisualCallback = function() end,
+		ServerCallbackId = "ChopTree",
+		VisualCallback = tree,
+		RegenTime = minutes(10),
 		Rewards = {
 			{ Chance = 1, Result = { Type = "Currency", CurrencyType = "SimpleMaterials", Amount = QuickCurrency(1, 2, 4) } },
 		},

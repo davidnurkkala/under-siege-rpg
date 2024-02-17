@@ -36,7 +36,7 @@ local Goons = {
 				return 1
 			end,
 			Speed = function()
-				return 0.05
+				return 0.075
 			end,
 			Range = function()
 				return 0.1
@@ -80,7 +80,7 @@ local Goons = {
 				return 0.55
 			end,
 			Speed = function()
-				return 0.05
+				return 0.075
 			end,
 			Range = function()
 				return 0.35
@@ -120,7 +120,7 @@ local Goons = {
 				return 0.27
 			end,
 			Speed = function()
-				return 0.04
+				return 0.075
 			end,
 			Range = function()
 				return 0.1
@@ -160,7 +160,7 @@ local Goons = {
 				return 1
 			end,
 			Speed = function()
-				return 0.05
+				return 0.075
 			end,
 			Range = function()
 				return 0.1
@@ -204,7 +204,7 @@ local Goons = {
 				return 0.55
 			end,
 			Speed = function()
-				return 0.05
+				return 0.075
 			end,
 			Range = function()
 				return 0.35
@@ -244,7 +244,7 @@ local Goons = {
 				return 0.27
 			end,
 			Speed = function()
-				return 0.04
+				return 0.075
 			end,
 			Range = function()
 				return 0.1
@@ -286,7 +286,7 @@ local Goons = {
 				return 0.55
 			end,
 			Speed = function()
-				return 0.05
+				return 0.075
 			end,
 			Range = function()
 				return 0.45
@@ -326,7 +326,7 @@ local Goons = {
 				return 0.27
 			end,
 			Speed = function()
-				return 0.06
+				return 0.1
 			end,
 			Range = function()
 				return 0.1
@@ -366,7 +366,7 @@ local Goons = {
 				return 1
 			end,
 			Speed = function()
-				return 0.05
+				return 0.075
 			end,
 			Range = function()
 				return 0.1
@@ -410,7 +410,7 @@ local Goons = {
 				return 0.55
 			end,
 			Speed = function()
-				return 0.05
+				return 0.075
 			end,
 			Range = function()
 				return 0.35
@@ -450,7 +450,7 @@ local Goons = {
 				return 0.27
 			end,
 			Speed = function()
-				return 0.04
+				return 0.075
 			end,
 			Range = function()
 				return 0.1
@@ -490,7 +490,7 @@ local Goons = {
 				return 0.27
 			end,
 			Speed = function()
-				return 0.04
+				return 0.075
 			end,
 			Range = function()
 				return 0.1
@@ -534,7 +534,7 @@ local Goons = {
 				return 0.55
 			end,
 			Speed = function()
-				return 0.05
+				return 0.075
 			end,
 			Range = function()
 				return 0.35
@@ -574,7 +574,7 @@ local Goons = {
 				return 0.27
 			end,
 			Speed = function()
-				return 0.06
+				return 0.1
 			end,
 			Range = function()
 				return 0.1
@@ -614,7 +614,7 @@ local Goons = {
 				return 0.2
 			end,
 			Speed = function()
-				return 0.05
+				return 0.075
 			end,
 			Range = function()
 				return 0.1
@@ -661,7 +661,7 @@ local Goons = {
 				return 0.85
 			end,
 			Speed = function()
-				return 0.05
+				return 0.075
 			end,
 			Range = function()
 				return 0.4
@@ -705,7 +705,7 @@ local Goons = {
 				return 0.85
 			end,
 			Speed = function()
-				return 0.05
+				return 0.075
 			end,
 			Range = function()
 				return 0.18
@@ -748,7 +748,7 @@ local Goons = {
 				return 0.55
 			end,
 			Speed = function()
-				return 0.05
+				return 0.075
 			end,
 			Range = function()
 				return 0.45
@@ -788,7 +788,7 @@ local Goons = {
 				return 0.55
 			end,
 			Speed = function()
-				return 0.075
+				return 0.08
 			end,
 			Range = function()
 				return 0.1
@@ -828,7 +828,7 @@ local Goons = {
 				return 0.43
 			end,
 			Speed = function()
-				return 0.1
+				return 0.08
 			end,
 			Range = function()
 				return 0.1
@@ -868,7 +868,7 @@ local Goons = {
 				return 0.2
 			end,
 			Speed = function()
-				return 0.06
+				return 0.075
 			end,
 			Range = function()
 				return 0.1
@@ -912,7 +912,7 @@ local Goons = {
 				return 0.55
 			end,
 			Speed = function()
-				return 0.06
+				return 0.075
 			end,
 			Range = function()
 				return 0.3
@@ -952,7 +952,7 @@ local Goons = {
 				return 0.2
 			end,
 			Speed = function()
-				return 0.1
+				return 0.075
 			end,
 			Range = function()
 				return 0.1
@@ -992,7 +992,7 @@ local Goons = {
 				return 0.27
 			end,
 			Speed = function()
-				return 0.06
+				return 0.075
 			end,
 			Range = function()
 				return 0.1
@@ -1032,7 +1032,7 @@ local Goons = {
 				return 0.3
 			end,
 			Speed = function()
-				return 0.15
+				return 0.075
 			end,
 			Range = function()
 				return 0.1
@@ -1072,7 +1072,7 @@ local Goons = {
 				return 0.27
 			end,
 			Speed = function()
-				return 0.04
+				return 0.075
 			end,
 			Range = function()
 				return 0.1
@@ -1112,7 +1112,7 @@ local Goons = {
 				return 0.27
 			end,
 			Speed = function()
-				return 0.04
+				return 0.05
 			end,
 			Range = function()
 				return 0.1
@@ -1152,7 +1152,7 @@ local Goons = {
 				return 0.43
 			end,
 			Speed = function()
-				return 0.1
+				return 0.08
 			end,
 			Range = function()
 				return 0.1
@@ -1196,7 +1196,7 @@ local Goons = {
 				return 0.55
 			end,
 			Speed = function()
-				return 0.05
+				return 0.08
 			end,
 			Range = function()
 				return 0.375
@@ -1239,7 +1239,7 @@ local Goons = {
 				return 0.3
 			end,
 			Speed = function()
-				return 0.05
+				return 0.075
 			end,
 			Range = function()
 				return 0.5
@@ -1279,7 +1279,7 @@ local Goons = {
 				return 0.43
 			end,
 			Speed = function()
-				return 0.05
+				return 0.075
 			end,
 			Range = function()
 				return 0.1
@@ -1319,7 +1319,7 @@ local Goons = {
 				return 0.43
 			end,
 			Speed = function()
-				return 0.2
+				return 0.075
 			end,
 			Range = function()
 				return 0.1
@@ -1363,7 +1363,7 @@ local Goons = {
 				return 1
 			end,
 			Speed = function()
-				return 0.1
+				return 0.075
 			end,
 			Range = function()
 				return 0.6
@@ -1449,7 +1449,7 @@ local Goons = {
 				return 0.8
 			end,
 			Speed = function()
-				return 0.14
+				return 0.15
 			end,
 			Range = function()
 				return 0.65

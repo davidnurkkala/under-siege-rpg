@@ -79,6 +79,11 @@ local Ids = {
 	RockCrumble5 = "rbxassetid://16200140965",
 	ChestOpen = "rbxassetid://16260474063",
 	Forage1 = "rbxassetid://16260579680",
+	WoodCut1 = "rbxassetid://16400349906",
+	WoodCut2 = "rbxassetid://16400349625",
+	WoodCut3 = "rbxassetid://16400349766",
+	WoodCut4 = "rbxassetid://16400349464",
+	WoodCut5 = "rbxassetid://16400349283",
 }
 
 return Sift.Dictionary.map(Ids, function(entry, name)

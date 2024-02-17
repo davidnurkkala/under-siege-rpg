@@ -77,4 +77,49 @@ return {
 			lobbySession.Animator:Stop("PickaxeSwingIdle")
 		end)
 	end,
+	ChopTree = function(lobbySession, model)
+		local position = model.PrimaryPart.Position
+		FaceCharacterTowards(lobbySession.Root, position)
+
+		local axe = ReplicatedStorage.Assets.Models.Effects.LumberAxe:Clone()
+		axe.Parent = lobbySession.Character
+
+		TryNow(function()
+			local constraint = Instance.new("RigidConstraint")
+			constraint.Attachment0 = lobbySession.Character.RightHand.RightGripAttachment
+			constraint.Attachment1 = axe.Grip
+			constraint.Parent = axe
+		end)
+
+		lobbySession.Animator:Play("AxeSwing")
+
+		return Promise.race({
+			lobbySession:LockDown(3),
+			Promise.new(function(resolve, _, onCancel)
+				for _ = 1, 3 do
+					task.wait(0.5)
+					if onCancel() then return end
+
+					EffectService:All(
+						EffectEmission({
+							Emitter = ReplicatedStorage.Assets.Emitters.WoodChips1,
+							Target = position,
+							ParticleCount = 8,
+						}),
+						EffectSound({
+							SoundId = "WoodCut" .. math.random(1, 5),
+							Target = position,
+						})
+					)
+
+					task.wait(0.5)
+					if onCancel() then return end
+				end
+				resolve()
+			end),
+		}):finally(function()
+			axe:Destroy()
+			lobbySession.Animator:Stop("AxeSwing")
+		end)
+	end,
 }
