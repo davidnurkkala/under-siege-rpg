@@ -1,2 +1,3 @@
-# Added
-- You can now duel other players in the newly added PVP area! Winning a duel adds to a permanent duel win count. Leaderboard coming soon!
+# Fixed
+- The barrier into the mine now works correctly and allows you through when you defeat the noble.
+- Various visual issues throughout the map have been corrected.
