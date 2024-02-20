@@ -7,7 +7,6 @@ local Lapis = require(ServerScriptService.ServerPackages.Lapis)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local SaveFile = require(ServerScriptService.Server.Classes.SaveFile)
-local Sift = require(ReplicatedStorage.Packages.Sift)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
 local COLLECTION_NAME = "DataService" .. Configuration.DataStoreVersion

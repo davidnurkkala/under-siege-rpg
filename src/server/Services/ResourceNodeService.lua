@@ -121,17 +121,24 @@ function ResourceNodeService.UseNode(self: ResourceNodeService, player: Player, 
 				return Sift.Dictionary.set(states, indexString, timestamp)
 			end)
 
-			local rewards = RewardHelper.ProcessChanceTable(player, def.Rewards)
+			local rewards = Sift.Array.append(RewardHelper.ProcessChanceTable(player, def.Rewards), {
+				Type = "Currency",
+				CurrencyType = "Glory",
+				Amount = math.ceil(def.RegenTime / 60),
+			})
 
 			Promise.all(Sift.Array.map(rewards, function(reward)
 				return RewardHelper.GiveReward(player, reward)
 			end)):andThen(function(givenRewards)
 				return Promise.each(givenRewards, function(reward)
+					local endGui = "GuiInventoryButton"
+					if Sift.Array.find({ "Glory", "Coins", "Gems" }, reward.CurrencyType) then endGui = "GuiPanel" .. reward.CurrencyType end
+
 					GuiEffectService.IndicatorRequestedRemote:Fire(player, {
 						Text = `+{reward.Amount}`,
 						Image = CurrencyDefs[reward.CurrencyType].Image,
 						Start = node:GetPivot().Position,
-						EndGui = "GuiInventoryButton",
+						EndGui = endGui,
 					})
 					return Promise.delay(0.5)
 				end)

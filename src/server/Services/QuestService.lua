@@ -1,3 +1,4 @@
+local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
@@ -75,6 +76,8 @@ function QuestService.PrepareBlocking(self: QuestService)
 									Name = questDef.Name,
 									Summary = questDef.Summary,
 									Description = processed:getDescription(),
+									State = processed:getState(),
+									Target = processed:getTarget(),
 								})
 							end)
 						end

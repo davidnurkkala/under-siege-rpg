@@ -23,8 +23,8 @@ function PlayerListLeaderboardService.PrepareBlocking(_self: PlayerListLeaderboa
 
 		local valueByCurrencyType = {}
 
-		for _, currencyType in { "Coins" } do
-			local val = Instance.new("StringValue")
+		for _, currencyType in { "Prestige" } do
+			local val = Instance.new("IntValue")
 			val.Name = CurrencyDefs[currencyType].Name
 			val.Parent = folder
 			valueByCurrencyType[currencyType] = val
@@ -33,7 +33,7 @@ function PlayerListLeaderboardService.PrepareBlocking(_self: PlayerListLeaderboa
 		trove:Add(DataService:ObserveKey(player, "Currency", function(currency)
 			for currencyType, amount in currency do
 				local val = valueByCurrencyType[currencyType]
-				if val then val.Value = FormatBigNumber(amount) end
+				if val then val.Value = amount end
 			end
 		end))
 

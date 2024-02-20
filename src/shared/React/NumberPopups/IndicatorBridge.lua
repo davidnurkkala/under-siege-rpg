@@ -1,4 +1,5 @@
 local CollectionService = game:GetService("CollectionService")
+local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Container = require(ReplicatedStorage.Shared.React.Common.Container)
@@ -10,8 +11,6 @@ local React = require(ReplicatedStorage.Packages.React)
 local Sift = require(ReplicatedStorage.Packages.Sift)
 local TextStroke = require(ReplicatedStorage.Shared.React.Util.TextStroke)
 local Trove = require(ReplicatedStorage.Packages.Trove)
-
-local ScreenInset = 36
 
 local function worldToScreen(position: Vector3)
 	local point, onScreen = workspace.CurrentCamera:WorldToViewportPoint(position)
@@ -27,7 +26,7 @@ local function guiToScreen(tagName: string)
 	if not object then return UDim2.fromScale(0.5, 0.5) end
 
 	local center = object.AbsolutePosition + object.AbsoluteSize / 2
-	return UDim2.fromOffset(center.X, center.Y + ScreenInset)
+	return UDim2.fromOffset(center.X, center.Y + GuiService:GetGuiInset().Y)
 end
 
 return function()

@@ -78,6 +78,26 @@ local Battlers = {
 			},
 		},
 	},
+	GuildmasterKutz = {
+		Name = "Guildmaster Kutz",
+		ModelName = "Guildmaster",
+		BattlegroundName = "World1",
+		BaseId = "ClassicReborn",
+		Soundtrack = { "AGoodBrawl", "ASmallConflict" },
+		Rewards = {
+			{ Chance = 1, Result = { Type = "Currency", CurrencyType = "Coins", Amount = QuickCurrency(200, 250, 300) } },
+		},
+		WeaponId = "Crossbow",
+		Deck = {
+			Spearman = 1,
+			Archer = 1,
+			Recruit = 1,
+			RainOfArrows = 1,
+		},
+		Brain = {
+			Id = "WeightedCost",
+		},
+	},
 	Noble = {
 		Name = "Noble",
 		BattlegroundName = "World1",
