@@ -187,7 +187,7 @@ local Dialogues = {
 							end)
 						end)
 						:andThen(function()
-							DialogueHelper.StartDialogue(self.Player, "PostTutorial")
+							QuestService:StartQuest(self.Player, "RebuildingAnArmy")
 						end)
 				end,
 			},
@@ -299,30 +299,130 @@ local Dialogues = {
 	},
 	GuildmasterKutz = {
 		Name = "Kutz, Guildmaster",
-		StartNodes = { "Unmet", "Met" },
+		StartNodes = { "RebuildingAnArmy", "DefeatThePeasant", "AfterPeasantVictory", "DefeatTheBandit", "AfterBanditVictory", "Rematch", "Start" },
 		NodesOut = {
-			Unmet = {
+			RebuildingAnArmy = {
 				Text = "Hmph! Well, if it isn't the lordling that's lost his kingdom. What a sorry excuse of a warrior, you are.",
 				Conditions = {
 					function(self)
-						return self:QuickFlagIsDown("HasMet")
+						return QuestService:IsQuestAtStage(self.Player, "RebuildingAnArmy", "SpeakToGuildmaster")
 					end,
 				},
-				Callback = function(self)
-					self:QuickFlagRaise("HasMet")
+				Nodes = { "RebuildingAnArmy2" },
+			},
+			RebuildingAnArmy2 = {
+				Text = "Let me guess: you aren't satisfied with these untrained peasants and you're looking for <i>real</i> troops.",
+				Nodes = { "YesGetRealTroops" },
+			},
+			GoFightThePeasant = {
+				Text = "Ha! Why would I trust my trained men to a failure like you? Prove you <i>deserve</i> better soldiers. Go fight John Sower's gang. Beat him with the men you have and maybe I'll consider helping you out.",
+				PostCallback = function(self)
+					QuestService:AdvanceQuest(self.Player, "RebuildingAnArmy")
 				end,
-				Nodes = { "Unmet2" },
 			},
-			Unmet2 = {
-				Text = "Lucky for weaklings like you, skill can be bought. I've got men ready to fight if you've got the coin. What'll it be?",
-				Nodes = { "Shop" },
+			DefeatThePeasant = {
+				Conditions = {
+					function(self)
+						return QuestService:IsQuestAtStage(self.Player, "RebuildingAnArmy", "DefeatThePeasant")
+					end,
+				},
+				Text = "What are you standing around yapping to me for? Go fight John Sower's boys!",
 			},
-			Met = {
+			AfterPeasantVictory = {
+				Conditions = {
+					function(self)
+						return QuestService:IsQuestAtStage(self.Player, "RebuildingAnArmy", "TellGuildmasterDefeatedPeasant")
+					end,
+				},
+				Text = "Well, well, well. Looks like you aren't good for nothing, after all. You can beat a disorganized mob of farmers with an... organized mob of farmers.",
+				Nodes = { "HaveASpearman" },
+			},
+			HaveASpearman = {
+				Text = "All right, I'll hire you a Spearman. The Spearman is a Light soldier, which means he's strong against Armored soldiers but weak to Ranged soldiers like archers.",
+				Nodes = { "GoFightABandit" },
+			},
+			GoFightABandit = {
+				Text = "All right. Now that you have at least <i>one</i> professional soldier, let's see you win a fight with stakes. Head up into the mountains and beat a bandit gang. After you've done that, come back and see me.",
+				PostCallback = function(self)
+					QuestService:AdvanceQuest(self.Player, "RebuildingAnArmy")
+				end,
+			},
+			DefeatTheBandit = {
+				Conditions = {
+					function(self)
+						return QuestService:IsQuestAtStage(self.Player, "RebuildingAnArmy", "DefeatABandit")
+					end,
+				},
+				Text = "You know what you need to do, lordling. Go defeat a bandit gang!",
+			},
+			AfterBanditVictory = {
+				Conditions = {
+					function(self)
+						return QuestService:IsQuestAtStage(self.Player, "RebuildingAnArmy", "TellGuildmasterDefeatedBandit")
+					end,
+				},
+				Text = "Ha! So you <i>did</i> manage a real fight after all. Maybe I misjudged you, lordling.",
+				Nodes = { "HaveAnArcher" },
+			},
+			HaveAnArcher = {
+				Text = "I'll hire you an Archer, now. He's a Ranged soldier, which means that he not only attacks at a distance but also does particularly well against Light soldiers. His arrows will bounce right off of Armored soldiers, though.",
+				Nodes = { "NowFightMe" },
+			},
+			NowFightMe = {
+				Text = "I've got one more soldier I'm willing to contract to you, but you've got to prove yourself to me directly. Let's fight.",
+				Callback = function(self)
+					QuestService:AdvanceQuest(self.Player, "RebuildingAnArmy")
+				end,
+				Nodes = { "FightForRecruit" },
+			},
+			Rematch = {
+				Conditions = {
+					function(self)
+						return QuestService:IsQuestAtStage(self.Player, "RebuildingAnArmy", "DefeatTheGuildmaster")
+					end,
+				},
+				Text = "Back for another round, lordling?",
+				Nodes = { "FightForRecruit" },
+			},
+			Defeated = {
+				Text = "Well, well, well. Seems I <i>was</i> wrong about you after all. You're a fine warrior.",
+				Nodes = { "HaveARecruit" },
+			},
+			HaveARecruit = {
+				Text = "This final soldier is the Recruit. He's an Armored soldier, which means he shrugs off attacks from Ranged soldiers but is too slow to fight effectively against Light soldiers.",
+				Nodes = { "AllDone" },
+			},
+			AllDone = {
+				Text = "Well, lordling, you've got some \"real\" troops now, and you've proved you know how to use them. You might not be able to fight the orcs now, but you've taken your first steps towards vengeance.",
+			},
+			Victorious = {
+				Text = "Ha! You're beaten, lordling. Losing to an old veteran like me isn't a good look. Try again?",
+				Nodes = { "FightForRecruit" },
+			},
+			Start = {
 				Text = "Welcome back, lordling. Looking for some more muscle?",
 				Nodes = { "Shop" },
 			},
 		},
 		NodesIn = {
+			YesGetRealTroops = {
+				Text = "Yes, I need stronger soldiers.",
+				Nodes = { "GoFightThePeasant" },
+			},
+			FightForRecruit = {
+				Text = "Let's fight.",
+				Callback = function(self)
+					BattleHelper.FadeToBattle(self.Player, "GuildmasterKutz"):andThen(function(playerWon)
+						if playerWon then
+							self:SetNodeById("Defeated")
+						else
+							self:SetNodeById("Victorious")
+						end
+					end)
+
+					return true
+				end,
+			},
 			Shop = {
 				Text = "Let me see what soldiers are for hire.",
 				Callback = function(self)

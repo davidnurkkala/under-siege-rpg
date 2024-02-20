@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local BattleController = require(ReplicatedStorage.Shared.Controllers.BattleController)
 local Comm = require(ReplicatedStorage.Packages.Comm)
 local Observers = require(ReplicatedStorage.Packages.Observers)
 local Promise = require(ReplicatedStorage.Packages.Promise)
@@ -90,6 +91,10 @@ function QuestController.SetUpDirectorBeam(self: QuestController)
 						beam.Attachment0 = a0
 						beam.Attachment1 = a1
 						beam.Parent = root
+
+						trove:Add(BattleController.InBattle:Observe(function(inBattle)
+							beam.Enabled = not inBattle
+						end))
 					end)
 
 				return function()

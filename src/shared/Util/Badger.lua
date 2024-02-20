@@ -20,6 +20,7 @@ export type Condition = {
 	withState: (Condition, (Condition) -> any) -> Condition,
 	named: (Condition, string) -> Condition,
 	targeting: (Condition, (Condition) -> any) -> Condition,
+	whenCompleted: (Condition, (Condition) -> ()) -> Condition,
 
 	without: (Condition, Condition) -> Condition,
 }
@@ -92,6 +93,10 @@ Badger.condition = {
 
 		without = function(self, prerequisite)
 			return Badger.without(self, prerequisite)
+		end,
+
+		whenCompleted = function(self, callback)
+			return Badger.onCompleted(self, callback)
 		end,
 	},
 }
