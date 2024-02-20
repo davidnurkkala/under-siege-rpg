@@ -122,7 +122,7 @@ return function()
 		Currencies = React.createElement(
 			React.Fragment,
 			nil,
-			Sift.Dictionary.map({ "Coins", "Gems" }, function(id, index)
+			Sift.Dictionary.map({ "Glory", "Coins", "Gems" }, function(id, index)
 				return React.createElement(currencyPanel, {
 					Id = id,
 					Amount = currency[id] or 0,

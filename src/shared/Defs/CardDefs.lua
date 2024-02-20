@@ -341,6 +341,8 @@ local Cards = {
 
 return Sift.Dictionary.map(Cards, function(card, id)
 	if card.Type == "Goon" then
+		assert(id == card.GoonId, `Any goon card must have the same id as its goon id`)
+
 		assert(GoonDefs[card.GoonId], `{id} has bad goon id`)
 		card.Name = GoonDefs[card.GoonId].Name
 	end

@@ -16,9 +16,30 @@ export type Currency = {
 
 local Currencies = {
 	-- SPECIAL
+	Glory = {
+		Name = "Glory",
+		Image = "rbxassetid://16443794112",
+		Description = "ERROR, YOU SHOULD NOT SEE THIS",
+		Colors = {
+			Primary = ColorDefs.Blue,
+			Secondary = ColorDefs.DarkBlue,
+		},
+		NotShownInInventory = true,
+	},
+	Prestige = {
+		-- also known as lifetime glory
+		Name = "Prestige",
+		Image = "rbxassetid://16443794112",
+		Description = "ERROR, YOU SHOULD NOT SEE THIS",
+		Colors = {
+			Primary = ColorDefs.Blue,
+			Secondary = ColorDefs.DarkBlue,
+		},
+		NotShownInInventory = true,
+	},
 	Coins = {
 		Name = "Coins",
-		Image = "rbxassetid://15243978848",
+		Image = "rbxassetid://16443794417",
 		Descripion = "ERROR, YOU SHOULD NOT SEE THIS",
 		Colors = {
 			Primary = ColorDefs.LightYellow,
@@ -28,7 +49,7 @@ local Currencies = {
 	},
 	Gems = {
 		Name = "Gems",
-		Image = "rbxassetid://15243979110",
+		Image = "rbxassetid://16443794312",
 		Descripion = "ERROR, YOU SHOULD NOT SEE THIS",
 		Colors = {
 			Primary = ColorDefs.LightPurple,

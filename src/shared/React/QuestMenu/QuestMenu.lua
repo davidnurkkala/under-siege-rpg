@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local BattleController = require(ReplicatedStorage.Shared.Controllers.BattleController)
@@ -9,7 +10,9 @@ local Label = require(ReplicatedStorage.Shared.React.Common.Label)
 local LayoutContainer = require(ReplicatedStorage.Shared.React.Common.LayoutContainer)
 local ListLayout = require(ReplicatedStorage.Shared.React.Common.ListLayout)
 local MenuContext = require(ReplicatedStorage.Shared.React.MenuContext.MenuContext)
+local Observers = require(ReplicatedStorage.Packages.Observers)
 local Panel = require(ReplicatedStorage.Shared.React.Common.Panel)
+local Promise = require(ReplicatedStorage.Packages.Promise)
 local QuestController = require(ReplicatedStorage.Shared.Controllers.QuestController)
 local RatioText = require(ReplicatedStorage.Shared.React.Common.RatioText)
 local React = require(ReplicatedStorage.Packages.React)
@@ -28,29 +31,31 @@ local function questTracker(props: {
 	if inBattle then return end
 	if not props.Quest then return end
 
-	return React.createElement(Container, {
-		Size = UDim2.fromScale(0.2, 1),
-		AnchorPoint = Vector2.new(1, 1),
-		Position = UDim2.fromScale(1, 1),
-	}, {
-		Layout = React.createElement(ListLayout, {
-			Padding = UDim.new(0, 4),
-			VerticalAlignment = Enum.VerticalAlignment.Bottom,
-		}),
+	return React.createElement(React.Fragment, nil, {
+		QuestTracker = React.createElement(Container, {
+			Size = UDim2.fromScale(0.2, 1),
+			AnchorPoint = Vector2.new(1, 1),
+			Position = UDim2.fromScale(1, 1),
+		}, {
+			Layout = React.createElement(ListLayout, {
+				Padding = UDim.new(0, 4),
+				VerticalAlignment = Enum.VerticalAlignment.Bottom,
+			}),
 
-		Title = React.createElement(RatioText, {
-			LayoutOrder = 1,
-			Ratio = 1 / 6,
-			Text = TextStroke("Quest"),
-			TextXAlignment = Enum.TextXAlignment.Left,
-		}),
+			Title = React.createElement(RatioText, {
+				LayoutOrder = 1,
+				Ratio = 1 / 6,
+				Text = TextStroke("Quest"),
+				TextXAlignment = Enum.TextXAlignment.Left,
+			}),
 
-		Description = React.createElement(RatioText, {
-			LayoutOrder = 2,
-			Ratio = 1 / 8,
-			Text = if props.Quest == "Complete" then TextStroke("Quest complete!") else TextStroke(props.Quest.Description),
-			TextXAlignment = Enum.TextXAlignment.Left,
-			TextYAlignment = Enum.TextYAlignment.Bottom,
+			Description = React.createElement(RatioText, {
+				LayoutOrder = 2,
+				Ratio = 1 / 8,
+				Text = if props.Quest == "Complete" then TextStroke("Quest complete!") else TextStroke(props.Quest.Description),
+				TextXAlignment = Enum.TextXAlignment.Left,
+				TextYAlignment = Enum.TextYAlignment.Bottom,
+			}),
 		}),
 	})
 end

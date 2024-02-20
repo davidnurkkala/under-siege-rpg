@@ -80,28 +80,33 @@ function CurrencyService.GetBoosted(_self: CurrencyService, player: Player, curr
 	end)
 end
 
-function CurrencyService.AddCurrency(_self: CurrencyService, player: Player, currencyType: string, amount: number)
+function CurrencyService.AddCurrency(self: CurrencyService, player: Player, currencyType: string, amount: number)
 	assert(Sift.Dictionary.has(CurrencyDefs, currencyType), `Invalid currency type {currencyType}`)
 
-	return DataService:GetSaveFile(player):andThen(function(saveFile)
-		saveFile:Update("Currency", function(currency)
-			return Sift.Dictionary.update(currency, currencyType, function(current)
-				return current + amount
-			end, function()
-				return amount
+	return DataService:GetSaveFile(player)
+		:andThen(function(saveFile)
+			saveFile:Update("Currency", function(currency)
+				return Sift.Dictionary.update(currency, currencyType, function(current)
+					return current + amount
+				end, function()
+					return amount
+				end)
 			end)
+
+			EventStream.Event({
+				Kind = "CurrencyAdded",
+				Player = player,
+				CurrencyType = currencyType,
+				Amount = amount,
+			})
+
+			return amount
 		end)
+		:andThen(function()
+			if currencyType == "Glory" then return self:AddCurrency(player, "Prestige", amount) end
 
-		EventStream.Event({
-
-			Kind = "CurrencyAdded",
-			Player = player,
-			CurrencyType = currencyType,
-			Amount = amount,
-		})
-
-		return amount
-	end)
+			return
+		end)
 end
 
 function CurrencyService.HasCurrency(self: CurrencyService, player: Player, currencyType: string, amount: number)

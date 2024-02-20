@@ -15,6 +15,7 @@ local Damage = require(ServerScriptService.Server.Classes.Damage)
 local EffectPart = require(ReplicatedStorage.Shared.Util.EffectPart)
 local EventStream = require(ReplicatedStorage.Shared.Util.EventStream)
 local Goon = require(ServerScriptService.Server.Classes.Goon)
+local GoonDefs = require(ReplicatedStorage.Shared.Defs.GoonDefs)
 local GuiEffectService = require(ServerScriptService.Server.Services.GuiEffectService)
 local MusicService = require(ServerScriptService.Server.Services.MusicService)
 local PartPath = require(ReplicatedStorage.Shared.Classes.PartPath)
@@ -245,6 +246,23 @@ function Battle.fromPlayerVersusBattler(player: Player, battlerId: string, playe
 
 				local def = BattlerDefs[battlerId]
 				local rewards = RewardHelper.ProcessChanceTable(player, def.Rewards)
+
+				local points = math.ceil(Sift.Array.reduce(
+					Sift.Dictionary.values(Sift.Dictionary.map(def.Deck, function(level, goonId)
+						local cardDef = CardDefs[goonId]
+						local rankValue = 1 + cardDef.Rank
+						return rankValue * level
+					end)),
+					function(acc, value)
+						return acc + value
+					end
+				))
+
+				rewards = Sift.Array.prepend(rewards, {
+					Type = "Currency",
+					CurrencyType = "Glory",
+					Amount = points * 10,
+				})
 
 				Promise.all(Sift.Array.map(rewards, function(reward)
 					return RewardHelper.GiveReward(player, reward)

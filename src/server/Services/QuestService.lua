@@ -75,6 +75,7 @@ function QuestService.PrepareBlocking(self: QuestService)
 									Name = questDef.Name,
 									Summary = questDef.Summary,
 									Description = processed:getDescription(),
+									State = processed:getState(),
 								})
 							end)
 						end
