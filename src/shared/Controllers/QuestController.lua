@@ -19,20 +19,24 @@ function QuestController.PrepareBlocking(self: QuestController)
 	self.TrackedIdRemote = self.Comm:GetProperty("TrackedId")
 	self.TrackId = self.Comm:GetFunction("TrackId")
 
-	local questsProperty = Property.new(nil, Sift.Dictionary.equalsDeep)
+	self.Quests = Property.new(nil, Sift.Dictionary.equalsDeep)
 	self:ObserveQuests(function(value)
-		questsProperty:Set(value)
+		self.Quests:Set(value)
 	end)
 
-	local trackedIdProperty = Property.new(nil)
+	self.TrackedId = Property.new(nil)
 	self:ObserveTrackedId(function(value)
-		trackedIdProperty:Set(value)
+		self.TrackedId:Set(value)
 	end)
 
-	questsProperty:Observe(function(quests)
+	self:SetUpDirectorBeam()
+end
+
+function QuestController.SetUpDirectorBeam(self: QuestController)
+	self.Quests:Observe(function(quests)
 		if quests == nil then return end
 
-		return trackedIdProperty:Observe(function(trackedId)
+		return self.TrackedId:Observe(function(trackedId)
 			if trackedId == nil then return end
 
 			local quest = quests[trackedId]
@@ -81,10 +85,15 @@ function QuestController.PrepareBlocking(self: QuestController)
 							a1.Parent = workspace.Terrain
 							a1.WorldCFrame = target
 						end
+
+						local beam = trove:Clone(ReplicatedStorage.Assets.Beams.DirectorBeam)
+						beam.Attachment0 = a0
+						beam.Attachment1 = a1
+						beam.Parent = root
 					end)
 
 				return function()
-					trove:clean()
+					trove:Clean()
 				end
 			end)
 		end)

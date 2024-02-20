@@ -208,8 +208,6 @@ return function()
 					Sift.Array.map(
 						Sift.Array.sort(Sift.Dictionary.keys(quests), function(idA, idB)
 							local a, b = quests[idA], quests[idB]
-							print(idA, a)
-							print(idB, b)
 							return a.Name < b.Name
 						end),
 						function(id, index)
