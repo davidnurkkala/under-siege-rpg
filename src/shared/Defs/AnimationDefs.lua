@@ -33,6 +33,7 @@ local Ids = {
 	StandGuardIdle = 16268909381,
 	PickaxeSwingIdle = 15920213980,
 	PickaxeSwingIdleSlow = 15920832797,
+	TraineeIdle = 16456275860,
 	AxeSwing = 16334113579,
 	DragonFly = 16232895326,
 	DragonIdle = 16232829190,
