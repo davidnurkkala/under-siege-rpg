@@ -29,6 +29,10 @@ function ActionController.PrepareBlocking(self: ActionController)
 		if input.KeyCode == Enum.KeyCode.ButtonR2 then self:SetActionActive("Primary", false) end
 	end)
 
+	UserInputService.TouchTapInWorld:Connect(function()
+		self:SetActionActive("Primary", true)
+	end)
+
 	UserInputService.TouchEnded:Connect(function()
 		self:SetActionActive("Primary", false)
 	end)
