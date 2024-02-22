@@ -157,6 +157,10 @@ local Shops = {
 				Reward = { Type = "Currency", CurrencyType = "Charcoal", Amount = 3 },
 				Price = { SimpleMaterials = 5, Coins = 50 },
 			},
+			{
+				Reward = { Type = "Currency", CurrencyType = "Charcoal", Amount = 6 },
+				Price = { StandardMaterials = 5, Coins = 50 },
+			},
 		},
 	},
 }

@@ -351,6 +351,18 @@ return Sift.Dictionary.map(Cards, function(card, id)
 		card.Name = AbilityHelper.GetAbility(card.AbilityId).Name
 	end
 
+	if card.Upgrades then
+		card.Upgrades = Sift.Array.map(card.Upgrades, function(price, index)
+			local levelPoints = index + 1
+			local rankPoints = card.Rank + 1
+
+			local baseValue = rankPoints * 100
+			local upgradeValue = rankPoints * 50 * levelPoints
+
+			return Sift.Dictionary.set(price, "Glory", baseValue + upgradeValue)
+		end)
+	end
+
 	if card.CostTime then
 		card.Cost = card.CostTime * Configuration.SuppliesGain
 		card.CostTime = nil

@@ -87,6 +87,24 @@ local Currencies = {
 			Secondary = ColorDefs.White,
 		},
 	},
+	QualityFood = {
+		Name = "Quality Food",
+		Image = "rbxassetid://16468559956",
+		Description = "Food that anyone would eat without complaint. A necessity for professional soldiers.",
+		Colors = {
+			Primary = ColorDefs.PaleGreen,
+			Secondary = ColorDefs.PaleGreen,
+		},
+	},
+	StandardMaterials = {
+		Name = "Standard Materials",
+		Image = "rbxassetid://16468559799",
+		Description = "Standard materials featuring hardwood, leather, and high quality cloth. Necessary for creating and maintaining standard equipment for an army.",
+		Colors = {
+			Primary = ColorDefs.PaleGreen,
+			Secondary = ColorDefs.PaleGreen,
+		},
+	},
 	CommonOre = {
 		Name = "Common Ore",
 		Image = "rbxassetid://16113724382",
@@ -110,8 +128,8 @@ local Currencies = {
 		Image = "rbxassetid://16260087125",
 		Description = "A hardy, high-quality metal favored by humans.",
 		Colors = {
-			Primary = ColorDefs.White,
-			Secondary = ColorDefs.White,
+			Primary = ColorDefs.LightBlue,
+			Secondary = ColorDefs.LightBlue,
 		},
 	},
 	Coal = {
