@@ -74,13 +74,20 @@ local Shops = {
 		Products = {
 			{
 				Reward = { Type = "Currency", CurrencyType = "SimpleFood", Amount = 5 },
-				Price = { Coins = 25 },
+				Price = { Coins = 50 },
 			},
 			{
 				Reward = { Type = "Currency", CurrencyType = "SimpleMaterials", Amount = 5 },
-				Price = { Coins = 50 },
+				Price = { Coins = 100 },
 			},
-
+			{
+				Reward = { Type = "Currency", CurrencyType = "QualityFood", Amount = 5 },
+				Price = { Coins = 250 },
+			},
+			{
+				Reward = { Type = "Currency", CurrencyType = "StandardMaterials", Amount = 5 },
+				Price = { Coins = 500 },
+			},
 			{
 				Reward = { Type = "Weapon", WeaponId = "HuntersBow" },
 				Price = { Coins = 1000 },
